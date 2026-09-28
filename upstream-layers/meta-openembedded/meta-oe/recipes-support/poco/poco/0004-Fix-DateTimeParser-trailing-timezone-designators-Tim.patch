@@ -1,0 +1,240 @@
+From a767d36fed678e874536e33731be6dbcc5fdc5d0 Mon Sep 17 00:00:00 2001
+From: kozemcak <akozemcak@gmail.com>
+Date: Tue, 12 May 2026 16:13:12 +0200
+Subject: [PATCH] Fix: DateTimeParser trailing timezone designators & Timezone
+ UTC offset cache invalidation (#5318)
+
+* fix(Foundation): Timezone: invalidate utcOffset cache when /etc/localtime changes
+
+Poco commit 1850dc16aabf5980a490bb1b66086d6695abb823 introduced a
+TZInfo cache for the UTC offset to avoid repeated tzset() syscalls.
+The cache is invalidated only when the TZ environment variable changes.
+However, the TZ variable is process-local: if a different process (e.g.
+a timezone configuration daemon or an init script) changes the system
+timezone by updating /etc/localtime, the running process is not notified
+and its TZ environment variable remains unchanged.
+
+On systems that switch timezone by updating /etc/localtime (a symlink)
+without touching the TZ env var, the cache is therefore never invalidated
+and Timezone::utcOffset() returns the stale value computed at startup.
+
+Fix by extending cacheTZ()/tzChanged() to also track the inode and
+mtime of /etc/localtime via stat(2).  When either changes the cache is
+considered stale and reloaded, preserving the performance benefit for
+the common case where neither TZ nor /etc/localtime changes between
+calls.
+
+Signed-off-by: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+
+* fix(Foundation): DateTimeParser: %S consume optional fractional seconds
+
+Parsing ISO 8601 date strings that contain both fractional seconds and a
+timezone offset (e.g. "2013-10-07T08:23:19.120-04:00") with the format
+"%Y-%m-%dT%H:%M:%S%z" raises a SyntaxException:
+
+  - %S consumes the integer seconds but stops at '.', leaving
+    ".120-04:00" unconsumed.
+  - %z (parseTZD) is called next but sees '.' and returns without
+    consuming anything.
+  - The trailing-garbage check then raises SyntaxException.
+
+Extend the %S case to consume and discard an optional fractional-second
+suffix ('.' or ',' followed by one or more digits) immediately after
+parsing the integer seconds.  This mirrors the existing %s behaviour and
+allows %z to see the timezone designator directly, keeping the
+trailing-garbage check fully effective for truly invalid input.
+
+Fix suggested by matejk.
+
+Signed-off-by: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+
+* test(DateTimeParserTest): add ISO8601 fractional seconds parser test
+
+Add testISO8601FracSeconds to verify that DateTimeParser correctly
+handles fractional-second suffixes (dot and comma separated) in
+ISO8601_FORMAT strings, and rejects malformed input such as a
+bare decimal point with no digits.
+
+---------
+
+Upstream-Status: Backport [1.15.3, https://github.com/pocoproject/poco/commit/b8d2b50774b25a470c5a30fc91bae7cd47c251fa]
+
+Signed-off-by: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+Co-authored-by: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+---
+ Foundation/include/Poco/DateTimeParser.h      |  6 ++++
+ Foundation/src/DateTimeParser.cpp             | 12 +++++++
+ Foundation/src/Timezone_UNIX.cpp              | 36 ++++++++++++++++++-
+ .../testsuite/src/DateTimeParserTest.cpp      | 32 +++++++++++++++++
+ Foundation/testsuite/src/DateTimeParserTest.h |  1 +
+ 5 files changed, 86 insertions(+), 1 deletion(-)
+
+diff --git a/Foundation/include/Poco/DateTimeParser.h b/Foundation/include/Poco/DateTimeParser.h
+index 2d1882d83..e82a934c9 100644
+--- a/Foundation/include/Poco/DateTimeParser.h
++++ b/Foundation/include/Poco/DateTimeParser.h
+@@ -63,6 +63,12 @@ public:
+ 		/// Throws a SyntaxException if the string cannot be successfully parsed.
+ 		/// Please see DateTimeFormatter::format() for a description of the format string.
+ 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
++		///
++		/// Note: The %S specifier parses whole seconds and then silently discards any
++		/// fractional-second suffix of the form '.DDD' or ',DDD' (including a bare decimal
++		/// point that is immediately followed by a non-digit is treated as a parse error).
++		/// Callers that need the fractional digits captured must use %s (millis+micros),
++		/// %i (milliseconds only), %c (centiseconds), or %F (six-digit fractional seconds).
+ 
+ 	static DateTime parse(const std::string& fmt, const std::string& str, int& timeZoneDifferential);
+ 		/// Parses a date and time in the given format from the given string.
+diff --git a/Foundation/src/DateTimeParser.cpp b/Foundation/src/DateTimeParser.cpp
+index 08b3494ac..c2fe3dfaa 100644
+--- a/Foundation/src/DateTimeParser.cpp
++++ b/Foundation/src/DateTimeParser.cpp
+@@ -243,6 +243,18 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
+ 				case 'S':
+ 					it = skipNonDigits(it, end);
+ 					second = parseNumberN(dtStr, it, end, 2);
++					// Consume optional fractional seconds ('.NNN' or ',NNN') so that a
++					// subsequent %z specifier can reach the timezone designator.
++					// A decimal point/comma not followed by a digit is an error.
++					if (it != end && (*it == '.' || *it == ','))
++					{
++						++it;
++						if (it == end || !Ascii::isDigit(*it))
++						{
++							throw SyntaxException("Invalid DateTimeString: " + dtStr + ", missing fractional digits");
++						}
++						it = skipDigits(it, end);
++					}
+ 					break;
+ 				case 's':
+ 					it = skipNonDigits(it, end);
+diff --git a/Foundation/src/Timezone_UNIX.cpp b/Foundation/src/Timezone_UNIX.cpp
+index d1489e72f..3e0d29838 100644
+--- a/Foundation/src/Timezone_UNIX.cpp
++++ b/Foundation/src/Timezone_UNIX.cpp
+@@ -18,6 +18,7 @@
+ #include <ctime>
+ #include <cstdlib>
+ #include <string>
++#include <sys/stat.h>
+ 
+ 
+ namespace Poco {
+@@ -66,13 +67,44 @@ private:
+ 	{
+ 		const char* tz = std::getenv("TZ");
+ 		_cachedTZ = tz ? tz : "";
++		// /etc/localtime is the system-wide zone source (updated by timedatectl etc.).
++		// Stat'ing it lets us detect zone changes that don't touch the TZ env var; we
++		// don't read its contents — tzset()/libc still resolves the actual zone data.
++		cacheLocaltimeStat();
+ 	}
+ 
+ 	bool tzChanged() const
+ 	{
+ 		const char* tz = std::getenv("TZ");
+ 		std::string currentTZ = tz ? tz : "";
+-		return currentTZ != _cachedTZ;
++		if (currentTZ != _cachedTZ) return true;
++		return localtimeStatChanged();
++	}
++
++	void cacheLocaltimeStat()
++	{
++		struct stat st{};
++		if (::stat("/etc/localtime", &st) == 0)
++		{
++			_localtimeIno = st.st_ino;
++			_localtimeMtime = st.st_mtime;
++		}
++		else
++		{
++			_localtimeIno = 0;
++			_localtimeMtime = 0;
++		}
++	}
++
++	bool localtimeStatChanged() const
++	{
++		struct stat st{};
++		if (::stat("/etc/localtime", &st) == 0)
++		{
++			return st.st_ino != _localtimeIno || st.st_mtime != _localtimeMtime;
++		}
++		// /etc/localtime not accessible: treat as changed only if we had it before
++		return _localtimeIno != 0;
+ 	}
+ 
+ 	static int computeTimeZone()
+@@ -112,6 +144,8 @@ private:
+ 	std::mutex _mutex;
+ 	int _tzOffset;
+ 	std::string _cachedTZ;
++	ino_t _localtimeIno = 0;
++	time_t _localtimeMtime = 0;
+ };
+ 
+ 
+diff --git a/Foundation/testsuite/src/DateTimeParserTest.cpp b/Foundation/testsuite/src/DateTimeParserTest.cpp
+index 246a0d531..0742e1e02 100644
+--- a/Foundation/testsuite/src/DateTimeParserTest.cpp
++++ b/Foundation/testsuite/src/DateTimeParserTest.cpp
+@@ -638,6 +638,37 @@ void DateTimeParserTest::testCustom()
+ }
+ 
+ 
++void DateTimeParserTest::testISO8601FracSeconds()
++{
++	// ISO8601_FORMAT uses %S which silently discards a well-formed fractional-second
++	// suffix so that the trailing %z can still reach the timezone designator.
++	int tzd;
++
++	// Dot-separated fractional seconds with negative timezone offset
++	DateTime dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.120-04:00", tzd);
++	assertTrue (dt.year()   == 2013);
++	assertTrue (dt.month()  == 10);
++	assertTrue (dt.day()    == 7);
++	assertTrue (dt.hour()   == 8);
++	assertTrue (dt.minute() == 23);
++	assertTrue (dt.second() == 19);
++	assertTrue (tzd == -4*3600);
++
++	// Comma-separated fractional seconds (ISO 8601 allows ',' as the decimal sign)
++	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19,120-04:00", tzd);
++	assertTrue (dt.year()   == 2013);
++	assertTrue (dt.month()  == 10);
++	assertTrue (dt.day()    == 7);
++	assertTrue (dt.hour()   == 8);
++	assertTrue (dt.minute() == 23);
++	assertTrue (dt.second() == 19);
++	assertTrue (tzd == -4*3600);
++
++	// A bare decimal point not followed by any digit must be rejected
++	testBad(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.-04:00", tzd);
++}
++
++
+ void DateTimeParserTest::testGuess()
+ {
+ 	int tzd;
+@@ -917,6 +948,7 @@ CppUnit::Test* DateTimeParserTest::suite()
+ 	CppUnit_addTest(pSuite, DateTimeParserTest, testASCTIME);
+ 	CppUnit_addTest(pSuite, DateTimeParserTest, testSORTABLE);
+ 	CppUnit_addTest(pSuite, DateTimeParserTest, testCustom);
++	CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601FracSeconds);
+ 	CppUnit_addTest(pSuite, DateTimeParserTest, testGuess);
+ 	CppUnit_addTest(pSuite, DateTimeParserTest, testCleanup);
+ 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseMonth);
+diff --git a/Foundation/testsuite/src/DateTimeParserTest.h b/Foundation/testsuite/src/DateTimeParserTest.h
+index f25416971..07f0b6924 100644
+--- a/Foundation/testsuite/src/DateTimeParserTest.h
++++ b/Foundation/testsuite/src/DateTimeParserTest.h
+@@ -34,6 +34,7 @@ public:
+ 	void testASCTIME();
+ 	void testSORTABLE();
+ 	void testCustom();
++	void testISO8601FracSeconds();
+ 	void testGuess();
+ 	void testCleanup();
+ 	void testParseMonth();

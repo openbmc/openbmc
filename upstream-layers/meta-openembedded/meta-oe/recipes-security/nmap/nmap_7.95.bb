@@ -12,6 +12,7 @@ SRC_URI = "http://nmap.org/dist/${BP}.tar.bz2 \
            file://0002-Fix-building-with-libc.patch \
            file://0003-Fix-off-by-one-overflow-in-the-IP-protocol-table.patch \
            file://0001-fix-racing-between-build-ncat-and-build-lua.patch \
+           file://CVE-2026-58058.patch \
            "
 SRC_URI[sha256sum] = "e14ab530e47b5afd88f1c8a2bac7f89cd8fe6b478e22d255c5b9bddb7a1c5778" 
 

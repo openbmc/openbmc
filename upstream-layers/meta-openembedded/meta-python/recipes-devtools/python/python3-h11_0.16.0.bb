@@ -7,4 +7,8 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1"
 
+CVE_PRODUCT = "python-hyper:h11"
+
 RDEPENDS:${PN} += "python3-profile"
+
+CVE_STATUS[CVE-2025-43859] = "fixed-version: fixed in v0.16.0"

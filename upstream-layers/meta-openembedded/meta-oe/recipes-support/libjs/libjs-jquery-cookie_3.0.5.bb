@@ -3,7 +3,9 @@ HOMEPAGE = "https://github.com/js-cookie/js-cookie"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e16cf0e247d84f8999bf55865a9c98cf"
 
-SRC_URI = "git://github.com/js-cookie/js-cookie.git;protocol=https;branch=main"
+SRC_URI = "git://github.com/js-cookie/js-cookie.git;protocol=https;branch=main \
+           file://CVE-2026-46625.patch \
+"
 
 SRCREV = "ab3f67fc4fad88cdf07b258c08e4164e06bf7506"
 

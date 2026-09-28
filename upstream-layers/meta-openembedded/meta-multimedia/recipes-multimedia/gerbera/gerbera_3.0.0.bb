@@ -27,3 +27,5 @@ PACKAGECONFIG[magic] = "-DWITH_MAGIC=TRUE,-DWITH_MAGIC=FALSE,file"
 PACKAGECONFIG[js] = "-DWITH_JS=TRUE,-DWITH_JS=FALSE,duktape"
 
 SECURITY_CFLAGS:riscv64 = "${SECURITY_NOPIE_CFLAGS}"
+
+CVE_STATUS[CVE-2025-23386] = "not-applicable-platform: The vulnerability is openSUSE specific"

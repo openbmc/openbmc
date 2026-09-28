@@ -13,7 +13,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://COPYING.pstdout;md5=d32239bcb673463ab874e80d47fae504 \
                     file://COPYING.sunbmc;md5=c03f21cd76ff5caba6b890d1213cbfbb"
 
-SRC_URI = "${GNU_MIRROR}/freeipmi/freeipmi-${PV}.tar.gz"
+SRC_URI = "${GNU_MIRROR}/freeipmi/freeipmi-${PV}.tar.gz \
+           file://CVE-2026-50031-1.patch \
+           file://CVE-2026-50031-2.patch \
+"
 SRC_URI[sha256sum] = "16783d10faa28847a795cce0bf86deeaa72b8fbe71d1f0dc1101d13a6b501ec1"
 
 DEPENDS = "libgcrypt"

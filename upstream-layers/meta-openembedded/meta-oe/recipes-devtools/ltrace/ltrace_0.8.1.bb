@@ -27,6 +27,7 @@ SRC_URI = "git://gitlab.com/cespedes/ltrace.git;protocol=https;branch=main;tag=$
            file://0001-proc-Make-PROC_PID_FILE-not-use-variable-length-arra.patch \
            file://0001-dwarf_prototypes-return-NULL-from-NEXT_SIBLING-on-er.patch \
            file://0001-trace-fix-1-bit-bitfield-assignments-for-clang-Wsing.patch \
+           file://0001-lens_default-fix-PRIb64-length-modifier-on-musl.patch \
            "
 SRC_URI:append:libc-musl = " file://add_ppc64le.patch"
 

@@ -25,6 +25,8 @@ SRC_URI = "https://www.rsyslog.com/files/download/rsyslog/${BPN}-${PV}.tar.gz \
            file://run-ptest \
            file://0001-tests-disable-the-check-for-inotify.patch \
            file://0001-tests-tcpflood.c-Pass-correct-parameter-type-to-send.patch \
+           file://CVE-2026-19654.patch \
+           file://CVE-2026-19654-regression.patch \
 "
 
 SRC_URI:append:libc-musl = " \

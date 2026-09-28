@@ -9,7 +9,10 @@ DEPENDS = "binutils-native elfutils-native"
 
 inherit native bash-completion
 
-SRC_URI = "${KERNELORG_MIRROR}/linux/kernel/v6.x/linux-${PV}.tar.xz"
+SRC_URI = "\
+    ${KERNELORG_MIRROR}/linux/kernel/v6.x/linux-${PV}.tar.xz \
+    file://0001-libbpf-Fix-Wdiscarded-qualifiers-under-C23.patch \
+"
 SRC_URI[sha256sum] = "1a4be2fe6b5246aa4ac8987a8a4af34c42a8dd7d08b46ab48516bcc1befbcd83"
 
 S = "${UNPACKDIR}/linux-${PV}"

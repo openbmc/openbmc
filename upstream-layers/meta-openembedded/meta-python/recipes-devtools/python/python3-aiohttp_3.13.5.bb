@@ -6,6 +6,19 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=748073912af33aa59430d3702aa32d41"
 
 SRC_URI[sha256sum] = "9d98cc980ecc96be6eb4c1994ce35d28d8b1f5e5208a23b421187d1209dbb7d1"
 
+SRC_URI += " \
+    file://CVE-2026-34993.patch \
+    file://CVE-2026-47265.patch \
+    file://CVE-2026-50269.patch \
+    file://CVE-2026-54274.patch \
+    file://CVE-2026-54275.patch \
+    file://CVE-2026-54276.patch \
+    file://CVE-2026-54277.patch \
+    file://CVE-2026-54278.patch \
+    file://CVE-2026-54279.patch \
+    file://CVE-2026-54280.patch \
+"
+
 CVE_PRODUCT = "aiohttp"
 CVE_STATUS_GROUPS = "CVE_AIOHTTP_FIX_3_13_4"
 CVE_AIOHTTP_FIX_3_13_4[status] = "fixed-version: fixed in 3.13.4"

@@ -20,6 +20,8 @@ SRC_URI = "http://v6web.litech.org/radvd/dist/radvd-${PV}.tar.gz \
            file://volatiles.03_radvd \
            file://radvd.default \
            file://radvd.conf \
+           file://CVE-2026-48715_dep.patch \
+           file://CVE-2026-48715.patch \
            "
 SRC_URI[sha256sum] = "af37c5a81d59f3bdc00d83056606ffa1810d4550beed6caa4f81181246494220"
 

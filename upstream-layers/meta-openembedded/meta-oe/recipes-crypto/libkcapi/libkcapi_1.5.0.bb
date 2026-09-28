@@ -5,6 +5,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=3d8a091d797491204567185a6efce70f"
 
 SRCREV = "fc937358e71253a6efaa3ba74885364976b040ea"
 SRC_URI = "git://github.com/smuellerDD/libkcapi.git;branch=master;protocol=https \
+           file://CVE-2026-71226-1.patch \
+           file://CVE-2026-71226-2.patch \
+           file://CVE-2026-71226-3.patch \
+           file://CVE-2026-71227.patch \
+           file://CVE-2026-71225.patch \
           "
 
 inherit autotools

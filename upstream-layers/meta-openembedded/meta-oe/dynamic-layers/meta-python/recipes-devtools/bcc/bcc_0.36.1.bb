@@ -95,3 +95,5 @@ COMPATIBLE_HOST = "(x86_64.*|aarch64.*|powerpc64.*|riscv64.*)-linux"
 # path from the test binary
 WARN_QA:append = "${@bb.utils.contains('PTEST_ENABLED', '1', ' buildpaths', '', d)}"
 ERROR_QA:remove = "${@bb.utils.contains('PTEST_ENABLED', '1', 'buildpaths', '', d)}"
+
+CVE_STATUS[CVE-2024-2314] = "fixed-version: fixed in 0.36.1"

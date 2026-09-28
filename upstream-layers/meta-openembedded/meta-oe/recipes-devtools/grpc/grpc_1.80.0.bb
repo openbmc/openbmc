@@ -66,3 +66,6 @@ FILES:${PN}-compiler += " \
     ${bindir} \
     ${libdir}/libgrpc_plugin_support${SOLIBS} \
     "
+
+CVE_STATUS[CVE-2023-33953] = "fixed-version: Fixed since 1.56.2"
+CVE_STATUS[CVE-2024-37168] = "cpe-incorrect: This CVE is for grps-js"

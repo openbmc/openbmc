@@ -17,6 +17,7 @@ SRCREV = "3455302847cf1e4671f1d8f5fa953fd46a7b1404"
 SRC_URI = "git://github.com/open-source-parsers/jsoncpp;branch=master;protocol=https;tag=${PV} \
            file://0001-Fix-C-11-ABI-breakage-when-compiled-with-C-17-1668-1.patch \
            file://run-ptest \
+           file://0001-fix-GCC-16-C-20-build-failure-with-u8-string-literal.patch \
            "
 
 inherit cmake ptest

@@ -69,3 +69,5 @@ RPROVIDES:${PN} += "lib7z.so()(64bit) 7z lib7z.so p7zip"
 RPROVIDES:${PN}-dev += "lib7z.so()(64bit) 7z lib7z.so"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2026-58052] = "not-applicable-platform: Issue only applies on Windows"

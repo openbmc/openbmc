@@ -1,0 +1,45 @@
+From e30056b76ecfbe94acfa462cbfda5e4e6e0c25ad Mon Sep 17 00:00:00 2001
+From: Nicolas PARLANT <nicolas.parlant@parhuet.fr>
+Date: Tue, 17 Mar 2026 20:29:19 +0100
+Subject: [PATCH] upnp: allow 1.14.30
+
+ABIbreak in 1.14.26 has been reverted w/ 1.14.30, reapplied in 1.18.X
+align with upstream versions and make easier packaging.
+
+Signed-off-by: Nicolas PARLANT <nicolas.parlant@parhuet.fr>
+(cherry picked from commit b54634fb99c9703a05334ed8920955d3c875e6e2)
+
+Upstream-Status: Backport [https://github.com/MusicPlayerDaemon/MPD/commit/b54634fb99c9703a05334ed8920955d3c875e6e2]
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ src/lib/upnp/meson.build | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/upnp/meson.build b/src/lib/upnp/meson.build
+index 9c2c7bac1..fa4886a11 100644
+--- a/src/lib/upnp/meson.build
++++ b/src/lib/upnp/meson.build
+@@ -13,7 +13,10 @@ endif
+ if upnp_option == 'auto'
+   upnp_dep = dependency('libupnp', version: '>= 1.8', required: false)
+ 
+-  if upnp_dep.found() and upnp_dep.version().version_compare('>= 1.14.26')
++  if upnp_dep.found() and (
++    ( upnp_dep.version().version_compare('>= 1.14.26') and upnp_dep.version().version_compare('< 1.14.30') )
++    or upnp_dep.version().version_compare('>= 1.18.0')
++  )
+     warning('Your libupnp version is known to be broken, see https://github.com/pupnp/pupnp/issues/528 - disabling')
+     upnp_dep = dependency('', required: false)
+   endif
+@@ -25,7 +28,10 @@ if upnp_option == 'auto'
+ elif upnp_option == 'pupnp'
+   upnp_dep = dependency('libupnp', version: '>= 1.8', required: true)
+ 
+-  if upnp_dep.found() and upnp_dep.version().version_compare('>= 1.14.26')
++  if upnp_dep.found() and (
++    ( upnp_dep.version().version_compare('>= 1.14.26') and upnp_dep.version().version_compare('< 1.14.30') )
++    or upnp_dep.version().version_compare('>= 1.18.0')
++  )
+     error('Your libupnp version is known to be broken, see https://github.com/pupnp/pupnp/issues/528')
+   endif
+ 

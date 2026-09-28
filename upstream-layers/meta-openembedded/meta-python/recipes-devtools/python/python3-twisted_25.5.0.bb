@@ -6,6 +6,14 @@ HOMEPAGE = "https://twisted.org"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5316a448a61a38d722c291f78d915d11"
 
+SRC_URI += "file://CVE-2026-42304_p1.patch \
+           file://CVE-2026-42304_p2.patch \
+           file://CVE-2026-42304_p3.patch \
+           file://CVE-2026-42304_p4.patch \
+           file://CVE-2026-42304_p5.patch \
+           file://CVE-2026-42304_p6.patch \
+           "
+
 SRC_URI[sha256sum] = "1deb272358cb6be1e3e8fc6f9c8b36f78eb0fa7c2233d2dbe11ec6fee04ea316"
 
 CVE_PRODUCT = "twisted"

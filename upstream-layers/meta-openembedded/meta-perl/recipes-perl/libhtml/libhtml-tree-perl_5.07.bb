@@ -25,13 +25,6 @@ export PERL_USE_UNSAFE_INC = "1"
 DEPENDS += "libmodule-build-perl-native \
 "
 
-do_install:append() {
-  sed -i \
-    -e 's|${TMPDIR}||g' \
-    `find ${D}/usr/share/doc/perl/html/site/lib/HTML/ -type f` \
-    `find ${D}/usr/lib/perl5 -type f -name .packlist`
-}
-
 RPROVIDES:${PN} = " libhtml-element-perl \
     libhtml-tree-assubs-perl \
     libhtml-tree-perl \

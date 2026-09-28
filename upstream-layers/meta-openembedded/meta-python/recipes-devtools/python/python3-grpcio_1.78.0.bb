@@ -51,3 +51,5 @@ CCACHE_DISABLE = "1"
 
 CVE_PRODUCT += "grpc:grpc"
 CVE_STATUS[CVE-2026-33186] = "cpe-incorrect: the vulnerabilty affects only the go implementation"
+CVE_STATUS[CVE-2023-33953] = "fixed-version: Fixed since 1.56.2"
+CVE_STATUS[CVE-2024-37168] = "cpe-incorrect: This CVE is for grps-js"

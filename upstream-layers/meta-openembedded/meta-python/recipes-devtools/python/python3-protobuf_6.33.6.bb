@@ -50,3 +50,5 @@ do_install:append () {
     # https://github.com/python/cpython/issues/122220
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf-*-nspkg.pth
 }
+
+CVE_STATUS[CVE-2024-7254] = "fixed-version: Fixed since 4.28.2"

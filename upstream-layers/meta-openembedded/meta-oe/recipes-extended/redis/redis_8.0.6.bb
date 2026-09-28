@@ -40,6 +40,10 @@ PACKAGECONFIG = "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "USE_SYSTEMD=yes,USE_SYSTEMD=no,systemd"
 
 EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
+# Redis adds -flto automatically to OPTIMIZATION when clang is used.
+# Pass OPT instead, which is the documented way to provide explicit flags
+# without Redis adding its own optimization defaults.
+EXTRA_OEMAKE:append:toolchain-clang = " OPT='-fno-omit-frame-pointer'"
 
 TARGET_LDFLAGS:append = " ${DEBUG_PREFIX_MAP}"
 

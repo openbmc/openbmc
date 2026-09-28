@@ -38,3 +38,5 @@ do_install() {
         ${S}/src/libfido2.pc.in > ${D}${datadir}/pkgconfig/libfido2.pc
 
 }
+
+CVE_STATUS[CVE-2026-40947] = "not-applicable-platform: issue only applies on Windows"

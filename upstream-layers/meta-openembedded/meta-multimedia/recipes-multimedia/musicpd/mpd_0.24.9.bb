@@ -20,6 +20,7 @@ DEPENDS += " \
 
 SRC_URI = "git://github.com/MusicPlayerDaemon/MPD;branch=master;protocol=https;tag=v${PV} \
            file://mpd.conf.in \
+           file://0001-upnp-allow-1.14.30.patch \
            "
 SRCREV = "7a9afa059e95668c912f779219ee8fe1e44dd2aa"
 

@@ -15,3 +15,5 @@ EXTRA_OECMAKE = " \
 	"
 
 FILES_${PN}-staticdev += "${libdir}/cmake/iniparser/iniparser-staticTargets*.cmake"
+
+CVE_STATUS[CVE-2025-0633] = "fixed-version: fixed in v4.2.6"

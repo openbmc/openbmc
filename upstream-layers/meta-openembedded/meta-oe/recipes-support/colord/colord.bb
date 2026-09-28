@@ -46,6 +46,11 @@ FILES:${PN} += " \
     ${libdir}/colord-sensors \
 "
 
+do_install:append() {
+	install -d ${D}${sysconfdir}/tmpfiles.d
+	echo "d ${localstatedir}/lib/colord 700 root root - -" > ${D}${sysconfdir}/tmpfiles.d/colord.conf
+}
+
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --user-group -s /bin/false colord"
+USERADD_PARAM:${PN} = "--system --user-group --shell /bin/false --no-create-home --home-dir ${localstatedir}/lib/colord colord"
 

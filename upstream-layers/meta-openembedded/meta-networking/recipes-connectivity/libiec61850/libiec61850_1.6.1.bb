@@ -17,6 +17,12 @@ SRCREV = "a13961110b8238d2d8ea577c1fb7592ba3017ad8"
 
 SRC_URI = "git://github.com/mz-automation/${BPN}.git;branch=v1.6;protocol=https;tag=v${PV} \
            file://0001-pyiec61850-Use-CMAKE_INSTALL_LIBDIR-from-GNUInstallD.patch \
+           file://CVE-2026-18582.patch \
+           file://CVE-2026-18583.patch \
+           file://CVE-2026-19108.patch \
+           file://CVE-2026-19206-1.patch \
+           file://CVE-2026-19206-2.patch \
+           file://CVE-2026-19206-3.patch \
 "
 
 
@@ -35,3 +41,5 @@ FILES:${PN} += " \
     ${PYTHON_SITEPACKAGES_DIR}/pyiec61850.py \
     ${PYTHON_SITEPACKAGES_DIR}/_pyiec61850.so \
 "
+
+CVE_STATUS[CVE-2024-45969] = "fixed-version: fixed since v1.6.0"

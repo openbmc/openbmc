@@ -1,0 +1,28 @@
+From 7a05df92b0820675803a5e8e73d20b9453538d68 Mon Sep 17 00:00:00 2001
+From: Darsh Kelaiya <dkelaiya@cisco.com>
+Date: Fri, 21 Aug 2026 00:20:00 -0700
+Subject: [PATCH] pyproject.toml: lower setuptools requirement for Wrynose
+
+Django 5.2.17 requires setuptools >= 83, the first upstream release
+containing the fix for [1]. Wrynose provides setuptools 82.0.1
+with upstream commit dd9f436 backported, so retain the previous build
+requirement.
+
+[1] https://github.com/pypa/setuptools/security/advisories/GHSA-h35f-9h28-mq5c
+
+Upstream-Status: Inappropriate [Wrynose-specific toolchain compatibility]
+
+Signed-off-by: Darsh Kelaiya <dkelaiya@cisco.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b2327d6..e2d8244 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,3 +1,3 @@
+ [build-system]
+-requires = ["setuptools>=83"]
++requires = ["setuptools>=77.0.3"]
+ build-backend = "setuptools.build_meta"

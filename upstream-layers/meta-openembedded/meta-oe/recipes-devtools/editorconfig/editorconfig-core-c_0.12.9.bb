@@ -4,7 +4,9 @@ SECTION = "libs"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=38f617473e9f7373b5e79baf437accf8"
 
-SRC_URI = "git://github.com/editorconfig/editorconfig-core-c.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/editorconfig/editorconfig-core-c.git;protocol=https;branch=master \
+           file://CVE-2026-40489.patch \
+"
 
 SRCREV = "e082c947e7f7b14240195d55c060a6e1eda1b0a1"
 
@@ -15,3 +17,5 @@ DEPENDS = "pcre2"
 do_install:append() {
     sed -i -e 's|${STAGING_DIR_HOST}||g' ${D}${libdir}/cmake/EditorConfig/EditorConfigTargets.cmake
 }
+
+CVE_STATUS[CVE-2024-53849] = "fixed-version: fixed since v0.12.7"

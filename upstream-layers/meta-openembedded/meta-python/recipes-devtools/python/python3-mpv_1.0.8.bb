@@ -14,4 +14,8 @@ RDEPENDS:${PN} += "\
     mpv \
     python3-ctypes \
 "
-EXCLUDE_FROM_WORLD = "${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "0", "1", d)}"
+# RDEPENDS on mpv, which propagates ffmpeg's LICENSE_FLAGS = "commercial";
+# carry the same flag so this recipe is cleanly skipped (in both world and
+# universe) unless "commercial" is in LICENSE_FLAGS_ACCEPTED, rather than
+# surfacing as an unbuildable "Nothing RPROVIDES 'mpv'" dependency.
+LICENSE_FLAGS = "commercial"

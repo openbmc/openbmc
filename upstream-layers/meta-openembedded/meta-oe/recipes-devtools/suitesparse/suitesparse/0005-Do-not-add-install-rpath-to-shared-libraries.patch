@@ -1,0 +1,37 @@
+From f8be0a727c506d25450386c370a846e66b3f3297 Mon Sep 17 00:00:00 2001
+From: Deepak Rathore <deeratho@cisco.com>
+Date: Wed, 5 Aug 2026 00:00:00 -0700
+Subject: [PATCH] Do not add install rpath to shared libraries
+
+SuiteSparse adds the install library directory to Linux shared library
+links through -Wl,-rpath=$(INSTALL_LIB). In Yocto builds INSTALL_LIB
+resolves to a build or install path under TMPDIR, so the final ELF files
+keep an absolute TMPDIR path in .dynstr even after chrpath removes the
+dynamic rpath tag.
+
+Yocto stages dependent SuiteSparse libraries through normal sysroot and
+package runtime dependencies. The install-tree rpath is not required for
+packaged target libraries, and it makes buildpaths QA fail.
+
+Upstream-Status: Inappropriate [oe-specific: build/install path triggers buildpaths QA]
+
+Signed-off-by: Deepak Rathore <deeratho@cisco.com>
+---
+ SuiteSparse_config/SuiteSparse_config.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/SuiteSparse_config/SuiteSparse_config.mk b/SuiteSparse_config/SuiteSparse_config.mk
+index 8309c5142..807323c4c 100644
+--- a/SuiteSparse_config/SuiteSparse_config.mk
++++ b/SuiteSparse_config/SuiteSparse_config.mk
+@@ -358,7 +358,7 @@ SUITESPARSE_VERSION = 5.10.1
+ 
+     ifeq ($(UNAME),Linux)
+         # add the realtime library, librt, and SuiteSparse/lib
+-        LDLIBS += -lrt -Wl,-rpath=$(INSTALL_LIB)
++        LDLIBS += -lrt
+     endif
+ 
+     #---------------------------------------------------------------------------
+-- 
+2.43.0

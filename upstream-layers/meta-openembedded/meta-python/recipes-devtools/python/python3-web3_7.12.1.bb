@@ -4,7 +4,10 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1d34d9701a1461e4bd71a904ac4cf7be"
 
+SRC_URI += "file://CVE-2026-40072.patch"
 SRC_URI[sha256sum] = "97f6a116ccaeb5907bb4cb6c771cc23bc942bf09528a840189e9b509b7b8347c"
+
+CVE_PRODUCT = "ethereum:web3.py apeworx:web3.py"
 
 inherit pypi setuptools3
 

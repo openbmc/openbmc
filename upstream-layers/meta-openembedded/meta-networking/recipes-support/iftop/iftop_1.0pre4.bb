@@ -15,3 +15,6 @@ SRC_URI[sha256sum] = "f733eeea371a7577f8fe353d86dd88d16f5b2a2e702bd96f5ffb2c197d
 
 inherit autotools-brokensep
 
+CVE_STATUS[CVE-2026-3824] = "cpe-incorrect: this CVE is for WellChoose"
+CVE_STATUS[CVE-2026-3825] = "cpe-incorrect: this CVE is for WellChoose"
+CVE_STATUS[CVE-2026-3826] = "cpe-incorrect: this CVE is for WellChoose"

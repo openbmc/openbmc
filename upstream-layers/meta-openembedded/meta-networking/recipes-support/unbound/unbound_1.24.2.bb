@@ -11,6 +11,38 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5308494bc0590c0cb036afd781d78f06"
 
 SRC_URI = "git://github.com/NLnetLabs/unbound.git;protocol=https;branch=master;tag=release-${PV} \
            file://run-ptest \
+           file://CVE-2026-33278.patch \
+           file://CVE-2026-42944-1.patch \
+           file://CVE-2026-42944-2.patch \
+           file://CVE-2026-42959.patch \
+           file://CVE-2026-32792.patch \
+           file://CVE-2026-40622.patch \
+           file://CVE-2026-41292.patch \
+           file://CVE-2026-42534.patch \
+           file://CVE-2026-42923.patch \
+           file://CVE-2026-42960.patch \
+           file://CVE-2026-44390.patch \
+           file://CVE-2026-44608.patch \
+           file://CVE-2026-46582.patch \
+           file://CVE-2026-32665.patch \
+           file://CVE-2026-42955.patch \
+           file://CVE-2026-44621.patch \
+           file://CVE-2026-44687.patch \
+           file://CVE-2026-50045.patch \
+           file://CVE-2026-50046.patch \
+           file://CVE-2026-50243.patch \
+           file://CVE-2026-50248.patch \
+           file://CVE-2026-50251.patch \
+           file://CVE-2026-50252.patch \
+           file://CVE-2026-52863.patch \
+           file://CVE-2026-54478.patch \
+           file://CVE-2026-55708.patch \
+           file://CVE-2026-55717.patch \
+           file://CVE-2026-55973.patch \
+           file://CVE-2026-55990.patch \
+           file://CVE-2026-55991.patch \
+           file://CVE-2026-56416.patch \
+           file://CVE-2026-56444.patch \
            "
 
 SRCREV = "f6269baa605d31859f28770e01a24e3677e5f82c"

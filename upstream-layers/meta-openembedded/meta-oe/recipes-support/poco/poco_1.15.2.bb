@@ -12,6 +12,7 @@ SRC_URI = "git://github.com/pocoproject/poco.git;branch=poco-${PV};protocol=http
            file://0001-cppignore.lnx-Ignore-PKCS12-and-testLaunch-test.patch \
            file://0002-DataTest-disable-testSQLChannel-test.patch \
            file://0003-quill-rdtsc-fallback-for-32-bit-powerpc.patch \
+           file://0004-Fix-DateTimeParser-trailing-timezone-designators-Tim.patch \
            file://run-ptest \
            "
 SRCREV = "afbb1ab68f29eec7079e2fdfa04b3efdbec6529d"

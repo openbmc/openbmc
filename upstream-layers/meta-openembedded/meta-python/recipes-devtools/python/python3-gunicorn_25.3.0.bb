@@ -29,3 +29,5 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} += "python3-setuptools python3-fcntl"
+
+CVE_STATUS[CVE-2024-1135] = "fixed-version: fixed since v22.0.0"

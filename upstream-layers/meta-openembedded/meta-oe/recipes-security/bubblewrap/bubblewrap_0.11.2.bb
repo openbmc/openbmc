@@ -23,3 +23,5 @@ PACKAGES += "${PN}-zsh-completion"
 FILES:${PN}-zsh-completion = "${datadir}/zsh/site-functions"
 
 BBCLASSEXTEND = "native"
+
+CVE_STATUS[CVE-2026-41163] = "fixed-version: fixed in 0.11.2"

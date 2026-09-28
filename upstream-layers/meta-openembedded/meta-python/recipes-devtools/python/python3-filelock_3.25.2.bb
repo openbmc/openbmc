@@ -5,6 +5,8 @@ HOMEPAGE = "https://py-filelock.readthedocs.io/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2c6acbdf7bb74caa37512c3a5ca6857b"
 
+CVE_PRODUCT = "tox-dev:filelock"
+
 SRC_URI += "file://run-ptest"
 SRC_URI[sha256sum] = "b64ece2b38f4ca29dd3e810287aa8c48182bbecd1ae6e9ae126c9b35f1382694"
 

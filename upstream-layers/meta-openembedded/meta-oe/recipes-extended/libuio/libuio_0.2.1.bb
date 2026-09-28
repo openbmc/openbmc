@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 SRCREV = "17d96e8f9a5bce7cee5e2222855ab46a246dba51"
 
 SRC_URI = "git://git.code.sf.net/p/libuio/code;branch=master;protocol=https"
+SRC_URI += "file://fix-fclose-leak-in-uio_line_from_file.patch"
 
 PV .= "+0.2.2+git"
 

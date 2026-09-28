@@ -199,3 +199,4 @@ do_install:append() {
 }
 
 CVE_PRODUCT = "cockpit-project:cockpit"
+CVE_STATUS[CVE-2024-2947] = "fixed-version: fixed in 352"

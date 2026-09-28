@@ -42,3 +42,5 @@ do_install:append () {
 }
 
 SYSTEMD_SERVICE:${PN} = "gpm.service"
+
+CVE_STATUS[CVE-2025-4558] = "cpe-incorrect: this CVE is for GPM from WormHole Tech"

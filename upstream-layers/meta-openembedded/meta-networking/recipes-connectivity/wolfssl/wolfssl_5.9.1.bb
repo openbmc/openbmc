@@ -15,6 +15,28 @@ RPROVIDES:${PN} = "cyassl"
 SRC_URI = " \
     git://github.com/wolfSSL/wolfssl.git;protocol=https;branch=master;tag=v${PV}-stable \
     file://run-ptest \
+    file://CVE-2026-10098-1.patch \
+    file://CVE-2026-10098-2.patch \
+    file://CVE-2026-10512.patch \
+    file://CVE-2026-55958.patch \
+    file://CVE-2026-6091-1.patch \
+    file://CVE-2026-6091-2.patch \
+    file://CVE-2026-6091-3.patch \
+    file://CVE-2026-6092.patch \
+    file://CVE-2026-6094-1.patch \
+    file://CVE-2026-6094-2.patch \
+    file://CVE-2026-6094-3.patch \
+    file://CVE-2026-6094-4.patch \
+    file://CVE-2026-6094-5.patch \
+    file://CVE-2026-6291.patch \
+    file://CVE-2026-6325.patch \
+    file://CVE-2026-6412-1.patch \
+    file://CVE-2026-6412-2.patch \
+    file://CVE-2026-6450-1.patch \
+    file://CVE-2026-6450-2.patch \
+    file://CVE-2026-6731-1.patch \
+    file://CVE-2026-6731-2.patch \
+    file://CVE-2026-7531.patch \
 "
 
 SRCREV = "1d363f3adceba9d1478230ede476a37b0dcdef24"
@@ -69,3 +91,6 @@ CVE_STATUS[CVE-2026-5504] = "fixed-version: fixed in 5.9.1"
 CVE_STATUS[CVE-2026-5507] = "fixed-version: fixed in 5.9.1"
 CVE_STATUS[CVE-2026-5772] = "fixed-version: fixed in 5.9.1"
 CVE_STATUS[CVE-2026-5778] = "fixed-version: fixed in 5.9.1"
+CVE_STATUS[CVE-2023-6937] = "fixed-version: fixed since v5.6.6"
+CVE_STATUS[CVE-2024-5814] = "fixed-version: fixed since v5.7.2"
+CVE_STATUS[CVE-2026-12340] = "not-applicable-config: this only affects builds with SM2 support"
