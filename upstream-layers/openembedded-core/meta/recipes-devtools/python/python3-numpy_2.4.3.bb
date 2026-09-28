@@ -18,6 +18,8 @@ SRC_URI[sha256sum] = "483a201202b73495f00dbc83796c6ae63137a9bdade074f7648b3e3261
 GITHUB_BASE_URI = "https://github.com/numpy/numpy/releases"
 UPSTREAM_CHECK_REGEX = "releases/tag/v?(?P<pver>\d+(\.\d+)+)$"
 
+CVE_PRODUCT = "numpy:numpy"
+
 inherit pkgconfig ptest python_mesonpy github-releases cython
 
 S = "${UNPACKDIR}/numpy-${PV}"

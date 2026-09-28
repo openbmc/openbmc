@@ -32,8 +32,6 @@ do_patch_module_build () {
 
 do_patch[postfuncs] += "do_patch_module_build"
 
-EXTRA_CPAN_BUILD_FLAGS = "--create_packlist=0"
-
 do_install:prepend () {
 	# We do not have a recipe for libpod-parser-perl which is for
 	# documentation (and is deprecated in favor of Pod::Simple)

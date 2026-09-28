@@ -18,4 +18,6 @@ RDEPENDS:${PN}:class-target = " \
 "
 RDEPENDS:${PN}-tests = "${PN}"
 
+CVE_PRODUCT = "jean-paul_calderone:pyopenssl pyca:pyopenssl pyopenssl:pyopenssl pyopenssl_project:pyopenssl"
+
 BBCLASSEXTEND = "native nativesdk"

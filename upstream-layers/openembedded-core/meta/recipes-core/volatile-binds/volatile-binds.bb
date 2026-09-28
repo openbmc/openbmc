@@ -57,10 +57,11 @@ ${@d.getVar('VOLATILE_BINDS').replace("\\n", "\n")}
 END
 
     if [ -e "$var_lib_servicefile" ]; then
-        # As the seed is stored under /var/lib, ensure that this service runs
-        # after the volatile /var/lib is mounted.
-        sed -i -e "/^Before=/s/\$/ systemd-random-seed.service/" \
-               -e "/^WantedBy=/s/\$/ systemd-random-seed.service/" \
+        # The random seed and the timesyncd clock file are stored under
+        # /var/lib, so ensure that those services run after the volatile
+        # /var/lib is mounted.
+        sed -i -e "/^Before=/s/\$/ systemd-random-seed.service systemd-timesyncd.service/" \
+               -e "/^WantedBy=/s/\$/ systemd-random-seed.service systemd-timesyncd.service/" \
                "$var_lib_servicefile"
     fi
 }

@@ -1,0 +1,38 @@
+From 09e077b87eed754cc0aac0f54d193d49f978c93f Mon Sep 17 00:00:00 2001
+From: Frank Chang <frank.chang@sifive.com>
+Date: Thu, 12 Feb 2026 17:54:49 +0800
+Subject: [PATCH] linux-user: Check if RESOLVE_CACHED flag is defined before
+ using it
+
+Upstream-Status: Backport [https://gitlab.com/qemu-project/qemu/-/commit/7ac4bded6af90a15a9562515743a789236b062d1]
+
+openat2.h was introduced in Linux kernel 5.6. However, RESOLVE_CACHED
+flag was only added in kernel 5.12 and later. Therefore, we need to check
+if RESOLVE_CACHED flag is defined before using it.
+
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+Reviewed-by: Helge Deller <deller@gmx.de>
+Signed-off-by: Helge Deller <deller@gmx.de>
+(cherry picked from commit 7ac4bded6af90a15a9562515743a789236b062d1)
+Signed-off-by: Deepak Rathore <deeratho@cisco.com>
+---
+ linux-user/strace.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 758c5d32b6..a903b414fd 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1125,7 +1125,9 @@ UNUSED static const struct flags openat2_resolve_flags[] = {
+     FLAG_GENERIC(RESOLVE_NO_SYMLINKS),
+     FLAG_GENERIC(RESOLVE_BENEATH),
+     FLAG_GENERIC(RESOLVE_IN_ROOT),
++#ifdef RESOLVE_CACHED
+     FLAG_GENERIC(RESOLVE_CACHED),
++#endif
+ #endif
+     FLAG_END,
+ };
+-- 
+2.35.6
+

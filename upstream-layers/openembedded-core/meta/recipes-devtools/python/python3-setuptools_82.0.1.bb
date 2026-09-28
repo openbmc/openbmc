@@ -9,7 +9,8 @@ inherit pypi python_setuptools_build_meta
 CVE_PRODUCT = "python3-setuptools python:setuptools"
 
 SRC_URI += " \
-            file://0001-_distutils-sysconfig.py-make-it-possible-to-substite.patch"
+            file://0001-_distutils-sysconfig.py-make-it-possible-to-substite.patch \
+            file://CVE-2026-59890.patch"
 
 SRC_URI[sha256sum] = "7d872682c5d01cfde07da7bccc7b65469d3dca203318515ada1de5eda35efbf9"
 

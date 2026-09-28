@@ -6,6 +6,8 @@ require diffutils.inc
 SRC_URI = "${GNU_MIRROR}/diffutils/diffutils-${PV}.tar.xz \
            file://run-ptest \
            file://0001-Skip-strip-trailing-cr-test-case.patch \
+           file://CVE-2026-53910-01.patch \
+           file://CVE-2026-53910-02.patch \
            "
 
 SRC_URI[sha256sum] = "7c8b7f9fc8609141fdea9cece85249d308624391ff61dedaf528fcb337727dfd"
@@ -20,6 +22,13 @@ EXTRA_OEMAKE:append:mingw32 = " LIBS='-lbcrypt'"
 inherit ptest
 
 RDEPENDS:${PN}-ptest += "make perl"
+
+# patch for CVE-2026-53910 touches source file, so build is trying to
+# refresh the manual, which is failing in cross-compile environment;
+# remove this code on next upgrade
+do_compile:prepend() {
+    touch ${S}/man/diff3.1
+}
 
 do_install_ptest() {
 	t=${D}${PTEST_PATH}

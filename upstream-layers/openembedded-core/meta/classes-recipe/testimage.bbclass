@@ -186,6 +186,7 @@ def get_testimage_boot_patterns(d):
 
 def testimage_main(d):
     import os
+    import glob
     import json
     import signal
     import logging
@@ -409,15 +410,33 @@ def testimage_main(d):
     # Copy additional logs to tmp/log/oeqa so it's easier to find them
     targetdir = os.path.join(get_json_result_dir(d), d.getVar("PN"))
     os.makedirs(targetdir, exist_ok=True)
-    os.symlink(bootlog, os.path.join(targetdir, os.path.basename(bootlog)))
+    if os.path.exists(bootlog):
+        os.symlink(bootlog, os.path.join(targetdir, os.path.basename(bootlog)))
+    else:
+        bb.note("testimage: boot log not found at %s" % bootlog)
+
     os.symlink(d.getVar("BB_LOGFILE"), os.path.join(targetdir, os.path.basename(d.getVar("BB_LOGFILE") + "." + d.getVar('DATETIME'))))
 
     if not results or not complete:
         bb.error('%s - FAILED - tests were interrupted during execution, check the logs in %s' % (pn, d.getVar("LOG_DIR")), forcelog=True)
     if results and not results.wasSuccessful():
-        with open(bootlog, 'r') as bootlogfile:
-            bootlines = "".join(bootlogfile.readlines()[-20:])
-        bb.plain('%s - FAILED - Last lines of QEMU boot log:\n%s' % (pn, bootlines))
+        bootlog_files = []
+        for candidate in [bootlog] + sorted(glob.glob(bootlog + ".*")):
+            if os.path.exists(candidate) and candidate not in bootlog_files:
+                bootlog_files.append(candidate)
+
+        if bootlog_files:
+            snippets = []
+            for bootlog_file in bootlog_files:
+                try:
+                    with open(bootlog_file, 'r') as bootlogfile:
+                        bootlines = "".join(bootlogfile.readlines()[-20:])
+                except OSError as err:
+                    bootlines = "<failed to read %s: %s>\n" % (bootlog_file, err)
+                snippets.append("--- %s ---\n%s" % (os.path.basename(bootlog_file), bootlines))
+            bb.plain('%s - FAILED - Last lines of QEMU boot logs:\n%s' % (pn, "\n".join(snippets)))
+        else:
+            bb.plain('%s - FAILED - QEMU boot logs not available at %s or %s.*' % (pn, bootlog, bootlog))
         bb.error('%s - FAILED - also check the logs in %s' % (pn, d.getVar("LOG_DIR")), forcelog=True)
 
 def get_runtime_paths(d):

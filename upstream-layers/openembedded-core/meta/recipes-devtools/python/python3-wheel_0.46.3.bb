@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "e3e79874b07d776c40bd6033f8ddf76a7dad46a7b8aa1b2787a8308351
 
 inherit python_flit_core pypi ptest-python-pytest
 
+CVE_PRODUCT = "wheel_project:wheel"
+
 RDEPENDS:${PN} += "python3-packaging"
 
 # One test is skipped but requires the "full" python3-flit, not just python3-flit-core

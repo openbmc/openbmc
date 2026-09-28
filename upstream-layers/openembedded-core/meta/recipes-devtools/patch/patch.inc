@@ -5,7 +5,11 @@ original files, producing patched versions."
 SECTION = "utils"
 HOMEPAGE = "http://savannah.gnu.org/projects/patch/"
 
-SRC_URI = "${GNU_MIRROR}/patch/patch-${PV}.tar.gz"
+SRC_URI = "${GNU_MIRROR}/patch/patch-${PV}.tar.gz \
+	   file://CVE-2026-56289.patch \
+	   file://CVE-2026-56288.patch"
+
+
 S = "${UNPACKDIR}/patch-${PV}"
 
 inherit autotools update-alternatives

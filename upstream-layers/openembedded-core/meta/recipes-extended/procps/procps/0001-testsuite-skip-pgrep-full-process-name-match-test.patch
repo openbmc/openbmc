@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pratik Farkase <pratik.farkase@est.tech>
+Date: Mon, 17 Aug 2026 10:00:00 +0000
+Subject: [PATCH] testsuite: skip pgrep full process name match test
+
+The "pgrep match against full process name" test uses pgrep -f with a
+regex pattern close to ARG_MAX in size (~100KB). This intermittently
+fails on qemuriscv64 where the process cmdline may not be fully visible
+in /proc/<pid>/cmdline at the time pgrep reads it, or the large regex
+match times out under TCG emulation.
+
+Skip this single test case while keeping all other pgrep tests which
+are reliable.
+
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=16290
+
+Upstream-Status: Inappropriate [OE-ptest specific: fails only under QEMU TCG emulation]
+Signed-off-by: Pratik Farkase <pratik.farkase@est.tech>
+---
+ testsuite/pgrep.test/pgrep.exp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testsuite/pgrep.test/pgrep.exp b/testsuite/pgrep.test/pgrep.exp
+index 54e75df..66edbaa 100644
+--- a/testsuite/pgrep.test/pgrep.exp
++++ b/testsuite/pgrep.test/pgrep.exp
+@@ -35,9 +35,9 @@ set test "pgrep with : delimiter"
+ spawn $pgrep -d : $testproc_comm
+ expect_pass "$test" "^${testproc1_pid}:${testproc2_pid}\\s*$"
+ 
+-set test "pgrep match against full process name"
+-spawn $pgrep -f "$testproc_path\\s+$testproc_arg_str"
+-expect_pass "$test" "^$testproc1_pid\\s*$"
++# Skip: intermittent failure on riscv64 - pgrep -f with large ARG_MAX
++# patterns can fail under QEMU emulation (timing/cmdline visibility race)
++untested "pgrep match against full process name"
+ 
+ set test "pgrep with matching gid"
+ spawn $pgrep -G $gid $testproc_comm

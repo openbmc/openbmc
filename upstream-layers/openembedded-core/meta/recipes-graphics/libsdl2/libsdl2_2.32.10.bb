@@ -21,7 +21,10 @@ LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'arm-neon', 'f
 
 PROVIDES = "virtual/libsdl2"
 
-SRC_URI = "https://www.libsdl.org/release/SDL2-${PV}.tar.gz"
+SRC_URI = "\
+    https://www.libsdl.org/release/SDL2-${PV}.tar.gz \
+    file://0001-directfb-Fix-CreateRenderer-callback-signature.patch \
+"
 
 S = "${UNPACKDIR}/SDL2-${PV}"
 

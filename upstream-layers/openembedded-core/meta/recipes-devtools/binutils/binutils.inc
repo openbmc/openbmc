@@ -15,6 +15,11 @@ DEPENDS = "flex-native bison-native zlib-native gnu-config-native autoconf-nativ
 
 inherit autotools gettext multilib_header pkgconfig texinfo
 
+# binutils maintains a stable branch per X.Y release (e.g. binutils-2_46-branch)
+# that only takes bugfixes and backported CVE fixes; X.Y.Z (Z>0) releases are
+# cut from that branch.
+inherit upstream-stable-release-point
+
 FILES:${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \
 	${libdir}/lib*.so.* \

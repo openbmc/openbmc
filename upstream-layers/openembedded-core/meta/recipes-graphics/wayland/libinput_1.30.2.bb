@@ -16,6 +16,7 @@ SRC_URI = "git://gitlab.freedesktop.org/libinput/libinput.git;protocol=https;bra
            file://CVE-2026-35093.patch \
            file://CVE-2026-35094.patch \
            file://run-ptest \
+           file://CVE-2026-50292.patch \
            "
 SRCREV = "042c5e6fd9cc910307027a1522453794b29f2c72"
 

@@ -4,7 +4,7 @@ HOMEPAGE = "https://developer.gnome.org/glib/"
 
 # pcre is under BSD;
 # docs/reference/COPYING is with a 'public domain'-like license!
-LICENSE = "LGPL-2.1-or-later & BSD-3-Clause & PD"
+LICENSE = "LGPL-2.1-or-later & BSD-3-Clause & GCR-docs"
 LIC_FILES_CHKSUM = "file://COPYING;md5=41890f71f740302b785c27661123bff5 \
                     file://glib/glib.h;beginline=4;endline=17;md5=72f7cc2847407f65d8981ef112e4e630 \
                     file://LICENSES/LGPL-2.1-or-later.txt;md5=41890f71f740302b785c27661123bff5 \
@@ -30,7 +30,9 @@ LEAD_SONAME = "libglib-2.0.*"
 
 GNOMEBN = "glib"
 
-inherit gettext gi-docgen gnomebase ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages gobject-introspection-data
+# GLib publishes bugfix/security-only micro releases on its stable
+# (even-minor) series.
+inherit gettext gi-docgen gnomebase ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages gobject-introspection-data upstream-stable-release-point
 
 S = "${UNPACKDIR}/${GNOMEBN}-${PV}"
 
@@ -124,6 +126,8 @@ do_install:append () {
 do_install:append:class-native () {
 	# Link gio-querymodules into ${bindir} as otherwise tools like meson won't find it
         ln -rs ${D}${libexecdir}/gio-querymodules ${D}${bindir}
+	# Remove gdb plugins as we'd never use them for native and they encode system build paths into their location
+	rm ${D}${datadir}/gdb -rf
 }
 
 do_install:append:class-target () {
@@ -231,12 +235,14 @@ SRC_URI += "\
            file://0001-gio-tests-resources.c-comment-out-a-build-host-only-.patch \
            file://0010-Do-not-hardcode-python-path-into-various-tools.patch \
            file://skip-timeout.patch \
+           file://CVE-2026-58016-1.patch \
+           file://CVE-2026-58016-2.patch \
            "
 SRC_URI:append:class-native = " file://relocate-modules.patch \
                                 file://0001-meson.build-do-not-enable-pidfd-features-on-native-g.patch \
                               "
 
-SRC_URI[archive.sha256sum] = "3546251ccbb3744d4bc4eb48354540e1f6200846572bab68e3a2b7b2b64dfd07"
+SRC_URI[archive.sha256sum] = "cf3f215a640c8a4257f14317586b8f1fdd25a10a93cb4bdda147c0f9ad88e74f"
 
 # Find any meson cross files in FILESPATH that are relevant for the current
 # build (using siteinfo) and add them to EXTRA_OEMESON.

@@ -16,6 +16,13 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://0002-Constant-Fix-up-shebang.patch \
            file://determinism.patch \
            file://0001-cpan-Sys-Syslog-Makefile.PL-Fix-_PATH_LOG-for-determ.patch \
+           file://CVE-2026-8376-01.patch \
+           file://CVE-2026-8376-02.patch \
+           file://CVE-2026-13221.patch \
+           file://CVE-2026-57432-01.patch \
+           file://CVE-2026-57432-02.patch \
+           file://CVE-2026-42496.patch \
+           file://CVE-2026-57433.patch \
            "
 SRC_URI:append:class-native = " \
            file://perl-configpm-switch.patch \
@@ -28,7 +35,7 @@ SRC_URI[perl.sha256sum] = "e093ef184d7f9a1b9797e2465296f55510adb6dab8842b0c3ed53
 
 B = "${WORKDIR}/perl-${PV}-build"
 
-inherit upstream-version-is-even update-alternatives
+inherit upstream-version-is-even update-alternatives upstream-stable-release-point
 
 DEPENDS += "perlcross-native bzip2 zlib virtual/crypt"
 DEPENDS:append:class-native = " bzip2-replacement-native"

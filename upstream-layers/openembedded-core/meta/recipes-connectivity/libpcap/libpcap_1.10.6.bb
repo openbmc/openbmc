@@ -10,7 +10,16 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5eb289217c160e2920d2e35bddc36453 \
                     file://pcap.h;beginline=1;endline=32;md5=39af3510e011f34b8872f120b1dc31d2"
 DEPENDS = "flex-native bison-native"
 
-SRC_URI = "https://www.tcpdump.org/release/${BP}.tar.xz"
+SRC_URI = "https://www.tcpdump.org/release/${BP}.tar.xz \
+	   file://0001-Fix-error-messages-about-32-bit-integer-overflow.patch \
+	   file://01-CVE-2026-0799.patch \
+	   file://02-CVE-2026-31912.patch \
+	   file://03-CVE-2026-31911.patch \
+	   file://04-CVE-2026-6244.patch \
+	   file://05-CVE-2026-6554.patch \
+	   file://06-CVE-2026-18313.patch \
+	   file://07-CVE-2026-18238.patch \
+          "
 SRC_URI[sha256sum] = "ec97d1206bdd19cb6bdd043eaa9f0037aa732262ec68e070fd7c7b5f834d5dfc"
 
 inherit autotools binconfig-disabled pkgconfig

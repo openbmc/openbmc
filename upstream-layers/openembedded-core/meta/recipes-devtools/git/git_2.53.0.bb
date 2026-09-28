@@ -48,6 +48,10 @@ EXTRA_OECONF:append:class-native = " --with-gitconfig=/etc/gitconfig "
 # Needs brokensep as this doesn't use automake
 inherit autotools-brokensep perlnative bash-completion manpages
 
+# Git's maintainer docs define vX.Y.Z (Z>0) maintenance releases as
+# bugfix-only, scoped to the corresponding vX.Y.0 feature release.
+inherit upstream-stable-release-point
+
 EXTRA_OEMAKE = "NO_PYTHON=1 CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}'"
 EXTRA_OEMAKE += "'PERL_PATH=/usr/bin/env perl'"
 EXTRA_OEMAKE += "COMPUTE_HEADER_DEPENDENCIES=no"

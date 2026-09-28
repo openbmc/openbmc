@@ -33,7 +33,7 @@ diff --git a/Lib/test/test_pyrepl/test_unix_console.py b/Lib/test/test_pyrepl/te
 index 3b0d2637dab..5a3c8952f61 100644
 --- a/Lib/test/test_pyrepl/test_unix_console.py
 +++ b/Lib/test/test_pyrepl/test_unix_console.py
-@@ -172,6 +172,7 @@ def test_cursor_up_down(self, _os_write):
+@@ -186,6 +186,7 @@ class TestConsole(TestCase):
          _os_write.assert_any_call(ANY, TERM_CAPABILITIES["cud"] + b":1")
          con.restore()
  

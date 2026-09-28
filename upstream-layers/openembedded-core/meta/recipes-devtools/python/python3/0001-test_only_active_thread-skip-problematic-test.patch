@@ -17,7 +17,7 @@ diff --git a/Lib/test/test_external_inspection.py b/Lib/test/test_external_inspe
 index a709b837161..7a87092c10e 100644
 --- a/Lib/test/test_external_inspection.py
 +++ b/Lib/test/test_external_inspection.py
-@@ -1111,6 +1111,7 @@ def test_self_trace(self):
+@@ -1154,6 +1154,7 @@ class TestGetStackTrace(unittest.TestCase):
              ],
          )
  

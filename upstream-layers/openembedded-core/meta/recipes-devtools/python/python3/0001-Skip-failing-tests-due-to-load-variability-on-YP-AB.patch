@@ -30,7 +30,7 @@ diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.
 index 9a72362c022..008e6a505a5 100644
 --- a/Lib/test/_test_multiprocessing.py
 +++ b/Lib/test/_test_multiprocessing.py
-@@ -722,6 +722,7 @@ def test_close(self):
+@@ -774,6 +774,7 @@ class _TestProcess(BaseTestCase):
          close_queue(q)
  
      @support.requires_resource('walltime')
@@ -38,7 +38,7 @@ index 9a72362c022..008e6a505a5 100644
      def test_many_processes(self):
          if self.TYPE == 'threads':
              self.skipTest('test not appropriate for {}'.format(self.TYPE))
-@@ -2345,6 +2346,7 @@ def _test_timeout_f(cls, barrier, results):
+@@ -2398,6 +2399,7 @@ class _TestBarrier(BaseTestCase):
          except threading.BrokenBarrierError:
              results.append(True)
  
@@ -46,7 +46,7 @@ index 9a72362c022..008e6a505a5 100644
      def test_timeout(self):
          """
          Test wait(timeout)
-@@ -5459,6 +5461,7 @@ def signal_and_sleep(cls, sem, period):
+@@ -5550,6 +5552,7 @@ class TestWait(unittest.TestCase):
          time.sleep(period)
  
      @support.requires_resource('walltime')
@@ -58,7 +58,7 @@ diff --git a/Lib/test/test_time.py b/Lib/test/test_time.py
 index 5312faa5077..36873d9a400 100644
 --- a/Lib/test/test_time.py
 +++ b/Lib/test/test_time.py
-@@ -548,6 +548,7 @@ def test_monotonic(self):
+@@ -548,6 +548,7 @@ class TimeTestCase(unittest.TestCase):
      def test_perf_counter(self):
          time.perf_counter()
  
@@ -66,7 +66,7 @@ index 5312faa5077..36873d9a400 100644
      @unittest.skipIf(
          support.is_wasi, "process_time not available on WASI"
      )
-@@ -567,6 +568,7 @@ def test_process_time(self):
+@@ -567,6 +568,7 @@ class TimeTestCase(unittest.TestCase):
          self.assertTrue(info.monotonic)
          self.assertFalse(info.adjustable)
  

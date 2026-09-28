@@ -34,6 +34,8 @@ SKIP="$SKIP http11-\*"
 SKIP="$SKIP httpProxy-\*"
 # These tests appear to be load-sensitive (16214)
 SKIP="$SKIP mutex-condition-\*"
+# Timer-related tests are going to be fragile (16324)
+SKIP="$SKIP timer-\*"
 
 # Run all tests in tests/*.test unless tests are specified as arguments
 TESTS=${*:-tests/*.test}

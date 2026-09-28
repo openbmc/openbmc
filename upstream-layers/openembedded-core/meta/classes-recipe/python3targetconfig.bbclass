@@ -8,6 +8,7 @@ inherit python3native
 
 EXTRA_PYTHON_DEPENDS ?= ""
 EXTRA_PYTHON_DEPENDS:class-target = "python3"
+EXTRA_PYTHON_DEPENDS:class-nativesdk = "nativesdk-python3"
 DEPENDS:append = " ${EXTRA_PYTHON_DEPENDS}"
 
 setup_target_config() {

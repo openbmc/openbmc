@@ -12,6 +12,7 @@ MESON_TARGET = "systemctl:executable"
 MESON_INSTALL_TAGS = "systemctl"
 EXTRA_OEMESON += "-Dlink-systemctl-shared=false"
 EXTRA_OEMESON += "-Dsysvinit-path= -Dsysvrcnd-path="
+EXTRA_OEMESON += "-Dpam=disabled"
 
 # Systemctl is supposed to operate on target, but the target sysroot is not
 # determined at run-time, but rather set during configure

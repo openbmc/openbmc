@@ -560,7 +560,7 @@ def upgrade(args, config, basepath, workspace):
 
         # try to automatically discover latest version and revision if not provided on command line
         if not args.version and not args.srcrev:
-            version_info = oe.recipeutils.get_recipe_upstream_version(rd)
+            version_info = oe.recipeutils.get_recipe_upstream_version(rd, args.stable)
             if version_info['version'] and not version_info['version'].endswith("new-commits-available"):
                 args.version = version_info['version']
             if version_info['revision']:
@@ -626,7 +626,7 @@ def latest_version(args, config, basepath, workspace):
         rd = parse_recipe(config, tinfoil, args.recipename, True)
         if not rd:
             return 1
-        version_info = oe.recipeutils.get_recipe_upstream_version(rd)
+        version_info = oe.recipeutils.get_recipe_upstream_version(rd, args.stable)
         # "new-commits-available" is an indication that upstream never issues version tags
         if not version_info['version'].endswith("new-commits-available"):
             logger.info("Current version: {}".format(version_info['current_version']))
@@ -649,7 +649,7 @@ def check_upgrade_status(args, config, basepath, workspace):
                                                                "cannot be updated due to: %s" %(recipe['no_upgrade_reason']) if recipe['no_upgrade_reason'] else ""))
     if not args.recipe:
         logger.info("Checking the upstream status for all recipes may take a few minutes")
-    results = oe.recipeutils.get_recipe_upgrade_status(args.recipe)
+    results = oe.recipeutils.get_recipe_upgrade_status(args.recipe, args.stable)
     for recipegroup in results:
         upgrades = [r for r in recipegroup if r['status'] != 'MATCH']
         currents = [r for r in recipegroup if r['status'] == 'MATCH']
@@ -673,6 +673,7 @@ def register_commands(subparsers, context):
                                            group='starting')
     parser_upgrade.add_argument('recipename', help='Name of recipe to upgrade (just name - no version, path or extension)')
     parser_upgrade.add_argument('srctree',  nargs='?', help='Path to where to extract the source tree. If not specified, a subdirectory of %s will be used.' % defsrctree)
+    parser_upgrade.add_argument('--stable', action="store_true", help='Only consider stable upstream releases')
     parser_upgrade.add_argument('--version', '-V', help='Version to upgrade to (PV). If omitted, latest upstream version will be determined and used, if possible.')
     parser_upgrade.add_argument('--srcrev', '-S', help='Source revision to upgrade to (useful when fetching from an SCM such as git)')
     parser_upgrade.add_argument('--srcbranch', '-B', help='Branch in source repository containing the revision to use (if fetching from an SCM such as git)')
@@ -690,11 +691,13 @@ def register_commands(subparsers, context):
                                                   description='Queries the upstream server for what the latest upstream release is (for git, tags are checked, for tarballs, a list of them is obtained, and one with the highest version number is reported)',
                                                   group='info')
     parser_latest_version.add_argument('recipename', help='Name of recipe to query (just name - no version, path or extension)')
+    parser_latest_version.add_argument('--stable', action="store_true", help='Only consider stable upstream releases')
     parser_latest_version.set_defaults(func=latest_version)
 
     parser_check_upgrade_status = subparsers.add_parser('check-upgrade-status', help="Report upgradability for multiple (or all) recipes",
                                                         description="Prints a table of recipes together with versions currently provided by recipes, and latest upstream versions, when there is a later version available",
                                                         group='info')
     parser_check_upgrade_status.add_argument('recipe', help='Name of the recipe to report (omit to report upgrade info for all recipes)', nargs='*')
+    parser_check_upgrade_status.add_argument('--stable', action="store_true", help='Only consider stable upstream releases')
     parser_check_upgrade_status.add_argument('--all', '-a', help='Show all recipes, not just recipes needing upgrade', action="store_true")
     parser_check_upgrade_status.set_defaults(func=check_upgrade_status)

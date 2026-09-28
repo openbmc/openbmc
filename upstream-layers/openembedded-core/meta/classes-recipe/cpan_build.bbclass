@@ -25,6 +25,13 @@ cpan_build_do_configure () {
 	fi
 
 	perl Build.PL --installdirs vendor --destdir ${D} \
+                        --create_packlist=0 \
+                        --config installhtml1dir= \
+                        --config installhtml3dir= \
+                        --config installsitehtml1dir= \
+                        --config installsitehtml3dir= \
+                        --config installvendorhtml1dir= \
+                        --config installvendorhtml3dir= \
 			${EXTRA_CPAN_BUILD_FLAGS}
 
 	# Build.PLs can exit with success without generating a

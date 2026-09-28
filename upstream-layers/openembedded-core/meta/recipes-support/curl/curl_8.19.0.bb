@@ -14,6 +14,31 @@ SRC_URI = " \
     file://run-ptest \
     file://disable-tests \
     file://no-test-timeout.patch \
+    file://CVE-2026-6276.patch \
+    file://CVE-2026-5773.patch \
+    file://mbedtls.patch \
+    file://CVE-2026-5545.patch \
+    file://CVE-2026-6253.patch \
+    file://CVE-2026-6429-dependent.patch \
+    file://CVE-2026-6429.patch \
+    file://CVE-2026-7168.patch \
+    file://CVE-2026-4873.patch \
+    file://CVE-2026-8286.patch \
+    file://CVE-2026-8927.patch \
+    file://CVE-2026-8932-dependent.patch \
+    file://CVE-2026-8932.patch \
+    file://CVE-2026-11352.patch \
+    file://CVE-2026-11586.patch \
+    file://CVE-2026-7009.patch \
+    file://CVE-2026-8925.patch \
+    file://CVE-2026-9080.patch \
+    file://CVE-2026-9545-01.patch \
+    file://CVE-2026-9545-02.patch \
+    file://CVE-2026-9079.patch \
+    file://CVE-2026-13608.patch \
+    file://CVE-2026-80229.patch \
+    file://CVE-2026-9546-01.patch \
+    file://CVE-2026-9546-02.patch \
 "
 
 SRC_URI:append:class-nativesdk = " \
@@ -25,6 +50,12 @@ SRC_URI[sha256sum] = "4eb41489790d19e190d7ac7e18e82857cdd68af8f4e66b292ced562d33
 # Curl has used many names over the years...
 CVE_PRODUCT = "haxx:curl haxx:libcurl curl:curl curl:libcurl libcurl:libcurl daniel_stenberg:curl"
 CVE_STATUS[CVE-2024-32928] = "ignored: CURLOPT_SSL_VERIFYPEER was disabled on google cloud services causing a potential man in the middle attack"
+CVE_STATUS[CVE-2026-8924] = "not-applicable-config: public suffix list support is disabled by the recipe with --without-libpsl"
+CVE_STATUS[CVE-2026-10536] = "${@bb.utils.contains('PACKAGECONFIG', 'nghttp2', 'unpatched', 'not-applicable-config: applicable only with HTTP/2', d)}"
+CVE_STATUS[CVE-2026-9547] = "not-applicable-config: vulnerable libssh backend is not enabled by the recipe"
+CVE_STATUS[CVE-2026-12064] = "${@bb.utils.contains('PACKAGECONFIG', 'libssh2', 'unpatched', 'not-applicable-config: SCP/SFTP support is not enabled in PACKAGECONFIG', d)}"
+CVE_STATUS[CVE-2026-8458] = "${@bb.utils.contains('PACKAGECONFIG', 'krb5 negotiate-auth', 'unpatched', 'not-applicable-config: applicable only with GSS-API-backed Negotiate authentication', d)}"
+CVE_STATUS[CVE-2026-82209] = "not-applicable-config: public suffix list support is disabled by the recipe with --without-libpsl"
 
 inherit autotools pkgconfig binconfig multilib_header ptest
 
@@ -56,7 +87,7 @@ PACKAGECONFIG[ldaps] = "--enable-ldaps,--disable-ldaps,openldap"
 PACKAGECONFIG[libgsasl] = "--with-libgsasl,--without-libgsasl,libgsasl"
 PACKAGECONFIG[libidn] = "--with-libidn2,--without-libidn2,libidn2"
 PACKAGECONFIG[libssh2] = "--with-libssh2,--without-libssh2,libssh2"
-PACKAGECONFIG[mbedtls] = "--with-mbedtls=${STAGING_DIR_TARGET},--without-mbedtls,mbedtls"
+PACKAGECONFIG[mbedtls] = "--with-mbedtls,--without-mbedtls,mbedtls"
 PACKAGECONFIG[mqtt] = "--enable-mqtt,--disable-mqtt,"
 PACKAGECONFIG[negotiate-auth] = "--enable-negotiate-auth,--disable-negotiate-auth"
 PACKAGECONFIG[nghttp2] = "--with-nghttp2,--without-nghttp2,nghttp2"

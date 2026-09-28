@@ -23,4 +23,8 @@ GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,parser_pull_short_read"
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3524
 GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,parser_convert_duration,parser_pull_frame_growth,parser_reverse_playback"
 
+# Intermittent fail
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/work_items/5163
+GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_device_monitor"
+
 gnome-desktop-testing-runner --parallel=4 gstreamer "$@"

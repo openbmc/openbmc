@@ -1,0 +1,159 @@
+From 2fa72585f927d340827eccdf91bb69cf60ac169e Mon Sep 17 00:00:00 2001
+From: Alexander Sosedkin <asosedkin@redhat.com>
+Date: Wed, 1 Apr 2026 19:51:45 +0200
+Subject: [PATCH 4/8] tests/mini-dtls-fragments: extend with a #1816 reproducer
+
+Signed-off-by: Alexander Sosedkin <asosedkin@redhat.com>
+
+Upstream-Status: Backport [https://gitlab.com/gnutls/gnutls/-/commit/cf3f1955e58cbcc10373b841bb101fb058565d87]
+CVE: CVE-2026-33846
+Signed-off-by: Pritam Srichandan Sahoo <PritamSrichandan.Sahoo@windriver.com>
+---
+ tests/mini-dtls-fragments.c | 120 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
+
+diff --git a/tests/mini-dtls-fragments.c b/tests/mini-dtls-fragments.c
+index ee75feeb6..8d5a18acd 100644
+--- a/tests/mini-dtls-fragments.c
++++ b/tests/mini-dtls-fragments.c
+@@ -106,6 +106,11 @@ static int pull_timeout(gnutls_transport_ptr_t tr, unsigned ms)
+ 	return 1;
+ }
+ 
++static int c2s_pull_timeout_once(gnutls_transport_ptr_t tr, unsigned ms)
++{
++	return c2s.head != c2s.tail ? 1 : 0;
++}
++
+ static ssize_t server_pull(gnutls_transport_ptr_t tr, void *b, size_t l)
+ {
+ 	return queue_get(&c2s, (gnutls_session_t)tr, b, l);
+@@ -198,10 +203,125 @@ static void test(gnutls_push_func client_push)
+ 	gnutls_certificate_free_credentials(scred);
+ }
+ 
++static void test_malicious1816(void)
++{
++	/* dgram1: msg_len=50, frag_offset=25, frag_len=25 */
++	static const uint8_t dgram1_hdr[] = {
++		0x16, /* type: handshake */
++		0xfe, 0xfd, /* version: DTLS 1.2 */
++		0x00, 0x00, /* epoch: 0 */
++		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* seq: 0 */
++		0x00, 0x25, /* record_length: 37 */
++		0x01, /* msg_type: ClientHello */
++		0x00, 0x00, 0x32, /* msg_length: 50 */
++		0x00, 0x00, /* msg_seq: 0 */
++		0x00, 0x00, 0x19, /* frag_offset: 25 */
++		0x00, 0x00, 0x19, /* frag_length: 25 */
++	};
++	/* dgram2: msg_len=3000, frag_offset=0, frag_len=48 */
++	static const uint8_t dgram2_hdr[] = {
++		0x16, /* type: handshake */
++		0xfe, 0xfd, /* version: DTLS 1.2 */
++		0x00, 0x00, /* epoch: 0 */
++		0x00, 0x00, 0x00, 0x00, 0x00, 0x01, /* seq: 1 */
++		0x00, 0x3c, /* record_length: 60 */
++		0x01, /* msg_type: ClientHello */
++		0x00, 0x0b, 0xb8, /* msg_length: 3000 */
++		0x00, 0x00, /* msg_seq: 0 */
++		0x00, 0x00, 0x00, /* frag_offset: 0 */
++		0x00, 0x00, 0x30, /* frag_length: 48 */
++	};
++	/* dgram3: msg_len=3000, frag_offset=40, frag_len=1475 */
++	static const uint8_t dgram3_hdr[] = {
++		0x16, /* type: handshake */
++		0xfe, 0xfd, /* version: DTLS 1.2 */
++		0x00, 0x00, /* epoch: 0 */
++		0x00, 0x00, 0x00, 0x00, 0x00, 0x02, /* seq: 2 */
++		0x05, 0xcf, /* record_length: 1487 */
++		0x01, /* msg_type: ClientHello */
++		0x00, 0x0b, 0xb8, /* msg_length: 3000 */
++		0x00, 0x00, /* msg_seq: 0 */
++		0x00, 0x00, 0x28, /* frag_offset: 40 */
++		0x00, 0x05, 0xc3, /* frag_length: 1475 */
++	};
++	/* dgram4: msg_len=3000, frag_offset=1500, frag_len=1475 */
++	static const uint8_t dgram4_hdr[] = {
++		0x16, /* type: handshake */
++		0xfe, 0xfd, /* version: DTLS 1.2 */
++		0x00, 0x00, /* epoch: 0 */
++		0x00, 0x00, 0x00, 0x00, 0x00, 0x03, /* seq: 3 */
++		0x05, 0xcf, /* record_length: 1487 */
++		0x01, /* msg_type: ClientHello */
++		0x00, 0x0b, 0xb8, /* msg_length: 3000 */
++		0x00, 0x00, /* msg_seq: 0 */
++		0x00, 0x05, 0xdc, /* frag_offset: 1500 */
++		0x00, 0x05, 0xc3, /* frag_length: 1475 */
++	};
++	gnutls_session_t server;
++	gnutls_certificate_credentials_t scred;
++	uint8_t dgram[1500];
++	int sr;
++
++	if (debug)
++		gnutls_global_set_log_level(4711);
++
++	gnutls_certificate_allocate_credentials(&scred);
++	gnutls_certificate_set_x509_key_mem(scred, &server_cert, &server_key,
++					    GNUTLS_X509_FMT_PEM);
++
++	gnutls_init(&server, GNUTLS_SERVER | GNUTLS_DATAGRAM);
++	gnutls_priority_set_direct(server, "NORMAL:+VERS-DTLS1.2", NULL);
++	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);
++
++	gnutls_dtls_set_timeouts(server, get_dtls_retransmit_timeout(),
++				 get_timeout());
++
++	gnutls_transport_set_ptr(server, server);
++	gnutls_transport_set_push_function(server, server_push);
++	gnutls_transport_set_pull_function(server, server_pull);
++	gnutls_transport_set_pull_timeout_function(server,
++						   c2s_pull_timeout_once);
++
++	memset(dgram, 0, sizeof(dgram));
++	memcpy(dgram, dgram1_hdr, 25);
++	queue_put(&c2s, dgram, 25 + 25);
++
++	memset(dgram, 0, sizeof(dgram));
++	memcpy(dgram, dgram2_hdr, 25);
++	queue_put(&c2s, dgram, 25 + 48);
++
++	memset(dgram, 0, sizeof(dgram));
++	memcpy(dgram, dgram3_hdr, 25);
++	queue_put(&c2s, dgram, 25 + 1475);
++
++	memset(dgram, 0, sizeof(dgram));
++	memcpy(dgram, dgram4_hdr, 25);
++	queue_put(&c2s, dgram, 25 + 1475);
++
++	gnutls_global_set_log_function(server_log_func);
++	do {
++		sr = gnutls_handshake(server); /* invalid write if vulnerable */
++	} while (c2s.head != c2s.tail && !gnutls_error_is_fatal(sr));
++	if (sr != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
++		fail("server: expected GNUTLS_E_UNEXPECTED_PACKET_LENGTH, "
++		     "got: %s\n",
++		     gnutls_strerror(sr));
++
++	success("OK\n");
++
++	queue_reset(&c2s);
++	queue_reset(&s2c);
++
++	gnutls_deinit(server);
++	gnutls_certificate_free_credentials(scred);
++}
++
+ void doit(void)
+ {
+ 	global_init();
+ 	test(client_push_normal);
++	success("malicious reassembly bug exploitation (#1816):\n");
++	test_malicious1816();
+ 	gnutls_global_deinit();
+ }
+ 
+-- 
+2.53.0
+

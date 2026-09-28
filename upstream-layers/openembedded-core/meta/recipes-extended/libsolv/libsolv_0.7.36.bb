@@ -11,6 +11,8 @@ DEPENDS = "expat zlib zstd"
 SRC_URI = "git://github.com/openSUSE/libsolv.git;branch=master;protocol=https;tag=${PV} \
            file://0001-compress_buf-fix-musl-segfaults.patch \
            file://run-ptest \
+           file://CVE-2026-9150.patch \
+           file://CVE-2026-9149.patch \
 "
 
 SRCREV = "1e377699be108ec82bb798ec9c223d45d84a733c"

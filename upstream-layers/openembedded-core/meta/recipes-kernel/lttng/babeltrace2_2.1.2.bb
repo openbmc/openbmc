@@ -19,7 +19,9 @@ SRC_URI = "git://git.efficios.com/babeltrace.git;branch=stable-2.1;protocol=http
 SRCREV = "d0e946a71faf5f0c2d7f1fb5b92a369983e9cf10"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>2(\.\d+)+)$"
 
-inherit autotools pkgconfig ptest setuptools3-base
+# babeltrace2 publishes bugfix/security-only releases on its per-minor
+# stable-X.Y branches.
+inherit autotools pkgconfig ptest setuptools3-base upstream-stable-release-point
 
 EXTRA_OECONF = "--disable-debug-info --disable-Werror --enable-python-plugins --enable-python-bindings"
 

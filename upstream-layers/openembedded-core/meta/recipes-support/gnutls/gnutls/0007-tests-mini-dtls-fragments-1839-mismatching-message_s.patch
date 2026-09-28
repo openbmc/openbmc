@@ -1,0 +1,104 @@
+From f7a5e7f3a7d05c7d558abd2f56f86e4c201be48b Mon Sep 17 00:00:00 2001
+From: Alexander Sosedkin <asosedkin@redhat.com>
+Date: Mon, 20 Apr 2026 16:36:08 +0200
+Subject: [PATCH 7/8] tests/mini-dtls-fragments: #1839 mismatching message_seq
+
+Signed-off-by: Alexander Sosedkin <asosedkin@redhat.com>
+
+Upstream-Status: Backport [https://gitlab.com/gnutls/gnutls/-/commit/a2b41be83a1a3529c551ccf54958da91a656550e]
+CVE: CVE-2026-33846
+Signed-off-by: Pritam Srichandan Sahoo <PritamSrichandan.Sahoo@windriver.com>
+---
+ tests/mini-dtls-fragments.c | 54 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 47 insertions(+), 7 deletions(-)
+
+diff --git a/tests/mini-dtls-fragments.c b/tests/mini-dtls-fragments.c
+index 93490bac2..499a92a92 100644
+--- a/tests/mini-dtls-fragments.c
++++ b/tests/mini-dtls-fragments.c
+@@ -165,7 +165,7 @@ static uint64_t read_u48(const uint8_t *p)
+ 	return seq;
+ }
+ 
+-static void test(gnutls_push_func client_push)
++static void test(gnutls_push_func client_push, bool expect_success)
+ {
+ 	gnutls_session_t client, server;
+ 	gnutls_certificate_credentials_t ccred, scred;
+@@ -218,12 +218,22 @@ static void test(gnutls_push_func client_push)
+ 			sr = gnutls_handshake(server);
+ 		if (!sr || gnutls_error_is_fatal(sr))
+ 			sdone = true;
++
++		if (c2s.head == c2s.tail && s2c.head == s2c.tail)
++			break; /* speed the test up */
+ 	}
+ 
+-	if (cr)
+-		fail("client: %s\n", gnutls_strerror(cr));
+-	if (sr)
+-		fail("server: %s\n", gnutls_strerror(sr));
++	if (expect_success) {
++		if (cr)
++			fail("client: %s\n", gnutls_strerror(cr));
++		if (sr)
++			fail("server: %s\n", gnutls_strerror(sr));
++
++	} else {
++		if (cr == 0 && sr == 0)
++			fail("handshake unexpectedly succeeded: %s / %s\n",
++			     gnutls_strerror(cr), gnutls_strerror(sr));
++	}
+ 
+ 	success("OK\n");
+ 
+@@ -421,14 +431,44 @@ static ssize_t client_push_split_hello(gnutls_transport_ptr_t tr, const void *b,
+ 	return l;
+ }
+ 
++static ssize_t client_push_split_hello_bad_seq(gnutls_transport_ptr_t tr,
++					       const void *b, size_t l)
++{
++	/* gnutls wasn't matching on message_seq on merging, see #1839 */
++	static int seq_offset = 0; /* for renumbering follow-up epoch0 ones */
++
++	const uint8_t *data = (const uint8_t *)b;
++	uint8_t *frag1, *frag2;
++	size_t frag1_len, frag2_len;
++
++	/* Pass through anything that isn't an epoch0 ClientHello with body */
++	if (l < 13 + 12 + 1 || /* too short for DTLS record header */
++	    data[0] != 22 || /* not a handshake record */
++	    data[3] != 0 || data[4] != 0 || /* not epoch 0 */
++	    data[13] != 1) /* not ClientHello */
++		return queue_put_renumbered(&c2s, b, l, seq_offset);
++
++	/* epoch0 Client Hello: special treatment of splitting into fragments */
++	split_client_hello(data, l, &frag1, &frag1_len, &frag2, &frag2_len);
++	queue_put(&c2s, frag1, frag1_len);
++	frag2[18]++; /* WRONG, message_seq mismatch must be rejected, #1839 */
++	queue_put(&c2s, frag2, frag2_len);
++	free(frag1);
++	free(frag2);
++	seq_offset++;
++	return l;
++}
++
+ void doit(void)
+ {
+ 	global_init();
+-	test(client_push_normal);
++	test(client_push_normal, true);
+ 	success("malicious reassembly bug exploitation (#1816):\n");
+ 	test_malicious1816();
+ 	success("split client hello smoke-test\n");
+-	test(client_push_split_hello);
++	test(client_push_split_hello, true);
++	success("split client hello smoke-test and mangle sequence number\n");
++	test(client_push_split_hello_bad_seq, false);
+ 	gnutls_global_deinit();
+ }
+ 
+-- 
+2.53.0
+

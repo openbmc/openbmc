@@ -5,6 +5,12 @@ SECTION = "base"
 
 inherit meson pkgconfig gettext upstream-version-is-even ptest-gnome
 
+# D-Bus publishes bugfix/security-only micro releases on its stable
+# (even-minor) branches. Odd-minor development branches (e.g. 1.17.x) are
+# not supported at all and receive no bug fixes, not even for security
+# vulnerabilities, so only the even-minor stable series is tracked here.
+inherit upstream-stable-release-point
+
 LICENSE = "AFL-2.1 | GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb0ffc69a965797a3d6686baa153ef05 \
                     file://dbus/dbus.h;beginline=6;endline=22;md5=df4251a6c6e15e6a9e3c77b2ac30065d \

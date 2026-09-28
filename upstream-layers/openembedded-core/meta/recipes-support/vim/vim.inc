@@ -16,6 +16,36 @@ SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https;tag=v${PV} 
            file://disable_acl_header_check.patch \
            file://0001-src-Makefile-improve-reproducibility.patch \
            file://no-path-adjust.patch \
+           file://CVE-2026-44656.patch \
+           file://CVE-2026-41411.patch \
+           file://CVE-2026-45130.patch \
+           file://CVE-2026-46483.patch \
+           file://CVE-2026-52858.patch \
+           file://CVE-2026-52858-regression.patch \
+           file://CVE-2026-52859.patch \
+           file://CVE-2026-52860.patch \
+           file://CVE-2026-42307.patch \
+           file://CVE-2026-43961.patch \
+           file://CVE-2026-47162.patch \
+           file://CVE-2026-47167.patch \
+           file://CVE-2026-55892.patch \
+           file://CVE-2026-57452.patch \
+           file://CVE-2026-55693.patch \
+           file://CVE-2026-55895.patch \
+           file://CVE-2026-57451.patch \
+           file://CVE-2026-57453.patch \
+           file://CVE-2026-57454.patch \
+           file://CVE-2026-57455.patch \
+           file://CVE-2026-57456.patch \
+           file://CVE-2026-59856.patch \
+           file://CVE-2026-59857.patch \
+           file://CVE-2026-59858.patch \
+           file://CVE-2026-73072.patch \
+           file://CVE-2026-73073.patch \
+           file://CVE-2026-73074.patch \
+           file://CVE-2026-73076.patch \
+           file://CVE-2026-73077.patch \
+           file://CVE-2026-73078.patch \
            "
 
 PV .= ".0340"

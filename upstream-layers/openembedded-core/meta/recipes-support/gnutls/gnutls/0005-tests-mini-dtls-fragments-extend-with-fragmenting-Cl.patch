@@ -1,0 +1,149 @@
+From cee203d6ba4d49332a49e46a7d59e9ef7b33a741 Mon Sep 17 00:00:00 2001
+From: Alexander Sosedkin <asosedkin@redhat.com>
+Date: Mon, 20 Apr 2026 16:08:11 +0200
+Subject: [PATCH 5/8] tests/mini-dtls-fragments: extend with fragmenting
+ ClientHello
+
+Signed-off-by: Alexander Sosedkin <asosedkin@redhat.com>
+
+Upstream-Status: Backport [https://gitlab.com/gnutls/gnutls/-/commit/bb427ff74dba849d40753ed9c8511e873f762743]
+CVE: CVE-2026-33846
+Signed-off-by: Pritam Srichandan Sahoo <PritamSrichandan.Sahoo@windriver.com>
+---
+ tests/mini-dtls-fragments.c | 107 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 107 insertions(+)
+
+diff --git a/tests/mini-dtls-fragments.c b/tests/mini-dtls-fragments.c
+index 8d5a18acd..93490bac2 100644
+--- a/tests/mini-dtls-fragments.c
++++ b/tests/mini-dtls-fragments.c
+@@ -132,6 +132,39 @@ static ssize_t client_push_normal(gnutls_transport_ptr_t tr, const void *b,
+ 	return queue_put(&c2s, b, l);
+ }
+ 
++static void write_u16(uint8_t *p, uint16_t val)
++{
++	p[0] = val >> 8;
++	p[1] = val & 0xff;
++}
++
++static void write_u24(uint8_t *p, uint32_t val)
++{
++	p[0] = (val >> 16) & 0xff;
++	p[1] = (val >> 8) & 0xff;
++	p[2] = val & 0xff;
++}
++
++static void write_u48(uint8_t *p, uint64_t seq)
++{
++	int i;
++	for (i = 5; i >= 0; i--) {
++		p[i] = seq & 0xff;
++		seq >>= 8;
++	}
++}
++
++static uint64_t read_u48(const uint8_t *p)
++{
++	uint64_t seq = 0;
++	int i;
++	for (i = 5; i >= 0; i--) {
++		seq <<= 8;
++		seq |= p[i];
++	}
++	return seq;
++}
++
+ static void test(gnutls_push_func client_push)
+ {
+ 	gnutls_session_t client, server;
+@@ -316,12 +349,86 @@ static void test_malicious1816(void)
+ 	gnutls_certificate_free_credentials(scred);
+ }
+ 
++static ssize_t queue_put_renumbered(queue_t *q, const uint8_t *data, size_t l,
++				    int delta_n)
++{
++	if (delta_n == 0 || l < 13 || data[3] != 0 || data[4] != 0)
++		return queue_put(&c2s, data, l);
++
++	uint8_t *p = malloc(l);
++	assert(p);
++	memcpy(p, data, l);
++	write_u48(p + 5, read_u48(p + 5) + delta_n);
++	ssize_t ret = queue_put(q, p, l);
++	free(p);
++	return ret;
++}
++
++static void split_client_hello(const uint8_t *data, size_t len, uint8_t **frag1,
++			       size_t *frag1_len, uint8_t **frag2,
++			       size_t *frag2_len)
++{
++	size_t body_size = len - 25;
++	*frag1_len = 13 + 12 + 1;
++	*frag2_len = 13 + 12 + (body_size - 1);
++
++	*frag1 = malloc(13 + 12 + 1);
++	assert(*frag1);
++	*frag2 = malloc(13 + 12 + body_size - 1);
++	assert(*frag2);
++
++	/* first fragment: record header + handshake header + first body byte */
++	memcpy(*frag1, data, 13); /* record header */
++	write_u16(*frag1 + 11, 12 + 1); /* record length */
++	memcpy(*frag1 + 13, data + 13, 12); /* handshake header */
++	write_u24(*frag1 + 19, 0); /* fragment_offset = 0 */
++	write_u24(*frag1 + 22, 1); /* fragment_length = 1 */
++	(*frag1)[25] = data[25]; /* first body byte */
++
++	/* second fragment: record header + handshake header + remaining body */
++	memcpy(*frag2, data, 13); /* record header */
++	write_u16(*frag2 + 11, *frag2_len - 13); /* record length */
++	write_u48(*frag2 + 5, read_u48(*frag2 + 5) + 1); /* sequence number */
++	memcpy(*frag2 + 13, data + 13, 12); /* handshake header */
++	write_u24(*frag2 + 19, 1); /* fragment_offset = 1 */
++	write_u24(*frag2 + 22, body_size - 1); /* shortened fragment_length */
++	memcpy(*frag2 + 25, data + 26, body_size - 1); /* remaining body */
++}
++
++static ssize_t client_push_split_hello(gnutls_transport_ptr_t tr, const void *b,
++				       size_t l)
++{
++	static int seq_offset = 0; /* for renumbering follow-up epoch0 ones */
++
++	const uint8_t *data = (const uint8_t *)b;
++	uint8_t *frag1, *frag2;
++	size_t frag1_len, frag2_len;
++
++	/* Pass through anything that isn't an epoch0 ClientHello with body */
++	if (l < 13 + 12 + 1 || /* too short for DTLS record header */
++	    data[0] != 22 || /* not a handshake record */
++	    data[3] != 0 || data[4] != 0 || /* not epoch 0 */
++	    data[13] != 1) /* not ClientHello */
++		return queue_put_renumbered(&c2s, b, l, seq_offset);
++
++	/* epoch0 Client Hello: special treatment of splitting into fragments */
++	split_client_hello(data, l, &frag1, &frag1_len, &frag2, &frag2_len);
++	queue_put(&c2s, frag1, frag1_len);
++	queue_put(&c2s, frag2, frag2_len);
++	free(frag1);
++	free(frag2);
++	seq_offset++;
++	return l;
++}
++
+ void doit(void)
+ {
+ 	global_init();
+ 	test(client_push_normal);
+ 	success("malicious reassembly bug exploitation (#1816):\n");
+ 	test_malicious1816();
++	success("split client hello smoke-test\n");
++	test(client_push_split_hello);
+ 	gnutls_global_deinit();
+ }
+ 
+-- 
+2.53.0
+

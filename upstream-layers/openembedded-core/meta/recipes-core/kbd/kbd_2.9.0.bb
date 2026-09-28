@@ -26,6 +26,7 @@ RCONFLICTS:${PN} = "console-tools"
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/${BP}.tar.xz \
            file://0001-Preserve-only-necessary-metadata-during-install.patch \
            file://0001-libkbdfile-Fix-problem-with-undeclared-sym_gzopen.patch \
+           file://CVE-2026-72693.patch \
            "
 
 SRC_URI[sha256sum] = "fb3197f17a99eb44d22a3a1a71f755f9622dd963e66acfdea1a45120951b02ed"

@@ -15,6 +15,7 @@ LIC_FILES_CHKSUM:append = " \
     file://Utilities/cmlibrhash/COPYING;md5=a8c2a557a5c53b1c12cddbee98c099af \
     file://Utilities/cmlibuv/LICENSE;md5=ad93ca1fffe931537fcf64f6fcce084d \
     file://Utilities/cmcurl/COPYING;md5=72f4e9890e99e68d77b7e40703d789b8 \
+    file://Utilities/cmnghttp2/COPYING;md5=764abdf30b2eadd37ce47dcbce0ea1ec \
     file://Utilities/cmcppdap/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
 "
 
@@ -31,8 +32,10 @@ EXTRA_OECMAKE += "\
     -DCMAKE_USE_SYSTEM_LIBRARY_LIBRHASH=0 \
     -DCMAKE_USE_SYSTEM_LIBRARY_EXPAT=0 \
     -DCMAKE_USE_SYSTEM_LIBRARY_CURL=0 \
+    -DCMAKE_DISABLE_FIND_PACKAGE_Libidn2=ON \
     -DENABLE_ACL=0 -DHAVE_ACL_LIBACL_H=0 \
     -DHAVE_SYS_ACL_H=0 \
+    -DCMAKE_USE_SYSTEM_LIBRARY_NGHTTP2=0 \
 "
 
 # Ensure e2fsprogs isn't found on the host to remove a build dependency and reproducible builds.

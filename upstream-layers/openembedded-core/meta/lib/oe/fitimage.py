@@ -425,8 +425,13 @@ class ItsNodeRootKernel(ItsNode):
         opt_props = {}
         conf_desc = []
         sign_entries = []
+        include_kernel = 1
 
-        if self._kernel:
+        # DTBO configuration sections do not include kernel property
+        if dtb and os.path.splitext(dtb.name)[1] == ".dtbo":
+            include_kernel = 0
+
+        if self._kernel and include_kernel:
             conf_desc.append("Linux kernel")
             opt_props["kernel"] = self._kernel.name
             if self._sign_enable:

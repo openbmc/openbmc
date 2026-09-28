@@ -42,6 +42,10 @@ SRC_URI += " \
     file://0001-tests-fix-TESTSUITE_AT.patch \
     file://0002-tests-check-for-recently-fixed-bug.patch \
     file://0003-Exclude-VCS-directory-with-writing-from-an-archive.patch \
+    file://CVE-2026-5704-dependent_p1.patch \
+    file://CVE-2026-5704-dependent_p2.patch \
+    file://CVE-2026-5704.patch \
+    file://CVE-2026-5704-regression.patch \
 "
 
 inherit ptest

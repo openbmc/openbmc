@@ -73,7 +73,7 @@ do_install() {
 		rmdir ${D}/bin
 	fi
 	if [ "${base_sbindir}" != "/sbin" ]; then
-		mkdir ${D}/${base_sbindir}
+		mkdir -p ${D}${base_sbindir}
 		mv ${D}/sbin/* ${D}/${base_sbindir}/
 		rmdir ${D}/sbin
 	fi

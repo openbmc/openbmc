@@ -25,3 +25,13 @@ do_kernel_configme:append () {
 # More details in: https://lists.openembedded.org/g/openembedded-core/message/229336
 # Disable ccache for kernel build if kernel rust support is enabled to workaround this.
 CCACHE_DISABLE ?= "1"
+
+python () {
+    if d.getVar('TARGET_ARCH') == 'riscv64' and d.getVar('TOOLCHAIN') != 'clang':
+        raise bb.parse.SkipRecipe(
+            "Rust support in the kernel on riscv64 requires kernel to be build with clang "
+            "toolchain, but the kernel is built with toolchain '%s'. See "
+            "https://docs.kernel.org/rust/arch-support.html for details."
+            % d.getVar('TOOLCHAIN')
+        )
+}

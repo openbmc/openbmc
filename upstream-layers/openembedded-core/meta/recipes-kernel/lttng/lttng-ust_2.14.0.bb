@@ -11,7 +11,9 @@ PYTHON_OPTION = "am_cv_python_pyexecdir='${PYTHON_SITEPACKAGES_DIR}' \
                  PYTHON_INCLUDE='-I${STAGING_INCDIR}/python${PYTHON_BASEVERSION}${PYTHON_ABI}' \
 "
 
-inherit autotools lib_package manpages python3native pkgconfig
+# lttng-ust publishes bugfix/security-only releases on its per-minor
+# stable-X.Y branches, the same upstream and release model as lttng-tools.
+inherit autotools lib_package manpages python3native pkgconfig upstream-stable-release-point
 
 include lttng-platforms.inc
 

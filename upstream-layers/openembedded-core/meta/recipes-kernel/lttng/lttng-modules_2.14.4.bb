@@ -7,6 +7,12 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=018e002dbdda3306682e394ddd65fa32"
 
 inherit module
 
+# lttng-modules publishes bugfix/security-only releases on its per-minor
+# stable-X.Y branches. Point releases also carry kernel-version enablement,
+# which keeps existing probes working against newer kernels rather than adding
+# user-visible functionality.
+inherit upstream-stable-release-point
+
 include lttng-platforms.inc
 
 SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
@@ -15,6 +21,7 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
 # Use :append here so that the patch is applied also when using devupstream
 SRC_URI:append = " file://0001-src-Kbuild-change-missing-CONFIG_TRACEPOINTS-to-warn.patch \
                    file://0001-fix-adjust-range-in-btrfs-probe-for-v6.18.14.patch \
+                   file://0001-fix-hrtimer-Reduce-trace-noise-in-hrtimer_start-v7.1.patch \
                 "
 SRC_URI[sha256sum] = "63deefbc15d9ce7c43d858187533367b01dcb6e8469d6b69ccb757d6d3dbb0ad"
 

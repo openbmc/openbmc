@@ -73,6 +73,8 @@ EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-werror \
 "
 
+EXTRA_OECONF:append:class-native = " --disable-grub-protect"
+
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[grub-mount] = "--enable-grub-mount,--disable-grub-mount,fuse"
 PACKAGECONFIG[device-mapper] = "--enable-device-mapper,--disable-device-mapper,libdevmapper"

@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "b80b99a14bd085fcacfa15c9165f651fbb3406e66cc603abf11c575093
 
 inherit pypi setuptools3
 
+CVE_PRODUCT = "pocoo:babel"
+
 S = "${UNPACKDIR}/babel-${PV}"
 
 CLEANBROKEN = "1"

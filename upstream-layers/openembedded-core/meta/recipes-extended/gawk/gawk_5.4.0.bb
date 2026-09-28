@@ -28,6 +28,11 @@ PACKAGECONFIG[pma-if-64bit] = "--enable-pma,--disable-pma, "
 SRC_URI = "${GNU_MIRROR}/gawk/gawk-${PV}.tar.xz \
            file://run-ptest \
            file://0001-configure.ac-re-enable-disabled-printf-features.patch \
+           file://CVE-2026-40467.patch \
+           file://CVE-2026-40468.patch \
+           file://CVE-2026-40469.patch \
+           file://CVE-2026-40553_p1.patch \
+           file://CVE-2026-40553_p2.patch \
            "
 
 SRC_URI[sha256sum] = "3dd430f0cd3b4428c6c3f6afc021b9cd3c1f8c93f7a688dc268ca428a90b4ac1"
@@ -80,7 +85,10 @@ do_install_ptest() {
 	# https://bugzilla.yoctoproject.org/show_bug.cgi?id=14371
 	rm -f ${D}${PTEST_PATH}/test/time.*
 	rm -f ${D}${PTEST_PATH}/test/timeout.*
-	for t in time timeout; do
+	# randtest is a statistical test that intermittently fails on overloaded systems
+	# https://bugzilla.yoctoproject.org/show_bug.cgi?id=16254
+	rm -f ${D}${PTEST_PATH}/test/randtest.*
+	for t in time timeout randtest; do
 		echo $t >> ${D}${PTEST_PATH}/test/skipped.txt
 	done
 }

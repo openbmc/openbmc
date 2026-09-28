@@ -20,7 +20,7 @@ diff --git a/Lib/test/test_readline.py b/Lib/test/test_readline.py
 index 537a9fb..ddf0323 100644
 --- a/Lib/test/test_readline.py
 +++ b/Lib/test/test_readline.py
-@@ -71,6 +71,7 @@ class TestHistoryManipulation (unittest.TestCase):
+@@ -74,6 +74,7 @@ class TestHistoryManipulation (unittest.TestCase):
  
      @unittest.skipUnless(hasattr(readline, "append_history_file"),
                           "append_history not available")
@@ -28,7 +28,7 @@ index 537a9fb..ddf0323 100644
      def test_write_read_append(self):
          hfile = tempfile.NamedTemporaryFile(delete=False)
          hfile.close()
-@@ -142,6 +143,7 @@ class TestHistoryManipulation (unittest.TestCase):
+@@ -145,6 +146,7 @@ class TestHistoryManipulation (unittest.TestCase):
          self.assertEqual(readline.get_history_item(1), "entrée 1")
          self.assertEqual(readline.get_history_item(2), "entrée 22")
  
@@ -36,7 +36,7 @@ index 537a9fb..ddf0323 100644
      def test_write_read_limited_history(self):
          previous_length = readline.get_history_length()
          self.addCleanup(readline.set_history_length, previous_length)
-@@ -390,6 +392,7 @@ readline.write_history_file(history_file)
+@@ -393,6 +395,7 @@ readline.write_history_file(history_file)
          self.assertIn(b"done", output)
  
  

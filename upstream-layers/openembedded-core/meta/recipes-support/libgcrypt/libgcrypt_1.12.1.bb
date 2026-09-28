@@ -25,12 +25,14 @@ SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.bz2 \
            file://no-native-gpg-error.patch \
            file://no-bench-slope.patch \
            file://run-ptest \
+           file://CVE-2026-41989.patch \
+           file://CVE-2026-41990.patch \
            "
 SRC_URI[sha256sum] = "7df5c08d952ba33f9b6bdabdb06a61a78b2cf62d2122c2d1d03a91a79832aa3c"
 
 BINCONFIG = "${bindir}/libgcrypt-config"
 
-inherit autotools texinfo binconfig-disabled pkgconfig ptest
+inherit autotools texinfo binconfig-disabled pkgconfig ptest upstream-stable-release-point
 
 require recipes-support/gnupg/drop-unknown-suffix.inc
 

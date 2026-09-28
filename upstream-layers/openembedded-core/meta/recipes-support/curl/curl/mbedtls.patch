@@ -1,0 +1,41 @@
+From 50b1408f97d9e8fc585c5351cbf86bf60a30eb59 Mon Sep 17 00:00:00 2001
+From: Viktor Szakats <commit@vsz.me>
+Date: Sat, 23 May 2026 01:05:10 +0200
+Subject: [PATCH] autotools: mbedtls detection fixes
+
+- fix symbol used for first-round detection.
+- skip detecting mbedtls on custom path if custom path was not supplied.
+
+Reported-by: Ross Burton
+Fixes #21727
+
+Closes #21729
+
+Upstream-Status: Backport [https://github.com/curl/curl/commit/50b1408f97d9e8fc585c5351cbf86bf60a30eb59]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ m4/curl-mbedtls.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/m4/curl-mbedtls.m4 b/m4/curl-mbedtls.m4
+index 7c5bccd22983..6887302592d6 100644
+--- a/m4/curl-mbedtls.m4
++++ b/m4/curl-mbedtls.m4
+@@ -42,7 +42,7 @@ if test "x$OPT_MBEDTLS" != "xno"; then
+     if test -z "$OPT_MBEDTLS"; then
+       dnl check for lib first without setting any new path
+ 
+-      AC_CHECK_LIB(mbedtls, mbedtls_havege_init,
++      AC_CHECK_LIB(mbedtls, mbedtls_ssl_init,
+       dnl libmbedtls found, set the variable
+       [
+         AC_DEFINE(USE_MBEDTLS, 1, [if mbedTLS is enabled])
+@@ -58,7 +58,7 @@ if test "x$OPT_MBEDTLS" != "xno"; then
+     addcflags=""
+     mbedtlslib=""
+ 
+-    if test "$USE_MBEDTLS" != "yes"; then
++    if test "$USE_MBEDTLS" != "yes" && test -n "$OPT_MBEDTLS"; then
+       dnl add the path and test again
+       addld=-L$OPT_MBEDTLS/lib$libsuff
+       addcflags=-I$OPT_MBEDTLS/include

@@ -15,6 +15,16 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/cups-${PV}-source.tar.gz \
            file://0004-cups-fix-multilib-install-file-conflicts.patch \
            file://volatiles.99_cups \
            file://cups-volatiles.conf \
+           file://CVE-2026-34978.patch \
+           file://CVE-2026-34979.patch \
+           file://CVE-2026-34980.patch \
+           file://CVE-2026-34990.patch \
+           file://CVE-2026-39314.patch \
+           file://CVE-2026-39316.patch \
+           file://CVE-2026-27447.patch \
+           file://CVE-2026-27447-regression_p1.patch \
+           file://CVE-2026-27447-regression_p2.patch \
+           file://CVE-2026-41079.patch \
            "
 
 GITHUB_BASE_URI = "https://github.com/OpenPrinting/cups/releases"

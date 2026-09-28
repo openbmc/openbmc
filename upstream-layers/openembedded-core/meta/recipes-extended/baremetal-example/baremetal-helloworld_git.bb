@@ -22,7 +22,7 @@ IMAGE_NAME_SUFFIX ?= ""
 inherit baremetal-image
 
 # startup code for x86 uses NASM syntax
-DEPENDS:qemux86:append = " nasm-native"
+DEPENDS:append:qemux86 = " nasm-native"
 
 # These parameters are app specific for this example
 # This will be translated automatically to the architecture and

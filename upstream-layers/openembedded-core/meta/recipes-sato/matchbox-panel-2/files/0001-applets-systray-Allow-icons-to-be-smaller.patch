@@ -8,7 +8,7 @@ systray panel. This makes sure the icons are drawn at the size they
 expect.
 
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
-Upstream-Status: Submitted
+Upstream-Status: Backport [c5f3e42a29a36a12d11007b21904d343dfbd6ad3]
 ---
  applets/systray/systray.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)

@@ -1,0 +1,84 @@
+From 9ec8cad56e47c0555a056e928e6568d543b3ae0c Mon Sep 17 00:00:00 2001
+From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+Date: Wed, 1 Apr 2026 19:30:04 +0800
+Subject: [PATCH v1] src/device: Fix stored gatt cache DB Hash value not update
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There is an asymmetry in behavior: when services are added during
+the same connection (via Service Changed indication), the persistent
+storage (disk) is not updated with the new DB hash, but when services
+are removed, it is updated.
+
+During the same connection, We check DB hash value stored at
+/var/lib/bluetooth/<adaptor addr>/cache/<remote addr>.
+When established connection, the stored DB Hash value is A.Then we
+add new services, the stored DB Hash value is still A which should
+change to B. However, if we remove the existing services, the stored
+DB Hash value changed to C.
+
+When performing addition, it goes like this:
+
+discover_primary_cb()
+  └─> gatt_db_insert_service()      ← NEW service inserted into db
+        └─> gatt_service_added()    ← callback fires immediately
+              └─> store_gatt_db()   ← SAVED TO DISK (hash still OLD)
+  ...
+  └─> discovery_op_complete(success=true)
+        └─> read_db_hash(op)             ← sends ATT Read By Type
+              └─> [ATT response arrives]
+                    └─> db_hash_read_cb()
+                          ├─> gatt_db_attribute_write(op->hash, ...)
+                          │     └─> hash UPDATED IN MEMORY
+                          └─> discovery_op_complete(true, 0)
+                                ├─> [no services to remove, no
+                                │    store_gatt_db called]
+                                └─> service_changed_complete()
+
+Whereas removal perform like this:
+discovery_op_complete(success=true)  [1st call]
+  └─> read_db_hash(op)
+      └─> op->hash is NULL → sends ATT request → early return
+...
+[ATT response arrives]
+db_hash_read_cb()
+  └─> gatt_db_attribute_write(op->hash, ) ← hash UPDATED IN MEMORY
+  └─> discovery_op_complete(true, 0)          [2nd call]
+      └─> read_db_hash(op)  → op->hash already set → returns false
+      └─> gatt_db_remove_service()
+          └─> gatt_service_removed()
+              └─> store_gatt_db() ← SAVED TO DISK (hash is NEW)
+
+There is a timing issue to update DB Hash value.
+
+The gatt_client_service_changed() callback in src/device.c is called
+from service_changed_complete() in gatt-client.c, which is invoked
+after db_hash_read_cb() has already updated the hash. Adding
+store_gatt_db(device) here guarantees the db is persisted with the
+correct, up-to-date hash for both the addition and removal cases.
+
+Upstream-Status: Backport [https://github.com/bluez/bluez/commit/0fd01e98cf94616a5c1c39749314cdd4a1654687]
+Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+---
+ src/device.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 3ea683667..cfbde307b 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6267,7 +6267,11 @@ static void gatt_client_service_changed(uint16_t start_handle,
+ 							uint16_t end_handle,
+ 							void *user_data)
+ {
++	struct btd_device *device = user_data;
++
+ 	DBG("start 0x%04x, end: 0x%04x", start_handle, end_handle);
++
++	store_gatt_db(device);
+ }
+
+ static void gatt_debug(const char *str, void *user_data)
+--
+2.34.1

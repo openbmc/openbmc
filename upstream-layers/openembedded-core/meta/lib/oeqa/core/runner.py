@@ -78,6 +78,10 @@ class OETestResult(_TestResult):
                     self.shownmsg.append(test.id())
                     break
 
+    # Python 3.12 added this, stub it out for now
+    def addDuration(self, test, elapsed):
+         pass
+
     def logSummary(self, component, context_msg=''):
         elapsed_time = self.tc._run_end_time - self.tc._run_start_time
         self.tc.logger.info("SUMMARY:")
