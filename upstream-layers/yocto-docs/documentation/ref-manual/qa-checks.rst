@@ -919,7 +919,7 @@ the variable if it is not needed.
 This check will detect if the source of the package contains some
 upstream-provided tests and, if so, that ptests are implemented for this
 recipe.  See the ":ref:`test-manual/ptest:testing packages with ptest`"
-section in the Yocto Project Development Tasks Manual. See also the
+section in the Yocto Project Test Environment Manual. See also the
 ":ref:`ref-classes-ptest`" section.
 
 .. _qa-check-unknown-configure-option:

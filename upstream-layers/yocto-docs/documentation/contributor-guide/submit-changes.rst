@@ -671,6 +671,12 @@ page.
 
 .. note::
 
+   Patches submitted for a stable branch need to be isolated changes that are
+   human readable and understandable. Fixes for CVEs or other issues which have
+   a high complexity, consist of a large number of commits and/or a large
+   numbers of changed lines are unlikely to be accepted due to the difficulty
+   they cause with maintainability and scalability.
+
    Changes will not typically be accepted for branches which are marked as
    End-Of-Life (EOL).
 

@@ -72,7 +72,7 @@ Security Flags
 
 The Yocto Project has security flags that you can enable that help make
 your build output more secure. The security flags are in the
-``meta/conf/distro/include/security_flags.inc`` file in your
+``meta/conf/distro/include/security_flags.inc`` file in
 :term:`OpenEmbedded-Core (OE-Core)`.
 
 .. note::

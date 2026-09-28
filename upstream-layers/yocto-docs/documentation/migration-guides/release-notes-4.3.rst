@@ -73,7 +73,7 @@ New Features / Enhancements in 4.3
      for the latest long-term release (6.1).
 
    - The list of fixed kernel CVEs is updated regularly using data from
-     `linuxkernelcves.com <https://linuxkernelcves.com>`__.
+     `linuxkernelcves.com <https://web.archive.org/web/20240420122324/https://www.linuxkernelcves.com/>`__.
 
    - A ``showconfig`` task was added to the :ref:`ref-classes-cml1` class, to
      easily examine the final generated ``.config`` file.

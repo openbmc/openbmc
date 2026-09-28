@@ -287,13 +287,6 @@ Development Tools
 Here are tools that help you develop images and applications using
 the Yocto Project:
 
--  *CROPS:* `CROPS <https://github.com/crops/poky-container/>`__ is an
-   open source, cross-platform development framework that leverages
-   `Docker Containers <https://www.docker.com/>`__. CROPS provides an
-   easily managed, extensible environment that allows you to build
-   binaries for a variety of architectures on Windows, Linux and Mac OS
-   X hosts.
-
 -  *devtool:* This command-line tool is available as part of the
    extensible SDK (eSDK) and is its cornerstone. You can use ``devtool``
    to help build, test, and package software within the eSDK. You can
@@ -513,9 +506,9 @@ Linux.
    Build Appliance was useful as a way to try out development in the
    Yocto Project environment.
 
-#. *CROPS:* The final and best solution available now for developing
-   using the Yocto Project on a system not native to Linux is with
-   :ref:`CROPS <overview-manual/yp-intro:development tools>`.
+#. *CROPS:* Used to be a solution available for developing
+   using the Yocto Project on a system not native to Linux (see
+   https://github.com/crops/poky-container).
 
 Development Methods
 ===================
@@ -549,25 +542,10 @@ Build Host runs, you have several choices.
    ":ref:`dev-manual/start:setting up a native linux host`"
    section in the Yocto Project Development Tasks Manual.
 
--  *CROss PlatformS (CROPS):* Typically, you use
-   `CROPS <https://github.com/crops/poky-container/>`__, which leverages
-   `Docker Containers <https://www.docker.com/>`__, to set up a Build
-   Host that is not running Linux (e.g. Microsoft Windows or macOS).
-
-   .. note::
-
-      You can, however, use CROPS on a Linux-based system.
-
-   CROPS is an open source, cross-platform development framework that
-   provides an easily managed, extensible environment for building
-   binaries targeted for a variety of architectures on Windows, macOS,
-   or Linux hosts. Once the Build Host is set up using CROPS, you can
-   prepare a shell environment to mimic that of a shell being used on a
-   system natively running Linux.
-
-   For information on how to set up a Build Host with CROPS, see the
-   ":ref:`dev-manual/start:setting up to use cross platforms (crops)`"
-   section in the Yocto Project Development Tasks Manual.
+-  *OCI Containers:* Typically, you use an :wikipedia:`OCI container
+   <Open_Container_Initiative>` (with `Docker <https://www.docker.com/>`__ or
+   `Podman <https://podman.io/>`__ for example), to set up a :term:`Build
+   Host` that is not running Linux (e.g. Microsoft Windows or macOS).
 
 -  *Windows Subsystem For Linux (WSL 2):* You may use Windows Subsystem
    For Linux version 2 to set up a Build Host using Windows 10 or later,

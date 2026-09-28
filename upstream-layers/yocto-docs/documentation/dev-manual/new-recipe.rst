@@ -837,7 +837,7 @@ different ways:
 -  *systemd:* System Management Daemon (systemd) was designed to replace
    SysVinit and to provide enhanced management of services. For more
    information on systemd, see the systemd homepage at
-   https://freedesktop.org/wiki/Software/systemd/.
+   https://systemd.io/.
 
    To enable a service using systemd, your recipe needs to inherit the
    :ref:`ref-classes-systemd` class. See the ``systemd.bbclass`` file
@@ -988,11 +988,10 @@ kernel recipe you want by using the :term:`PREFERRED_PROVIDER` variable. As
 an example, consider the :oe_git:`x86-base.inc
 </openembedded-core/tree/meta/conf/machine/include/x86/x86-base.inc>` include file, which is a
 machine (i.e. :term:`MACHINE`) configuration file. This include file is the
-reason all x86-based machines use the ``linux-yocto`` kernel. Here are the
-relevant lines from the include file::
+reason all x86-based machines use the ``linux-yocto`` kernel. Here is the
+relevant line from that include file::
 
    PREFERRED_PROVIDER_virtual/kernel ??= "linux-yocto"
-   PREFERRED_VERSION_linux-yocto ??= "4.15%"
 
 When you use a virtual provider, you do not have to "hard code" a recipe
 name as a build dependency. You can use the
@@ -1056,7 +1055,7 @@ correctly trigger an upgrade.
 In order to ensure the versions compare properly, the recommended
 convention is to use a tilde (``~``) character as follows::
 
-  PV = 0.8.16~rc1
+  PV = "0.8.16~rc1"
 
 This way ``0.8.16~rc1`` sorts before ``0.8.16``. See the
 ":ref:`contributor-guide/recipe-style-guide:version policy`" section in the
@@ -1657,7 +1656,7 @@ in the BitBake User Manual.
    You indicate Python code using the ``${@python_code}`` syntax for the
    variable assignment::
 
-      SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/zip${@d.getVar('PV',1).replace('.', '')}.tgz
+      SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/zip${@d.getVar('PV',1).replace('.', '')}.tgz"
 
 -  *Shell Function Syntax:* Write shell functions as if you were writing
    a shell script when you describe a list of actions to take. You

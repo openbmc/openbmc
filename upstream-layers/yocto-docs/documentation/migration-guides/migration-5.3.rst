@@ -83,16 +83,16 @@ How to make those adjustments without tedious manual editing
 The following sed command can be used to remove S = "${WORKDIR}/git
 across a whole layer::
 
-   sed -i "/^S = \"\${WORKDIR}\/git\"/d" `find . -name *.bb -o -name *.inc -o -name *.bbclass`
+   sed -i "/^S = \"\${WORKDIR}\/git\"/d" `find . -name '*.bb' -o -name '*.inc' -o -name '*.bbclass'`
 
 Then, the following command can tweak the remaining :term:`S` assignments to
 refer to :term:`UNPACKDIR` instead of :term:`WORKDIR`::
 
-   sed -i "s/^S = \"\${WORKDIR}\//S = \"\${UNPACKDIR}\//g" `find . -name *.bb -o -name *.inc -o -name *.bbclass`
+   sed -i "s/^S = \"\${WORKDIR}\//S = \"\${UNPACKDIR}\//g" `find . -name '*.bb' -o -name '*.inc' -o -name '*.bbclass'`
 
 The first change can introduce a lot of consecutive empty lines, so those can be removed with::
 
-   sed -i -z -E 's/([ \t\f\v\r]*\n){3,}/\n\n/g' `find . -name *.bb -o -name *.inc`
+   sed -i -z -E 's/([ \t\f\v\r]*\n){3,}/\n\n/g' `find . -name '*.bb' -o -name '*.inc'`
 
 
 BitBake Git fetcher ``tag`` parameter
@@ -247,7 +247,7 @@ The following variables have been removed:
    built during the build. This was partly broken and hard to maintain.
 
 -  ``GPE_MIRROR``: this variable used to contain the
-   "http://gpe.linuxtogo.org/download/source" URL, but was not used by any
+   "https://web.archive.org/web/20160319203545/http://gpe.linuxtogo.org/download/source/" URL, but was not used by any
    recipe in OE-Core.
 
 Removed recipes

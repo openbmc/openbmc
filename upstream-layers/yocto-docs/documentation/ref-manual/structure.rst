@@ -370,7 +370,7 @@ Once the build process gets the sample file, it uses ``sed`` to substitute final
 .. _structure-build-conf-site.conf:
 
 ``build/conf/site.conf``
-========================
+------------------------
 
 This configuration file contains the site specific configurations for your build
 environment.
@@ -868,7 +868,10 @@ layer.
 ---------------
 
 This directory contains common license files and several text files used
-by the build system. The text files contain minimal device information
+by the build system, as well as
+:ref:`Wic files <dev-manual/wic:creating partitioned images using wic>`
+that define the layouts of the images produced by the build.
+The text files contain minimal device information
 and lists of files and directories with known permissions.
 
 .. _structure-meta-lib:
@@ -878,7 +881,7 @@ and lists of files and directories with known permissions.
 
 This directory contains OpenEmbedded Python library code used during the
 build process. It is enabled via the ``addpylib`` directive in
-``meta/conf/local.conf``. For more information, see
+``meta/conf/layer.conf``. For more information, see
 :ref:`bitbake-user-manual/bitbake-user-manual-metadata:extending python library code`.
 
 .. _structure-meta-recipes-bsp:

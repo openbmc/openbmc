@@ -8,3 +8,6 @@ Release 6.0 (wrynose)
 
    release-notes-6.0
    migration-6.0
+   release-notes-6.0.1
+   release-notes-6.0.2
+   release-notes-6.0.3

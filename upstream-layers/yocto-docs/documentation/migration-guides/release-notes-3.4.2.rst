@@ -200,7 +200,7 @@ openembedded-core
 
 meta-mingw
 
--  Repository Location: :yocto_git:`meta-mingw`
+-  Repository Location: :yocto_git:`/meta-mingw`
 -  Branch: :yocto_git:`honister </meta-mingw/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4.2 </meta-mingw/tag/?h=yocto-3.4.2>`
 -  Git Revision: :yocto_git:`f5d761cbd5c957e4405c5d40b0c236d263c916a8 </meta-mingw/commit/?id=f5d761cbd5c957e4405c5d40b0c236d263c916a8>`
@@ -239,4 +239,4 @@ yocto-docs
 -  Repository Location: :yocto_git:`/yocto-docs`
 -  Branch: :yocto_git:`honister </yocto-docs/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4.2 </yocto-docs/tag/?h=yocto-3.4.2>`
--  Git Revision: :yocto_git:`3061d3d62054a5c3b9e16bfce4bcd186fa7a23d2` </yocto-docs/commit/?3061d3d62054a5c3b9e16bfce4bcd186fa7a23d2>`
+-  Git Revision: :yocto_git:`3061d3d62054a5c3b9e16bfce4bcd186fa7a23d2 </yocto-docs/commit/?3061d3d62054a5c3b9e16bfce4bcd186fa7a23d2>`

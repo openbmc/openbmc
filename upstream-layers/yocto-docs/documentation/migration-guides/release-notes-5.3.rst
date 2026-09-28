@@ -253,7 +253,8 @@ New Features / Enhancements in |yocto-ver|
       the :term:`Poky` distro.
 
    -  ``linux/generate-cve-exclusions``: use data from CVEProject instead of
-      the archived https://linuxkernelcves.com.
+      the archived https://linuxkernelcves.com (see
+      https://web.archive.org/web/20240420122324/https://www.linuxkernelcves.com/).
 
    -  ``kernel-yocto``: allow annotated options to be modified. For example if
       the following kernel configuration is set::
@@ -561,7 +562,7 @@ New Features / Enhancements in |yocto-ver|
       :term:`IMAGE_EXTRA_PARTITION_FILES` variable for more information.
 
    -  The ``--diskid`` option was added to allow passing a :wikipedia:`MS-DOS
-      </MS-DOS>` or :wikipedia:`GPT <GUID_Partition_Table>`-formatted
+      <MS-DOS>` or :wikipedia:`GPT <GUID_Partition_Table>`-formatted
       disk IDs for a partition (for example: ``deadbeef-cafe-babe-f00d-cec2ea4eface``).
 
 -  SDK-related changes:

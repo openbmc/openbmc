@@ -675,7 +675,7 @@ When invoked by the user, this task creates a file containing the
 differences between the original config as produced by
 :ref:`ref-tasks-kernel_configme` task and the
 changes made by the user with other methods (i.e. using
-(:ref:`ref-tasks-kernel_menuconfig`). Once the
+(:ref:`ref-tasks-menuconfig`). Once the
 file of differences is created, it can be used to create a config
 fragment that only contains the differences. You can invoke this task
 from the command line as follows::
@@ -703,7 +703,7 @@ kernel with the correct branches checked out.
 -------------------------
 
 Validates the configuration produced by the
-:ref:`ref-tasks-kernel_menuconfig` task. The
+:ref:`ref-tasks-menuconfig` task. The
 :ref:`ref-tasks-kernel_configcheck` task produces warnings when a requested
 configuration does not appear in the final ``.config`` file or when you
 override a policy configuration in a hardware configuration fragment.
@@ -728,26 +728,6 @@ passed to the kernel configuration phase proper. This is also the time
 during which user-specified defconfigs are applied if present, and where
 configuration modes such as ``--allnoconfig`` are applied.
 
-.. _ref-tasks-kernel_menuconfig:
-
-``do_kernel_menuconfig``
-------------------------
-
-Invoked by the user to manipulate the ``.config`` file used to build a
-linux-yocto recipe. This task starts the Linux kernel configuration
-tool, which you then use to modify the kernel configuration.
-
-.. note::
-
-   You can also invoke this tool from the command line as follows::
-
-           $ bitbake linux-yocto -c menuconfig
-
-
-See the ":ref:`kernel-dev/common:using ``menuconfig```"
-section in the Yocto Project Linux Kernel Development Manual for more
-information on this configuration tool.
-
 .. _ref-tasks-kernel_metadata:
 
 ``do_kernel_metadata``
@@ -766,10 +746,19 @@ which can then be applied by subsequent tasks such as
 ``do_menuconfig``
 -----------------
 
-Runs ``make menuconfig`` for the kernel. For information on
-``menuconfig``, see the
-":ref:`kernel-dev/common:using ``menuconfig```"
-section in the Yocto Project Linux Kernel Development Manual.
+Invoked by the user to manipulate the ``.config`` file used to build a
+linux-yocto recipe. This task starts the Linux kernel configuration
+tool, which you then use to modify the kernel configuration.
+
+You can invoke this tool from the command line as follows:
+
+.. code-block:: console
+
+   $ bitbake linux-yocto -c menuconfig
+
+See the ":ref:`kernel-dev/common:using ``menuconfig```"
+section in the Yocto Project Linux Kernel Development Manual for more
+information on this configuration tool.
 
 .. _ref-tasks-savedefconfig:
 
@@ -780,7 +769,7 @@ When invoked by the user, creates a defconfig file that can be used
 instead of the default defconfig. The saved defconfig contains the
 differences between the default defconfig and the changes made by the
 user using other methods (i.e. the
-:ref:`ref-tasks-kernel_menuconfig` task. You
+:ref:`ref-tasks-menuconfig` task. You
 can invoke the task using the following command::
 
    $ bitbake linux-yocto -c savedefconfig
@@ -802,21 +791,28 @@ can successfully build the kernel modules in the next step of the build.
 ``do_sizecheck``
 ----------------
 
-After the kernel has been built, this task checks the size of the
-stripped kernel image against
-:term:`KERNEL_IMAGE_MAXSIZE`. If that
-variable was set and the size of the stripped kernel exceeds that size,
-the kernel build produces a warning to that effect.
+If the variable :term:`KERNEL_IMAGE_MAXSIZE` is set, this task compares
+the size of all stripped kernel images listed in :term:`KERNEL_IMAGETYPES`
+against that value. If more than one image type is listed there, warn on
+any that exceed that value, but fail only if none of them fit.
 
 .. _ref-tasks-strip:
 
 ``do_strip``
 ------------
 
-If ``KERNEL_IMAGE_STRIP_EXTRA_SECTIONS`` is defined, this task strips
+If :term:`KERNEL_IMAGE_STRIP_EXTRA_SECTIONS` is defined, this task strips
 the sections named in that variable from ``vmlinux``. This stripping is
 typically used to remove nonessential sections such as ``.comment``
 sections from a size-sensitive configuration.
+
+Common sections to strip:
+
+-  ``.comment``: Holds compiler version strings and information
+
+-  ``.note.*``: Extra notes often left by the compiler
+
+-  ``.debug``: Debugging information
 
 .. _ref-tasks-validate_branches:
 

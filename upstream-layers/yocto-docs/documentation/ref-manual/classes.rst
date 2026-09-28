@@ -288,11 +288,8 @@ to ``${TMPDIR}/buildstats/``. You can analyze the elapsed time using
 chart of the entire build process and can be useful for highlighting
 bottlenecks.
 
-Collecting build statistics is enabled by default through the
-:term:`USER_CLASSES` variable from your
-``local.conf`` file. Consequently, you do not have to do anything to
-enable the class. However, if you want to disable the class, simply
-remove ":ref:`ref-classes-buildstats`" from the :term:`USER_CLASSES` list.
+If you want to enable the class, you can add ":ref:`ref-classes-buildstats`" to
+the :term:`USER_CLASSES` variable.
 
 .. _ref-classes-buildstats-summary:
 
@@ -564,7 +561,7 @@ starting with with ``SPDX_``.
 
 See the description of these variables and the
 ":ref:`dev-manual/sbom:creating a software bill of materials`"
-section in the Yocto Project Development Manual for more details.
+section in the Yocto Project Development Tasks Manual for more details.
 
 .. _ref-classes-cross:
 
@@ -2053,11 +2050,8 @@ consider some further things about using RPM:
    perform on-device upgrades.
 
 You can find additional information on the effects of the package class
-at these two Yocto Project mailing list links:
-
--  :yocto_lists:`/pipermail/poky/2011-May/006362.html`
-
--  :yocto_lists:`/pipermail/poky/2011-May/006363.html`
+at this Yocto Project mailing list link:
+:yocto_lists:`/g/poky/topic/61292484#msg6286`
 
 .. _ref-classes-package_deb:
 
@@ -2129,6 +2123,18 @@ For information on how to use this class, see the
 section in the Yocto Project Development Tasks Manual.
 
 Previously, this class was called the ``task`` class.
+
+.. note::
+
+   If you're defining a packagegroup and need to set::
+
+      PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+   for the packagegroup, you need to do that *before* the
+   ``inherit packagegroup`` line in the recipe file.
+   Setting it afterward can break BitBake parsing, result in
+   an "allarch" architecture mismatch error, or allow
+   architecture-independent defaults to override your intent.
 
 .. _ref-classes-patch:
 
@@ -2416,7 +2422,7 @@ This class is intended to be inherited by individual recipes. However,
 the class' functionality is largely disabled unless "ptest" appears in
 :term:`DISTRO_FEATURES`. See the
 ":ref:`test-manual/ptest:testing packages with ptest`"
-section in the Yocto Project Development Tasks Manual for more information
+section in the Yocto Project Test Environment Manual for more information
 on ptest.
 
 .. _ref-classes-ptest-cargo:
@@ -2440,7 +2446,7 @@ have tests intended to be executed with ``gnome-desktop-testing``.
 
 For information on setting up and running ptests, see the
 ":ref:`test-manual/ptest:testing packages with ptest`"
-section in the Yocto Project Development Tasks Manual.
+section in the Yocto Project Test Environment Manual.
 
 .. _ref-classes-ptest-python-pytest:
 
@@ -2613,6 +2619,13 @@ recipe or recipes you are working on to the :term:`RM_WORK_EXCLUDE` variable,
 which can also be set in your ``local.conf`` file. Here is an example::
 
    RM_WORK_EXCLUDE += "busybox glibc"
+
+Finally, if you are using this class for a recipe but want to prevent
+:term:`BitBake` from deleting specific folders or files in that recipe's
+:term:`WORKDIR` (other than ``temp``), you can preserve those folders or
+files with the :term:`RM_WORK_EXCLUDE_ITEMS` variable as follows::
+
+   RM_WORK_EXCLUDE_ITEMS += "items_to_keep"
 
 .. _ref-classes-rootfs*:
 
@@ -2819,7 +2832,7 @@ Python version 3.x extensions that use build systems based on ``setuptools``
 ``pyproject.toml`` format). Unlike :ref:`ref-classes-setuptools3`,
 this uses the traditional ``setup.py`` ``build`` and ``install`` commands and
 not wheels. This use of ``setuptools`` like this is
-`deprecated <https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v5830>`__
+`deprecated <https://github.com/pypa/setuptools/blob/14cc4452199818e60cf01cd9cea96e90761abce7/NEWS.rst#v5830>`__
 but still relatively common.
 
 .. _ref-classes-setuptools3-base:
@@ -3075,7 +3088,7 @@ the :term:`SYSTEMD_BOOT_CFG`,
 :term:`SYSTEMD_BOOT_TIMEOUT` variables.
 
 You can also see the `Systemd-boot
-documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__
+documentation <https://systemd.io/BOOT/>`__
 for more information.
 
 .. _ref-classes-terminal:
@@ -3515,8 +3528,7 @@ by rootfs image recipes. The build configuration should also use an
 on target hardware. Using ``systemd`` as init is recommended. Image builds
 should create an ESP partition for UEFI firmware and copy ``systemd-boot`` and
 UKI files there. Sample configuration for Wic images is provided in
-:oe_git:`scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in
-</openembedded-core/tree/scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in>`.
+:oecore_path:`meta/files/wic/efi-uki-bootdisk.wks.in`
 UKIs are generated using ``systemd`` reference implementation `ukify
 <https://www.freedesktop.org/software/systemd/man/latest/ukify.html>`__.
 This class uses a number of variables but tries to find sensible defaults for

@@ -277,7 +277,7 @@ release selection:
    <!-- Bitbake versions which correspond to the metadata release -->
    <object model="orm.bitbakeversion" pk="1">
       <field type="CharField" name="name">&DISTRO_NAME_NO_CAP;</field>
-      <field type="CharField" name="giturl">git://git.yoctoproject.org/poky</field>
+      <field type="CharField" name="giturl">https://git.yoctoproject.org/poky</field>
       <field type="CharField" name="branch">&DISTRO_NAME_NO_CAP;</field>
       <field type="CharField" name="dirpath">bitbake</field>
    </object>
@@ -331,7 +331,7 @@ that includes the layer. In general all releases include the layer.
    <object model="orm.layer" pk="1">
       <field type="CharField" name="name">openembedded-core</field>
       <field type="CharField" name="layer_index_url"></field>
-      <field type="CharField" name="vcs_url">git://git.yoctoproject.org/poky</field>
+      <field type="CharField" name="vcs_url">https://git.yoctoproject.org/poky</field>
       <field type="CharField" name="vcs_web_url">https://git.yoctoproject.org/cgit/cgit.cgi/poky</field>
       <field type="CharField" name="vcs_web_tree_base_url">https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%</field>
       <field type="CharField" name="vcs_web_file_base_url">https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%</field>
@@ -408,7 +408,7 @@ itemizes all builds in progress. This file includes the time in seconds since
 each respective build started as well as the progress of the cloning, parsing,
 and task execution. Here is sample output for a build in progress:
 
-.. code-block:: JSON
+.. code-block:: json
 
    {"count": 1,
     "building": [
@@ -442,7 +442,7 @@ Be sure to provide values for host and port. The output is a JSON file that
 itemizes all complete builds, and includes build summary information. Here
 is sample output for a completed build:
 
-.. code-block:: JSON
+.. code-block:: json
 
    {"count": 1,
     "builds": [
@@ -481,7 +481,7 @@ The output is a JSON file that itemizes the specific build and includes
 build summary information. Here is sample output for a specific
 build:
 
-.. code-block:: JSON
+.. code-block:: json
 
    {"build":
       {"distro": "poky",

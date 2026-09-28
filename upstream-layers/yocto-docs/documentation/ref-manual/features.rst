@@ -211,7 +211,7 @@ metadata, as extra layers can define their own:
 -  *ptest:* Enables building the package tests where supported by
    individual recipes. For more information on package tests, see the
    ":ref:`test-manual/ptest:testing packages with ptest`" section
-   in the Yocto Project Development Tasks Manual.
+   in the Yocto Project Test Environment Manual.
 
 -  *pulseaudio:* Include support for
    `PulseAudio <https://www.freedesktop.org/wiki/Software/PulseAudio/>`__.
@@ -326,7 +326,7 @@ The image features available for all images are:
 -  *read-only-rootfs:* Creates an image whose root filesystem is
    read-only. See the
    ":ref:`security-manual/read-only-rootfs:creating a read-only root filesystem`"
-   section in the Yocto Project Development Tasks Manual for more
+   section in the Yocto Project Security Manual for more
    information.
 
 -  *read-only-rootfs-delayed-postinsts:* when specified in conjunction
@@ -348,7 +348,7 @@ The image features available for all images are:
    different package name (or names) within the image recipe or at the
    distro configuration level.
 
--  *stateless-rootfs:*: specifies that the image should be created as
+-  *stateless-rootfs:* specifies that the image should be created as
    stateless - when using ``systemd``, ``systemctl-native`` will not
    be run on the image, leaving the image for population at runtime by
    systemd.
@@ -397,6 +397,10 @@ these valid features is as follows:
    ":ref:`dev-manual/debugging:debugging with the gnu project debugger (gdb) remotely`" section
    in the Yocto Project Development Tasks Manual. For information on
    tracing and profiling, see the :doc:`/profile-manual/index`.
+
+-  *tools-profile:*: Installs profiling tools such as ``perf``. See the
+   :ref:`profile-manual/intro:Yocto Project Profiling and Tracing Manual` for more
+   information.
 
 -  *tools-sdk:* Installs a full SDK that runs on the device.
 

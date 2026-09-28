@@ -9,16 +9,6 @@ OpenEmbedded Kickstart (``.wks``) Reference
 Introduction
 ============
 
-The current Wic implementation supports only the basic kickstart
-partitioning commands: ``partition`` (or ``part`` for short) and
-``bootloader``.
-
-.. note::
-
-   Future updates will implement more commands and options. If you use
-   anything that is not specifically supported, results can be
-   unpredictable.
-
 This chapter provides a reference on the available kickstart commands.
 The information lists the commands, their syntax, and meanings.
 Kickstart commands are based on the Fedora kickstart versions but with
@@ -230,7 +220,7 @@ supports the following options:
 
 -  ``--configfile``: Specifies a user-defined configuration file for
    the bootloader. You can provide a full pathname for the file or a
-   file located in the ``canned-wks`` folder. This option overrides
+   file located in the ``files/wic`` folder. This option overrides
    all other bootloader options.
 
 -  ``--ptable``: Specifies the partition table format. Valid values are:
@@ -242,3 +232,15 @@ supports the following options:
 -  ``--timeout``: Specifies the number of seconds before the
    bootloader times out and boots the default option.
 
+Directive: include
+==================
+
+The ``include`` directive can be used to include a WKS file into another. The
+only argument to this command is the path to the file to include, relative to
+the current file. For example:
+
+.. code-block:: shell
+
+   include common.wks.inc
+
+   bootloader --configfile="directdisk-bootloader-config.cfg"

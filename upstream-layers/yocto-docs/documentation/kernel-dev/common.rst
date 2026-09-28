@@ -207,7 +207,7 @@ section:
    ``linux-yocto-4.12`` kernel and be in the ``standard/base`` branch::
 
       $ cd ~
-      $ git clone git://git.yoctoproject.org/linux-yocto-4.12 --branch standard/base
+      $ git clone https://git.yoctoproject.org/linux-yocto-4.12 --branch standard/base
       Cloning into 'linux-yocto-4.12'...
       remote: Counting objects: 6097195, done.
       remote: Compressing objects: 100% (901026/901026), done.
@@ -233,7 +233,7 @@ section:
    ``yocto-kernel-cache`` and switch to the ``yocto-4.12`` branch::
 
       $ cd ~
-      $ git clone git://git.yoctoproject.org/yocto-kernel-cache --branch yocto-4.12
+      $ git clone https://git.yoctoproject.org/yocto-kernel-cache --branch yocto-4.12
       Cloning into 'yocto-kernel-cache'...
       remote: Counting objects: 22639, done.
       remote: Compressing objects: 100% (9761/9761), done.

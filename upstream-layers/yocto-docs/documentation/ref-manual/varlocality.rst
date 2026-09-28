@@ -76,13 +76,13 @@ Local
 This section lists variables whose configuration context is the local
 configuration through the ``local.conf`` file.
 
--  :term:`DISTRO`
+-  :term:`DISTRO` (can also be set by the :ref:`ref-fragments-builtin-core-distro`
+   :term:`built-in fragment`)
 
--  :term:`MACHINE`
+-  :term:`MACHINE` (can also be set by the :ref:`ref-fragments-builtin-core-machine`
+   :term:`built-in fragment`)
 
 -  :term:`DL_DIR`
-
--  :term:`BBFILES`
 
 -  :term:`EXTRA_IMAGE_FEATURES`
 

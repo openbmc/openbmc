@@ -36,10 +36,7 @@ Here is a list of supported recipes:
 -  ``build-appliance-image``: An example virtual machine that contains
    all the pieces required to run builds using the build system as well
    as the build system itself. You can boot and run the image using
-   either the `VMware
-   Player <https://www.vmware.com/products/player/overview.html>`__ or
-   `VMware
-   Workstation <https://www.vmware.com/products/workstation/overview.html>`__.
+   `VMware Workstation <https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion>`__.
    For more information on this image, see the :yocto_home:`Build
    Appliance </software-item/build-appliance>` page
    on the Yocto Project website.

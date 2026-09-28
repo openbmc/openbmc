@@ -39,7 +39,7 @@ other tools when it seems useful to do so.
 The coverage below details some of the most common ways you'll likely
 want to apply the tool; full documentation can be found either within
 the tool itself or in the manual pages at
-`perf(1) <https://linux.die.net/man/1/perf>`__.
+:manpage:`perf(1)`.
 
 perf Setup
 ----------
@@ -869,8 +869,8 @@ goes a little way to support the idea mentioned previously that given
 the right kind of trace data, higher-level profiling-type summaries can
 be derived from it.
 
-Documentation on using the `'perf script' Python
-binding <https://linux.die.net/man/1/perf-script-python>`__.
+Documentation on using the :manpage:`'perf script' Python
+binding <perf-script-python(1)>`.
 
 System-Wide Tracing and Profiling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1150,23 +1150,19 @@ perf Documentation
 Online versions of the manual pages for the commands discussed in this
 section can be found here:
 
--  The `'perf stat' manual page <https://linux.die.net/man/1/perf-stat>`__.
+-  The :manpage:`'perf stat' manual page <perf-stat(1)>`.
 
--  The `'perf record'
-   manual page <https://linux.die.net/man/1/perf-record>`__.
+-  The :manpage:`'perf record' manual page <perf-record(1)>`.
 
--  The `'perf report'
-   manual page <https://linux.die.net/man/1/perf-report>`__.
+-  The :manpage:`'perf report' manual page <perf-report(1)>`.
 
--  The `'perf probe' manual page <https://linux.die.net/man/1/perf-probe>`__.
+-  The :manpage:`'perf probe' manual page <perf-probe(1)>`.
 
--  The `'perf script'
-   manual page <https://linux.die.net/man/1/perf-script>`__.
+-  The :manpage:`'perf script' manual page <perf-script(1)>`.
 
--  Documentation on using the `'perf script' Python
-   binding <https://linux.die.net/man/1/perf-script-python>`__.
+-  Documentation on using the :manpage:`'perf script' Python binding <perf-script-python(1)>`.
 
--  The top-level `perf(1) manual page <https://linux.die.net/man/1/perf>`__.
+-  The top-level :manpage:`perf(1) manual page <perf(1)>`.
 
 Normally, you should be able to open the manual pages via perf itself
 e.g. ``perf help`` or ``perf help record``.
@@ -1781,7 +1777,7 @@ gather / print / aggregate data extracted from the context they end up being
 called under.
 
 For example, this probe from the `SystemTap
-tutorial <https://sourceware.org/systemtap/tutorial/>`__ just prints a
+tutorial <https://sourceware.org/systemtap/tutorial.html>`__ just prints a
 line every time any process on the system runs ``open()`` on a file. For each line,
 it prints the executable name of the program that opened the file, along
 with its PID, and the name of the file it opened (or tried to open), which it
@@ -1957,7 +1953,7 @@ SystemTap Documentation
 -----------------------
 
 The SystemTap language reference can be found here: `SystemTap Language
-Reference <https://sourceware.org/systemtap/langref/>`__
+Reference <https://sourceware.org/systemtap/langref.html>`__
 
 Links to other SystemTap documents, tutorials, and examples can be found
 here: `SystemTap documentation
@@ -2388,7 +2384,7 @@ first part of the filenames::
 The report shows each event that was
 found in the blktrace data, along with a summary of the overall block
 I/O traffic during the run. You can look at the
-`blkparse <https://linux.die.net/man/1/blkparse>`__ manual page to learn the
+:manpage:`blkparse(1)` manual page to learn the
 meaning of each field displayed in the trace listing.
 
 Live Mode
@@ -2588,14 +2584,14 @@ blktrace Documentation
 Online versions of the manual pages for the commands discussed in this
 section can be found here:
 
--  https://linux.die.net/man/8/blktrace
+-  :manpage:`blktrace(8)`
 
--  https://linux.die.net/man/1/blkparse
+-  :manpage:`blkparse(1)`
 
--  https://linux.die.net/man/8/btrace
+-  :manpage:`btrace(8)`
 
 The above manual pages, along with manuals for the other blktrace utilities
 (``btt``, ``blkiomon``, etc) can be found in the ``/doc`` directory of the blktrace
 tools git repository::
 
-   $ git clone git://git.kernel.dk/blktrace.git
+   $ git clone https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git

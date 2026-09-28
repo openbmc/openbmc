@@ -141,7 +141,7 @@ the following types of tests:
    built by the OpenEmbedded build system on the target machine. See the
    :ref:`Testing Packages With
    ptest <test-manual/ptest:Testing Packages With ptest>` section
-   in the Yocto Project Development Tasks Manual and the
+   in the Yocto Project Test Environment Manual and the
    ":yocto_wiki:`Ptest </Ptest>`" Wiki page for more
    information on Ptest.
 

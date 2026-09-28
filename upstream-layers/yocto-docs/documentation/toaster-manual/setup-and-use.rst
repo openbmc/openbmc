@@ -236,7 +236,7 @@ Perform the following steps to install Toaster:
 #.  Checkout a copy of ``poky`` into the web server directory. You will
     be using ``/var/www/toaster``::
 
-      $ git clone git://git.yoctoproject.org/poky
+      $ git clone https://git.yoctoproject.org/poky
       $ git checkout &DISTRO_NAME_NO_CAP;
 
 #.  Install Toaster dependencies using the ``--user`` flag which keeps the

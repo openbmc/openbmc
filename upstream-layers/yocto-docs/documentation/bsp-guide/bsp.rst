@@ -60,7 +60,7 @@ repository unto itself and clicking on the layer name displays two URLs
 from which you can clone the layer's repository to your local system.
 Here is an example that clones the Raspberry Pi BSP layer::
 
-   $ git clone git://git.yoctoproject.org/meta-raspberrypi
+   $ git clone https://git.yoctoproject.org/meta-raspberrypi
 
 In addition to BSP layers, the ``meta-yocto-bsp`` layer is part of
 :yocto_git:`meta-yocto </meta-yocto>`. The ``meta-yocto-bsp`` layer maintains
@@ -147,8 +147,7 @@ section.
 #. *Set Up the Build Environment:* Be sure you are set up to use BitBake
    in a shell. See the ":ref:`dev-manual/start:preparing the build host`"
    section in the Yocto Project Development Tasks Manual for information on how
-   to get a build host ready that is either a native Linux machine or a machine
-   that uses CROPS.
+   to get a :term:`build host` ready.
 
 #. *Prepare the Source Repositories*:
 
@@ -178,7 +177,7 @@ section.
 
    #. *Clone the Layer:* ::
 
-         $ git clone git://git.yoctoproject.org/meta-intel.git
+         $ git clone https://git.yoctoproject.org/meta-intel.git
          Cloning into 'meta-intel'...
          remote: Counting objects: 15585, done.
          remote: Compressing objects: 100% (5056/5056), done.
@@ -211,7 +210,7 @@ section.
    your hardware most closely matches the ``meta-raspberrypi``, clone
    that layer::
 
-      $ git clone git://git.yoctoproject.org/meta-raspberrypi
+      $ git clone https://git.yoctoproject.org/meta-raspberrypi
       Cloning into 'meta-raspberrypi'...
       remote: Counting objects: 4743, done.
       remote: Compressing objects: 100% (2185/2185), done.
@@ -440,7 +439,8 @@ the :yocto_git:`Source Repositories <>`:
    meta-raspberrypi/recipes-multimedia/omxplayer/omxplayer_git.bb
    meta-raspberrypi/recipes-multimedia/x264
    meta-raspberrypi/recipes-multimedia/x264/x264_git.bbappend
-   meta-raspberrypi/wic meta-raspberrypi/wic/sdimage-raspberrypi.wks
+   meta-raspberrypi/wic
+   meta-raspberrypi/wic/sdimage-raspberrypi.wks
 
 The following sections describe each part of the proposed BSP format.
 
@@ -1165,7 +1165,7 @@ Use these steps to create a BSP layer:
    :yocto_git:`Source Repositories <>`. To get examples of what you need
    in your configuration file, locate a layer (e.g. "meta-ti") and
    examine the
-   :yocto_git:`local.conf </meta-ti/tree/meta-ti-bsp/conf/layer.conf>`
+   :yocto_git:`layer.conf </meta-ti/tree/meta-ti-bsp/conf/layer.conf>`
    file.
 
 -  *Create a Machine Configuration File:* Create a

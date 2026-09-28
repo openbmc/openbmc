@@ -744,7 +744,7 @@ Replicating a Build Offline
 It can be useful to take a "snapshot" of upstream sources used in a
 build and then use that "snapshot" later to replicate the build offline.
 To do so, you need to first prepare and populate your downloads
-directory your "snapshot" of files. Once your downloads directory is
+directory with your "snapshot" of files. Once your downloads directory is
 ready, you can use it at any time and from any machine to replicate your
 build.
 

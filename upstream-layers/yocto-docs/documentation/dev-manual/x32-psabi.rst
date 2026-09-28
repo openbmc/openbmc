@@ -3,8 +3,8 @@
 Using x32 psABI
 ***************
 
-x32 processor-specific Application Binary Interface (`x32
-psABI <https://software.intel.com/en-us/node/628948>`__) is a native
+x32 processor-specific Application Binary Interface (:wikipedia:`x32
+psABI <X32_ABI>`) is a native
 32-bit processor-specific ABI for Intel 64 (x86-64) architectures. An
 ABI defines the calling conventions between functions in a processing
 environment. The interface determines what registers are used and what

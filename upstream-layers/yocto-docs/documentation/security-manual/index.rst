@@ -14,6 +14,7 @@ Yocto Project Security Manual
    securing-images
    vulnerabilities
    read-only-rootfs
+   sstate-signing
 
 .. include:: /boilerplate.rst
 

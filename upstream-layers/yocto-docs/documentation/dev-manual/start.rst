@@ -235,7 +235,7 @@ particular working environment and set of practices.
        equivalence feature.
 
        See the :doc:`/dev-manual/hashequivserver` section of the Yocto Project
-       Development Tasks Manual for details on how to setup a
+       Development Tasks Manual for details on how to set up a
        :ref:`overview-manual/concepts:Hash Equivalence` server.
 
     -  Set up an Autobuilder and have it populate the sstate cache and
@@ -261,11 +261,10 @@ Preparing the Build Host
 This section provides procedures to set up a system to be used as your
 :term:`Build Host` for
 development using the Yocto Project. Your build host can be a native
-Linux machine (recommended), it can be a machine (Linux, Mac, or
-Windows) that uses `CROPS <https://github.com/crops/poky-container>`__,
-which leverages `Docker Containers <https://www.docker.com/>`__ or it
-can be a Windows machine capable of running version 2 of Windows Subsystem
-For Linux (WSL 2).
+Linux machine (recommended), it can be an :wikipedia:`OCI container
+<Open_Container_Initiative>` (such as `Docker <https://www.docker.com/>`__ or
+`Podman <https://podman.io/>`__), or it can be a Windows machine capable of
+running version 2 of Windows Subsystem For Linux (WSL 2).
 
 .. note::
 
@@ -300,8 +299,7 @@ Project Build Host:
    officially supported. For a list of the distributions under
    validation and their status, see the ":ref:`Supported Linux
    Distributions <system-requirements-supported-distros>`"
-   section in the Yocto Project Reference Manual and the wiki page at
-   :yocto_wiki:`Distribution Support </Distribution_Support>`.
+   section in the Yocto Project Reference Manual.
 
 #. *Have Enough Free Memory:* Your system should have at least 50 Gbytes
    of free disk space for building images.
@@ -344,101 +342,6 @@ to use the Extensible SDK, see the ":doc:`/sdk-manual/extensible`" Chapter in th
 Project Application Development and the Extensible Software Development
 Kit (eSDK) manual. If you want to work on the kernel, see the :doc:`/kernel-dev/index`. If you are going to use
 Toaster, see the ":doc:`/toaster-manual/setup-and-use`"
-section in the Toaster User Manual. If you are a VSCode user, you can configure
-the `Yocto Project BitBake
-<https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
-extension accordingly.
-
-Setting Up to Use CROss PlatformS (CROPS)
------------------------------------------
-
-With `CROPS <https://github.com/crops/poky-container>`__, which
-leverages `Docker Containers <https://www.docker.com/>`__, you can
-create a Yocto Project development environment that is operating system
-agnostic. You can set up a container in which you can develop using the
-Yocto Project on a Windows, Mac, or Linux machine.
-
-Follow these general steps to prepare a Windows, Mac, or Linux machine
-as your Yocto Project build host:
-
-#. *Determine What Your Build Host Needs:*
-   `Docker <https://www.docker.com/what-docker>`__ is a software
-   container platform that you need to install on the build host.
-   Depending on your build host, you might have to install different
-   software to support Docker containers. Go to the Docker installation
-   page and read about the platform requirements in "`Supported
-   Platforms <https://docs.docker.com/engine/install/#supported-platforms>`__"
-   your build host needs to run containers.
-
-#. *Choose What To Install:* Depending on whether or not your build host
-   meets system requirements, you need to install "Docker CE Stable" or
-   the "Docker Toolbox". Most situations call for Docker CE. However, if
-   you have a build host that does not meet requirements (e.g.
-   Pre-Windows 10 or Windows 10 "Home" version), you must install Docker
-   Toolbox instead.
-
-#. *Go to the Install Site for Your Platform:* Click the link for the
-   Docker edition associated with your build host's native software. For
-   example, if your build host is running Microsoft Windows Version 10
-   and you want the Docker CE Stable edition, click that link under
-   "Supported Platforms".
-
-#. *Install the Software:* Once you have understood all the
-   pre-requisites, you can download and install the appropriate
-   software. Follow the instructions for your specific machine and the
-   type of the software you need to install:
-
-   -  Install `Docker Desktop on
-      Windows <https://docs.docker.com/docker-for-windows/install/#install-docker-desktop-on-windows>`__
-      for Windows build hosts that meet requirements.
-
-   -  Install `Docker Desktop on
-      MacOs <https://docs.docker.com/docker-for-mac/install/#install-and-run-docker-desktop-on-mac>`__
-      for Mac build hosts that meet requirements.
-
-   -  Install `Docker Engine on
-      CentOS <https://docs.docker.com/engine/install/centos/>`__
-      for Linux build hosts running the CentOS distribution.
-
-   -  Install `Docker Engine on
-      Debian <https://docs.docker.com/engine/install/debian/>`__
-      for Linux build hosts running the Debian distribution.
-
-   -  Install `Docker Engine for
-      Fedora <https://docs.docker.com/engine/install/fedora/>`__
-      for Linux build hosts running the Fedora distribution.
-
-   -  Install `Docker Engine for
-      Ubuntu <https://docs.docker.com/engine/install/ubuntu/>`__
-      for Linux build hosts running the Ubuntu distribution.
-
-#. *Optionally Orient Yourself With Docker:* If you are unfamiliar with
-   Docker and the container concept, you can learn more here -
-   https://docs.docker.com/get-started/.
-
-#. *Launch Docker or Docker Toolbox:* You should be able to launch
-   Docker or the Docker Toolbox and have a terminal shell on your
-   development host.
-
-#. *Set Up the Containers to Use the Yocto Project:* Go to
-   https://github.com/crops/docker-win-mac-docs/wiki and follow
-   the directions for your particular build host (i.e. Linux, Mac, or
-   Windows).
-
-   Once you complete the setup instructions for your machine, you have
-   the Poky, Extensible SDK, and Toaster containers available. You can
-   click those links from the page and learn more about using each of
-   those containers.
-
-Once you have a container set up, everything is in place to develop just
-as if you were running on a native Linux machine. If you are going to
-use the Poky container, see the
-":ref:`dev-manual/start:preparing the Poky reference distro`"
-section. If you are going to use the Extensible SDK container, see the
-":doc:`/sdk-manual/extensible`" Chapter in the Yocto
-Project Application Development and the Extensible Software Development
-Kit (eSDK) manual. If you are going to use the Toaster container, see
-the ":doc:`/toaster-manual/setup-and-use`"
 section in the Toaster User Manual. If you are a VSCode user, you can configure
 the `Yocto Project BitBake
 <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
@@ -606,7 +509,7 @@ Initializing the Build Environment
 Initializing the build environment is a common task, as it needs to be done for
 each new instance of the shell where the :term:`Poky` reference distro was set up:
 
--  If ``bitbake-setup`` was used to setup the :term:`Poky` reference distro, you
+-  If ``bitbake-setup`` was used to set up the :term:`Poky` reference distro, you
    need to source the ``init-build-env`` file of the :term:`bitbake:Setup`
    directory that was created after the :ref:`bitbake:ref-bbsetup-command-init`
    command execution:
@@ -616,7 +519,7 @@ each new instance of the shell where the :term:`Poky` reference distro was set u
       $ source <setup-dir>/build/init-build-env
 
 
--  If the :term:`Poky` distro was setup using manual clones of the layers, you
+-  If the :term:`Poky` distro was set up using manual clones of the layers, you
    need to source the ``oe-init-build-env`` script present in the
    :term:`OpenEmbedded-Core (OE-Core)` layer:
 
@@ -624,7 +527,7 @@ each new instance of the shell where the :term:`Poky` reference distro was set u
 
       $ source openembedded-core/oe-init-build-env
 
-This will setup your current shell and change the current working directory to
+This will set up your current shell and change the current working directory to
 the :term:`Build Directory`.
 
 Where To Go From Here

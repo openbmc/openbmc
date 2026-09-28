@@ -245,7 +245,7 @@ following list:
          KERNEL_CC:append:arc = " ${TOOLCHAIN_OPTIONS}"
          KERNEL_LD:append:arc = " ${TOOLCHAIN_OPTIONS}"
 
-         KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc"
+         KERNEL_FEATURES:append:qemuall = " features/debug/printk.scc"
 
    -  *Place Machine-Specific Files in Machine-Specific Locations:* When
       you have a base recipe, such as ``base-files.bb``, that contains a
@@ -600,7 +600,7 @@ important as it ensures that items in the list remain colon-separated.
    append file would not even use the :term:`FILESEXTRAPATHS` statement.
 
 The end result of this ``.bbappend`` file is that on a Raspberry Pi, where
-``rpi`` will exist in the list of :term:`OVERRIDES`, the file
+``rpi`` will exist in the list of :term:`FILESOVERRIDES`, the file
 ``meta-raspberrypi/recipes-bsp/formfactor/formfactor/rpi/machconfig`` will be
 used during :ref:`ref-tasks-fetch` and the test for a non-zero file size in
 :ref:`ref-tasks-install` will return true, and the file will be installed.
@@ -660,7 +660,7 @@ file is in the layer at ``recipes-graphics/xorg-xserver``::
 Building off of the previous example, we once again are setting the
 :term:`FILESEXTRAPATHS` variable.  In this case we are also using
 :term:`SRC_URI` to list additional source files to use when ``rpi`` is found in
-the list of :term:`OVERRIDES`.  The :ref:`ref-tasks-install` task will then perform a
+the list of :term:`FILESOVERRIDES`.  The :ref:`ref-tasks-install` task will then perform a
 check for an additional :term:`MACHINE_FEATURES` that if set will cause these
 additional files to be installed.  These additional files are listed in
 :term:`FILES` so that they will be packaged.
@@ -956,13 +956,13 @@ above:
 
       Setting up source meta-intel, revision 15.0-hardknott-3.3-310-g0a96edae, branch master
       Running 'git init -q /srv/work/alex/my-build/meta-intel'
-      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin git://git.yoctoproject.org/meta-intel' in /srv/work/alex/my-build/meta-intel
+      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin https://git.yoctoproject.org/meta-intel' in /srv/work/alex/my-build/meta-intel
       Running 'git fetch -q origin || true' in /srv/work/alex/my-build/meta-intel
       Running 'git checkout -q 0a96edae609a3f48befac36af82cf1eed6786b4a' in /srv/work/alex/my-build/meta-intel
 
       Setting up source poky, revision 4.1_M1-372-g55483d28f2, branch akanavin/setup-layers
       Running 'git init -q /srv/work/alex/my-build/poky'
-      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin git://git.yoctoproject.org/poky' in /srv/work/alex/my-build/poky
+      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin https://git.yoctoproject.org/poky' in /srv/work/alex/my-build/poky
       Running 'git fetch -q origin || true' in /srv/work/alex/my-build/poky
       Running 'git remote remove poky-contrib > /dev/null 2>&1; git remote add poky-contrib ssh://git@push.yoctoproject.org/poky-contrib' in /srv/work/alex/my-build/poky
       Running 'git fetch -q poky-contrib || true' in /srv/work/alex/my-build/poky

@@ -1,7 +1,7 @@
 .. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
-Identify the component
-**********************
+Identifying the component
+*************************
 
 The Yocto Project and OpenEmbedded ecosystem is built of :term:`layers <Layer>`
 so the first step is to identify the component where the issue likely lies.

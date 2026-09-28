@@ -77,7 +77,7 @@ Default :term:`INIT_MANAGER` definition changed to ``systemd``
 --------------------------------------------------------------
 
 The default definition of :term:`INIT_MANAGER` in the :oe_git:`defaultsetup.conf
-<openembedded-core/tree/meta/conf/distro/defaultsetup.conf>` file was changed
+</openembedded-core/tree/meta/conf/distro/defaultsetup.conf>` file was changed
 from ``none`` to ``systemd``.
 
 This means that users of the default distro setup (appearing as the ``nodistro``
@@ -243,7 +243,7 @@ See commit :oecore_rev:`cd9e7304481b24b27df61c03ad73496d18e4d47c` for more infor
 
 All the :ref:`ref-classes-pkgconfig`-related variables, such as
 :term:`PKG_CONFIG_PATH`, are no longer exported in
-:oe_git:`meta/conf/bitbake.conf <bitbake/tree/meta/conf/bitbake.conf>` with the
+:oe_git:`meta/conf/bitbake.conf </bitbake/tree/meta/conf/bitbake.conf>` with the
 :ref:`export <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:Exporting
 Variables to the Environment>` directive.
 
@@ -406,12 +406,12 @@ Should be replaced by::
 See commit :oecore_rev:`b50d6debf7baa555fbfb3521c4f952675bba2d37` for more
 information.
 
-:doc:`WIC </dev-manual/wic>` files to be moved under ``files/wic``
-------------------------------------------------------------------
+:doc:`WIC </dev-manual/wic>` kickstart files to be moved under ``files/wic``
+----------------------------------------------------------------------------
 
-:doc:`WIC </dev-manual/wic>` related files such as :doc:`WKS
-</ref-manual/kickstart>` files or custom WIC plugins should be moved to the
-``files/wic/`` directory of the layer containing them.
+:doc:`WIC </dev-manual/wic>` kickstart files (:doc:`WKS </ref-manual/kickstart>`
+files) should be moved to the ``files/wic/`` directory of the layer containing
+them.
 
 If not done, the build will fail with errors indicating how to move these files,
 for example::
@@ -438,6 +438,9 @@ For example, here is the content of the :term:`OpenEmbedded-Core (OE-Core)`
    ├── qemux86-directdisk.wks
    ├── sdimage-bootpart.wks
    └── systemd-bootdisk.wks
+
+This change does not affect :ref:`WIC plugins <dev-manual/wic:Using the Wic
+Plugin Interface>`, which should remain in ``scripts/lib/wic/plugins/source/``.
 
 Support for SysVinit compatibility in systemd was dropped
 ---------------------------------------------------------

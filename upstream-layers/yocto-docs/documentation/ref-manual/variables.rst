@@ -300,6 +300,9 @@ system and gives an overview of their function and contents.
       variable), the OpenEmbedded build system ignores your request and
       will install the packages to avoid dependency errors.
 
+      This variable is supported for the RPM and IPK packaging backends,
+      but not for DEB.
+
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`PACKAGE_EXCLUDE` variables for related
       information.
@@ -940,7 +943,7 @@ system and gives an overview of their function and contents.
       Specifies each additional separate configuration when you are
       building targets with multiple configurations. Use this variable in
       your ``conf/local.conf`` configuration file. Specify a
-      multiconfigname for each configuration file you are using. For
+      multiconfig name for each configuration file you are using. For
       example, the following line specifies three configuration files::
 
          BBMULTICONFIG = "configA configB configC"
@@ -1527,6 +1530,11 @@ system and gives an overview of their function and contents.
       :term:`CCACHE_DISABLE` variable can be set to "1" in a recipe to disable
       `Ccache` support. This is useful when the recipe is known to not support it.
 
+   :term:`CCACHE_NATIVE_RECIPES_ALLOWED`
+      The :term:`CCACHE_NATIVE_RECIPES_ALLOWED` variable can be set in a
+      :term:`configuration file` to a list of native recipes that are allowed to
+      be optimized with the :ref:`ref-classes-ccache` class.
+
    :term:`CCACHE_TOP_DIR`
       When inheriting the :ref:`ref-classes-ccache` class, the
       :term:`CCACHE_TOP_DIR` variable can be set to the location of where
@@ -1802,12 +1810,49 @@ system and gives an overview of their function and contents.
       Where :term:`AUTOTOOLS_SCRIPT_PATH` is the location of the of the
       Autotools build system scripts, which defaults to :term:`S`.
 
+   :term:`CONFLICT_COMBINED_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies combined features (see
+      :term:`COMBINED_FEATURES` for what this means) that would be in conflict
+      should the recipe be built. In other words, if the
+      :term:`CONFLICT_COMBINED_FEATURES` variable lists a feature that also
+      appears in :term:`COMBINED_FEATURES` within the current configuration,
+      then the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
    :term:`CONFLICT_DISTRO_FEATURES`
       When inheriting the :ref:`ref-classes-features_check`
-      class, this variable identifies distribution features that would be
+      class, this variable identifies distro features that would be
       in conflict should the recipe be built. In other words, if the
       :term:`CONFLICT_DISTRO_FEATURES` variable lists a feature that also
       appears in :term:`DISTRO_FEATURES` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
+   :term:`CONFLICT_IMAGE_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies image features that would be
+      in conflict should the recipe be built. In other words, if the
+      :term:`CONFLICT_IMAGE_FEATURES` variable lists a feature that also
+      appears in :term:`IMAGE_FEATURES` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
+   :term:`CONFLICT_MACHINE_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies machine features that would be
+      in conflict should the recipe be built. In other words, if the
+      :term:`CONFLICT_MACHINE_FEATURES` variable lists a feature that also
+      appears in :term:`MACHINE_FEATURES` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
+   :term:`CONFLICT_TUNE_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies tune features that would be
+      in conflict should the recipe be built. In other words, if the
+      :term:`CONFLICT_TUNE_FEATURES` variable lists a feature that also
+      appears in :term:`TUNE_FEATURES` within the current configuration, then
       the recipe will be skipped, and if the build system attempts to build
       the recipe then an error will be triggered.
 
@@ -2135,8 +2180,8 @@ system and gives an overview of their function and contents.
 
    :term:`DEBUG_OPTIMIZATION`
       The options to pass in :term:`TARGET_CFLAGS` and :term:`CFLAGS` when
-      compiling a system for debugging. This variable defaults to "-O
-      -fno-omit-frame-pointer ${DEBUG_FLAGS} -pipe".
+      compiling a system for debugging. This variable defaults to "-Og
+      ${DEBUG_LEVELFLAG}".
 
    :term:`DEBUG_PREFIX_MAP`
       Allows to set C compiler options, such as ``-fdebug-prefix-map``,
@@ -2390,6 +2435,20 @@ system and gives an overview of their function and contents.
       of the distribution, see the :term:`DISTRO_NAME`
       variable.
 
+      You can define the :term:`DISTRO` in two ways:
+
+      -  with the :ref:`ref-fragments-builtin-core-distro` fragment:
+
+         .. code-block:: console
+
+            $ bitbake-config-build enable-fragment distro/<DISTRO>
+
+         Replace ``<DISTRO>`` with the name of the distro in the above
+         command.
+
+      -  in the :ref:`structure-build-conf-local.conf` file found in the
+         :term:`Build Directory`.
+
       The :term:`DISTRO` variable corresponds to a distribution configuration
       file whose root name is the same as the variable's argument and whose
       filename extension is ``.conf``. For example, the distribution
@@ -2624,7 +2683,7 @@ system and gives an overview of their function and contents.
    :term:`EFI_ARCH`
       The CPU architecture name within EFI standard. Set in
       :oe_git:`meta/conf/image-uefi.conf
-      <openembedded-core/tree/meta/conf/image-uefi.conf>`.
+      </openembedded-core/tree/meta/conf/image-uefi.conf>`.
 
    :term:`EFI_PROVIDER`
       When building bootable images (i.e. where ``hddimg``, ``iso``, or
@@ -2874,7 +2933,7 @@ system and gives an overview of their function and contents.
         - "read-only-rootfs" --- creates an image whose root filesystem is
           read-only. See the
           ":ref:`security-manual/read-only-rootfs:creating a read-only root filesystem`"
-          section in the Yocto Project Development Tasks Manual for more
+          section in the Yocto Project Security Manual for more
           information
         - "tools-debug" --- adds debugging tools such as gdb and strace.
         - "tools-sdk" --- adds development tools such as gcc, make,
@@ -3731,7 +3790,7 @@ system and gives an overview of their function and contents.
             source $loadaddr#bootscr-boot.cmd
 
       More information can be found in the official U-Boot documentation:
-      `U-Boot source command <https://docs.u-boot.org/en/latest/usage/cmd/source.html#fit-image.f>`__
+      `U-Boot source command <https://docs.u-boot.org/en/latest/usage/cmd/source.html#fit-image>`__
 
    :term:`FONT_EXTRA_RDEPENDS`
       When inheriting the :ref:`ref-classes-fontcache` class,
@@ -3754,8 +3813,8 @@ system and gives an overview of their function and contents.
 
    :term:`FULL_OPTIMIZATION`
       The options to pass in :term:`TARGET_CFLAGS` and :term:`CFLAGS` when
-      compiling an optimized system. This variable defaults to "-O2 -pipe
-      ${DEBUG_FLAGS}".
+      compiling an optimized system. This variable defaults to "-O2
+      ${DEBUG_LEVELFLAG}".
 
    :term:`GCCPIE`
       Enables Position Independent Executables (PIE) within the GNU C
@@ -3775,7 +3834,8 @@ system and gives an overview of their function and contents.
          GCCVERSION ?= "8.%"
 
       You can override this value by setting it in a
-      configuration file such as the ``local.conf``.
+      :term:`configuration file` such as a distro configuration file, granted
+      that the recipes associated to this version of GCC exist in your workspace.
 
    :term:`GDB`
       The minimal command and arguments to run the GNU Debugger.
@@ -3898,7 +3958,7 @@ system and gives an overview of their function and contents.
          GROUPADD_PARAM:${PN} = "-g 880 group1; -g 890 group2"
 
       For information on the standard Linux shell command
-      ``groupadd``, see https://linux.die.net/man/8/groupadd.
+      ``groupadd``, see :manpage:`groupadd(8)`.
 
    :term:`GROUPMEMS_PARAM`
       When inheriting the :ref:`ref-classes-useradd` class,
@@ -4310,6 +4370,21 @@ system and gives an overview of their function and contents.
             variable, you cannot update its contents by using ``:append``
             or ``:prepend``. You must use the ``+=`` operator to add one or
             more options to the :term:`IMAGE_FSTYPES` variable.
+
+   :term:`IMAGE_FSTYPES_DEBUGFS`
+      The :term:`IMAGE_FSTYPES_DEBUGFS` holds a list of filesystem image types
+      to generate when the :term:`IMAGE_GEN_DEBUGFS` variable is set to "1". The
+      content of this variable is the same as what is supported by the
+      :term:`IMAGE_FSTYPES` variable.
+
+   :term:`IMAGE_GEN_DEBUGFS`
+      When set to "1" in an :ref:`ref-classes-image` recipe, the
+      :term:`OpenEmbedded Build System` will generate a companion image that
+      contains the debug symbols and source code for the packages installed on
+      the image. The :term:`OpenEmbedded Build System` does this by adding all
+      the available ``-dbg`` and ``-src`` packages available in the package
+      feed, which are automatically generated during
+      :ref:`overview-manual/concepts:Package Splitting`.
 
    :term:`IMAGE_INSTALL`
       Used by recipes to specify the packages to install into an image
@@ -4965,8 +5040,8 @@ system and gives an overview of their function and contents.
          to "core-image-minimal-initramfs".
 
       You can also find more information by referencing the
-      ``conf/templates/default/local.conf.sample.extended``
-      configuration file in :yocto_git:`meta-poky <meta-yocto/tree/meta-poky>`, the :ref:`ref-classes-image`
+      :oecore_path:`meta/conf/templates/default/local.conf.sample.extended`
+      configuration file in :term:`OpenEmbedded-Core (OE-Core)`, the :ref:`ref-classes-image`
       class, and the :ref:`ref-classes-kernel` class to see how to use the
       :term:`INITRAMFS_IMAGE` variable.
 
@@ -5538,17 +5613,18 @@ system and gives an overview of their function and contents.
       information.
 
    :term:`KERNEL_IMAGE_MAXSIZE`
-      Specifies the maximum size of the kernel image file in kilobytes. If
-      :term:`KERNEL_IMAGE_MAXSIZE` is set, the size of the kernel image file is
-      checked against the set value during the
-      :ref:`ref-tasks-sizecheck` task. The task fails if
-      the kernel image file is larger than the setting.
+      Specifies the maximum allowable size of the kernel image file in kibibytes.
+      If this variable is set, the sizes of all of the kernel image files listed
+      in :term:`KERNEL_IMAGETYPES` are checked against this value during the
+      :ref:`ref-tasks-sizecheck` task. That task will warn about any of the
+      kernel images that exceed the maximum, and will fail only if all images
+      are too large.
 
       :term:`KERNEL_IMAGE_MAXSIZE` is useful for target devices that have a
       limited amount of space in which the kernel image must be stored.
 
       By default, this variable is not set, which means the size of the
-      kernel image is not checked.
+      kernel images are not checked.
 
    :term:`KERNEL_IMAGE_NAME`
       The base name of the kernel image. This variable is set in the
@@ -5557,6 +5633,13 @@ system and gives an overview of their function and contents.
          KERNEL_IMAGE_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
       See :term:`KERNEL_ARTIFACT_NAME` for additional information.
+
+   :term:`KERNEL_IMAGE_STRIP_EXTRA_SECTIONS`
+      If this variable is set, it should contain the sections to be
+      stripped from the ``vmlinux`` image by the kernel-related
+      :ref:`ref-tasks-strip` task. As a simple example::
+
+         KERNEL_IMAGE_STRIP_EXTRA_SECTIONS = ".comment .note.* .debug"
 
    :term:`KERNEL_IMAGETYPE`
       The type of kernel to build for a device, usually set by the machine
@@ -5871,7 +5954,8 @@ system and gives an overview of their function and contents.
       section in the Yocto Project Development Tasks Manual.
 
    :term:`LICENSE`
-      The list of source licenses for the recipe. Follow these rules:
+      This is a required field in an OpenEmbedded recipe file, and should
+      contain a list of source licenses for the recipe. Follow these rules:
 
       -  Do not use spaces within individual license names.
 
@@ -5910,6 +5994,12 @@ system and gives an overview of their function and contents.
          LICENSE = "GFDL-1.2 & GPL-2.0-only"
          LICENSE:${PN} = "GPL-2.0.only"
          LICENSE:${PN}-doc = "GFDL-1.2"
+
+      .. note::
+
+         A recipe's :term:`LICENSE` value must be accompanied by an associated
+         :term:`LIC_FILES_CHKSUM` value, except in the special case where
+         the :term:`LICENSE` value is set to "CLOSED".
 
    :term:`LICENSE_CREATE_PACKAGE`
       Setting :term:`LICENSE_CREATE_PACKAGE` to "1" causes the OpenEmbedded
@@ -6025,6 +6115,19 @@ system and gives an overview of their function and contents.
          $ uname -r
          3.7.0-rc8-custom
 
+   :term:`LOCALE_PATHS`
+      The :term:`LOCALE_PATHS` variable holds a whitespace separated list of
+      paths that are scanned to construct ``-locale`` packages during
+      :ref:`overview-manual/concepts:Package Splitting`. The list
+      contains ``${datadir}/locale`` by default.
+
+   :term:`LOCALE_UTF8_IS_DEFAULT`
+      If set, locale names are renamed such that those lacking an explicit
+      encoding (e.g. ``en_US``) will always be UTF-8, and non-UTF-8 encodings
+      are renamed to, e.g., ``en_US.ISO-8859-1``. Otherwise, the encoding is
+      specified by `Glibc`'s ``SUPPORTED`` file. This is not supported for
+      pre-compiled locales.
+
    :term:`LOG_DIR`
       Specifies the directory to which the OpenEmbedded build system writes
       overall log files. The default directory is ``${TMPDIR}/log``.
@@ -6040,13 +6143,20 @@ system and gives an overview of their function and contents.
       in-use.
 
    :term:`MACHINE`
-      Specifies the target device for which the image is built. You define
-      :term:`MACHINE` in the ``local.conf`` file found in the
-      :term:`Build Directory`. By default, :term:`MACHINE` is set to
-      "qemux86", which is an x86-based architecture machine to be emulated
-      using QEMU::
+      Specifies the target device for which the image is built. You can define
+      the :term:`MACHINE` in two ways:
 
-         MACHINE ?= "qemux86"
+      -  with the :ref:`ref-fragments-builtin-core-machine` fragment:
+
+         .. code-block:: console
+
+            $ bitbake-config-build enable-fragment machine/<MACHINE>
+
+         Replace ``<MACHINE>`` with the name of the machine in the above
+         command.
+
+      -  in the :ref:`structure-build-conf-local.conf` file found in the
+         :term:`Build Directory`.
 
       The variable corresponds to a machine configuration file of the same
       name, through which machine-specific configurations are set. Thus,
@@ -6350,7 +6460,7 @@ system and gives an overview of their function and contents.
       See the :term:`KERNEL_MODULE_AUTOLOAD` variable for more information.
 
    :term:`module_conf`
-      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`__
+      Specifies :manpage:`modprobe.d(5)`
       syntax lines for inclusion in the ``/etc/modprobe.d/modname.conf``
       file.
 
@@ -6498,8 +6608,7 @@ system and gives an overview of their function and contents.
          functionality, such as kernel modules. It is up to you to add
          packages with the :term:`IMAGE_INSTALL` variable.
 
-      This variable is only supported when using the IPK and RPM
-      packaging backends. DEB is not supported.
+      This variable is supported for all packaging backends.
 
       See the :term:`BAD_RECOMMENDATIONS` and
       the :term:`PACKAGE_EXCLUDE` variables for
@@ -6930,8 +7039,7 @@ system and gives an overview of their function and contents.
       an iterative development process to remove specific components from a
       system.
 
-      This variable is supported only when using the IPK and RPM
-      packaging backends. DEB is not supported.
+      This variable is supported for all packaging backends.
 
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`BAD_RECOMMENDATIONS` variables for
@@ -7074,6 +7182,53 @@ system and gives an overview of their function and contents.
       to install when creating an image. If a listed package fails to
       install, the build system does not generate an error. This variable
       is generally not user-defined.
+
+   :term:`PACKAGE_NO_LOCALE`
+      The :term:`PACKAGE_NO_LOCALE` variable can be set to "1" to prevent the
+      :term:`OpenEmbedded Build System` from splitting the locales found in the
+      :term:`PKGD` directory into split packages.
+
+      For example, the ``quilt`` recipe automatically produces split packages
+      after the :ref:`ref-tasks-package` task is run. Taking a look inside the
+      :term:`WORKDIR` directory of ``quilt``:
+
+      .. code-block:: console
+
+         $ ls -1 packages-split/
+         guards
+         guards-doc
+         quilt
+         quilt-dbg
+         quilt-dev
+         quilt-doc
+         quilt-locale-de
+         quilt-locale-fr
+         quilt-locale-ja
+         quilt-locale-ru
+         quilt-ptest
+         quilt-src
+         quilt-staticdev
+
+      We can see the ``quilt-locale-*`` packages were automatically generated.
+      Setting :term:`PACKAGE_NO_LOCALE` to "1" would produce the following
+      packages:
+
+      .. code-block:: console
+
+         $ ls -1 packages-split/
+         guards
+         guards-doc
+         quilt
+         quilt-dbg
+         quilt-dev
+         quilt-doc
+         quilt-locale
+         quilt-ptest
+         quilt-src
+         quilt-staticdev
+
+      The ``quilt-locale`` package contains the merged content of the previous
+      ``quilt-locale-*`` packages.
 
    :term:`PACKAGE_PREPROCESS_FUNCS`
       Specifies a list of functions run to pre-process the
@@ -7221,6 +7376,12 @@ system and gives an overview of their function and contents.
       :term:`PACKAGECONFIG` but not a class that handles the
       :ref:`ref-tasks-configure` task, then you need to use
       :term:`PACKAGECONFIG_CONFARGS` appropriately.
+
+   :term:`PACKAGEFUNCS`
+      The :term:`PACKAGEFUNCS` variable holds a list of functions which are
+      executed to process metadata based on split packages found in the
+      :term:`PKGDEST` directory. These functions are executed in the
+      :ref:`ref-classes-package` class in the order found in the list.
 
    :term:`PACKAGEGROUP_DISABLE_COMPLEMENTARY`
       For recipes inheriting the :ref:`ref-classes-packagegroup` class, setting
@@ -7752,7 +7913,8 @@ system and gives an overview of their function and contents.
              git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
              ftp://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
              http://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
-             https://.*/.* &YOCTO_DL_URL;/mirror/sources/"
+             https://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+         "
 
       These changes cause the
       build system to intercept Git, FTP, HTTP, and HTTPS requests and
@@ -7992,6 +8154,25 @@ system and gives an overview of their function and contents.
       replaces the ``@CLIENT@`` and ``@GATEWAY@`` place holders by the IP and
       the gateway address of the QEMU guest.
 
+   :term:`QB_DEFAULT_BIOS`
+      The :term:`QB_DEFAULT_BIOS` variable can be used to provide a default
+      value for the path of a file located in :term:`DEPLOY_DIR_IMAGE` and
+      used by ``runqemu`` to specify the `-bios <https://www.qemu.org/docs/master/system/invocation.html#hxtool-8>`__
+      option of QEMU. For example, this variable can be set as follows to
+      emulate U-Boot for the :oecore_path:`qemuarm64 <meta/conf/machine/qemuarm64.conf>`
+      machine::
+
+         QB_DEFAULT_BIOS = "u-boot.bin"
+
+      The above example makes the assumption the U-Boot recipe was built
+      and that the ``u-boot.bin`` is deployed in the :term:`DEPLOY_DIR_IMAGE`
+      directory.
+
+      .. note::
+
+         When using ``runqemu``, the ``BIOS`` environment variable takes
+         precedence over this variable.
+
    :term:`QB_DEFAULT_FSTYPE`
 
       The :term:`QB_DEFAULT_FSTYPE` variable controls the default filesystem
@@ -8095,12 +8276,12 @@ system and gives an overview of their function and contents.
    :term:`QB_SMP`
 
       When using ``runqemu``, the :term:`QB_SMP` variable controls
-      amount of CPU cores made availalble inside the QEMU guest, each mapped to
+      amount of CPU cores made available inside the QEMU guest, each mapped to
       a thread on the host.
 
       For example::
 
-         QB_SMP = "-smp 8".
+         QB_SMP = "-smp 8"
 
    :term:`QB_TAP_NAMESERVER`
 
@@ -8431,6 +8612,12 @@ system and gives an overview of their function and contents.
    :term:`RM_WORK_EXCLUDE`
       With :ref:`ref-classes-rm-work` enabled, this variable
       specifies a list of recipes whose work directories should not be removed.
+      See the ":ref:`ref-classes-rm-work`" section for more details.
+
+   :term:`RM_WORK_EXCLUDE_ITEMS`
+      With :ref:`ref-classes-rm-work` enabled, this variable specifies
+      a list of files or folders --- relative to the recipe's :term:`WORKDIR` ---
+      to be preserved.
       See the ":ref:`ref-classes-rm-work`" section for more details.
 
    :term:`ROOT_HOME`
@@ -9313,6 +9500,29 @@ system and gives an overview of their function and contents.
 
             SOURCE_MIRROR_URL = "http://example.com/my_source_mirror;user=<user>;pswd=<password>"
 
+   :term:`SPDX_AUTHORS`
+      This variable is used to list the authors of the created SPDX data.
+      It works slightly differently than the other agent variables (like
+      :term:`SPDX_IMAGE_SUPPLIER`) in that the base variable provides a list of
+      suffixes which are used to construct the variable prefixes for the
+      created authors. For example::
+
+         SPDX_AUTHORS = "myorg myself"
+         SPDX_AUTHORS_myorg_name = "My Organization"
+         SPDX_AUTHORS_myorg_type = "organization"
+         SPDX_AUTHORS_myself_name = "My Name"
+         SPDX_AUTHORS_myself_type = "Person"
+
+
+      Note that references to other objects can be made using the ``_ref``
+      suffix, for example::
+
+         SPDX_AUTHORS_myself_ref = "SPDX_IMAGE_SUPPLIER"
+
+      And other variables can reference authors by using the correct prefix::
+
+         SPDX_IMAGE_SUPPLIER_ref = "SPDX_AUTHORS_myorg"
+
    :term:`SPDX_BUILD_HOST`
       The base variable name describing the build host on which the build is
       running. The value must name a key from ``SPDX_IMPORTS``, allowing
@@ -9397,38 +9607,28 @@ system and gives an overview of their function and contents.
       PURLs.
 
    :term:`SPDX_IMAGE_SUPPLIER`
-      The name of an agent variable prefix describing the organization or
-      person who supplies the image SBOM. When set, the supplier is attached
-      to all root elements of the image SBOM using the ``suppliedBy`` property.
+      The variable prefix for describing the organization or person who
+      supplies the image SBOM. When set, the supplier is attached to all root
+      elements of the image SBOM using the ``suppliedBy`` property.
 
       The value of this variable is the base prefix used to look up the
       agent's details. The following sub-variables are read using that prefix:
 
-      -  ``<PREFIX>_name``: display name of the supplier (required)
-      -  ``<PREFIX>_type``: agent type: ``organization``, ``person``,
+      -  ``SPDX_IMAGE_SUPPLIER_name``: display name of the supplier (required)
+      -  ``SPDX_IMAGE_SUPPLIER_type``: agent type: ``organization``, ``person``,
          ``software``, or ``agent`` (optional, defaults to ``agent``)
-      -  ``<PREFIX>_comment``: free-text comment (optional)
-      -  ``<PREFIX>_id_email``: contact e-mail address (optional)
-
-      The simplest approach is to use the variable itself as its own prefix,
-      so the sub-variable names follow directly from
-      ``SPDX_IMAGE_SUPPLIER``.
+      -  ``SPDX_IMAGE_SUPPLIER_comment``: free-text comment (optional)
+      -  ``SPDX_IMAGE_SUPPLIER_id_email``: contact e-mail address (optional)
 
       Example (set in the image recipe or in a :term:`configuration file`)::
 
-         SPDX_IMAGE_SUPPLIER = "SPDX_IMAGE_SUPPLIER"
          SPDX_IMAGE_SUPPLIER_name = "Acme Corp"
          SPDX_IMAGE_SUPPLIER_type = "organization"
 
-      Alternatively, you can use any other prefix name, which is useful for
-      sharing an agent definition across multiple supplier variables::
+      Alternatively, it is also possible to reference an agent created by
+      another variable prefix, using ``SPDX_IMAGE_SUPPLIER_ref``. For example::
 
-         MY_COMPANY_name = "Acme Corp"
-         MY_COMPANY_type = "organization"
-         SPDX_IMAGE_SUPPLIER = "MY_COMPANY"
-         SPDX_SDK_SUPPLIER = "MY_COMPANY"
-
-      If not set, no supplier information is added to the image SBOM.
+        SPDX_IMAGE_SUPPLIER_ref = "SPDX_PACKAGE_SUPPLIER"
 
       See also :term:`SPDX_PACKAGE_SUPPLIER` and :term:`SPDX_SDK_SUPPLIER`.
 
@@ -9567,7 +9767,7 @@ system and gives an overview of their function and contents.
          already fixed upstream (warning: this can be large and slow).
 
    :term:`SPDX_INVOKED_BY`
-      The base variable name describing the agent that invoked the build.
+      The variable prefix describing the agent that invoked the build.
       Each ``Build`` object in the SPDX output is linked to this agent with an
       ``invokedBy`` relationship. Requires
       :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD` to be set to ``"1"``.
@@ -9581,7 +9781,6 @@ system and gives an overview of their function and contents.
       Example (CI pipeline invoking the build)::
 
          SPDX_INCLUDE_BITBAKE_PARENT_BUILD = "1"
-         SPDX_INVOKED_BY = "SPDX_INVOKED_BY"
          SPDX_INVOKED_BY_name = "GitLab CI"
          SPDX_INVOKED_BY_type = "software"
 
@@ -9622,7 +9821,7 @@ system and gives an overview of their function and contents.
       ``http://spdx.org/spdxdoc``.
 
    :term:`SPDX_ON_BEHALF_OF`
-      The base variable name describing the agent on whose behalf the invoking
+      The variable prefix describing the agent on whose behalf the invoking
       agent (:term:`SPDX_INVOKED_BY`) is running the build. Requires
       :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD` to be set to ``"1"``.
       Has no effect if :term:`SPDX_INVOKED_BY` is not also set.
@@ -9636,10 +9835,8 @@ system and gives an overview of their function and contents.
       Example (CI system building on behalf of a customer organization)::
 
          SPDX_INCLUDE_BITBAKE_PARENT_BUILD = "1"
-         SPDX_INVOKED_BY = "SPDX_INVOKED_BY"
          SPDX_INVOKED_BY_name = "GitLab CI"
          SPDX_INVOKED_BY_type = "software"
-         SPDX_ON_BEHALF_OF = "SPDX_ON_BEHALF_OF"
          SPDX_ON_BEHALF_OF_name = "Acme Corp"
          SPDX_ON_BEHALF_OF_type = "organization"
 
@@ -9652,7 +9849,7 @@ system and gives an overview of their function and contents.
       :term:`SPDX_INVOKED_BY`, and :term:`SPDX_BUILD_HOST`.
 
    :term:`SPDX_PACKAGE_SUPPLIER`
-      The base variable name describing the agent who supplies the artifacts
+      The variable prefix describing the agent who supplies the artifacts
       produced by the build. Works identically to :term:`SPDX_IMAGE_SUPPLIER`
       but applies to individual packages rather than the image SBOM.
 
@@ -9661,7 +9858,6 @@ system and gives an overview of their function and contents.
       to apply only to packages of that recipe. Recipe-level overrides
       (``SPDX_PACKAGE_SUPPLIER:pn-<recipe>``) are also supported::
 
-         SPDX_PACKAGE_SUPPLIER = "SPDX_PACKAGE_SUPPLIER"
          SPDX_PACKAGE_SUPPLIER_name = "Acme Corp"
          SPDX_PACKAGE_SUPPLIER_type = "organization"
 
@@ -10077,6 +10273,24 @@ system and gives an overview of their function and contents.
 
       For details on the process, see the :ref:`ref-classes-staging` class.
 
+   :term:`SSTATE_SIG_KEY`
+      When signing :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts (when :term:`SSTATE_VERIFY_SIG` is set to
+      "1"), the :term:`SSTATE_SIG_KEY` variable is the :wikipedia:`GPG
+      <GNU_Privacy_Guard>` key identifier used to sign them.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
+   :term:`SSTATE_SIG_PASSPHRASE`
+      When signing :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts (when :term:`SSTATE_VERIFY_SIG` is set to
+      "1"), the :term:`SSTATE_SIG_PASSPHRASE` variable is the passphrase used to
+      protect the private key signing the artifacts.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
    :term:`SSTATE_SKIP_CREATION`
       The :term:`SSTATE_SKIP_CREATION` variable can be used to skip the
       creation of :ref:`shared state <overview-manual/concepts:shared state cache>`
@@ -10096,6 +10310,43 @@ system and gives an overview of their function and contents.
       The syntax to disable it for the whole recipe is::
 
          SSTATE_SKIP_CREATION = "1"
+
+   :term:`SSTATE_VALID_SIGS`
+      When verifying :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts (when :term:`SSTATE_VERIFY_SIG` is set to
+      "1"), the :term:`SSTATE_VALID_SIGS` variable is a space-separated list of
+      :wikipedia:`GPG <GNU_Privacy_Guard>` key identifiers to use to verify their
+      signature.
+
+      It must contain the short form identifier of the key pair. For example,
+      when running the ``gpg --list-keys`` command (in bold text below):
+
+      .. parsed-literal::
+
+         pub   ed25519 2026-04-17 [SC]
+               \4049A47E3AAA99D0250966DC\ **5B97632FA7F4E942**
+         uid           [ultimate] Antonin Godard (SState Signing) <antonin.godard\@bootlin.com>
+         sub   cv25519 2026-04-17 [E]
+
+      The short form equals the last 16 characters of the identifier. In the
+      above example: ``5B97632FA7F4E942``.
+
+      .. note::
+
+         If this variable is empty (the default), any of the GPG key present on
+         the :term:`Build Host` can be used by the :term:`OpenEmbedded Build
+         System` to verify the shared state artifacts.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
+   :term:`SSTATE_VERIFY_SIG`
+      The :term:`SSTATE_VERIFY_SIG` variable controls whether to enable or
+      disable the :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts signing feature.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
 
    :term:`STAGING_BASE_LIBDIR_NATIVE`
       Specifies the path to the ``/lib`` subdirectory of the sysroot
@@ -10848,6 +11099,11 @@ system and gives an overview of their function and contents.
 
          TEST_SERIALCONTROL_CMD = "picocom /dev/ttyUSB0 -b 115200"
 
+   :term:`TEST_SERIALCONTROL_CONNECT_TIMEOUT`
+      For automated hardware testing with the :ref:`ref-classes-testexport`
+      class, the :term:`TEST_SERIALCONTROL_CONNECT_TIMEOUT` variable specifies
+      the timeout in seconds for the initial connection to the target.
+
    :term:`TEST_SERIALCONTROL_EXTRA_ARGS`
       For automated hardware testing, specifies additional arguments to
       pass through to the command specified in
@@ -10855,6 +11111,12 @@ system and gives an overview of their function and contents.
       :term:`TEST_SERIALCONTROL_EXTRA_ARGS` is optional. You can use it if you
       wish, for example, to separate the machine-specific and
       non-machine-specific parts of the command.
+
+   :term:`TEST_SERIALCONTROL_PS1`
+      For automated hardware testing with the :ref:`ref-classes-testexport`
+      class, the :term:`TEST_SERIALCONTROL_PS1` variable specifies a regex
+      string representing an empty prompt on the target terminal. For example:
+      ``root@target:.*#``.
 
    :term:`TEST_SERVER_IP`
       The IP address of the build machine (host machine). This IP address
@@ -11057,7 +11319,8 @@ system and gives an overview of their function and contents.
       For background information on cross-development toolchains in the
       Yocto Project development environment, see the
       ":ref:`sdk-manual/intro:the cross-development toolchain`"
-      section in the Yocto Project Overview and Concepts Manual. For
+      section in the Yocto Project Application Development and Software
+      Development Kits (SDK/eSDK) Manual. For
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
 
@@ -11117,7 +11380,8 @@ system and gives an overview of their function and contents.
       For background information on cross-development toolchains in the
       Yocto Project development environment, see the
       ":ref:`sdk-manual/intro:the cross-development toolchain`"
-      section in the Yocto Project Overview and Concepts Manual. For
+      section in the Yocto Project Application Development and Software
+      Development Kits (SDK/eSDK) Manual. For
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
 
@@ -11272,7 +11536,7 @@ system and gives an overview of their function and contents.
       configuration must define the :term:`UBOOT_MACHINE` variable.
       Additional control variables are: :term:`UBOOT_CONFIG_BINARY`,
       :term:`UBOOT_CONFIG_FRAGMENTS`, :term:`UBOOT_CONFIG_IMAGE_FSTYPES`, and
-      :term:`UBOOT_CONFIG_MAKE_OPTS`. 
+      :term:`UBOOT_CONFIG_MAKE_OPTS`.
 
       Here is an updated example from the ``meta-freescale`` layer. ::
 
@@ -12049,7 +12313,7 @@ system and gives an overview of their function and contents.
 
       For more information, see
       ``conf/templates/default/local.conf.sample`` in
-      :yocto_git:`meta-poky <meta-yocto/tree/meta-poky>`.
+      :yocto_git:`meta-poky </meta-yocto/tree/meta-poky>`.
 
    :term:`USERADD_DEPENDS`
       Specifies a list of recipes that create users / groups (via
@@ -12141,7 +12405,7 @@ system and gives an overview of their function and contents.
 
       For information on the
       standard Linux shell command ``useradd``, see
-      https://linux.die.net/man/8/useradd.
+      :manpage:`useradd(8)`.
 
    :term:`USERADD_UID_TABLES`
       Specifies a password file to use for obtaining static user

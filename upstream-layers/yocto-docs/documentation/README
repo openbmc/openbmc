@@ -8,7 +8,7 @@ This repository is where manual development occurs. If you plan on contributing
 back to the Yocto Project documentation, you should set up a local Git
 repository based on this upstream repository as follows:
 
-  git clone git://git.yoctoproject.org/yocto-docs
+  git clone https://git.yoctoproject.org/yocto-docs
 
 Manual Organization
 ===================
@@ -26,6 +26,8 @@ Here the folders corresponding to individual manuals:
 * sdk-manual           - Yocto Project Software Development Kit (SDK) Developer's Guide.
 * toaster-manual       - Toaster User Manual
 * test-manual          - Yocto Project Test Environment Manual
+* security-manual      - Yocto Project Security Manual
+* security-reference   - Yocto Project Security Reference
 * migration-guides     - Yocto Project Release and Migration Notes
 
 Each folder is self-contained regarding content and figures.
@@ -109,6 +111,13 @@ dependencies in a virtual environment:
  $ pipenv install
  $ pipenv run make html
 
+Note: if you decide to use Pipenv for installing the dependencies, don't forget
+to prefix all the make commands below with "pipenv run ". The make commands
+which already start with "pipenv run " don't need to be prefixed a second time
+but require you to use Pipenv for them to run and aren't available when
+following the instructions from
+https://docs.yoctoproject.org/dev/ref-manual/system-requirements.html#required-packages-for-the-build-host.
+
 Style checking the Yocto Project documentation
 ==============================================
 
@@ -117,19 +126,19 @@ to validate the text style.
 
 To install Vale:
 
- $ pip install vale
+ $ pipenv install --dev
 
 To run Vale:
 
- $ make stylecheck
+ $ pipenv run make stylecheck
 
 Style checking the whole documentation might take some time and generate a
 lot of warnings/errors, thus one can run Vale on a subset of files or
 directories:
 
-  $ make stylecheck VALEDOCS=<file>
-  $ make stylecheck VALEDOCS="<file1> <file2>"
-  $ make stylecheck VALEDOCS=<dir>
+  $ pipenv run make stylecheck VALEDOCS=<file>
+  $ pipenv run make stylecheck VALEDOCS="<file1> <file2>"
+  $ pipenv run make stylecheck VALEDOCS=<dir>
 
 Lint checking the Yocto Project documentation
 =============================================
@@ -139,19 +148,19 @@ the project uses sphinx-lint (https://github.com/sphinx-contrib/sphinx-lint).
 
 To install sphinx-lint:
 
- $ pip install sphinx-lint
+ $ pipenv install --dev
 
 To run sphinx-lint:
 
- $ make sphinx-lint
+ $ pipenv run make sphinx-lint
 
 Lint checking the whole documentation might take some time and generate a
 lot of warnings/errors, thus one can run sphinx-lint on a subset of files
 or directories:
 
-  $ make sphinx-lint SPHINXLINTDOCS=<file>
-  $ make sphinx-lint SPHINXLINTDOCS="<file1> <file2>"
-  $ make sphinx-lint SPHINXLINTDOCS=<dir>
+  $ pipenv run make sphinx-lint SPHINXLINTDOCS=<file>
+  $ pipenv run make sphinx-lint SPHINXLINTDOCS="<file1> <file2>"
+  $ pipenv run make sphinx-lint SPHINXLINTDOCS=<dir>
 
 Sphinx theme and CSS customization
 ==================================

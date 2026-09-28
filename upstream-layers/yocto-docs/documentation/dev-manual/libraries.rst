@@ -202,7 +202,7 @@ Here are the implementation details for the IPK Package Management System:
 Installing Multiple Versions of the Same Library
 ================================================
 
-There are be situations where you need to install and use multiple versions
+There might be situations where you need to install and use multiple versions
 of the same library on the same system at the same time. This
 almost always happens when a library API changes and you have
 multiple pieces of software that depend on the separate versions of the
