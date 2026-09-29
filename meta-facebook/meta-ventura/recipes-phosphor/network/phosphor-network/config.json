@@ -1,3 +1,4 @@
 {
-    "eth0": "Ventura_RMC"
+    "eth0": "Ventura_SCM",
+    "eth1": "Ventura_RMC"
 }
