@@ -22,6 +22,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 
 # Anapaca platform services
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    platform-init \
     plat-svc \
 "
 
