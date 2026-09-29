@@ -73,6 +73,27 @@ set_product_versions_to_mb_cpld()
     done
 }
 
+verify_reg()
+{
+    local BUS="$1"
+    local ADDR="$2"
+    local REG="$3"
+    local EXPECTED="$4"
+    local MODE="$5"
+    local NAME="$6"
+    local READ_VAL
+
+    READ_VAL=$(i2cget -y -f "$BUS" "$ADDR" "$REG" "$MODE" 2>/dev/null)
+
+    if [ -z "$READ_VAL" ]; then
+        echo "Failed to read $NAME"
+    elif [ "$((READ_VAL))" -eq "$((EXPECTED))" ]; then
+        echo "$NAME set to $EXPECTED"
+    else
+        echo "$NAME mismatch (W:$EXPECTED R:$READ_VAL)"
+    fi
+}
+
 ti_hsc_init()
 {
     local BOARD="1KW_paddle_BD"
@@ -93,40 +114,38 @@ ti_hsc_init()
     if [ "$SOURCE" = "HSC-TIC" ]; then
         local BUS="8"
         local ADDR="0x47"
-        local REG_WRITE_PROTECT="0xF8"
-        local REG_OC_TIMER="0xE6"
-        local REG_ALERT_MASK="0xDB"
         local REG_CLEAR_FAULTS="0x03"
+        local REG_VOUT_UV_WARN="0x43"
+        local REG_OT_WARN="0x51"
+        local REG_VIN_OV_WARN="0x57"
+        local REG_VIN_UV_WARN="0x58"
+        local REG_ALERT_MASK="0xDB"
+        local REG_OC_TIMER="0xE6"
+        local REG_WRITE_PROTECT="0xF8"
         local WRITE_PROTECT_VAL="0xA2"
         local OC_TIMER_VAL="0x5c"
         local ALERT_MASK_VAL="0x0102"
-        local READ_VAL
+        local VOUT_UV_WARN_VAL="0x0087"
+        local OT_WARN_VAL="0x007C"
+        local VIN_OV_WARN_VAL="0x00AA"
+        local VIN_UV_WARN_VAL="0x0087"
 
         echo "Initializing TIC HSC"
         i2cset -y -f "$BUS" "$ADDR" "$REG_WRITE_PROTECT" "$WRITE_PROTECT_VAL" || echo "Failed to unlock write protection"
         i2cset -y -f "$BUS" "$ADDR" "$REG_OC_TIMER" "$OC_TIMER_VAL" || echo "Failed to set OC timer"
         i2cset -y -f "$BUS" "$ADDR" "$REG_ALERT_MASK" "$ALERT_MASK_VAL" w || echo "Failed to set alert mask"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_VOUT_UV_WARN" "$VOUT_UV_WARN_VAL" w || echo "Failed to set VOUT UV warning"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_OT_WARN" "$OT_WARN_VAL" w || echo "Failed to set OT warning"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_VIN_OV_WARN" "$VIN_OV_WARN_VAL" w || echo "Failed to set VIN OV warning"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_VIN_UV_WARN" "$VIN_UV_WARN_VAL" w || echo "Failed to set VIN UV warning"
         i2cset -y -f "$BUS" "$ADDR" "$REG_CLEAR_FAULTS" || echo "Failed to clear faults"
 
-        READ_VAL=$(i2cget -y -f "$BUS" "$ADDR" "$REG_OC_TIMER" 2>/dev/null)
-        if [ -z "$READ_VAL" ]; then
-            echo "Failed to read OC timer"
-        elif [ "$READ_VAL" == "$OC_TIMER_VAL" ]; then
-            echo "OC timer set to $OC_TIMER_VAL"
-        else
-            echo "OC timer mismatch (W:$OC_TIMER_VAL R:$READ_VAL)"
-        fi
-
-        READ_VAL=""
-
-        READ_VAL=$(i2cget -y -f "$BUS" "$ADDR" "$REG_ALERT_MASK" w 2>/dev/null)
-        if [ -z "$READ_VAL" ]; then
-            echo "Failed to read alert mask"
-        elif [ "$READ_VAL" == "$ALERT_MASK_VAL" ]; then
-            echo "Alert mask set to $ALERT_MASK_VAL"
-        else
-            echo "Alert mask mismatch (W:$ALERT_MASK_VAL R:$READ_VAL)"
-        fi
+        verify_reg "$BUS" "$ADDR" "$REG_OC_TIMER" "$OC_TIMER_VAL" "" "OC timer"
+        verify_reg "$BUS" "$ADDR" "$REG_ALERT_MASK" "$ALERT_MASK_VAL" "w" "Alert mask"
+        verify_reg "$BUS" "$ADDR" "$REG_VOUT_UV_WARN" "$VOUT_UV_WARN_VAL" "w" "VOUT UV warning"
+        verify_reg "$BUS" "$ADDR" "$REG_OT_WARN" "$OT_WARN_VAL" "w" "OT warning"
+        verify_reg "$BUS" "$ADDR" "$REG_VIN_OV_WARN" "$VIN_OV_WARN_VAL" "w" "VIN OV warning"
+        verify_reg "$BUS" "$ADDR" "$REG_VIN_UV_WARN" "$VIN_UV_WARN_VAL" "w" "VIN UV warning"
     fi
 }
 
