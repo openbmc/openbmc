@@ -17,6 +17,8 @@
 
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 gbmc_br_from_ra_init=
 gbmc_br_from_ra_mac=
@@ -26,13 +28,51 @@ declare -A gbmc_br_from_ra_pfxs=()
 declare -A gbmc_br_from_ra_gone=()
 declare -A gbmc_br_from_ra_prev_addrs=()
 
-# Every reconfigure of gbmcbr restarts networkd's router discovery, which
-# flushes all of the RA routes until the next RA is received, which it
+# The RA addresses are configured through networkd rather than only with
+# `ip addr`. networkd removes addresses it doesn't manage every time it
+# reconfigures gbmcbr (e.g. on any reload), which briefly changed the
+# preferred source and triggered more reloads in a loop.
+#
+# Every reconfigure of gbmcbr also restarts networkd's router discovery,
+# which flushes all of the RA routes until the next RA is received, which it
 # solicits right away. Route deletions therefore don't immediately mean the
-# prefix is gone. Instead, a prefix is only dropped once its route stayed
-# gone for GBMC_BR_FROM_RA_GRACE seconds. This also covers prefixes networkd
-# removes because they were withdrawn or expired.
+# prefix is gone, and acting on them would rewrite our config and reload
+# networkd, flushing the routes again. Instead, a prefix is only dropped once
+# its route stayed gone for GBMC_BR_FROM_RA_GRACE seconds. This also covers
+# prefixes networkd removes because they were withdrawn or expired.
 GBMC_BR_FROM_RA_GRACE=5
+GBMC_BR_FROM_RA_CONFS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/65-ra-addrs.conf)
+
+# Writes the networkd config for the given addresses, only reloading networkd
+# when the set of addresses actually changes.
+gbmc_br_from_ra_write_conf() {
+  local contents=
+  local addr
+  while read -r addr; do
+    [[ -n $addr ]] || continue
+    contents+="[Address]"$'\n'"Address=$addr"$'\n'"AddPrefixRoute=no"$'\n'
+  done < <(printf '%s\n' "$@" | sort)
+
+  local changed=
+  local file
+  for file in "${GBMC_BR_FROM_RA_CONFS[@]}"; do
+    if [[ -z $contents ]]; then
+      [[ -e $file ]] || continue
+      rm -f "$file"
+    else
+      [[ "$(cat "$file" 2>/dev/null)"$'\n' == "$contents" ]] && continue
+      mkdir -p "$(dirname "$file")"
+      printf '%s' "$contents" >"$file.tmp"
+      mv -f "$file.tmp" "$file"
+    fi
+    changed=1
+  done
+  if [[ -n $changed ]]; then
+    echo "gBMC Bridge RA addresses changed: ${*:-none}" >&2
+    # shellcheck disable=SC2119
+    gbmc_net_networkd_reload
+  fi
+}
 
 gbmc_br_from_ra_update() {
   [[ -n $gbmc_br_from_ra_init && -n $gbmc_br_from_ra_mac ]] || return
@@ -40,6 +80,7 @@ gbmc_br_from_ra_update() {
   local now
   gbmc_ip_monitor_uptime now || return
   local next=
+  local -a addrs=()
   local pfx
   for pfx in "${!gbmc_br_from_ra_pfxs[@]}"; do
     local cidr
@@ -79,9 +120,11 @@ gbmc_br_from_ra_update() {
         next=$deadline
       fi
     fi
-    if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]] || ! ip addr show dev gbmcbr | grep -q "$addr"; then
+    addrs+=("$addr")
+    if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
       echo "gBMC Bridge RA Addr Add: $addr (pfx $pfx label 99)" >&2
       gbmc_br_from_ra_prev_addrs["$addr"]=1
+      # Usable right away, networkd takes it over once it reloads
       ip addr replace "$addr" dev gbmcbr noprefixroute
       ip addrlabel add prefix "$pfx" label 99 2>/dev/null || true
     fi
@@ -91,6 +134,7 @@ gbmc_br_from_ra_update() {
   else
     gbmc_ip_monitor_timer_cancel from-ra
   fi
+  gbmc_br_from_ra_write_conf "${addrs[@]}"
 }
 
 gbmc_br_from_ra_hook() {
@@ -105,12 +149,14 @@ gbmc_br_from_ra_hook() {
   elif [[ $change == route && $route != *' via '* ]] &&
        [[ $route == *' dev gbmcbr proto ra '* ]]; then
     local pfx="${route%% *}"
-    # Deletions get a grace period, see the comment on GBMC_BR_FROM_RA_GRACE
+    # Deletions get a grace period, see the comment on GBMC_BR_FROM_RA_CONFS
     # shellcheck disable=SC2154
     if [[ $action == add ]]; then
       unset 'gbmc_br_from_ra_gone[$pfx]'
-      gbmc_br_from_ra_pfxs["$pfx"]=1
-      gbmc_ip_monitor_defer
+      if [[ -z ${gbmc_br_from_ra_pfxs["$pfx"]-} ]]; then
+        gbmc_br_from_ra_pfxs["$pfx"]=1
+        gbmc_ip_monitor_defer
+      fi
     elif [[ -n ${gbmc_br_from_ra_pfxs["$pfx"]-} ]]; then
       [[ -z ${gbmc_br_from_ra_gone["$pfx"]-} ]] || return 0
       local now
