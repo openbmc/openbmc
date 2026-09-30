@@ -113,7 +113,8 @@ gbmc_br_set_runtime_ip() {
   if [ -z "$ip" ]; then
     echo "Removing runtime gbmcbr IP: $name" >&2
     rm -f /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-"$name".conf
-    gbmc_net_networkd_reload gbmcbr
+    # shellcheck disable=SC2119
+    gbmc_net_networkd_reload
     return $rc
   fi
 
@@ -162,7 +163,11 @@ EOF
     printf '%s\n%s' "$contents" "$scontents" >"$file"
   done
 
-  gbmc_net_networkd_reload gbmcbr
+  # A plain reload is enough, networkd reconfigures gbmcbr when its drop-ins
+  # change. Forcing a reconfigure would flush every address and route
+  # networkd owns on gbmcbr and drop any added outside of networkd.
+  # shellcheck disable=SC2119
+  gbmc_net_networkd_reload
 }
 
 gbmc_br_reload_ips() {

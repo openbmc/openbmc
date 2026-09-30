@@ -79,7 +79,7 @@ add_rtr() {
     ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" || st=$?
   fi
   if (( st != 0 )); then
-    gbmc_net_networkd_reload "$RA_IF" || true
+    gbmc_net_networkd_reload || true
   fi
 }
 
@@ -130,7 +130,7 @@ default_update_rtr() {
 
     # Fall back to reload if remove failed
     ip -6 route del default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" || \
-      gbmc_net_networkd_reload "$RA_IF" || true
+      gbmc_net_networkd_reload || true
   fi
 }
 

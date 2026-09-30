@@ -161,6 +161,8 @@ test_gbmc_nic_neigh_carrier_up_fallback() {
   sysctl() { :; }
   local networkd_reloads=0
   local reloaded_intfs=()
+  # Records any interfaces to make sure none are ever passed
+  # shellcheck disable=SC2120
   gbmc_net_networkd_reload() {
     (( networkd_reloads++ ))
     reloaded_intfs+=("$@")
@@ -175,7 +177,8 @@ test_gbmc_nic_neigh_carrier_up_fallback() {
   gbmc_nic_neigh_hook
 
   expect_numeq 1 "$networkd_reloads"
-  expect_streq "eth0" "${reloaded_intfs[0]}"
+  # A plain reload, never a forced reconfigure of the interface
+  expect_numeq 0 "${#reloaded_intfs[@]}"
 }
 
 test_gbmc_nic_neigh_fallback_on_failure() {
@@ -187,6 +190,8 @@ test_gbmc_nic_neigh_fallback_on_failure() {
   sysctl() { :; }
   local networkd_reloads=0
   local reloaded_intfs=()
+  # Records any interfaces to make sure none are ever passed
+  # shellcheck disable=SC2120
   gbmc_net_networkd_reload() {
     (( networkd_reloads++ ))
     reloaded_intfs+=("$@")
@@ -201,7 +206,8 @@ test_gbmc_nic_neigh_fallback_on_failure() {
 
   gbmc_nic_neigh_set add "2002:a05:7538:212b::"
   expect_numeq 1 "$networkd_reloads"
-  expect_streq "eth0" "${reloaded_intfs[0]}"
+  # A plain reload, never a forced reconfigure of the interface
+  expect_numeq 0 "${#reloaded_intfs[@]}"
 }
 
 expect_err 0 main

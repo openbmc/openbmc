@@ -109,7 +109,7 @@ EOF
   done
   gbmc_net_nftables_reload || true
   if (( "${#failed_intfs[@]}" > 0 )); then
-    gbmc_net_networkd_reload "${failed_intfs[@]}"
+    gbmc_net_networkd_reload
   fi
 }
 
@@ -160,7 +160,7 @@ gbmc_nic_neigh_hook() {
       fi
     done
     if (( "${#failed_intfs[@]}" > 0 )); then
-      gbmc_net_networkd_reload "${failed_intfs[@]}"
+      gbmc_net_networkd_reload
     fi
   fi
 }

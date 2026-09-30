@@ -22,7 +22,7 @@ EOF
   echo "[Network]" > "${netconfdir}/10-ra-config.conf"
   echo "IPv6AcceptRA=true" >> "${netconfdir}/10-ra-config.conf"
   gbmc_net_nftables_reload
-  gbmc_net_networkd_reload "${nic}"
+  gbmc_net_networkd_reload
 done
 gbmc_net_reload_queue_end
 

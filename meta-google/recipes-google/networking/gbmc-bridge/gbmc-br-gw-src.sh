@@ -133,7 +133,7 @@ EOF
   printf '%s\n' "$ra_metric" >"$fpath"
 
   # shellcheck disable=SC2119
-  gbmc_net_networkd_reload l2br
+  gbmc_net_networkd_reload
 }
 
 gbmc_br_gw_src_update() {

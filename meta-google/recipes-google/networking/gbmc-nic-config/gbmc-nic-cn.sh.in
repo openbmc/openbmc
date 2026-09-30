@@ -32,6 +32,7 @@ gbmc_nic_cn_set() {
   ip_to_bytes pfx_bytes "$ip"
 
   local cn_ips=()
+  local failed_intfs=()
 
   local intf
   local contents
@@ -70,7 +71,7 @@ EOF
   done
 
   if (( "${#failed_intfs[@]}" > 0 )); then
-    gbmc_net_networkd_reload "${failed_intfs[@]}"
+    gbmc_net_networkd_reload
   fi
 }
 
