@@ -215,6 +215,53 @@ testParseDefer() {
   expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
 }
 
+testParseTimer() {
+  GBMC_IP_MONITOR_TIMERS=([foo]=10 [bar]=20)
+  expect_err 0 gbmc_ip_monitor_parse_line '[TIMER]foo 10'
+  expect_streq "$change" 'timer'
+  expect_streq "$timer" 'foo'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]-}" ''
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[bar]-}" '20'
+  # Replaced or cancelled timers are ignored
+  change=
+  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 10'
+  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]bar 15'
+  expect_streq "$change" ''
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[bar]-}" '20'
+  GBMC_IP_MONITOR_TIMERS=()
+}
+
+testTimerArm() {
+  local saved
+  saved="$(declare -f gbmc_ip_monitor_timer_ gbmc_ip_monitor_uptime)"
+  gbmc_ip_monitor_timer_() { :; }
+  gbmc_ip_monitor_uptime() {
+    local -n out="$1"
+    # shellcheck disable=SC2034
+    out=100
+  }
+  GBMC_IP_MONITOR_TIMERS=()
+  gbmc_ip_monitor_timer foo 30
+  wait
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '130'
+  # A later deadline keeps the pending timer
+  gbmc_ip_monitor_timer foo 60
+  wait
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '130'
+  # An earlier deadline replaces it
+  gbmc_ip_monitor_timer foo 10
+  wait
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '110'
+  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 130'
+  expect_err 0 gbmc_ip_monitor_parse_line '[TIMER]foo 110'
+  gbmc_ip_monitor_timer foo 5
+  gbmc_ip_monitor_timer_cancel foo
+  wait
+  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 105'
+  GBMC_IP_MONITOR_TIMERS=()
+  eval "$saved"
+}
+
 testReloadCoalesceLive() {
   local reload_exec_count=0
   _gbmc_net_networkd_reload_exec() {

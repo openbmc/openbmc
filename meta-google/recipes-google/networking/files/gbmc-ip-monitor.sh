@@ -83,6 +83,43 @@ gbmc_ip_monitor_defer() {
   GBMC_IP_MONITOR_DEFER_OUTSTANDING=1
 }
 
+# Stores the seconds since boot in the variable named by $1. This is
+# monotonic, unlike the wall clock which can jump when time is synced.
+gbmc_ip_monitor_uptime() {
+  local -n out_uptime="$1"
+  local up _
+  read -r up _ </proc/uptime || return
+  out_uptime="${up%.*}"
+}
+
+# Uptime deadline of the pending timer for each name
+declare -A GBMC_IP_MONITOR_TIMERS=()
+gbmc_ip_monitor_timer_() {
+  sleep "$2"
+  printf '[TIMER]%s %s\n' "$1" "$3" >&"$GBMC_IP_MONITOR_DEFER"
+}
+# Requests a `change=timer` event with `timer=$1` in no more than $2 seconds.
+# An earlier pending timer with the same name is kept instead, so hooks must
+# re-arm the timer when it fires if they still need a later one. Unlike
+# deferrals, timers don't hold back reloads while they are pending.
+gbmc_ip_monitor_timer() {
+  local name="$1"
+  local secs="$2"
+  (( secs < 0 )) && secs=0
+  local now
+  gbmc_ip_monitor_uptime now || return
+  local due=$(( now + secs ))
+  local pending="${GBMC_IP_MONITOR_TIMERS["$name"]-}"
+  if [[ -n $pending ]] && (( pending <= due )); then
+    return 0
+  fi
+  GBMC_IP_MONITOR_TIMERS["$name"]=$due
+  gbmc_ip_monitor_timer_ "$name" "$secs" "$due" &
+}
+gbmc_ip_monitor_timer_cancel() {
+  unset 'GBMC_IP_MONITOR_TIMERS[$1]'
+}
+
 gbmc_ip_monitor_parse_line() {
   local line="$1"
   if [[ "$line" == '[INIT]'* ]]; then
@@ -144,6 +181,13 @@ gbmc_ip_monitor_parse_line() {
   elif [[ "$line" == '[DEFER]'* ]]; then
     GBMC_IP_MONITOR_DEFER_OUTSTANDING=
     change=defer
+  elif [[ "$line" =~ ^\[TIMER\]([^ ]+)\ ([0-9]+)$ ]]; then
+    local name="${BASH_REMATCH[1]}"
+    # Ignore timers that were cancelled or replaced by an earlier one
+    [[ ${GBMC_IP_MONITOR_TIMERS["$name"]-} == "${BASH_REMATCH[2]}" ]] || return 2
+    unset 'GBMC_IP_MONITOR_TIMERS[$name]'
+    change=timer
+    timer="$name"
   else
     return 2
   fi
