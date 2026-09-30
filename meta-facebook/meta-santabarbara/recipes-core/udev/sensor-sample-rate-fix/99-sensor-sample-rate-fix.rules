@@ -1,0 +1,11 @@
+# main source INA238
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0040", ATTR{name}=="ina238", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x40 0x01 0xfd 0xb6"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0041", ATTR{name}=="ina238", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x41 0x01 0xfd 0xb6"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0044", ATTR{name}=="ina238", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x44 0x01 0xfd 0xb6"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0045", ATTR{name}=="ina238", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x45 0x01 0xfd 0xb6"
+
+# 2nd source SQ52206
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0040", ATTR{name}=="sq52206", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x40 0x01 0xfb 0x6e"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0041", ATTR{name}=="sq52206", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x41 0x01 0xfb 0x6e"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0044", ATTR{name}=="sq52206", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x44 0x01 0xfb 0x6e"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="46-0045", ATTR{name}=="sq52206", RUN+="/usr/sbin/i2ctransfer -f -y 46 w3@0x45 0x01 0xfb 0x6e"
