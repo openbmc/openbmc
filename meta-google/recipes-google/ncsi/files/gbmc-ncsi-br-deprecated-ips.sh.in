@@ -113,6 +113,27 @@ EOF
     fi
   done
 
+  # BMCs behind gbmcbr autoconfigure addresses in the stateless /80, route it
+  # on-link so they stay reachable over NCSI without a static address.
+  local brroute=
+  if [ -e /sys/class/net/gbmcbr ]; then
+    brroute="$stateless_pfx/80"
+    local brcontents
+    read -r -d '' brcontents <<EOF
+[Route]
+Destination=$brroute
+Metric=512
+EOF
+    for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-deprecated-"$ip".conf; do
+      mkdir -p -m 755 "$(dirname "$file")"
+      if [ -n "$del" ]; then
+        rm -f "$file"
+      else
+        printf '%s' "$brcontents" >"$file"
+      fi
+    done
+  fi
+
   local st=0
   if [ -n "$intf_old" ]; then
     ip -6 neigh del proxy $pfx dev $intf_old 2>/dev/null || true
@@ -141,9 +162,15 @@ EOF
       unset 'gbmc_ncsi_br_deprecated_ips_savedconf["$stateless_ip"]'
       ip -6 neigh del proxy $stateless_ip dev $intf 2>/dev/null || true
     fi
+    if [ -n "$brroute" ]; then
+      ip -6 route del "$brroute" dev gbmcbr metric 512 2>/dev/null || true
+    fi
   else
     ip -6 rule add proto static to "$pfx/76" pref $GBMC_INTF_ROUTE_TABLE_BASE lookup main || st=$?
     ip -6 rule add proto static from "$pfx/76" pref $rt lookup $rt || st=$?
+    if [ -n "$brroute" ]; then
+      ip -6 route replace "$brroute" dev gbmcbr metric 512 || st=$?
+    fi
     gbmc_ncsi_br_deprecated_ips_savedconf["$pfx"]="$intf"
     gbmc_ncsi_br_deprecated_ips_savedconf["$stateless_pfx"]="$intf"
     if [ -n "$host_pfx" ]; then

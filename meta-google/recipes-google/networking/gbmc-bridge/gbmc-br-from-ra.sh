@@ -43,14 +43,19 @@ declare -A gbmc_br_from_ra_prev_addrs=()
 GBMC_BR_FROM_RA_GRACE=5
 GBMC_BR_FROM_RA_CONFS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/65-ra-addrs.conf)
 
-# Writes the networkd config for the given addresses, only reloading networkd
-# when the set of addresses actually changes.
+# Writes the networkd config for the given "<addr> <pfx>" entries, only
+# reloading networkd when the set of addresses actually changes.
+#
+# Each prefix also gets an on-link route over gbmcbr. The kernel installs one
+# from the RA, but it is flushed on every reconfigure until the next RA, which
+# leaves the rest of the /80 (e.g. other BMCs) unreachable in the meantime.
 gbmc_br_from_ra_write_conf() {
   local contents=
-  local addr
-  while read -r addr; do
+  local addr pfx
+  while read -r addr pfx; do
     [[ -n $addr ]] || continue
     contents+="[Address]"$'\n'"Address=$addr"$'\n'"AddPrefixRoute=no"$'\n'
+    contents+="[Route]"$'\n'"Destination=$pfx"$'\n'"Metric=512"$'\n'
   done < <(printf '%s\n' "$@" | sort)
 
   local changed=
@@ -120,12 +125,13 @@ gbmc_br_from_ra_update() {
         next=$deadline
       fi
     fi
-    addrs+=("$addr")
+    addrs+=("$addr $pfx")
     if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
       echo "gBMC Bridge RA Addr Add: $addr (pfx $pfx label 99)" >&2
       gbmc_br_from_ra_prev_addrs["$addr"]=1
       # Usable right away, networkd takes it over once it reloads
       ip addr replace "$addr" dev gbmcbr noprefixroute
+      ip -6 route replace "$pfx" dev gbmcbr metric 512 2>/dev/null || true
       ip addrlabel add prefix "$pfx" label 99 2>/dev/null || true
     fi
   done

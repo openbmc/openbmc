@@ -144,11 +144,18 @@ LifetimeSec=120
 EOF
   local scontents
   if [[ -n $stateless_size ]]; then
+    # Downstream BMCs autoconfigure addresses in the advertised /80, so it
+    # needs an on-link route over gbmcbr. Otherwise the unreachable route
+    # covering the rest of the allocation swallows traffic to them, and they
+    # are only reachable while they also hold a statically assigned address.
     read -r -d '' scontents <<EOF
 [IPv6Prefix]
 Prefix=$stateless_pfx/80
 PreferredLifetimeSec=120
 ValidLifetimeSec=120
+[Route]
+Destination=$stateless_pfx/80
+Metric=512
 [Route]
 Destination=$stateless_pfx/$stateless_size
 Type=unreachable
