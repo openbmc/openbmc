@@ -8,6 +8,7 @@
 
 import ast
 import re
+import shlex
 import subprocess
 import sys
 
@@ -1556,7 +1557,7 @@ if True:
     # perform the final actions for the project specific page
     def project_specific_finalize(cmnd, pid):
         project = Project.objects.get(pk=pid)
-        callback = project.get_variable(Project.PROJECT_SPECIFIC_CALLBACK)
+        callback = shlex.split(project.get_variable(Project.PROJECT_SPECIFIC_CALLBACK) or "")
         if "update" == cmnd:
             # Delete all '_PROJECT_PREPARE_' builds
             for b in Build.objects.all().filter(project=project):
@@ -1569,16 +1570,15 @@ if True:
                     management.call_command('builddelete', str(b.id), interactive=False)
             # perform callback at this last moment if defined, in case Toaster gets shutdown next
             default_target = project.get_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE)
-            if callback:
-                callback = callback.replace("<IMAGE>",default_target)
+            for i in range(len(callback)):
+                callback[i] = callback[i].replace("<IMAGE>", default_target)
         if "cancel" == cmnd:
-            if callback:
-                callback = callback.replace("<IMAGE>","none")
-                callback = callback.replace("--update","--cancel")
+            for i in range(len(callback)):
+                callback[i] = callback[i].replace("<IMAGE>", "none")
+                callback[i] = callback[i].replace("--update", "--cancel")
         # perform callback at this last moment if defined, in case this Toaster gets shutdown next
-        ret = ''
         if callback:
-            ret = os.system('bash -c "%s"' % callback)
+            subprocess.run(callback, shell=False)
             project.set_variable(Project.PROJECT_SPECIFIC_CALLBACK,'')
         # Delete the temp project specific variables
         project.set_variable(Project.PROJECT_SPECIFIC_ISNEW,'')

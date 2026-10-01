@@ -84,7 +84,7 @@ def pending_hash_index(tid, rqdata):
     (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
     pn = rqdata.dataCaches[mc].pkg_fn[taskfn]
     h = rqdata.runtaskentries[tid].unihash
-    return pn + ":" + "taskname" + h
+    return pn + ":" + taskname + h
 
 class RunQueueStats:
     """
@@ -2250,9 +2250,8 @@ class RunQueueExecute:
                             return True
                         continue
                     # If covered tasks are running, need to wait for them to complete
-                    for t in self.sqdata.sq_covered_tasks[nexttask]:
-                        if t in self.runq_running and t not in self.runq_complete:
-                            continue
+                    if any(t in self.runq_running and t not in self.runq_complete for t in self.sqdata.sq_covered_tasks[nexttask]):
+                        continue
                     if nexttask in self.sq_deferred:
                         # Deferred tasks that were still deferred were skipped above so we now need to process
                         logger.debug("Task %s no longer deferred" % nexttask)
@@ -2610,7 +2609,7 @@ class RunQueueExecute:
             next = set()
             ready = {}
             for tid in current:
-                if self.rqdata.runtaskentries[p].depends and not self.rqdata.runtaskentries[tid].depends.isdisjoint(total):
+                if self.rqdata.runtaskentries[tid].depends and not self.rqdata.runtaskentries[tid].depends.isdisjoint(total):
                     continue
                 # get_taskhash for a given tid *must* be called before get_unihash* below
                 ready[tid] = bb.parse.siggen.get_taskhash(tid, self.rqdata.runtaskentries[tid].depends, self.rqdata.dataCaches)

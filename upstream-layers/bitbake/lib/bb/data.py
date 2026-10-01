@@ -94,7 +94,7 @@ def expandKeys(alterdata, readdata = None):
             val = alterdata.getVar(key, False)
             if val is not None:
                 bb.warn("Variable key %s (%s) replaces original key %s (%s)." % (key, val, ekey, newval))
-        alterdata.renameVar(key, ekey)
+        alterdata.renameVar(key, ekey, recurse=False)
 
 def inheritFromOS(d, savedenv, permitted):
     """Inherit variables from the initial environment."""

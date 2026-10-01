@@ -105,7 +105,10 @@ class Wget(FetchMethod):
         fetchcmd = self.basecmd
 
         dldir = os.path.realpath(d.getVar("DL_DIR"))
-        localpath = os.path.join(dldir, ud.localfile) + ".tmp"
+        # Where we ultimately want the file
+        finalpath = os.path.join(dldir, ud.localfile)
+        # A temp location while processing, keeping in mind max path lengths
+        localpath = finalpath[:250] + ".tmp"
         bb.utils.mkdirhier(os.path.dirname(localpath))
         fetchcmd += " --output-document=%s" % shlex.quote(localpath)
 
@@ -142,7 +145,7 @@ class Wget(FetchMethod):
 
         # Remove the ".tmp" and move the file into position atomically
         # Our lock prevents multiple writers but mirroring code may grab incomplete files
-        os.rename(localpath, localpath[:-4])
+        os.rename(localpath, finalpath)
 
         return True
 

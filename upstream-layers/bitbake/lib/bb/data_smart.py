@@ -661,7 +661,7 @@ class DataSmart(MutableMapping):
     def getVar(self, var, expand=True, noweakdefault=False, parsing=False):
         return self.getVarFlag(var, "_content", expand, noweakdefault, parsing)
 
-    def renameVar(self, key, newkey, **loginfo):
+    def renameVar(self, key, newkey, recurse=True, **loginfo):
         """
         Rename the variable key to newkey
         """
@@ -693,7 +693,8 @@ class DataSmart(MutableMapping):
             self.overridedata[newkey] = []
             for (v, o) in self.overridedata[key]:
                 self.overridedata[newkey].append([v.replace(key, newkey), o])
-                self.renameVar(v, v.replace(key, newkey))
+                if recurse:
+                    self.renameVar(v, v.replace(key, newkey))
 
         if ':' in newkey and val is None:
             self._setvar_update_overrides(newkey, **loginfo)
