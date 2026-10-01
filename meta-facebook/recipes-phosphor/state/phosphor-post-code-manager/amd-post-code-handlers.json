@@ -67,25 +67,38 @@
   {
     "name": "PSB_NO_BIOS_SIGNING_KEY",
     "description": "P0: BIOS signing key entry not found",
-    "primary": "0xEFE00022",
+    "primary": "0xEF000022",
     "event": {
       "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
       "arguments": {
         "SOURCE": "/xyz/openbmc_project/state/host0",
-        "EVENT": "PSB Event(EFE00022) P0: BIOS signing key entry not found",
+        "EVENT": "PSB Event(EF000022) P0: BIOS signing key entry not found",
 	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_FUSE_INFO_READ_ERROR_P0",
+    "description": "P0: Error reading fuse information on one P0 IOD",
+    "primary": "0xEF00003E",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF00003E) P0: Error reading fuse information on one P0 IOD",
+        "RAW_EVENT": ""
       }
     }
   },
   {
     "name": "PSB_BIOS_SIGNING_KEY_FLAG_VIOLATION",
     "description": "P0: OEM BIOS Signing Key Usage flag violation",
-    "primary": "0xEFE0006F",
+    "primary": "0xEF00006F",
     "event": {
       "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
       "arguments": {
         "SOURCE": "/xyz/openbmc_project/state/host0",
-        "EVENT": "PSB Event(EFE0006F) P0: OEM BIOS Signing Key Usage flag violation",
+        "EVENT": "PSB Event(EF00006F) P0: OEM BIOS Signing Key Usage flag violation",
 	"RAW_EVENT": ""
       }
     }
@@ -93,25 +106,38 @@
   {
     "name": "PSB_NO_BIOS_RTM_SIGNATURE",
     "description": "P0: BIOS RTM Signature entry not found",
-    "primary": "0xEFE00078",
+    "primary": "0xEF000078",
     "event": {
       "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
       "arguments": {
         "SOURCE": "/xyz/openbmc_project/state/host0",
-        "EVENT": "PSB Event(EFE00078) P0: BIOS RTM Signature entry not found",
+        "EVENT": "PSB Event(EF000078) P0: BIOS RTM Signature entry not found",
 	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_BIOS_COPY_TO_DRAM_FAILED",
+    "description": "P0: BIOS copy to DRAM failed",
+    "primary": "0xEF000079",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF000079) P0: BIOS copy to DRAM failed",
+        "RAW_EVENT": ""
       }
     }
   },
   {
     "name": "PSB_BIOS_RTM_SIGNATURE_VERIFICATION_FAILED",
     "description": "P0: BIOS RTM Signature verification failed",
-    "primary": "0xEFE0007A",
+    "primary": "0xEF00007A",
     "event": {
       "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
       "arguments": {
         "SOURCE": "/xyz/openbmc_project/state/host0",
-        "EVENT": "PSB Event(EFE0007A) P0: BIOS RTM Signature verification failed",
+        "EVENT": "PSB Event(EF00007A) P0: BIOS RTM Signature verification failed",
 	"RAW_EVENT": ""
       }
     }
@@ -119,26 +145,117 @@
   {
     "name": "PSB_BIOS_SIGNING_KEY_VERIFICATION_FAILED",
     "description": "P0: OEM BIOS Signing Key failed signature verification",
-    "primary": "0xEFE0007B",
+    "primary": "0xEF00007B",
     "event": {
       "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
       "arguments": {
         "SOURCE": "/xyz/openbmc_project/state/host0",
-        "EVENT": "PSB Event(EFE0007B) P0: OEM BIOS Signing Key failed signature verification",
+        "EVENT": "PSB Event(EF00007B) P0: OEM BIOS Signing Key failed signature verification",
 	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_VENDOR_MODEL_ID_BINDING_VIOLATION_P0",
+    "description": "P0: Platform Vendor ID and/or Model ID binding violation on one P0 IOD",
+    "primary": "0xEF00007C",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF00007C) P0: Platform Vendor ID and/or Model ID binding violation on one P0 IOD",
+        "RAW_EVENT": ""
       }
     }
   },
   {
     "name": "PSB_BIOS_COPY_BIT_UNSET",
     "description": "P0: BIOS Copy bit is unset for reset image",
-    "primary": "0xEFE0007D",
+    "primary": "0xEF00007D",
     "event": {
       "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
       "arguments": {
         "SOURCE": "/xyz/openbmc_project/state/host0",
-        "EVENT": "PSB Event(EFE0007D) P0: BIOS Copy bit is unset for reset image",
+        "EVENT": "PSB Event(EF00007D) P0: BIOS Copy bit is unset for reset image",
 	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_FUSE_ALREADY_BLOWN_P0",
+    "description": "P0: Requested fuse is already blown; reblow will cause ASIC malfunction",
+    "primary": "0xEF00007E",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF00007E) P0: Requested fuse is already blown; reblow will cause ASIC malfunction",
+        "RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_FUSING_OPERATION_ERROR_P0",
+    "description": "P0: Error with actual fusing operation on one P0 IOD",
+    "primary": "0xEF00007F",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF00007F) P0: Error with actual fusing operation on one P0 IOD",
+        "RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_FUSE_INFO_READ_ERROR_P1",
+    "description": "P1: Error reading fuse information on one P1 IOD",
+    "primary": "0xEF000080",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF000080) P1: Error reading fuse information on one P1 IOD",
+        "RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_VENDOR_MODEL_ID_BINDING_VIOLATION_P1",
+    "description": "P1: Platform Vendor ID and/or Model ID binding violation on one P1 IOD",
+    "primary": "0xEF000081",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF000081) P1: Platform Vendor ID and/or Model ID binding violation on one P1 IOD",
+        "RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_FUSE_ALREADY_BLOWN_P1",
+    "description": "P1: Requested fuse is already blown; reblow will cause ASIC malfunction on one P1 IOD",
+    "primary": "0xEF000082",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF000082) P1: Requested fuse is already blown; reblow will cause ASIC malfunction on one P1 IOD",
+        "RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_FUSING_OPERATION_ERROR_P1",
+    "description": "P1: Error with actual fusing operation on one P1 IOD",
+    "primary": "0xEF000083",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EF000083) P1: Error with actual fusing operation on one P1 IOD",
+        "RAW_EVENT": ""
       }
     }
   }
