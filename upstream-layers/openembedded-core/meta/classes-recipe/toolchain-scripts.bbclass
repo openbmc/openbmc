@@ -63,6 +63,8 @@ toolchain_create_sdk_env_script () {
 	echo "export PATH=$sdkpathnative$bindir:$sdkpathnative$sbindir:$sdkpathnative$base_bindir:$sdkpathnative$base_sbindir:$sdkpathnative$bindir/../${HOST_SYS}/bin:$sdkpathnative$bindir/${TARGET_SYS}"$EXTRAPATH':"$PATH"' >> $script
 	echo 'export PKG_CONFIG_SYSROOT_DIR=$SDKTARGETSYSROOT' >> $script
 	echo 'export PKG_CONFIG_PATH=$SDKTARGETSYSROOT'"$libdir"'/pkgconfig:$SDKTARGETSYSROOT'"$prefix"'/share/pkgconfig' >> $script
+	echo 'export PKG_CONFIG_SYSTEM_INCLUDE_PATH=$SDKTARGETSYSROOT'"$prefix"'/include:'"$sdkpathnative${includedir_nativesdk}" >> $script
+	echo 'export PKG_CONFIG_SYSTEM_LIBRARY_PATH=$SDKTARGETSYSROOT'"$libdir"':$SDKTARGETSYSROOT/${baselib}:'"$sdkpathnative${libdir_nativesdk}" >> $script
 	echo 'export CONFIG_SITE=${SDKPATH}/site-config-'"${multimach_target_sys}" >> $script
 	echo "export OECORE_NATIVE_SYSROOT=\"$sdkpathnative\"" >> $script
 	echo 'export OECORE_TARGET_SYSROOT="$SDKTARGETSYSROOT"' >> $script

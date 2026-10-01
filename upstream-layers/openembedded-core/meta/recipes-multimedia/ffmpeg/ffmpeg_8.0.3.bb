@@ -37,6 +37,9 @@ SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
            file://CVE-2026-65705_p1.patch \
            file://CVE-2026-65705_p2.patch \
            file://CVE-2026-65706.patch \
+           file://CVE-2026-66037.patch \
+           file://CVE-2026-66038.patch \
+           file://CVE-2026-66039.patch \
            "
 
 SRC_URI[sha256sum] = "6136812ea6d4e68bdba27e33c2a94382711cdf4f8602ffef056ff792bd6f9818"
@@ -196,3 +199,6 @@ CVE_STATUS[CVE-2025-59729] = "fixed-version: this CVE are fixed since v8.0"
 CVE_STATUS[CVE-2025-59730] = "fixed-version: this CVE are fixed since v8.0"
 CVE_STATUS[CVE-2026-8461] = "cpe-stable-backport: this CVE are fixed since v8.0.3"
 CVE_STATUS[CVE-2026-40962] = "cpe-stable-backport: this CVE are fixed since v8.0.2"
+CVE_STATUS[CVE-2026-52295] = "fixed-version: fixed since v8.0.2"
+CVE_STATUS[CVE-2026-52296] = "fixed-version: fixed since v8.0.2"
+CVE_STATUS[CVE-2026-52297] = "fixed-version: fixed since v8.0.2"

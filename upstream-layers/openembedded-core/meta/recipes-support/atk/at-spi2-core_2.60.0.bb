@@ -23,6 +23,8 @@ DEPENDS = " \
 PROVIDES += "atk at-spi2-atk"
 RPROVIDES:${PN} += "atk at-spi2-atk"
 
+RDEPENDS:${PN}:append:class-target = " gsettings-desktop-schemas"
+
 inherit gnomebase gi-docgen gettext systemd upstream-version-is-even gobject-introspection python3targetconfig
 
 EXTRA_OEMESON = " -Dsystemd_user_dir=${systemd_user_unitdir} \

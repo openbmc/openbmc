@@ -21,7 +21,7 @@ SRC_URI = "git://github.com/NetworkConfiguration/dhcpcd;protocol=https;branch=ma
            file://CVE-2026-56117.patch \
            "
 
-SRCREV = "42ff6d2548209af3185473e6cb6f9d235c48bbf4"
+SRCREV = "243ad84ac67a87d631ff7eb83b2eed2727acebb5"
 
 # Doesn't use automake so we can't do out-of-tree builds
 inherit pkgconfig autotools-brokensep systemd useradd

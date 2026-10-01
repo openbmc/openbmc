@@ -42,6 +42,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://CVE-2025-14876_p1.patch \
            file://CVE-2025-14876_p2.patch \
            file://0012-linux-user-Check-if-RESOLVE_CACHED-flag-is-defined-b.patch \
+           file://CVE-2026-48914.patch \
            "
 # file index at download.qemu.org isn't reliable: https://gitlab.com/qemu-project/qemu-web/-/issues/9
 UPSTREAM_CHECK_URI = "https://www.qemu.org"
