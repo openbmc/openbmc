@@ -111,12 +111,6 @@ default_update_rtr() {
   local mac="$2"
   local op="${3-add}"
 
-  if ip addr show | grep -q "^[ ]*inet6 $rtr/"; then
-    echo "Router is ourself, ignoring" >&2
-    return 0
-  fi
-
-
   if [[ ${op} = "add" ]]; then
     echo "Set router $rtr on $RA_IF" >&2
     add_rtr "$rtr" "$mac" 1
@@ -202,6 +196,10 @@ while true; do
       # Only valid default routers can be considered, 0 lifetime implies
       # a non-default router
       (( lifetime > 0 )) || continue
+      if ip addr show | grep -q "^[ ]*inet6 $rtr/"; then
+        echo "Router is ourself, ignoring" >&2
+        continue
+      fi
 
       dl=$((expire_time + SECONDS))
       fqdn=

@@ -46,11 +46,23 @@ GBMC_BR_FROM_RA_CONFS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/65-ra-add
 # Writes the networkd config for the given "<addr> <pfx>" entries, only
 # reloading networkd when the set of addresses actually changes.
 #
+# It also makes networkd ignore RAs from our own gbmcbr link-local address. A
+# BMC that also routes for gbmcbr (e.g. a tray with its own front link)
+# advertises prefixes there. networkd ignores route options from its own RAs,
+# but not on-link prefixes, so whenever we solicit RAs our own prefixes showed
+# up as RA routes. Configuring an address in one reloaded networkd, which
+# flushed the route again, which removed the address and reloaded again,
+# every RS interval, flushing the tray default routes every time.
+#
 # Each prefix also gets an on-link route over gbmcbr. The kernel installs one
 # from the RA, but it is flushed on every reconfigure until the next RA, which
 # leaves the rest of the /80 (e.g. other BMCs) unreachable in the meantime.
 gbmc_br_from_ra_write_conf() {
   local contents=
+  local ll
+  if ll="$(ip_pfx_concat fe80::/64 "$(mac_to_eui64 "$gbmc_br_from_ra_mac")")"; then
+    contents+="[IPv6AcceptRA]"$'\n'"RouterDenyList=${ll%/*}"$'\n'
+  fi
   local addr pfx
   while read -r addr pfx; do
     [[ -n $addr ]] || continue
