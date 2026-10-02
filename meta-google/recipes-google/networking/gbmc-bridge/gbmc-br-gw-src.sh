@@ -246,6 +246,13 @@ gbmc_br_gw_src_hook() {
   # shellcheck disable=SC2154
   if [[ $change == init || $change == defer ]]; then
     gbmc_br_gw_src_br_update
+  # The source we pick for a gateway depends on which interface our addresses
+  # route out of, which policy rules can change without any route or address
+  # events. Rules come in bursts, so batch them up.
+  elif [[ $change == rule ]]; then
+    gbmc_ip_monitor_timer gbmc-br-gw-src-rule 1
+  elif [[ $change == timer && $timer == gbmc-br-gw-src-rule ]]; then
+    gbmc_br_gw_src_update
   # We only want to match default gateway routes that are dynamic
   # (have an expiration time). These will be updated with our preferred
   # source.

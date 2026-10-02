@@ -176,6 +176,22 @@ testParseRouteDel() {
 }
 
 # shellcheck disable=SC2329
+testParseRuleAdd() {
+  expect_err 0 gbmc_ip_monitor_parse_line $'[RULE]1003:\tfrom 2002:a05:6469:4004:fd01::/76 lookup 1003 proto static'
+  expect_streq "$change" 'rule'
+  expect_streq "$action" 'add'
+  expect_streq "$rule" $'1003:\tfrom 2002:a05:6469:4004:fd01::/76 lookup 1003 proto static'
+}
+
+# shellcheck disable=SC2329
+testParseRuleDel() {
+  expect_err 0 gbmc_ip_monitor_parse_line $'[RULE]Deleted 1003:\tfrom 2002:a05:6469:4004:fd01::/76 lookup 1003 proto static'
+  expect_streq "$change" 'rule'
+  expect_streq "$action" 'del'
+  expect_streq "$rule" $'1003:\tfrom 2002:a05:6469:4004:fd01::/76 lookup 1003 proto static'
+}
+
+# shellcheck disable=SC2329
 testParseLinkAdd() {
   expect_err 0 gbmc_ip_monitor_parse_line "[LINK]2: eno2@extra: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000" \
     < <(echo 'link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff')

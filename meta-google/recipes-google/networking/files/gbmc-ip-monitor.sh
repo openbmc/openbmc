@@ -160,6 +160,13 @@ gbmc_ip_monitor_parse_line() {
       action=del
     fi
     route="${BASH_REMATCH[2]}"
+  elif [[ "$line" =~ ^\[RULE\](Deleted )?(.*)$ ]]; then
+    change=rule
+    action=add
+    if [ -n "${BASH_REMATCH[1]}" ]; then
+      action=del
+    fi
+    rule="${BASH_REMATCH[2]}"
   elif [[ "$line" == '[LINK]'* ]]; then
     change='link'
     action=add
@@ -222,4 +229,4 @@ while read -r line; do
   elif [ "$change" = 'defer' ]; then
     gbmc_net_reload_queue_end
   fi
-done < <(gbmc_ip_monitor_generate_init; ip monitor link addr route label & cat <&"$GBMC_IP_MONITOR_DEFER")
+done < <(gbmc_ip_monitor_generate_init; ip monitor link addr route rule label & cat <&"$GBMC_IP_MONITOR_DEFER")
