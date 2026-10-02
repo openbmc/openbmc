@@ -1952,7 +1952,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_0_0_TEMP_C",
+            "Name": "MB_DIMM_A0_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -1981,7 +1981,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_0_1_TEMP_C",
+            "Name": "MB_DIMM_A1_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2010,7 +2010,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_0_2_TEMP_C",
+            "Name": "MB_DIMM_A2_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2039,7 +2039,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_0_3_TEMP_C",
+            "Name": "MB_DIMM_A3_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2068,7 +2068,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_0_4_TEMP_C",
+            "Name": "MB_DIMM_A4_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2097,7 +2097,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_0_5_TEMP_C",
+            "Name": "MB_DIMM_A5_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2126,7 +2126,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_1_0_TEMP_C",
+            "Name": "MB_DIMM_B0_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2155,7 +2155,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_1_1_TEMP_C",
+            "Name": "MB_DIMM_B1_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2184,7 +2184,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_1_2_TEMP_C",
+            "Name": "MB_DIMM_B2_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2213,7 +2213,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_1_3_TEMP_C",
+            "Name": "MB_DIMM_B3_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2242,7 +2242,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_1_4_TEMP_C",
+            "Name": "MB_DIMM_B4_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2271,7 +2271,7 @@
     },
     {
         "Desc": {
-            "Name": "MB_DIMM_1_5_TEMP_C",
+            "Name": "MB_DIMM_B5_TEMP_C",
             "SensorType": "temperature"
         },
         "Threshold": {
@@ -2297,5 +2297,341 @@
             ]
         },
         "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_A0_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM0_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_A1_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM1_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_A2_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM2_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_A3_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM3_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_A4_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM4_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_A5_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM5_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_B0_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM6_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_B1_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM7_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_B2_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM8_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_B3_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM9_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_B4_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM10_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_B5_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "CriticalHigh": 14
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_POWER",
+                    "Desc": {
+                        "Name": "PHX_DIMM11_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_POWER"
     }
 ]
