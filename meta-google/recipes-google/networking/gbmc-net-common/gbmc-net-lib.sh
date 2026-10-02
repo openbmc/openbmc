@@ -17,10 +17,38 @@
 
 [ -n "${gbmc_net_lib_init-}" ] && return
 
+# Prints the file to bind-mount over `target` so that it looks removed.
+# Files under /etc/systemd shadow same-named files in /run/systemd and
+# /usr/lib/systemd, and a /dev/null there is systemd's marker for a masked
+# file, which hides the lower copies too. Use the copy systemd would fall back
+# to if the file were removed, and /dev/null only when there is none.
+# Arguments:
+#   $1: Path to the target file
+#   $2: Optional root prefix for the lookup (testing)
+gbmc_net_mask_file_source() {
+  local target="$1"
+  local root="${2-}"
+  if [[ $target == /etc/systemd/* ]]; then
+    local rel="${target#/etc/systemd/}"
+    local lower
+    for lower in "$root"/run/systemd/"$rel" "$root"/usr/lib/systemd/"$rel"; do
+      [ -e "$lower" ] || [ -L "$lower" ] || continue
+      # A masked lower copy keeps the file masked
+      if [ -f "$lower" ] && [ ! -L "$lower" ]; then
+        echo "$lower"
+        return 0
+      fi
+      break
+    done
+  fi
+  echo /dev/null
+}
+
 # Safely mask or remove a filesystem target (file or directory).
 # If GBMC_AVOID_RWFS is set, avoids writing or unlinking on persistent
-# storage (RWFS) by bind-mounting /dev/null (for files) or an empty
-# directory (for directories) over the target if not already mounted.
+# storage (RWFS) by bind-mounting over the target if not already mounted,
+# an empty directory for directories and the file from
+# gbmc_net_mask_file_source for files.
 # If GBMC_AVOID_RWFS is unset, unmounts any active mount and removes the
 # target directly via rm -rf.
 # Arguments:
@@ -38,7 +66,7 @@ gbmc_net_mask_or_rm() {
       mkdir -p "$empty_dir"
       mount --bind "$empty_dir" "$target" || return
     else
-      mount --bind /dev/null "$target" || return
+      mount --bind "$(gbmc_net_mask_file_source "$target")" "$target" || return
     fi
   else
     echo "Removing path $target from $(caller 0 2>/dev/null || echo unknown)" >&2

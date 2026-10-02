@@ -377,4 +377,35 @@ testUnmaskAndWrite() {
   rm -rf "$test_dir"
 }
 
+testMaskFileSource() {
+  local root
+  root="$(mktemp -d)"
+
+  # Non-systemd paths and systemd paths without a lower copy use /dev/null
+  expect_streq "$(gbmc_net_mask_file_source /var/google/foo "$root")" /dev/null
+  expect_streq "$(gbmc_net_mask_file_source \
+    /etc/systemd/network/00-bmc-ncsi.network "$root")" /dev/null
+
+  # Fall back to the vendor copy so the file is not masked by systemd
+  mkdir -p "$root"/usr/lib/systemd/network "$root"/run/systemd/network
+  touch "$root"/usr/lib/systemd/network/00-bmc-ncsi.network
+  expect_streq "$(gbmc_net_mask_file_source \
+    /etc/systemd/network/00-bmc-ncsi.network "$root")" \
+    "$root"/usr/lib/systemd/network/00-bmc-ncsi.network
+
+  # A runtime copy takes precedence over the vendor copy
+  touch "$root"/run/systemd/network/00-bmc-ncsi.network
+  expect_streq "$(gbmc_net_mask_file_source \
+    /etc/systemd/network/00-bmc-ncsi.network "$root")" \
+    "$root"/run/systemd/network/00-bmc-ncsi.network
+
+  # A masked runtime copy keeps the file masked
+  rm "$root"/run/systemd/network/00-bmc-ncsi.network
+  ln -s /dev/null "$root"/run/systemd/network/00-bmc-ncsi.network
+  expect_streq "$(gbmc_net_mask_file_source \
+    /etc/systemd/network/00-bmc-ncsi.network "$root")" /dev/null
+
+  rm -rf "$root"
+}
+
 main
