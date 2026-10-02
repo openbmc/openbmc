@@ -17,6 +17,7 @@ SRC_URI += " \
   file://50-gbmc-br.rules \
   file://gbmc-br-ula.sh \
   file://gbmc-br-from-ra.sh \
+  file://gbmc-br-withdrawn.sh \
   file://gbmc-br-hostname.sh \
   file://gbmc-br-hostname.service \
   file://gbmc-br-ra.sh.in \
@@ -199,6 +200,7 @@ do_install() {
   install -d -m0755 "$mondir"
   install -m0644 ${UNPACKDIR}/gbmc-br-ula.sh "$mondir"/
   install -m0644 ${UNPACKDIR}/gbmc-br-from-ra.sh "$mondir"/
+  install -m0644 ${UNPACKDIR}/gbmc-br-withdrawn.sh "$mondir"/
   install -m0644 ${UNPACKDIR}/gbmc-br-gw-src.sh "$mondir"/
   install -m0644 ${UNPACKDIR}/gbmc-br-nft.sh "$mondir"/
 
