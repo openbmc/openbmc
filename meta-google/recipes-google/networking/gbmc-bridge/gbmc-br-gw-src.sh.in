@@ -24,6 +24,11 @@ source /usr/share/gbmc-br-lib.sh || exit
 
 declare -A gbmc_br_gw_src_ips=()
 declare -A gbmc_br_gw_src_routes=()
+# Main table default routes (without src) we removed because none of our
+# addresses can source traffic through them. Without a source the kernel picks
+# whatever address it likes, e.g. a NIC address out of the front panel, so
+# they are only put back once there is a source for them.
+declare -A gbmc_br_gw_src_disabled=()
 gbmc_br_gw_defgw=
 # The NCSI interface, empty if there isn't one
 gbmc_br_gw_src_ncsi_if='@NCSI_IF@'
@@ -335,18 +340,74 @@ gbmc_br_gw_src_nic_dev() {
   nic_dev_out="$gbmc_br_gw_src_ncsi_if"
 }
 
+# Disables the main table default routes of our networkd gateway drop-ins
+# (10-gateway*.conf) that aren't in the kernel at startup, as a previous
+# instance most likely removed them for lack of a source. Their owner only
+# puts them back on a reconfigure or a router change, so this brings them
+# back once there is a source for them.
+gbmc_br_gw_src_disabled_load() {
+  local -A have=()
+  local route
+  while read -r route; do
+    [[ $route =~ ' dev '([^ ]+).*' metric '([0-9]+) ]] || continue
+    have["${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"]=1
+  done < <(ip -6 route show default 2>/dev/null)
+  local file
+  for file in /run/systemd/network/00-bmc-*.network.d/10-gateway*.conf; do
+    [[ -f $file ]] || continue
+    local intf="${file#/run/systemd/network/00-bmc-}"
+    intf="${intf%%.network.d/*}"
+    [[ $intf != gbmcbr ]] || continue
+    local contents=
+    IFS= read -r -d '' contents <"$file" || true
+    while [[ $contents == *'[Route]'* ]]; do
+      contents="${contents#*\[Route\]}"
+      local sec="${contents%%\[*}"
+      [[ $sec != *Table=* && $sec =~ Gateway=([^[:space:]]+) ]] || continue
+      local gw="${BASH_REMATCH[1]}"
+      [[ $sec =~ Metric=([0-9]+) ]] || continue
+      local metric="${BASH_REMATCH[1]}"
+      [[ -z ${have["$intf $metric"]-} ]] || continue
+      # The way the route events show it, see gbmc_br_gw_src_hook()
+      route="default via $gw dev $intf metric $metric"
+      [[ $sec != *GatewayOnLink=true* ]] || route+=' onlink'
+      route+=' pref medium'
+      echo "gBMC Bridge GW still disabled: $route" >&2
+      gbmc_br_gw_src_routes["$route"]=1
+      gbmc_br_gw_src_disabled["$route"]=1
+    done
+  done
+}
+
 gbmc_br_gw_src_update() {
   local route
   local ip
+  # The lookups below never land on the routes we disabled, so without a
+  # policy rule for it, none of our addresses would ever bring one back.
+  # Addresses that would route out of the most preferred one if it were there
+  # count for it.
+  local dis_dev=
+  local dis_metric=
+  for route in "${!gbmc_br_gw_src_disabled[@]}"; do
+    [[ $route =~ ' dev '([^ ]+).*' metric '([0-9]+) ]] || continue
+    if [[ -z $dis_metric ]] || (( BASH_REMATCH[2] < dis_metric )); then
+      dis_dev="${BASH_REMATCH[1]}"
+      dis_metric="${BASH_REMATCH[2]}"
+    fi
+  done
   # {dev}-{ip} -> {metric}
   local -A dev_ip_to_metric=()
   for ip in "${!gbmc_br_gw_src_ips[@]}"; do
     local rt
     rt="$(ip -6 route get 2000:: from "$ip" 2>/dev/null)"
+    if [[ -n $dis_metric ]] && ! [[ "$rt" =~ ' metric '([0-9]+) &&
+          ${BASH_REMATCH[1]} -le $dis_metric ]]; then
+      dev_ip_to_metric["$dis_dev-$ip"]="$dis_metric"
+    fi
     [[ "$rt" =~ ' dev '([^ ]+).*' metric '([^ ]+) ]] || continue
     local rt_dev="${BASH_REMATCH[1]}"
     local rt_metric="${BASH_REMATCH[2]}"
-    dev_ip_to_metric["$rt_dev-$ip"]+="$rt_metric"
+    dev_ip_to_metric["$rt_dev-$ip"]="$rt_metric"
   done
   local primary_ip
   primary_ip="$(gbmc_br_get_ip)"
@@ -420,13 +481,16 @@ gbmc_br_gw_src_update() {
       base_route="${route/ src $cur_src / }"
     fi
     if (( new_len >= 16 )); then
+      [[ -n ${gbmc_br_gw_src_disabled["$base_route"]-} ]] && continue
+      echo "gBMC Bridge Disabling GW without a source: $route" >&2
       # A source picked before, e.g. before the policy rules were in place,
       # is no longer valid for this route
-      [[ -n $cur_src ]] || continue
-      echo "gBMC Bridge Removing GW source [$cur_src]: $route" >&2
-      gbmc_br_config_primary_ip "$route" "del"
+      [[ -z $cur_src ]] || gbmc_br_config_primary_ip "$route" "del"
+      unset 'gbmc_br_gw_src_routes[$route]'
+      gbmc_br_gw_src_routes["$base_route"]=1
+      gbmc_br_gw_src_disabled["$base_route"]=1
       # shellcheck disable=SC2086
-      ip route change $base_route && unset 'gbmc_br_gw_src_routes[$route]'
+      ip route del $base_route 2>/dev/null || true
       continue
     fi
     local rt_metric=4096  # Use a default that will be recognized as invalid
@@ -436,6 +500,21 @@ gbmc_br_gw_src_update() {
     if (( rt_metric <= 1536 )) && [[ "$new_src" == "$primary_ip" ]]; then
       # Add primary src ip for the GW
       gbmc_br_config_primary_ip "$base_route src $new_src" "replace"
+    fi
+    if [[ -n ${gbmc_br_gw_src_disabled["$base_route"]-} ]]; then
+      unset 'gbmc_br_gw_src_disabled[$base_route]'
+      unset 'gbmc_br_gw_src_routes[$route]'
+      # Don't bring back a route through a router we no longer use
+      local gw=
+      [[ $route =~ ' via '([^ ]+) ]] && gw="${BASH_REMATCH[1]}"
+      local table
+      table="$(gbmc_net_route_table_for_intf "$dev")" || continue
+      [[ -n $gw && -n "$(ip -6 route show default via "$gw" dev "$dev" \
+          table "$table" 2>/dev/null)" ]] || continue
+      echo "gBMC Bridge Enabling GW with source [$new_src]: $route" >&2
+      # shellcheck disable=SC2086
+      ip route replace $base_route src "$new_src" || true
+      continue
     fi
     [[ $route != *" src $new_src "* ]] || continue
     echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
@@ -559,6 +638,10 @@ gbmc_br_gw_src_hook() {
   local br_route_regex='^[0-9a-f:]+/124 .*dev gbmcbr( |$)'
   # shellcheck disable=SC2154
   if [[ $change == init || $change == defer ]]; then
+    if [[ $change == init ]]; then
+      gbmc_br_gw_src_disabled_load
+      gbmc_br_gw_src_update
+    fi
     gbmc_br_gw_src_br_update
   # The source we pick for a gateway depends on which interface our addresses
   # route out of, which policy rules can change without any route or address
@@ -616,7 +699,15 @@ gbmc_br_gw_src_hook() {
     if [[ $route =~ $proto_regex ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
-    if [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
+    if [[ $action == add && -n ${gbmc_br_gw_src_disabled["$route"]-} ]]; then
+      # Put back by its owner (e.g. a networkd reconfigure) while still
+      # without a source, disable it again
+      unset 'gbmc_br_gw_src_disabled[$route]'
+      gbmc_br_gw_src_update
+    elif [[ $action == del && -n ${gbmc_br_gw_src_disabled["$route"]-} ]]; then
+      # Our own removal
+      return 0
+    elif [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
       gbmc_br_gw_src_routes["$route"]=1
       gbmc_br_gw_src_update
       gbmc_br_set_router
@@ -661,7 +752,7 @@ gbmc_br_gw_src_hook() {
           unset 'gbmc_br_gw_src_routes[$route]'
           local route_regex='^(.*) src [^ ]+(.*)$'
           if [[ $route =~ $route_regex ]]; then
-            new_route_key="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+            local new_route_key="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
             gbmc_br_gw_src_routes["$new_route_key"]=1
           fi
         fi
