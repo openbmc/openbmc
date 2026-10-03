@@ -202,6 +202,24 @@ test_ip_pfx_to_cidr() {
   expect_numeq "$cidr" 24
 }
 
+test_ip_same_pfx() {
+  expect_err 2 ip_same_pfx 'z::' 'fd01::' 64
+  expect_err 2 ip_same_pfx 'fd01::' '' 64
+  expect_err 2 ip_same_pfx 'fd01::' 'fd01::' 129
+  expect_err 2 ip_same_pfx '10.0.0.1' '10.0.0.1' 33
+  expect_err 1 ip_same_pfx 'fd01::' '10.0.0.1' 0
+
+  expect_err 0 ip_same_pfx 'fd01::' 'fd02::' 0
+  expect_err 0 ip_same_pfx '2001:db8:1:2::1' '2001:db8:1:2:fd00::' 64
+  expect_err 1 ip_same_pfx '2001:db8:1:2::1' '2001:db8:1:3::1' 64
+  expect_err 0 ip_same_pfx '2001:db8::fd01:0:0:1' '2001:db8::fd0f:1:2:3' 76
+  expect_err 1 ip_same_pfx '2001:db8::fd01:0:0:1' '2001:db8::fd11:1:2:3' 76
+  expect_err 0 ip_same_pfx 'fd01::1' 'fd01::1' 128
+  expect_err 1 ip_same_pfx 'fd01::1' 'fd01::2' 128
+  expect_err 0 ip_same_pfx '10.0.1.1' '10.0.1.200' 24
+  expect_err 1 ip_same_pfx '10.0.1.1' '10.0.2.1' 23
+}
+
 test_normalize_ip() {
   ip="$(normalize_ip 'fd01:1::0:0:1')" || fail
   expect_streq "$ip" 'fd01:1::1'

@@ -290,6 +290,29 @@ ip_pfx_to_cidr() {
   echo "${BASH_REMATCH[1]}"
 }
 
+# Checks whether two addresses share their first bits.
+# Arguments:
+#   $1: First address
+#   $2: Second address
+#   $3: Number of leading bits to compare, e.g. 64 for the same /64
+# Returns 0 if they match, 1 if they don't or are of different families and
+# 2 if an address is invalid or the length is too long.
+ip_same_pfx() {
+  local a_bytes=() b_bytes=()
+  ip_to_bytes a_bytes "$1" || return 2
+  ip_to_bytes b_bytes "$2" || return 2
+  local bits="$3"
+  [[ $bits =~ ^[0-9]+$ ]] && (( bits <= ${#a_bytes[@]} * 8 )) || return 2
+  (( ${#a_bytes[@]} == ${#b_bytes[@]} )) || return 1
+  local i
+  for (( i = 0; i < bits / 8; ++i )); do
+    (( a_bytes[i] == b_bytes[i] )) || return 1
+  done
+  (( bits % 8 == 0 )) && return 0
+  local mask=$(( (0xff << (8 - bits % 8)) & 0xff ))
+  (( (a_bytes[i] & mask) == (b_bytes[i] & mask) )) || return 1
+}
+
 normalize_ip() {
   # shellcheck disable=SC2034
   local ip_bytes=()
