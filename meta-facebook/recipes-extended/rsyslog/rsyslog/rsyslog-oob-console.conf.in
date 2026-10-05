@@ -11,7 +11,7 @@ $ActionQueueType Direct
 # never reaps them, so each rotation would otherwise leave one behind
 # in $WorkDirectory forever.
 input(type="imfile"
-  File="/var/log/obmc-console-__OOB_CONSOLE_HOST__.log"
+  File="/var/log/obmc-console-__OOB_CONSOLE_HOST__-timestamped.log"
   Tag="oob_console[mTerm___OOB_CONSOLE_HOST__]"
   Severity="debug"
   Facility="local3"
