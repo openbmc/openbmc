@@ -119,6 +119,8 @@ ti_hsc_init()
         local REG_OT_WARN="0x51"
         local REG_VIN_OV_WARN="0x57"
         local REG_VIN_UV_WARN="0x58"
+        local REG_IIN_OC_WARN="0x5D"
+        local REG_PIN_OP_WARN="0x6B"
         local REG_ALERT_MASK="0xDB"
         local REG_OC_TIMER="0xE6"
         local REG_WRITE_PROTECT="0xF8"
@@ -126,9 +128,11 @@ ti_hsc_init()
         local OC_TIMER_VAL="0x5c"
         local ALERT_MASK_VAL="0x0102"
         local VOUT_UV_WARN_VAL="0x0087"
-        local OT_WARN_VAL="0x007C"
+        local OT_WARN_VAL="0x0074"
         local VIN_OV_WARN_VAL="0x00AA"
         local VIN_UV_WARN_VAL="0x0087"
+        local IIN_OC_WARN_VAL="0x0076"
+        local PIN_OP_WARN_VAL="0x0049"
 
         echo "Initializing TIC HSC"
         i2cset -y -f "$BUS" "$ADDR" "$REG_WRITE_PROTECT" "$WRITE_PROTECT_VAL" || echo "Failed to unlock write protection"
@@ -138,6 +142,8 @@ ti_hsc_init()
         i2cset -y -f "$BUS" "$ADDR" "$REG_OT_WARN" "$OT_WARN_VAL" w || echo "Failed to set OT warning"
         i2cset -y -f "$BUS" "$ADDR" "$REG_VIN_OV_WARN" "$VIN_OV_WARN_VAL" w || echo "Failed to set VIN OV warning"
         i2cset -y -f "$BUS" "$ADDR" "$REG_VIN_UV_WARN" "$VIN_UV_WARN_VAL" w || echo "Failed to set VIN UV warning"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_IIN_OC_WARN" "$IIN_OC_WARN_VAL" w || echo "Failed to set IIN OC warning"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_PIN_OP_WARN" "$PIN_OP_WARN_VAL" w || echo "Failed to set PIN OP warning"
         i2cset -y -f "$BUS" "$ADDR" "$REG_CLEAR_FAULTS" || echo "Failed to clear faults"
 
         verify_reg "$BUS" "$ADDR" "$REG_OC_TIMER" "$OC_TIMER_VAL" "" "OC timer"
@@ -146,6 +152,8 @@ ti_hsc_init()
         verify_reg "$BUS" "$ADDR" "$REG_OT_WARN" "$OT_WARN_VAL" "w" "OT warning"
         verify_reg "$BUS" "$ADDR" "$REG_VIN_OV_WARN" "$VIN_OV_WARN_VAL" "w" "VIN OV warning"
         verify_reg "$BUS" "$ADDR" "$REG_VIN_UV_WARN" "$VIN_UV_WARN_VAL" "w" "VIN UV warning"
+        verify_reg "$BUS" "$ADDR" "$REG_IIN_OC_WARN" "$IIN_OC_WARN_VAL" "w" "IIN OC warning"
+        verify_reg "$BUS" "$ADDR" "$REG_PIN_OP_WARN" "$PIN_OP_WARN_VAL" "w" "PIN OP warning"
     fi
 }
 
