@@ -1,0 +1,466 @@
+#!/bin/bash
+#
+# config: 2 99
+# @brief: Collect Yosemite5 CM CPLD/IO-expander status for debug.
+#
+
+# The sourced `functions` file is not
+# available during shellcheck linting
+#
+# shellcheck disable=SC1091
+if [ -n "$DREPORT_INCLUDE" ] && [ -f "$DREPORT_INCLUDE/functions" ]; then
+    . "$DREPORT_INCLUDE/functions"
+else
+    # Run directly on BMC for manual testing.
+    add_cmd_output()
+    {
+        eval "$1"
+    }
+fi
+
+BUS=8
+ADDR=0x0f
+PCA9555_ADDR0=0x24
+PCA9555_ADDR1=0x25
+
+decode_slot()
+{
+    local slot=$1
+    local reg=$2
+    local val=$((reg))
+
+    echo ""
+    echo "===================================================="
+    echo " SLOT${slot} STATUS"
+    echo "===================================================="
+
+    if [ $(((val >> 7) & 1)) -eq 1 ]; then
+        status="OK"
+    else
+        status="NOT GOOD<==============================================================================================="
+    fi
+    printf "%-30s : %s\n" "HSC Power Good" "$status"
+
+    if [ $(((val >> 6) & 1)) -eq 1 ]; then
+        status="Normal"
+    else
+        status="ALERT<=================================================================================================="
+    fi
+    printf "%-30s : %s\n" "IO Expander Alert" "$status"
+
+    if [ $(((val >> 5) & 1)) -eq 1 ]; then
+        status="Normal"
+    else
+        status="FAULT<=================================================================================================="
+    fi
+    printf "%-30s : %s\n" "HSC Fault" "$status"
+
+    if [ $(((val >> 4) & 1)) -eq 1 ]; then
+        status="Released"
+    else
+        status="Pressed<================================================================================================"
+    fi
+    printf "%-30s : %s\n" "AC Power Button" "$status"
+
+    prsnt0=$(((val >> 3) & 1))
+    prsnt1=$(((val >> 2) & 1))
+
+    if [ "$prsnt0" -eq 0 ]; then
+        status="Present"
+    else
+        status="Not Present<============================================================================================"
+    fi
+    printf "%-30s : %s\n" "Motherboard PRSNT0" "$status"
+
+    if [ "$prsnt1" -eq 0 ]; then
+        status="Present"
+    else
+        status="Not Present<============================================================================================"
+    fi
+    printf "%-30s : %s\n" "Motherboard PRSNT1" "$status"
+
+    #
+    # MB Type Detection
+    #
+
+    if [ "$prsnt0" -eq 0 ] && [ "$prsnt1" -eq 0 ]; then
+        status="MB Present"
+    elif [ "$prsnt0" -eq 0 ] && [ "$prsnt1" -eq 1 ]; then
+        status="Dummy Blade"
+    elif [ "$prsnt0" -eq 1 ] && [ "$prsnt1" -eq 0 ]; then
+        status="Dummy Tray"
+    else
+        status="Slot is blank<=========================================================================================="
+    fi
+
+printf "%-30s : %s\n" "Motherboard presense check" "$status"
+
+    if [ $(((val >> 1) & 1)) -eq 0 ]; then
+        status="Enable"
+    else
+        status="Disable"
+    fi
+    printf "%-30s : %s\n" "12V HSC Enable" "$status"
+
+    if [ $((val & 1)) -eq 0 ]; then
+        status="Enable"
+    else
+        status="Disable"
+    fi
+    printf "%-30s : %s\n" "SMBus Repeater" "$status"
+}
+
+decode_bmc_fail()
+{
+    local reg=$1
+    local val=$((reg))
+
+    echo ""
+    echo "===================================================="
+    echo " BMC HANG STATUS"
+    echo "===================================================="
+
+    for ((slot=1; slot<=SLOT_COUNT; slot++))
+    do
+        bit=$((slot - 1))
+
+        if [ $(((val >> bit) & 1)) -eq 1 ]; then
+            status="HANG !!!<==========================================================================================="
+        else
+            status="OK"
+        fi
+
+        printf "SLOT%-2s BMC : %s\n" "$slot" "$status"
+    done
+}
+
+decode_fan_mode()
+{
+if [ "$1" -eq 1 ]; then
+echo "Auto"
+else
+echo "Manual<============================================================================================================"
+fi
+}
+
+
+get_bit()
+{
+    local val=$1
+    local bit=$2
+    echo $(((val >> bit) & 1))
+}
+
+print_active_low_status()
+{
+    local label="$1"
+    local val=$2
+    local bit=$3
+    local assert_text="$4"
+    local normal_text="$5"
+
+    if [ "$(get_bit "$val" "$bit")" -eq 0 ]; then
+        status="${assert_text}<==============================================================================================="
+    else
+        status="$normal_text"
+    fi
+    printf "%-45s : %s\n" "$label" "$status"
+}
+
+print_active_high_status()
+{
+    local label="$1"
+    local val=$2
+    local bit=$3
+    local assert_text="$4"
+    local normal_text="$5"
+
+    if [ "$(get_bit "$val" "$bit")" -eq 1 ]; then
+        status="${assert_text}<==============================================================================================="
+    else
+        status="$normal_text"
+    fi
+    printf "%-45s : %s\n" "$label" "$status"
+}
+
+decode_pca9555_0x24_p0()
+{
+    local reg=$1
+    local val=$((reg))
+
+    echo ""
+    echo "===================================================="
+    echo " PCA9555 0x24 INPUT PORT 0 STATUS"
+    echo "===================================================="
+    print_active_high_status  "PDB P52V HSC Fault"           "$val" 0 "ASSERT" "Normal"
+    print_active_high_status  "PDB P12V VR Power Good"       "$val" 1 "DROP"   "OK"
+
+    for ((slot=1; slot<=SLOT_COUNT; slot++))
+    do
+        bit=$((slot + 1))
+        print_active_low_status "SLOT${slot} Paddle P12V HSC Fault" "$val" "$bit" "FAULT" "Normal"
+    done
+}
+
+decode_pca9555_0x24_p1()
+{
+    local reg=$1
+    local val=$((reg))
+
+    echo ""
+    echo "===================================================="
+    echo " PCA9555 0x24 INPUT PORT 1 STATUS"
+    echo "===================================================="
+
+    for fan in 0 1 2 3
+    do
+        print_active_low_status "Fan module ${fan}" "$val" "$fan" "REMOVED" "Present"
+    done
+
+    printf "%-45s : %s\n" "Bit4" "Reserved"
+    printf "%-45s : %s\n" "Bit5" "Reserved"
+    printf "%-45s : %s\n" "Bit6" "Reserved"
+    print_active_low_status "IO expander 0x25 Alert" "$val" 7 "ASSERT" "Normal"
+}
+
+decode_pca9555_0x25_p0()
+{
+    local reg=$1
+    local val=$((reg))
+
+    echo ""
+    echo "===================================================="
+    echo " PCA9555 0x25 INPUT PORT 0 STATUS"
+    echo "===================================================="
+    print_active_high_status "PDB CM update" "$val" 0 "RUNNING" "Idle"
+
+    for ((slot=1; slot<=SLOT_COUNT; slot++))
+    do
+        print_active_high_status "SLOT${slot} BMC update CM" "$val" "$slot" "RUNNING" "Idle"
+    done
+
+    printf "%-45s : %s\n" "Bit7" "Reserved"
+}
+
+decode_pca9555_0x25_p1()
+{
+    local reg=$1
+    local val=$((reg))
+
+    echo ""
+    echo "===================================================="
+    echo " PCA9555 0x25 INPUT PORT 1 STATUS"
+    echo "===================================================="
+
+    for ((slot=1; slot<=SLOT_COUNT; slot++))
+    do
+        bit=$((slot - 1))
+        print_active_high_status "SLOT${slot} MB" "$val" "$bit" "REMOVED" "Present"
+    done
+
+    printf "%-45s : %s\n" "Bit6" "Reserved"
+    printf "%-45s : %s\n" "Bit7" "Reserved"
+}
+
+cm_debug_report()
+{
+    # ==========================================================
+    # Detect system configuration from CPLD register 0x12[3:0]
+    # ==========================================================
+    CONFIG_RAW=$(i2cget -y -f $BUS $ADDR 0x12 2>/dev/null)
+    if [[ ! "$CONFIG_RAW" =~ ^0x[0-9a-fA-F]+$ ]]; then
+        echo "ERROR: Failed to read configuration from I2C bus $BUS, address $ADDR, register 0x12."
+        return 1
+    fi
+
+    CONFIG_BITS=$((CONFIG_RAW & 0x0f))
+    case "$CONFIG_BITS" in
+        0) CONFIG="T2";  SLOT_COUNT=3 ;;
+        2) CONFIG="T1";  SLOT_COUNT=6 ;;
+        3) CONFIG="T22"; SLOT_COUNT=6 ;;
+        1) CONFIG="T11"; SLOT_COUNT=6 ;;
+        *)
+            printf 'ERROR: Unsupported configuration value: 0x%X (REG0x12[3:0])\n' "$CONFIG_BITS"
+            return 1
+            ;;
+    esac
+
+    echo "CM debug script v3.4"
+
+    echo "Detected configuration: $CONFIG (REG0x12=$CONFIG_RAW, slots=$SLOT_COUNT)"
+
+    #
+    # Read Registers
+    #
+    REG00=$(i2cget -y -f $BUS $ADDR 0x00)
+    REG01=$(i2cget -y -f $BUS $ADDR 0x01)
+    REG02=$(i2cget -y -f $BUS $ADDR 0x02)
+    REG15=$(i2cget -y -f $BUS $ADDR 0x15)
+    REG16=$(i2cget -y -f $BUS $ADDR 0x16)
+    REG17=$(i2cget -y -f $BUS $ADDR 0x17)
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+        REG03=$(i2cget -y -f $BUS $ADDR 0x03)
+        REG04=$(i2cget -y -f $BUS $ADDR 0x04)
+        REG05=$(i2cget -y -f $BUS $ADDR 0x05)
+        REG18=$(i2cget -y -f $BUS $ADDR 0x18)
+        REG19=$(i2cget -y -f $BUS $ADDR 0x19)
+        REG1A=$(i2cget -y -f $BUS $ADDR 0x1a)
+    fi
+    REG1B=$(i2cget -y -f $BUS $ADDR 0x1b)
+    REG1C=$(i2cget -y -f $BUS $ADDR 0x1c)
+    REG1D=$(i2cget -y -f $BUS $ADDR 0x1d)
+    REG1E=$(i2cget -y -f $BUS $ADDR 0x1e)
+
+    PCA24_P0=$(i2cget -y -f $BUS $PCA9555_ADDR0 0x00)
+    PCA24_P1=$(i2cget -y -f $BUS $PCA9555_ADDR0 0x01)
+    PCA25_P0=$(i2cget -y -f $BUS $PCA9555_ADDR1 0x00)
+    PCA25_P1=$(i2cget -y -f $BUS $PCA9555_ADDR1 0x01)
+
+    echo ""
+    echo "===================================================="
+    echo " CPLD REGISTER DUMP"
+    echo "===================================================="
+    printf "REG00 (SLOT1) : %s\n" "$REG00"
+    printf "REG01 (SLOT2) : %s\n" "$REG01"
+    printf "REG02 (SLOT3) : %s\n" "$REG02"
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+    printf "REG03 (SLOT4) : %s\n" "$REG03"
+    printf "REG04 (SLOT5) : %s\n" "$REG04"
+    printf "REG05 (SLOT6) : %s\n" "$REG05"
+    fi
+    printf "REG15 (SLOT1) : %s\n" "$REG15"
+    printf "REG16 (SLOT2) : %s\n" "$REG16"
+    printf "REG17 (SLOT3) : %s\n" "$REG17"
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+    printf "REG18 (SLOT4) : %s\n" "$REG18"
+    printf "REG19 (SLOT5) : %s\n" "$REG19"
+    printf "REG1A (SLOT6) : %s\n" "$REG1A"
+    fi
+    printf "REG1B         : %s\n" "$REG1B"
+    printf "REG1C         : %s\n" "$REG1C"
+    printf "REG1D         : %s\n" "$REG1D"
+    printf "REG1E (BMC)   : %s\n" "$REG1E"
+
+    echo ""
+    echo "===================================================="
+    echo " PCA9555 IO EXPANDER REGISTER DUMP"
+    echo "===================================================="
+    printf "0x24 INPUT PORT 0 : %s\n" "$PCA24_P0"
+    printf "0x24 INPUT PORT 1 : %s\n" "$PCA24_P1"
+    printf "0x25 INPUT PORT 0 : %s\n" "$PCA25_P0"
+    printf "0x25 INPUT PORT 1 : %s\n" "$PCA25_P1"
+
+    decode_slot 1 "$REG00"
+    decode_slot 2 "$REG01"
+    decode_slot 3 "$REG02"
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+    decode_slot 4 "$REG03"
+    decode_slot 5 "$REG04"
+    decode_slot 6 "$REG05"
+    fi
+
+    echo ""
+    echo "===================================================="
+    echo " FAN PWM SETTINGS"
+    echo "===================================================="
+    PWM1_RAW=$((REG15))
+    PWM2_RAW=$((REG16))
+    PWM3_RAW=$((REG17))
+    PWM4_RAW=$((REG18))
+    PWM5_RAW=$((REG19))
+    PWM6_RAW=$((REG1A))
+    PWM1=$((PWM1_RAW * 100 / 256))
+    PWM2=$((PWM2_RAW * 100 / 256))
+    PWM3=$((PWM3_RAW * 100 / 256))
+    PWM4=$((PWM4_RAW * 100 / 256))
+    PWM5=$((PWM5_RAW * 100 / 256))
+    PWM6=$((PWM6_RAW * 100 / 256))
+    printf "%-20s : %3d %% (0x%02X)\n" "SLOT1 FAN PWM" "$PWM1" "$PWM1_RAW"
+    printf "%-20s : %3d %% (0x%02X)\n" "SLOT2 FAN PWM" "$PWM2" "$PWM2_RAW"
+    printf "%-20s : %3d %% (0x%02X)\n" "SLOT3 FAN PWM" "$PWM3" "$PWM3_RAW"
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+    printf "%-20s : %3d %% (0x%02X)\n" "SLOT4 FAN PWM" "$PWM4" "$PWM4_RAW"
+    printf "%-20s : %3d %% (0x%02X)\n" "SLOT5 FAN PWM" "$PWM5" "$PWM5_RAW"
+    printf "%-20s : %3d %% (0x%02X)\n" "SLOT6 FAN PWM" "$PWM6" "$PWM6_RAW"
+    fi
+
+    MODE1=$(( (REG1B >> 1) & 1 ))
+    MODE2=$(( REG1B & 1 ))
+    MODE3=$(( (REG1C >> 1) & 1 ))
+    MODE4=$(( REG1C & 1 ))
+    MODE5=$(( (REG1D >> 1) & 1 ))
+    MODE6=$(( REG1D & 1 ))
+
+    echo ""
+    echo "===================================================="
+    echo " FAN CONTROL MODE"
+    echo "===================================================="
+    printf "%-20s : %s\n" "SLOT1 Fan Mode" "$(decode_fan_mode $MODE1)"
+    printf "%-20s : %s\n" "SLOT2 Fan Mode" "$(decode_fan_mode $MODE2)"
+    printf "%-20s : %s\n" "SLOT3 Fan Mode" "$(decode_fan_mode $MODE3)"
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+    printf "%-20s : %s\n" "SLOT4 Fan Mode" "$(decode_fan_mode $MODE4)"
+    printf "%-20s : %s\n" "SLOT5 Fan Mode" "$(decode_fan_mode $MODE5)"
+    printf "%-20s : %s\n" "SLOT6 Fan Mode" "$(decode_fan_mode $MODE6)"
+    fi
+
+    decode_bmc_fail "$REG1E"
+
+    decode_pca9555_0x24_p0 "$PCA24_P0"
+    decode_pca9555_0x24_p1 "$PCA24_P1"
+    decode_pca9555_0x25_p0 "$PCA25_P0"
+    decode_pca9555_0x25_p1 "$PCA25_P1"
+
+    #
+    # CM Debug Register Dump
+    #
+    echo ""
+    echo "===================================================="
+    echo " CM DEBUG REGISTER DUMP (i2cdump -y 8 0x0f)"
+    echo "===================================================="
+    i2cdump -y 8 0x0f
+
+    #
+    # CM UFM Dump
+    #
+    echo ""
+    echo "===================================================="
+    echo " CM UFM Dump (i2cdump -y 8 0x20)"
+    echo "===================================================="
+    i2cdump -y 8 0x20
+
+    echo ""
+    echo "===================================================="
+    echo " Legend"
+    echo "===================================================="
+    echo "HSC Power Good      = Paddle board P12V Power rail healthy"
+    echo "IO Expander Alert   = Alert signal from CM internal IO Expander"
+    echo "HSC Fault           = Paddle board P12V Hot-swap controller fault"
+    echo "Motherboard Present = MB insertion status"
+    echo "HSC Enable          = Paddle board P12V power enable (Active Low)"
+    echo "SMBus Repeater      = SMBus repeater enable (Active Low)"
+    echo "BMC HANG            = CPLD detected BMC hang condition"
+    echo "PCA9555 0x24/0x25  = Additional IO expander status decoded from input ports 0/1"
+    echo "ASSERT/DROP/FAULT   = Abnormal condition detected; highlighted with marker"
+    echo "===================================================="
+
+    echo ""
+    echo "===================================================="
+    echo " AC Cycle Command Reference"
+    echo "===================================================="
+    echo "AC cycle slot1 = i2cset -y -f 8 0x0f 0x00 0xf2; sleep 10; i2cset -y -f 8 0x0f 0x00 0xf0"
+    echo "AC cycle slot2 = i2cset -y -f 8 0x0f 0x01 0xf2; sleep 10; i2cset -y -f 8 0x0f 0x01 0xf0"
+    echo "AC cycle slot3 = i2cset -y -f 8 0x0f 0x02 0xf2; sleep 10; i2cset -y -f 8 0x0f 0x02 0xf0"
+    if [ "$SLOT_COUNT" -ge 6 ]; then
+    echo "AC cycle slot4 = i2cset -y -f 8 0x0f 0x03 0xf2; sleep 10; i2cset -y -f 8 0x0f 0x03 0xf0"
+    echo "AC cycle slot5 = i2cset -y -f 8 0x0f 0x04 0xf2; sleep 10; i2cset -y -f 8 0x0f 0x04 0xf0"
+    echo "AC cycle slot6 = i2cset -y -f 8 0x0f 0x05 0xf2; sleep 10; i2cset -y -f 8 0x0f 0x05 0xf0"
+    fi
+    echo "===================================================="
+    echo ""
+}
+
+file_name="yv5-cm-debug.log"
+desc="Yosemite5 CM debug output"
+
+add_cmd_output "cm_debug_report" "$file_name" "$desc"
