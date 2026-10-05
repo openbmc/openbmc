@@ -22,6 +22,8 @@ source /usr/share/gbmc-br-lib.sh || exit
 gbmc_ncsi_br_pub_addr_init=
 gbmc_ncsi_br_pub_addr_lastip=
 gbmc_ncsi_br_pub_addr_confip=
+# The gbmcbr IP we recorded in /run/gbmc-br-ip
+gbmc_ncsi_br_pub_addr_brip=
 
 gbmc_ncsi_br_pub_addr_update() {
   [ -n "$gbmc_ncsi_br_pub_addr_init" ] || return
@@ -53,12 +55,28 @@ gbmc_ncsi_br_pub_addr_update() {
     if (( pfx_bytes[9] == 0 )); then
       pfx_bytes[9]=0x01
     fi
+    local br_ip
+    br_ip="$(ip_bytes_to_str pfx_bytes)"
     # Remove any existing persisted IP
-    gbmc_br_set_ip
+    gbmc_net_mask_or_rm /var/google/gbmc-br-ip
+    # Record the IP as our runtime assignment, as the host explicitly
+    # provisions it on every boot. Otherwise gbmc-br-dhcp-term treats us as
+    # unassigned and never stops the DHCP client. This can't use
+    # `GBMC_AVOID_RWFS=1 gbmc_br_set_ip`, its hooks remove the NCSI network
+    # file the host provisioned, which this address is derived from.
+    echo "$br_ip" >/run/gbmc-br-ip || true
+    gbmc_ncsi_br_pub_addr_brip="$br_ip"
     # Load the IP to the bridge non-persistently
-    gbmc_br_set_runtime_ip static "$(ip_bytes_to_str pfx_bytes)"
+    gbmc_br_set_runtime_ip static "$br_ip"
   else
-    gbmc_br_set_runtime_ip static
+    # Only drop our own IP, not one gbmc-br-dhcp or gbmc_br_reload_ips set
+    # since, which also replaced the runtime IP
+    if [[ -n $gbmc_ncsi_br_pub_addr_brip &&
+          "$(cat /run/gbmc-br-ip 2>/dev/null)" == "$gbmc_ncsi_br_pub_addr_brip" ]]; then
+      rm -f /run/gbmc-br-ip
+      gbmc_br_set_runtime_ip static
+    fi
+    gbmc_ncsi_br_pub_addr_brip=
   fi
 }
 
