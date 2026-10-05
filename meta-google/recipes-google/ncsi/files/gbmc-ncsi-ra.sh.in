@@ -25,8 +25,14 @@ ROUTE_METRIC=900
 
 update_rtr() {
   local op="${3-add}"
-  busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/"$RA_IF" \
-    xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s "" || true
+  local cfg=/etc/systemd/network/00-bmc-"$RA_IF".network
+  # Drop IPv6 gateways persisted by phosphor-networkd. Skip when there is
+  # nothing to clear or the file is read-only, as phosphor-networkd exits on
+  # failure. access(W_OK) fails with EROFS on a read-only fs even for root.
+  if grep -q '^Gateway=.*:' "$cfg" 2>/dev/null && [[ -w $cfg ]]; then
+    busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/"$RA_IF" \
+      xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s "" || true
+  fi
 
   default_update_rtr "$@"
 }
