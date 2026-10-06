@@ -5,6 +5,8 @@ source /usr/libexec/fb-common-functions
 # shellcheck source=meta-facebook/meta-anacapa/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+rm -f /run/openbmc/host-abnormal-power-loss
+
 check_i2c_dev()
 {
     local bus=$1

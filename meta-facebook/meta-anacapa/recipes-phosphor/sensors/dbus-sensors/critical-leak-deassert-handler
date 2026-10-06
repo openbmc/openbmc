@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "Incorrect number of arguments. Expected 1, got $#."
+    exit 1
+fi
+
+detector=$1
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+# shellcheck source=meta-facebook/meta-anacapa/recipes-phosphor/sensors/dbus-sensors/critical-leak-assert-handler-platform.sh
+source "${SCRIPT_DIR}/critical-leak-assert-handler-platform.sh"
+
+# Power the host back on once every leak that took it down has cleared.  The
+# tray CPLD may still be holding the host in standby; host-poweron waits for
+# it to release RSMRST_N, so asking early is fine.
+
+if [ ! -e "${LEAK_STAMP_DIR}/${detector}" ]; then
+    echo "Leak '${detector}' cleared, host was not taken down by it"
+    exit 0
+fi
+rm -f "${LEAK_STAMP_DIR}/${detector}"
+
+shopt -s nullglob
+remaining=("${LEAK_STAMP_DIR}"/*)
+if [ ${#remaining[@]} -gt 0 ]; then
+    echo "Leak '${detector}' cleared, still waiting on: ${remaining[*]##*/}"
+    exit 0
+fi
+
+state=$(get_host_property CurrentHostState)
+if [ "${state}" != "xyz.openbmc_project.State.Host.HostState.Off" ]; then
+    echo "Leak '${detector}' cleared, host is ${state##*.}, nothing to do"
+    exit 0
+fi
+
+echo "Leak '${detector}' cleared, powering the host back on"
+set_host_transition On

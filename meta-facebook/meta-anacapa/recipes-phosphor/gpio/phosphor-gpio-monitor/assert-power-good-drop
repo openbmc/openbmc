@@ -37,6 +37,9 @@ transition=$(busctl get-property \
     RequestedHostTransition | awk '{print $2}' | tr -d '"')
 
 if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ] && [ "$(power_status)" == "off" ]; then
+    # Let the leak handlers know the host was running until now.
+    mkdir -p /run/openbmc
+    touch /run/openbmc/host-abnormal-power-loss
     busctl set-property xyz.openbmc_project.State.Host0 \
         /xyz/openbmc_project/state/host0 \
         xyz.openbmc_project.State.Host \
