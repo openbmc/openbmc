@@ -1,5 +1,6 @@
 owners:
 - ed@tanous.net
+- deepak.kodihalli.83@gmail.com
 
 matchers:
 - partial_regex: meta-nvl32-obmc
