@@ -1,0 +1,1 @@
+ACTION!="remove", SUBSYSTEM=="net", SUBSYSTEMS=="usb", ATTRS{busnum}=="?*", ENV{ID_NET_NAME_PATH}=="enu*", ENV{ID_NET_NAME_PATH}="$env{ID_NET_NAME_PATH}b$attr{busnum}"

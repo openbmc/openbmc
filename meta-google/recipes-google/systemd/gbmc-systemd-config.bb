@@ -25,9 +25,11 @@ SRC_URI:append = " \
   file://10-halt-timeout.conf \
   file://10-kexec-timeout.conf \
   file://delayed-reboot.service \
+  file://76-gbmc-usb-net.rules \
   "
 
 FILES:${PN}:append = " \
+  ${nonarch_base_libdir}/udev/rules.d/76-gbmc-usb-net.rules \
   ${systemd_unitdir}/coredump.conf.d/40-gbmc-coredump.conf \
   ${systemd_unitdir}/resolved.conf.d/40-gbmc-nomdns.conf \
   ${systemd_unitdir}/timesyncd.conf.d/40-gbmc-time.conf \
@@ -122,6 +124,9 @@ do_install() {
 
   # Install new delayed-reboot.service
   install -m 0644 ${UNPACKDIR}/delayed-reboot.service ${D}${systemd_system_unitdir}/delayed-reboot.service
+
+  install -d -m 0755 ${D}${nonarch_base_libdir}/udev/rules.d/
+  install -D -m0644 ${UNPACKDIR}/76-gbmc-usb-net.rules ${D}${nonarch_base_libdir}/udev/rules.d/
 }
 
 do_install:append:dev() {
