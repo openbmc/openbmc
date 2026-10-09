@@ -15,6 +15,11 @@ MCTP_POST_READY="rainier-mctp-ready@soc-post.target"
 MCTP_POWER_READY="rainier-mctp-ready@power-good.target"
 MCTP_SERVICE="rainier-mctp-i3c@0.service"
 
+BUS11=11
+RTC_DEVICE=0x6F
+REG_OFFSET=0x0b
+CLEAR_BIT=0x07
+
 mctp_is_ready() {
     systemctl --quiet is-active "$MCTP_POST_READY" &&
         systemctl --quiet is-active "$MCTP_POWER_READY"
@@ -142,6 +147,10 @@ handle_all_power_ok() {
     esac
 }
 
+restore_clear_rtc_bit() {
+    set_gpio RTC_CLR 0
+    i2cset -f -y "$BUS11" "$RTC_DEVICE" "$REG_OFFSET" "$CLEAR_BIT"
+}
 case "$GPIO_NET" in
     SOC_PORQ)
         # MCTP cleanup must not block the original host reset action.
@@ -163,6 +172,9 @@ case "$GPIO_NET" in
         # MCTP cleanup must not block the original host power-off action.
         invalidate_mctp_post_ready || true
         trigger_host_poweroff
+        ;;
+    FM_CLEAR_RTC)
+        restore_clear_rtc_bit
         ;;
     *)
         ;;

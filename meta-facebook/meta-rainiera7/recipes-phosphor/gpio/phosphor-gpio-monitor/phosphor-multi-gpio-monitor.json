@@ -34,6 +34,13 @@
         "Continue": true
     },
     {
+        "Name": "CLEAR_RTC",
+        "LineName": "FM_CLEAR_RTC",
+        "EventMon": "RISING",
+        "Target": "rainier-gpio-handler@FM_CLEAR_RTC:INIT_HIGH.service",
+        "Continue": true
+    },
+    {
         "Name": "SOC_SYS_PWRDN",
         "LineName": "SOC_SYS_PWRDN_CPLD",
         "EventMon": "RISING",
