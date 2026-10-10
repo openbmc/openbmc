@@ -1,3 +1,5 @@
+# gbmc-ncsi-usb.sh gives each matching link its own -bmc-<intf>.network,
+# generated from this file, which has to sort before this one to be used.
 [Match]
 Property=ID_BUS=usb ID_VENDOR_ID=0424 ID_MODEL_ID=ec00
 [Network]

@@ -29,6 +29,7 @@ gbmc_ncsi_dynamic_hook() {
     ip link show "$intf" | grep -q '^ *alias ncsi-usb-side$' || return
     echo "NCSI USB Link Add $intf" >&2
 
+    local contents
 read -r -d '' contents <<EOF
 table inet filter {
     chain ${intf}_input {
@@ -51,23 +52,50 @@ table inet filter {
     }
 }
 EOF
-    local rfile=/run/nftables/50-gbmc-ncsi-"$intf".rules
-    mkdir -p "$(dirname "$rfile")"
-    printf '%s' "$contents" >"$rfile"
-    gbmc_net_nftables_reload || true
+    gbmc_net_write_if_changed "$contents" \
+      /run/nftables/50-gbmc-ncsi-"$intf".rules || true
+
+    gbmc_ncsi_usb_network "$intf"
 
     systemctl start --no-block gbmc-ncsi-ra@"$intf"
     numaddrs=${numaddrs-0}
   elif [[ "$change" = 'link' && "$action" = 'del' ]]; then
     [[ -n "${numaddrs-}" ]] || return 0
     echo "NCSI USB Link Del $intf" >&2
-    if rm /run/nftables/50-gbmc-ncsi-"$intf".rules 2>/dev/null; then
-      gbmc_net_nftables_reload || true
-    fi
+    gbmc_net_rm_if_exists \
+      /run/nftables/50-gbmc-ncsi-"$intf".rules \
+      /run/systemd/network/-bmc-"$intf".network || true
     systemctl stop --no-block gbmc-ncsi-ra@"$intf" || true
     rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
     unset numaddrs
   fi
+}
+
+# The USB NCSI links all match the shared -bmc-gbmcncsiusb.network, so the
+# per-interface drop-ins in -bmc-<intf>.network.d that hold the RA gateway
+# routes, proxy NDP and policy rules never apply. Their routes and settings
+# then only exist because they were also applied with ip(8), and networkd
+# drops them as foreign whenever it reconfigures the link (reload, restart,
+# carrier loss), leaving the BMC without any route out of the interface.
+# Give each link its own runtime .network so those drop-ins apply, with the
+# settings of the shared file. networkd uses the first matching .network in
+# lexical order, so this relies on -bmc-<intf>.network sorting before
+# -bmc-gbmcncsiusb.network. That holds for the USB path (enu*) and kernel
+# (eth*) names these links get.
+# Arguments:
+#   $1: USB NCSI interface name
+gbmc_ncsi_usb_network() {
+  local intf="$1"
+  local shared=-bmc-gbmcncsiusb.network
+  local name=-bmc-"$intf".network
+  if [[ $name > "$shared" ]]; then
+    echo "NCSI USB $name sorts after $shared, its drop-ins won't apply" >&2
+  fi
+  local contents
+  contents="$(sed -e '/^#/d' -e "s/^Property=.*/Name=$intf/" \
+    /usr/lib/systemd/network/"$shared")" || return
+  # Link events repeat on every carrier change, only reload when it changed
+  gbmc_net_write_if_changed "$contents" /run/systemd/network/"$name" || true
 }
 
 GBMC_IP_MONITOR_HOOKS+=(gbmc_ncsi_dynamic_hook)
