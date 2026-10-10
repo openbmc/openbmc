@@ -23,39 +23,66 @@ source /usr/share/gbmc-net-lib.sh || exit
 gbmc_nic_cn_intfs=(@IFS@)
 gbmc_nic_cn_addr=
 
+# Builds the proxied CN addresses, <pfx>:1000:: through <pfx>:7000::.
+# Arguments:
+#   $1: Output array for the addresses
+#   $2: Our /64 address on gbmcbr
+gbmc_nic_cn_ips() {
+  local -n cn_ips_out="$1"
+  local pfx_bytes=()
+  ip_to_bytes pfx_bytes "$2" || return
+  cn_ips_out=()
+  local i
+  for (( i=1; i<8; ++i )); do
+    # shellcheck disable=SC2034  # Read by name in ip_bytes_to_str
+    (( pfx_bytes[8] = i * 16 ))
+    cn_ips_out+=("$(ip_bytes_to_str pfx_bytes)")
+  done
+}
+
 gbmc_nic_cn_set() {
   local act="$1"
   local ip="$2"
-  local contents=
 
   echo "gBMC NIC CN $act $ip: ${gbmc_nic_cn_intfs[*]}" >&2
-  local pfx_bytes=()
-  ip_to_bytes pfx_bytes "$ip"
 
   local cn_ips=()
-  local i
-  local cn_ip
-  for (( i=1; i<8; ++i )); do
-    (( pfx_bytes[8] = i * 16 ))
-    cn_ips+=("$(ip_bytes_to_str pfx_bytes)")
-  done
+  gbmc_nic_cn_ips cn_ips "$ip" || return
+
+  local route=
+  local proxy=
   if [[ "$act" == add ]]; then
-    read -r -d '' contents <<EOF
+    read -r -d '' route <<EOF
 [Route]
 Destination=$ip/65
 Metric=$GBMC_ROUTE_METRIC_CATCHALL
 EOF
+    # The CN addresses are answered on the NIC interfaces, so the proxy NDP
+    # config has to live with those links. Otherwise networkd applies it to
+    # gbmcbr instead and nothing restores the proxies on the NIC when the
+    # kernel flushes them on carrier loss or networkd reconfigures the link.
+    proxy='[Network]'$'\n''IPv6ProxyNDP=yes'
+    local cn_ip
     for cn_ip in "${cn_ips[@]}"; do
-      contents+=$'\n'"IPv6ProxyNDPAddress=$cn_ip"
+      proxy+=$'\n'"IPv6ProxyNDPAddress=$cn_ip"
     done
   fi
-  gbmc_net_networkd_write_dropin gbmcbr 10-nic-cn.conf "$contents" || true
+  gbmc_net_networkd_write_dropin gbmcbr 10-nic-cn.conf "$route" || true
 
-  ip -6 route add "$ip/65" dev gbmcbr metric "$GBMC_ROUTE_METRIC_CATCHALL" 2>dev/null || true
+  if [[ "$act" == add ]]; then
+    ip -6 route replace "$ip/65" dev gbmcbr metric "$GBMC_ROUTE_METRIC_CATCHALL" || true
+  else
+    ip -6 route del "$ip/65" dev gbmcbr metric "$GBMC_ROUTE_METRIC_CATCHALL" 2>/dev/null || true
+  fi
+  local intf
   for intf in "${gbmc_nic_cn_intfs[@]}"; do
+    gbmc_net_networkd_write_dropin "$intf" 10-nic-cn.conf "$proxy" || true
     if [[ "$act" == add ]]; then
+      gbmc_net_proxy_ndp_add "$intf" "${cn_ips[@]}" || true
+    else
+      local cn_ip
       for cn_ip in "${cn_ips[@]}"; do
-        ip -6 neigh "$act" proxy "$cn_ip" dev "$intf" || true
+        ip -6 neigh del proxy "$cn_ip" dev "$intf" 2>/dev/null || true
       done
     fi
   done
@@ -63,7 +90,14 @@ EOF
 
 gbmc_nic_cn_hook() {
   # shellcheck disable=SC2154
-  if [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
+  if [[ $change == init && -z $gbmc_nic_cn_addr ]]; then
+    # Our address went away while we weren't running, drop the config left
+    # for it, which networkd would otherwise keep applying
+    local cn_intf
+    for cn_intf in gbmcbr "${gbmc_nic_cn_intfs[@]}"; do
+      gbmc_net_networkd_write_dropin "$cn_intf" 10-nic-cn.conf '' || true
+    done
+  elif [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
        [[ $fam == inet6 && $flags != *tentative* ]]; then
     local ip_bytes=()
     if ! ip_to_bytes ip_bytes "$ip"; then
@@ -87,9 +121,19 @@ gbmc_nic_cn_hook() {
       gbmc_nic_cn_addr="$ip"
       gbmc_nic_cn_set add "$ip"
     elif [[ $action == del && "$gbmc_nic_cn_addr" == "$ip"  ]]; then
-      gbmc_nic_cn_addr=
       gbmc_nic_cn_set del "$ip"
+      gbmc_nic_cn_addr=
     fi
+  elif [[ $change == link && $action == add && $carrier == UP && -n $gbmc_nic_cn_addr ]]; then
+    # The kernel drops the proxies with the link, put them back right away
+    local cn_intf
+    for cn_intf in "${gbmc_nic_cn_intfs[@]}"; do
+      [[ $intf == "$cn_intf" ]] || continue
+      echo "gBMC NIC CN carrier UP $gbmc_nic_cn_addr: $intf" >&2
+      local cn_ips=()
+      gbmc_nic_cn_ips cn_ips "$gbmc_nic_cn_addr" || continue
+      gbmc_net_proxy_ndp_add "$intf" "${cn_ips[@]}" || true
+    done
   fi
 }
 
