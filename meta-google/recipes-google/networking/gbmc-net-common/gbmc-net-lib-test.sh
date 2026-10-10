@@ -513,4 +513,105 @@ testRmIfExists() {
   rm -rf "$test_dir"
 }
 
+testConfRouteSrc() {
+  local conf
+  conf=$'[Neighbor]\nMACAddress=00:11:22:33:44:55\nAddress=fe80::1\n'
+  conf+=$'[Route]\nGateway=fe80::1\nGatewayOnLink=true\nMetric=512\nTable=1002\n'
+  conf+=$'[Route]\nGateway=fe80::1\nGatewayOnLink=true\nMetric=1800\n'
+  local out
+
+  # Only the main table route with the gateway and metric gets the source
+  gbmc_net_conf_route_src out "$conf" fe80::1 1800 2001:db8::1 || fail
+  local want="${conf}PreferredSource=2001:db8::1"$'\n'
+  expect_streq "$out" "$want"
+
+  # Replacing the source keeps a single one
+  gbmc_net_conf_route_src out "$out" fe80::1 1800 2001:db8::2 || fail
+  expect_streq "$out" "${conf}PreferredSource=2001:db8::2"$'\n'
+
+  # An empty source removes it
+  gbmc_net_conf_route_src out "$out" fe80::1 1800 '' || fail
+  expect_streq "$out" "$conf"
+
+  # Interface table routes, other gateways and metrics are left alone
+  gbmc_net_conf_route_src out "$conf" fe80::1 512 2001:db8::1 && fail
+  gbmc_net_conf_route_src out "$conf" fe80::2 1800 2001:db8::1 && fail
+  gbmc_net_conf_route_src out "$conf" fe80::1 800 2001:db8::1 && fail
+  expect_streq "$out" "$conf"
+  gbmc_net_conf_route_src out '' fe80::1 800 2001:db8::1 && fail
+  expect_streq "$out" ''
+}
+
+testRouteSrcSet() {
+  local test_dir
+  test_dir="$(mktemp -d)"
+  local GBMC_NET_ROUTE_SRC_DIR="$test_dir/state"
+  # Point the networkd paths at the test directory
+  local saved_set saved_dropin
+  saved_set="$(declare -f gbmc_net_route_src_set)"
+  saved_dropin="$(declare -f gbmc_net_networkd_write_dropin)"
+  eval "${saved_set//\/run\/systemd\/network/$test_dir/network}"
+  eval "${saved_dropin//\/run\/systemd\/network/$test_dir/network}"
+
+  local dyn=$'[Route]\nGateway=fe80::1\nGatewayOnLink=true\nMetric=800\n'
+  local lo=$'[Route]\nGateway=fe80::1\nGatewayOnLink=true\nMetric=1800\n'
+  gbmc_net_gateway_conf_write front 10-gateway-dyn.conf "$dyn"
+  gbmc_net_gateway_conf_write front 10-gateway.conf "$lo"
+  local f cur
+  for f in "$test_dir"/network/{00,}-bmc-front.network.d/10-gateway-dyn.conf; do
+    IFS= read -r -d '' cur <"$f" || true
+    expect_streq "$cur" "$dyn"
+  done
+
+  # The source lands in the matching drop-in of both file sets
+  gbmc_net_route_src_set front fe80::1 800 2001:db8::1 || fail
+  for f in "$test_dir"/network/{00,}-bmc-front.network.d/10-gateway-dyn.conf; do
+    IFS= read -r -d '' cur <"$f" || true
+    expect_streq "$cur" "${dyn}PreferredSource=2001:db8::1"$'\n'
+  done
+  for f in "$test_dir"/network/{00,}-bmc-front.network.d/10-gateway.conf; do
+    IFS= read -r -d '' cur <"$f" || true
+    expect_streq "$cur" "$lo"
+  done
+  local src
+  gbmc_net_route_src_get src front fe80::1 800
+  expect_streq "$src" 2001:db8::1
+  gbmc_net_route_src_get src front fe80::2 800
+  expect_streq "$src" ''
+  gbmc_net_route_src_get src front fe80::1 1800
+  expect_streq "$src" ''
+
+  # gbmc-ra rewriting its drop-in keeps the saved source
+  gbmc_net_gateway_conf_write front 10-gateway-dyn.conf "$dyn"
+  IFS= read -r -d '' cur <"$test_dir/network/-bmc-front.network.d/10-gateway-dyn.conf" || true
+  expect_streq "$cur" "${dyn}PreferredSource=2001:db8::1"$'\n'
+
+  # Unknown routes report failure
+  gbmc_net_route_src_set front fe80::1 900 2001:db8::1 && fail
+  gbmc_net_route_src_set ncsi fe80::1 800 2001:db8::1 && fail
+  [ ! -e "$GBMC_NET_ROUTE_SRC_DIR/front/900" ] || fail
+  [ ! -e "$GBMC_NET_ROUTE_SRC_DIR/ncsi/800" ] || fail
+
+  # A stale gateway at the same metric leaves the saved source alone
+  gbmc_net_route_src_set front fe80::2 800 2001:db8::2 && fail
+  gbmc_net_route_src_set front fe80::2 800 '' && fail
+  gbmc_net_route_src_get src front fe80::1 800
+  expect_streq "$src" 2001:db8::1
+
+  # Removing the source
+  gbmc_net_route_src_set front fe80::1 800 '' || fail
+  IFS= read -r -d '' cur <"$test_dir/network/00-bmc-front.network.d/10-gateway-dyn.conf" || true
+  expect_streq "$cur" "$dyn"
+  gbmc_net_route_src_get src front fe80::1 800
+  expect_streq "$src" ''
+
+  # Empty contents remove the drop-in
+  gbmc_net_gateway_conf_write front 10-gateway-dyn.conf ''
+  [ ! -e "$test_dir/network/-bmc-front.network.d/10-gateway-dyn.conf" ] || fail
+
+  eval "$saved_set"
+  eval "$saved_dropin"
+  rm -rf "$test_dir"
+}
+
 main

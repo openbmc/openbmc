@@ -35,6 +35,26 @@ old_mac=invalid
 old_pfx=invalid
 old_fqdn=invalid
 
+# Installs one of the router's main table default routes, with the source
+# gbmc-br-gw-src picked for it if any. The route matches its networkd
+# [Route] (proto static and the same source) so networkd keeps it when it
+# reconfigures the interface, see GBMC_NET_ROUTE_SRC_DIR.
+# Arguments:
+#   $1: Router IPv6 address
+#   $2: Route metric
+rtr_route_replace() {
+  local rtr="$1"
+  local metric="$2"
+  local args=(default via "$rtr" onlink dev "$RA_IF" metric "$metric" proto static)
+  local src
+  gbmc_net_route_src_get src "$RA_IF" "$rtr" "$metric"
+  # The saved source might not be usable (yet), install it without one
+  if [[ -n $src ]] && ip -6 route replace "${args[@]}" src "$src" 2>/dev/null; then
+    return 0
+  fi
+  ip -6 route replace "${args[@]}"
+}
+
 # Install router and gateway configuration for an RA router.
 # Writes networkd drop-ins ([Neighbor] and [Route] definitions) under
 # /run/systemd/network/ for the RA interface, updates the runtime neighbor
@@ -65,14 +85,14 @@ add_rtr() {
     conf+="$route"
   fi
   gbmc_net_reload_queue_start
-  gbmc_net_networkd_write_dropin "$RA_IF" 10-gateway.conf "$conf" || true
+  gbmc_net_gateway_conf_write "$RA_IF" 10-gateway.conf "$conf"
   if (( new == 1 )); then
     conf=
     if [ -n "$ROUTE_METRIC" ]; then
       printf -v conf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\n' \
         "$rtr" "$ROUTE_METRIC"
     fi
-    gbmc_net_networkd_write_dropin "$RA_IF" 10-gateway-dyn.conf "$conf" || true
+    gbmc_net_gateway_conf_write "$RA_IF" 10-gateway-dyn.conf "$conf"
     gbmc_net_write_if_changed "$rtr"$'\n'"$mac" "/run/last-ra/$RA_IF" || true
     if [ -z "${gbmc_net_avoid_rwfs-${GBMC_AVOID_RWFS-}}" ]; then
       gbmc_net_write_if_changed "$rtr"$'\n'"$mac" "/var/google/last-ra/$RA_IF" || true
@@ -81,12 +101,12 @@ add_rtr() {
 
   # Also apply to the kernel right away
   ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac" || true
-  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" || true
+  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" proto static || true
   if [ -n "$ROUTE_METRIC" ]; then
-    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC_LO" || true
+    rtr_route_replace "$rtr" "$ROUTE_METRIC_LO" || true
   fi
   if (( new == 1 )) && [ -n "$ROUTE_METRIC" ]; then
-    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" || true
+    rtr_route_replace "$rtr" "$ROUTE_METRIC" || true
   fi
   gbmc_net_reload_queue_end || true
 }
@@ -126,7 +146,7 @@ default_update_rtr() {
     echo "Del router $rtr on $RA_IF" >&2
     # Override any existing gateway information within files
     # Make sure we cover `00-*` and `-*` files
-    gbmc_net_networkd_write_dropin "$RA_IF" 10-gateway-dyn.conf '' || true
+    gbmc_net_gateway_conf_write "$RA_IF" 10-gateway-dyn.conf ''
 
     [ -n "$ROUTE_METRIC" ] || return 0
     ip -6 route del default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" 2>/dev/null || true

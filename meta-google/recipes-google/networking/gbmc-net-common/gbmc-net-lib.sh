@@ -556,8 +556,7 @@ gbmc_net_write_if_changed() {
       [[ $cur == "$contents" ]] && continue
     fi
     local tmp="$file.tmp.$BASHPID"
-    if { [[ -d ${file%/*} ]] || mkdir -p "${file%/*}"; } &&
-        printf '%s' "$contents" >"$tmp" &&
+    if mkdir -p "${file%/*}" && printf '%s' "$contents" >"$tmp" &&
         mv -f "$tmp" "$file"; then
       changed=1
     else
@@ -605,6 +604,187 @@ gbmc_net_rm_if_exists() {
 gbmc_net_networkd_write_dropin() {
   gbmc_net_write_if_changed "$3" \
     /run/systemd/network/{00,}-bmc-"$1".network.d/"$2"
+}
+
+# Sources picked by gbmc-br-gw-src for the main table default routes that
+# gbmc-ra configures through networkd, one file per interface and metric
+# (<dir>/<intf>/<metric>) holding "<gateway> <source>".
+#
+# networkd only keeps a route it configured across a reconfigure of its
+# interface if the kernel route still matches the [Route] exactly, including
+# the protocol (static) and the source. Otherwise it removes the route and
+# adds it back, here without a source, letting the kernel pick any address
+# (e.g. a NIC address out of the front panel) until gbmc-br-gw-src puts the
+# source back. So the source goes into the [Route] as PreferredSource= and the
+# route is installed with "proto static".
+GBMC_NET_ROUTE_SRC_DIR=/run/gbmc-net-route-src
+
+# Sets PreferredSource= in the main table [Route] sections for a gateway and
+# metric of networkd .network contents.
+# Arguments:
+#   $1: Output variable for the new contents
+#   $2: Contents
+#   $3: Gateway
+#   $4: Metric
+#   $5: Source address, empty to remove the source
+# Returns failure if no [Route] section matched.
+# The locals are prefixed so they don't shadow the output variable.
+# shellcheck disable=SC2034  # namerefs
+gbmc_net_conf_route_src() {
+  local -n conf_src_out="$1"
+  local _crs_contents="$2"
+  local _crs_gw="$3"
+  local _crs_metric="$4"
+  local _crs_src="$5"
+  conf_src_out="$_crs_contents"
+  [[ -n $_crs_contents ]] || return 1
+  local -a _crs_secs=()
+  local _crs_sec=
+  local _crs_line
+  while IFS= read -r _crs_line; do
+    if [[ $_crs_line == '['*']' && -n $_crs_sec ]]; then
+      _crs_secs+=("$_crs_sec")
+      _crs_sec=
+    fi
+    _crs_sec+="$_crs_line"$'\n'
+  done <<<"${_crs_contents%$'\n'}"
+  [[ -n $_crs_sec ]] && _crs_secs+=("$_crs_sec")
+  local _crs_out=
+  local _crs_matched=0
+  for _crs_sec in "${_crs_secs[@]}"; do
+    if [[ $_crs_sec == $'[Route]\n'* && $_crs_sec != *$'\nTable='* ]] &&
+       [[ $_crs_sec == *$'\nGateway='"$_crs_gw"$'\n'* ]] &&
+       [[ $_crs_sec == *$'\nMetric='"$_crs_metric"$'\n'* ]]; then
+      local _crs_new=
+      while IFS= read -r _crs_line; do
+        [[ $_crs_line == PreferredSource=* ]] || _crs_new+="$_crs_line"$'\n'
+      done <<<"${_crs_sec%$'\n'}"
+      [[ -z $_crs_src ]] || _crs_new+="PreferredSource=$_crs_src"$'\n'
+      _crs_sec="$_crs_new"
+      _crs_matched=1
+    fi
+    _crs_out+="$_crs_sec"
+  done
+  # Keep the contents exactly as they were without a trailing newline
+  [[ $_crs_contents == *$'\n' ]] || _crs_out="${_crs_out%$'\n'}"
+  conf_src_out="$_crs_out"
+  (( _crs_matched == 1 ))
+}
+
+# Looks up the saved source for a default route.
+# Arguments:
+#   $1: Output variable for the source, empty without one
+#   $2: Interface
+#   $3: Gateway
+#   $4: Metric
+# shellcheck disable=SC2034  # namerefs
+gbmc_net_route_src_get() {
+  local -n route_src_out="$1"
+  route_src_out=
+  local _rsg_file="$GBMC_NET_ROUTE_SRC_DIR/$2/$4"
+  [[ -f $_rsg_file ]] || return 0
+  local _rsg_gw _rsg_src
+  read -r _rsg_gw _rsg_src <"$_rsg_file" || return 0
+  [[ $_rsg_gw == "$3" ]] && route_src_out="$_rsg_src"
+  return 0
+}
+
+# Applies every saved source for an interface to networkd contents.
+# Arguments:
+#   $1: Output variable for the new contents
+#   $2: Interface
+#   $3: Contents
+# shellcheck disable=SC2034  # namerefs
+gbmc_net_route_src_apply() {
+  local -n route_apply_out="$1"
+  local _rsa_contents="$3"
+  local _rsa_file
+  for _rsa_file in "$GBMC_NET_ROUTE_SRC_DIR/$2"/*; do
+    [[ -f $_rsa_file ]] || continue
+    local _rsa_gw _rsa_src
+    read -r _rsa_gw _rsa_src <"$_rsa_file" || continue
+    gbmc_net_conf_route_src _rsa_contents "$_rsa_contents" "$_rsa_gw" \
+      "${_rsa_file##*/}" "$_rsa_src" || true
+  done
+  route_apply_out="$_rsa_contents"
+}
+
+# Takes the lock serializing the gateway drop-in updates for an interface.
+# Callers hold a reload queue reference while holding it, so the networkd
+# reload only runs once the lock is released, and give up on it after a while
+# rather than stalling gbmc-ip-monitor.
+# Arguments:
+#   $1: Output variable for the lock file descriptor
+#   $2: Interface
+gbmc_net_route_src_lock() {
+  local -n route_lock_fd="$1"
+  mkdir -p "$GBMC_NET_ROUTE_SRC_DIR" || return
+  exec {route_lock_fd}>"$GBMC_NET_ROUTE_SRC_DIR/$2.lock" || return
+  flock -x "$route_lock_fd"
+}
+
+# Writes one of the networkd gateway drop-ins (10-gateway*.conf) of an
+# interface with the saved sources applied, see GBMC_NET_ROUTE_SRC_DIR.
+# Arguments:
+#   $1: Interface
+#   $2: Drop-in file name
+#   $3: Contents, empty to remove the drop-in
+gbmc_net_gateway_conf_write() {
+  local intf="$1"
+  local name="$2"
+  local contents="$3"
+  local lfd
+  gbmc_net_reload_queue_start
+  gbmc_net_route_src_lock lfd "$intf" || true
+  [[ -z $contents ]] || gbmc_net_route_src_apply contents "$intf" "$contents"
+  gbmc_net_networkd_write_dropin "$intf" "$name" "$contents" || true
+  [[ -z ${lfd-} ]] || exec {lfd}>&-
+  gbmc_net_reload_queue_end || true
+}
+
+# Saves the source picked for a default route and sets it in the networkd
+# gateway drop-ins of its interface. The saved source is only touched when a
+# drop-in configures the route or it was saved for the same gateway, so a
+# stale route at the same metric doesn't clobber the current one.
+# Arguments:
+#   $1: Interface
+#   $2: Gateway
+#   $3: Metric
+#   $4: Source address, empty to remove the source
+# Returns failure if the route isn't configured through networkd.
+gbmc_net_route_src_set() {
+  local intf="$1"
+  local gw="$2"
+  local metric="$3"
+  local src="$4"
+  local lfd
+  gbmc_net_reload_queue_start
+  gbmc_net_route_src_lock lfd "$intf" || true
+  local found=0
+  local file
+  for file in /run/systemd/network/{00,}-bmc-"$intf".network.d/10-gateway*.conf; do
+    [[ -f $file ]] || continue
+    local contents=
+    IFS= read -r -d '' contents <"$file" || true
+    local new
+    gbmc_net_conf_route_src new "$contents" "$gw" "$metric" "$src" || continue
+    found=1
+    gbmc_net_write_if_changed "$new" "$file" || true
+  done
+  local state="$GBMC_NET_ROUTE_SRC_DIR/$intf/$metric"
+  local saved_gw=
+  [[ ! -f $state ]] || read -r saved_gw _ <"$state" || true
+  if (( found == 1 )) || [[ $saved_gw == "$gw" ]]; then
+    if [[ -n $src ]]; then
+      { [[ -d ${state%/*} ]] || mkdir -p "${state%/*}"; } &&
+        printf '%s %s\n' "$gw" "$src" >"$state"
+    else
+      rm -f "$state"
+    fi
+  fi
+  [[ -z ${lfd-} ]] || exec {lfd}>&-
+  gbmc_net_reload_queue_end || true
+  (( found == 1 ))
 }
 
 gbmc_net_lib_init=1

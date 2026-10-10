@@ -59,6 +59,17 @@ declare -A gbmc_br_gw_src_br_gone=()
 # Installed default route metric -> "<gateway> <source>", for trays
 declare -A gbmc_br_gw_src_br_installed=()
 
+# Main table default routes we own, the primary route and the routes through
+# the BMCs on gbmcbr, "<intf> <metric>" -> "<gateway> <source>". They are
+# also written to a networkd drop-in of their interface, otherwise networkd
+# flushes them as foreign routes whenever it reconfigures the interface, see
+# GBMC_NET_ROUTE_SRC_DIR.
+declare -A gbmc_br_gw_src_conf=()
+GBMC_BR_GW_SRC_CONF=75-gw-src.conf
+# The drop-ins of a previous instance would bring back routes we don't know
+# about on the next networkd reload, start over
+rm -f /run/systemd/network/{00,}-bmc-*.network.d/"$GBMC_BR_GW_SRC_CONF"
+
 # Maps a head default route metric to the metric of the tray route through the
 # head. The primary, front panel and NCSI routes (700, 800, 900) become 1070,
 # 1080 and 1090, and the always present front panel and NCSI fallbacks (1800,
@@ -123,6 +134,118 @@ gbmc_br_adv_metric() {
   adv_metric_out="$m"
 }
 
+# Writes the drop-in with our routes for an interface, see
+# gbmc_br_gw_src_conf.
+# Arguments:
+#   $1: Interface
+gbmc_br_gw_src_conf_write() {
+  local intf="$1"
+  local -a metrics=()
+  local key
+  for key in "${!gbmc_br_gw_src_conf[@]}"; do
+    [[ $key == "$intf "* ]] && metrics+=("${key#* }")
+  done
+  local contents=
+  local metric
+  while read -r metric; do
+    [[ -n $metric ]] || continue
+    local data
+    read -ra data <<<"${gbmc_br_gw_src_conf["$intf $metric"]}"
+    contents+="[Route]"$'\n'"Gateway=${data[0]}"$'\n'"GatewayOnLink=true"$'\n'
+    contents+="Metric=$metric"$'\n'"PreferredSource=${data[1]}"$'\n'
+  done < <(printf '%s\n' "${metrics[@]}" | sort -n)
+  gbmc_net_networkd_write_dropin "$intf" "$GBMC_BR_GW_SRC_CONF" "$contents" || true
+}
+
+# Installs one of our default routes, see gbmc_br_gw_src_conf.
+# Arguments:
+#   $1: Interface
+#   $2: Gateway
+#   $3: Source address
+#   $4: Metric
+gbmc_br_gw_src_conf_add() {
+  local intf="$1"
+  local gw="$2"
+  local src="$3"
+  local metric="$4"
+  local key="$intf $metric"
+  # Matches the networkd [Route] exactly, including the protocol, so networkd
+  # leaves it alone
+  ip -6 route replace default via "$gw" dev "$intf" onlink src "$src" \
+    metric "$metric" proto static || return
+  # Only write the drop-in once the route is in place, one for a route the
+  # kernel refuses would reconfigure the interface for nothing. The route
+  # event for it only comes after we return.
+  if [[ ${gbmc_br_gw_src_conf["$key"]-} != "$gw $src" ]]; then
+    gbmc_br_gw_src_conf["$key"]="$gw $src"
+    gbmc_br_gw_src_conf_write "$intf"
+  fi
+}
+
+# Removes one of our default routes, see gbmc_br_gw_src_conf.
+# Arguments:
+#   $1: Interface
+#   $2: Gateway
+#   $3: Metric
+gbmc_br_gw_src_conf_del() {
+  local intf="$1"
+  local gw="$2"
+  local metric="$3"
+  local key="$intf $metric"
+  if [[ ${gbmc_br_gw_src_conf["$key"]-} == "$gw "* ]]; then
+    unset 'gbmc_br_gw_src_conf[$key]'
+    gbmc_br_gw_src_conf_write "$intf"
+  fi
+  ip -6 route del default via "$gw" dev "$intf" metric "$metric" 2>/dev/null
+}
+
+# Keeps the kernel in line with our routes on route events for them, putting
+# them back when something else removes them or replaces their source.
+# Arguments:
+#   $1: Route event action (add or del)
+#   $2: Route
+# Returns failure if it isn't one of our routes.
+gbmc_br_gw_src_conf_check() {
+  local action="$1"
+  local route="$2"
+  [[ $route =~ ' via '([^ ]+) ]] || return
+  local gw="${BASH_REMATCH[1]}"
+  [[ $route =~ ' dev '([^ ]+) ]] || return
+  local intf="${BASH_REMATCH[1]}"
+  [[ $route =~ ' metric '([0-9]+) ]] || return
+  local metric="${BASH_REMATCH[1]}"
+  local data
+  read -ra data <<<"${gbmc_br_gw_src_conf["$intf $metric"]-}"
+  [[ ${data[0]-} == "$gw" ]] || return
+  if [[ $action == del ]]; then
+    [[ -e /sys/class/net/$intf ]] || return 0
+    echo "gBMC Bridge restoring route: $route" >&2
+    gbmc_br_gw_src_conf_add "$intf" "$gw" "${data[1]}" "$metric" || true
+    return 0
+  fi
+  # Ours, but put it back if something replaced its source
+  [[ $route == *" src ${data[1]} "* ]] && return 0
+  gbmc_br_gw_src_conf_add "$intf" "$gw" "${data[1]}" "$metric" || true
+  return 0
+}
+
+# Saves the source we picked for one of the default routes gbmc-ra
+# configures through networkd, see GBMC_NET_ROUTE_SRC_DIR.
+# Arguments:
+#   $1: Route
+#   $2: Source address, empty to remove it
+# Returns failure if networkd doesn't configure the route.
+gbmc_br_gw_src_save() {
+  local route="$1"
+  local src="$2"
+  [[ $route =~ ' via '([^ ]+) ]] || return
+  local gw="${BASH_REMATCH[1]}"
+  [[ $route =~ ' dev '([^ ]+) ]] || return
+  local intf="${BASH_REMATCH[1]}"
+  [[ $route =~ ' metric '([0-9]+) ]] || return
+  gbmc_net_route_src_set "$intf" "$gw" "${BASH_REMATCH[1]}" "$src"
+}
+
 gbmc_br_set_router() {
   local defgw=
   local route
@@ -148,17 +271,64 @@ gbmc_br_set_router() {
 gbmc_br_config_primary_ip() {
    local route=$1
    local op=$2
+   local metric="$GBMC_ROUTE_METRIC_PRIMARY"
 
-   local route_new
-   route_new=$(echo "$route" | sed -E 's/ metric [0-9]+//')
-   echo "gBMC Bridge primary IP route $op (metric $GBMC_ROUTE_METRIC_PRIMARY): $route_new" >&2
-   if [[ "$op" == "del" ]]; then
-     # shellcheck disable=SC2086
-     ip route "$op" $route_new metric "$GBMC_ROUTE_METRIC_PRIMARY" 2>/dev/null
-   else
-     # shellcheck disable=SC2086
-     ip route "$op" $route_new metric "$GBMC_ROUTE_METRIC_PRIMARY"
+   local route_new="$route"
+   if [[ $route =~ ^(.*)' metric '[0-9]+(.*)$ ]]; then
+     route_new="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
    fi
+   local gw=''
+   local intf=''
+   local src=''
+   [[ $route =~ ' via '([^ ]+) ]] && gw="${BASH_REMATCH[1]}"
+   [[ $route =~ ' dev '([^ ]+) ]] && intf="${BASH_REMATCH[1]}"
+   [[ $route =~ ' src '([^ ]+) ]] && src="${BASH_REMATCH[1]}"
+   if [[ -z $gw || -z $intf ]]; then
+     echo "gBMC Bridge primary IP route $op (metric $metric): $route_new" >&2
+     # shellcheck disable=SC2086
+     ip route "$op" $route_new metric "$metric" 2>/dev/null
+     return
+   fi
+   if [[ "$op" == "del" ]]; then
+     # Only the routes the primary route is made from can take it away, not
+     # e.g. the fallback through the same router
+     if [[ $route =~ ' metric '([0-9]+) ]] &&
+        (( BASH_REMATCH[1] > GBMC_ROUTE_METRIC_PRIMARY_MAX )); then
+       return 0
+     fi
+     [[ ${gbmc_br_gw_src_conf["$intf $metric"]-} == "$gw "* ]] || return 0
+     echo "gBMC Bridge primary IP route $op (metric $metric): $route_new" >&2
+     gbmc_br_gw_src_conf_del "$intf" "$gw" "$metric"
+     return 0
+   fi
+   [[ -n $src && ${gbmc_br_gw_src_conf["$intf $metric"]-} != "$gw $src" ]] || return 0
+   echo "gBMC Bridge primary IP route $op (metric $metric): $route_new" >&2
+   # The kernel keeps a single default route per metric, so this replaces
+   # the primary route through any other interface
+   gbmc_br_gw_src_conf_add "$intf" "$gw" "$src" "$metric" || return
+   local key
+   for key in "${!gbmc_br_gw_src_conf[@]}"; do
+     [[ $key == *" $metric" && $key != "$intf $metric" ]] || continue
+     unset 'gbmc_br_gw_src_conf[$key]'
+     gbmc_br_gw_src_conf_write "${key% *}"
+   done
+}
+
+# Removes the primary routes a previous instance left behind that we don't
+# put back. networkd keeps the drop-ins we removed at startup until its next
+# reload, and keeps such a route until then.
+gbmc_br_gw_src_primary_reconcile() {
+  local metric="$GBMC_ROUTE_METRIC_PRIMARY"
+  local route
+  while read -r route; do
+    [[ $route == *" metric $metric "* ]] || continue
+    [[ $route =~ ' via '([^ ]+)' dev '([^ ]+) ]] || continue
+    local gw="${BASH_REMATCH[1]}"
+    local intf="${BASH_REMATCH[2]}"
+    [[ ${gbmc_br_gw_src_conf["$intf $metric"]-} != "$gw "* ]] || continue
+    echo "gBMC Bridge removing stale primary route: $route" >&2
+    ip -6 route del default via "$gw" dev "$intf" metric "$metric" 2>/dev/null || true
+  done < <(ip -6 route show default 2>/dev/null)
 }
 
 # Advertise all of our default routes, other than those through gbmcbr, to the
@@ -383,6 +553,8 @@ gbmc_br_gw_src_update() {
     local nic
     gbmc_br_gw_src_nic_dev nic "$ip" && ip_nic["$ip"]="$nic"
   done
+  local primary_route=
+  local primary_metric=
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
     local new_src=
     local new_len=16
@@ -443,6 +615,7 @@ gbmc_br_gw_src_update() {
       # A source picked before, e.g. before the policy rules were in place,
       # is no longer valid for this route
       [[ -z $cur_src ]] || gbmc_br_config_primary_ip "$route" "del"
+      gbmc_br_gw_src_save "$base_route" '' || true
       unset 'gbmc_br_gw_src_routes[$route]'
       gbmc_br_gw_src_routes["$base_route"]=1
       gbmc_br_gw_src_disabled["$base_route"]=1
@@ -454,31 +627,39 @@ gbmc_br_gw_src_update() {
     if [[ "$route" =~ ' metric '([^ ]+) ]]; then
       rt_metric="${BASH_REMATCH[1]}"
     fi
+    local primary=0
     if (( rt_metric <= GBMC_ROUTE_METRIC_PRIMARY_MAX )) && [[ "$new_src" == "$primary_ip" ]]; then
-      # Add primary src ip for the GW
-      gbmc_br_config_primary_ip "$base_route src $new_src" "replace"
+      primary=1
     fi
     if [[ -n ${gbmc_br_gw_src_disabled["$base_route"]-} ]]; then
       unset 'gbmc_br_gw_src_disabled[$base_route]'
       unset 'gbmc_br_gw_src_routes[$route]'
-      # Don't bring back a route through a router we no longer use
-      local gw=
-      [[ $route =~ ' via '([^ ]+) ]] && gw="${BASH_REMATCH[1]}"
-      local table
-      table="$(gbmc_net_route_table_for_intf "$dev")" || continue
-      [[ -n $gw && -n "$(ip -6 route show default via "$gw" dev "$dev" \
-          table "$table" 2>/dev/null)" ]] || continue
+      # Only bring back a route networkd still configures, not one through a
+      # router we no longer use
+      gbmc_br_gw_src_save "$base_route" "$new_src" || continue
       echo "gBMC Bridge Enabling GW with source [$new_src]: $route" >&2
       # shellcheck disable=SC2086
-      ip route replace $base_route src "$new_src" || true
-      continue
+      ip route replace $base_route src "$new_src" proto static || true
+    elif [[ $route != *" src $new_src "* ]]; then
+      # Routes networkd configures get the source in their networkd [Route]
+      # too, and need to match it exactly
+      local proto=
+      gbmc_br_gw_src_save "$base_route" "$new_src" && proto='proto static'
+      echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
+      # Keep the primary route, it is put in place below
+      (( primary == 1 )) || gbmc_br_config_primary_ip "$route" "del"
+      # shellcheck disable=SC2086
+      ip route change $base_route src "$new_src" $proto && unset 'gbmc_br_gw_src_routes[$route]'
     fi
-    [[ $route != *" src $new_src "* ]] || continue
-    echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
-    gbmc_br_config_primary_ip "$route" "del"
-    # shellcheck disable=SC2086
-    ip route change $base_route src "$new_src" && unset 'gbmc_br_gw_src_routes[$route]'
+    (( primary == 1 )) || continue
+    if [[ -z $primary_route ]] || (( rt_metric < primary_metric )); then
+      primary_route="$base_route src $new_src"
+      primary_metric="$rt_metric"
+    fi
   done
+  # Add primary src ip for the GW, copied from the most preferred route
+  # sourced from it. Several of them would replace each other otherwise.
+  [[ -z $primary_route ]] || gbmc_br_config_primary_ip "$primary_route" "replace"
   gbmc_br_gw_src_adv_update
 }
 
@@ -598,6 +779,7 @@ gbmc_br_gw_src_hook() {
     if [[ $change == init ]]; then
       gbmc_br_gw_src_disabled_load
       gbmc_br_gw_src_update
+      gbmc_br_gw_src_primary_reconcile
     fi
     gbmc_br_gw_src_br_update
   # The source we pick for a gateway depends on which interface our addresses
@@ -637,6 +819,7 @@ gbmc_br_gw_src_hook() {
     fi
     # ignore the primary route as this script fully controls it
     if [[ $route == *" metric $GBMC_ROUTE_METRIC_PRIMARY "* ]]; then
+      gbmc_br_gw_src_conf_check "$action" "$route" || true
       gbmc_br_gw_src_adv_update
       return
     fi
@@ -655,6 +838,28 @@ gbmc_br_gw_src_hook() {
     local proto_regex='^(.*)( +proto +[^ ]+)(.*)$'
     if [[ $route =~ $proto_regex ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+    fi
+    # Replacing a default route, e.g. when gbmc-ra switches routers, doesn't
+    # report the one it replaced as deleted. Only routes on the same link, as
+    # networkd appends rather than replaces, so same metric routes on other
+    # links can coexist.
+    if [[ $action == add && $route =~ ' metric '([0-9]+)' ' ]]; then
+      local same_metric=" metric ${BASH_REMATCH[1]} "
+      local same_dev=
+      [[ $route =~ ' dev '([^ ]+)' ' ]] && same_dev="${BASH_REMATCH[0]}"
+      local via_dev=
+      [[ $route =~ ' via '([^ ]+)' dev '([^ ]+)' ' ]] && via_dev="${BASH_REMATCH[0]}"
+      local key
+      for key in "${!gbmc_br_gw_src_routes[@]}"; do
+        [[ $key != "$route" && $key == *"$same_dev"* && $key == *"$same_metric"* ]] ||
+          continue
+        # Only a route through another router takes the primary route with it
+        if [[ $key == *' src '* && $key != *"$via_dev"* ]]; then
+          gbmc_br_config_primary_ip "$key" "del"
+        fi
+        unset 'gbmc_br_gw_src_routes[$key]'
+        unset 'gbmc_br_gw_src_disabled[$key]'
+      done
     fi
     if [[ $action == add && -n ${gbmc_br_gw_src_disabled["$route"]-} ]]; then
       # Put back by its owner (e.g. a networkd reconfigure) while still
