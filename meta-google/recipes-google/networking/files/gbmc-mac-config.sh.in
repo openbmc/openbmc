@@ -16,6 +16,8 @@
 # shellcheck source=meta-google/recipes-google/ipmi/ipmi-fru-sh/lib.sh
 source /usr/share/ipmi-fru/lib.sh || exit
 source /usr/share/network/lib.sh  || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 ipmi_fru_alloc '@EEPROM@' eeprom || exit
 
@@ -64,6 +66,7 @@ done
 lower=$(((mac[3] << 16) | (mac[4] << 8) | mac[5]))
 rm -f "/run/gbmc-mac-config/gbmc-mac-list"
 mkdir -p "/run/gbmc-mac-config"
+gbmc_net_reload_queue_start
 for (( i=0; i<num; i++ )); do
   if (( lower > 0xffffff )); then
     echo "MAC assignment too large: ${mac[*]}" >&2
@@ -78,32 +81,30 @@ for (( i=0; i<num; i++ )); do
   echo "$macstr" >> "/run/gbmc-mac-config/gbmc-mac-list"
   for intf in ${num_to_intfs[$i]}; do
     echo "Setting $intf to $macstr" >&2
-    for override in /run/systemd/network/{00,}-bmc-$intf.network.d; do
-      mkdir -p "$override"
-      printf '[Link]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
-      # Add ula for standard l2br
-      if [[ "$intf" == "l2br" ]]; then
-        eui64=$(mac_to_eui64 "$macstr")
-        eui64="${eui64:2}"
-        printf '[Address]\nAddress=fdb5:0481:10ce:1:%s/64\nPreferredLifetime=0\n' "$eui64" > "$override"/60-ula.conf
-      fi
-      # Add ula for gbmcbr
-      if [[ "$intf" == "gbmcbr" ]]; then
-        eui64=$(mac_to_eui64 "$macstr")
-        eui64="${eui64:2}"
-        printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\n' "$eui64" > "$override"/60-ula.conf
-        dhcp_override="/run/systemd/network/-bmc-gbmcdhcp.network.d"
+    gbmc_net_networkd_write_dropin "$intf" 50-mac.conf \
+      "[Link]"$'\n'"MACAddress=$macstr" || true
+    # Add ula for standard l2br
+    if [[ "$intf" == "l2br" ]]; then
+      eui64=$(mac_to_eui64 "$macstr")
+      eui64="${eui64:2}"
+      gbmc_net_networkd_write_dropin "$intf" 60-ula.conf \
+        "[Address]"$'\n'"Address=fdb5:0481:10ce:1:$eui64/64"$'\n'"PreferredLifetime=0" || true
+    fi
+    # Add ula for gbmcbr
+    if [[ "$intf" == "gbmcbr" ]]; then
+      eui64=$(mac_to_eui64 "$macstr")
+      eui64="${eui64:2}"
+      gbmc_net_networkd_write_dropin "$intf" 60-ula.conf \
+        "[Address]"$'\n'"Address=fdb5:0481:10ce:0:$eui64/64" || true
 
-        eui64_tweak=$(mac_to_eui64 "$macstr" "0xff" "0xfd")
-        eui64_tweak="${eui64_tweak:2}"
-        mkdir -p "$dhcp_override"
-        printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\n' "$eui64_tweak" > "$dhcp_override"/10-ula.conf
-      fi
-    done
-    for override in /run/systemd/network/{00,}-bmc-$intf.netdev.d; do
-      mkdir -p "$override"
-      printf '[NetDev]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
-    done
+      eui64_tweak=$(mac_to_eui64 "$macstr" "0xff" "0xfd")
+      eui64_tweak="${eui64_tweak:2}"
+      gbmc_net_write_if_changed \
+        "[Address]"$'\n'"Address=fdb5:0481:10ce:0:$eui64_tweak/64" \
+        /run/systemd/network/-bmc-gbmcdhcp.network.d/10-ula.conf || true
+    fi
+    gbmc_net_write_if_changed "[NetDev]"$'\n'"MACAddress=$macstr" \
+      /run/systemd/network/{00,}-bmc-"$intf".netdev.d/50-mac.conf || true
     # In case we don't have any interface configs, set the MAC directly
     # This is safe to apply, as systemd-networkd will always override this
     # value based on written configs.
@@ -114,5 +115,6 @@ for (( i=0; i<num; i++ )); do
   done
   (( ++lower ))
 done
+gbmc_net_reload_queue_end || true
 
 exit $rc

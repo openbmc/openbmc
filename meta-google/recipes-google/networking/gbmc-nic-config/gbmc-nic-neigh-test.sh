@@ -41,8 +41,11 @@ sed -e 's,@IFS@,eth0,g' \
     -e "s#/usr/share/gbmc-net-lib.sh#$GBMC_NET_LIB#g" \
     gbmc-nic-neigh.sh.in >"$TEST_DIR/gbmc-nic-neigh.sh"
 
+orig_write_dropin="$(declare -f gbmc_net_networkd_write_dropin)"
+
 reload_neigh_sh() {
   unset gbmc_nic_neigh_lib
+  eval "$orig_write_dropin"
   # shellcheck source=meta-google/recipes-google/networking/gbmc-nic-config/gbmc-nic-neigh.sh.in
   source "$TEST_DIR/gbmc-nic-neigh.sh"
 }
@@ -87,11 +90,12 @@ test_gbmc_nic_neigh_set_add_del() {
 
   # Override run directory paths in gbmc_nic_neigh_set
   eval "$(declare -f gbmc_nic_neigh_set | sed "s#/run#$run_dir#g")"
+  eval "$(declare -f gbmc_net_networkd_write_dropin | sed "s#/run#$run_dir#g")"
 
   # Test add
   gbmc_nic_neigh_set add "2002:a05:7538:212b::"
 
-  expect_numeq 0 "$networkd_reloads"
+  expect_numeq 1 "$networkd_reloads"
   expect_numeq 1 "$nft_reloads"
 
   # Check that 10-nic-neigh-table.conf was created
@@ -114,7 +118,7 @@ test_gbmc_nic_neigh_set_add_del() {
   networkd_reloads=0
   gbmc_nic_neigh_set del "2002:a05:7538:212b::"
 
-  expect_numeq 0 "$networkd_reloads"
+  expect_numeq 1 "$networkd_reloads"
   expect_numeq 1 "$nft_reloads"
   [ ! -f "${conf_files[0]}" ] || fail
 
@@ -152,7 +156,7 @@ test_gbmc_nic_neigh_carrier_up() {
   expect_numeq 16 "$neigh_adds"
 }
 
-test_gbmc_nic_neigh_carrier_up_fallback() {
+test_gbmc_nic_neigh_carrier_up_failure() {
   reload_neigh_sh
 
   ip() {
@@ -160,12 +164,9 @@ test_gbmc_nic_neigh_carrier_up_fallback() {
   }
   sysctl() { :; }
   local networkd_reloads=0
-  local reloaded_intfs=()
-  # Records any interfaces to make sure none are ever passed
   # shellcheck disable=SC2120
   gbmc_net_networkd_reload() {
     (( networkd_reloads++ ))
-    reloaded_intfs+=("$@")
   }
 
   gbmc_nic_neigh_addr="2002:a05:7538:212b::"
@@ -176,9 +177,8 @@ test_gbmc_nic_neigh_carrier_up_fallback() {
 
   gbmc_nic_neigh_hook
 
-  expect_numeq 1 "$networkd_reloads"
-  # A plain reload, never a forced reconfigure of the interface
-  expect_numeq 0 "${#reloaded_intfs[@]}"
+  # Nothing changed for networkd, so a reload wouldn't do anything
+  expect_numeq 0 "$networkd_reloads"
 }
 
 test_gbmc_nic_neigh_fallback_on_failure() {
@@ -196,6 +196,7 @@ test_gbmc_nic_neigh_fallback_on_failure() {
     (( networkd_reloads++ ))
     reloaded_intfs+=("$@")
   }
+  gbmc_net_nftables_reload() { :; }
   gbmc_net_route_table_for_intf() {
     echo "1002"
   }
@@ -203,6 +204,7 @@ test_gbmc_nic_neigh_fallback_on_failure() {
   local run_dir="$TEST_DIR/run_fail"
   mkdir -p "$run_dir/systemd/network" "$run_dir/nftables"
   eval "$(declare -f gbmc_nic_neigh_set | sed "s#/run#$run_dir#g")"
+  eval "$(declare -f gbmc_net_networkd_write_dropin | sed "s#/run#$run_dir#g")"
 
   gbmc_nic_neigh_set add "2002:a05:7538:212b::"
   expect_numeq 1 "$networkd_reloads"

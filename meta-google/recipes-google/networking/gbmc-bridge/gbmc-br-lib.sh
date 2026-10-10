@@ -115,13 +115,10 @@ gbmc_br_ra_withdraw() {
   else
     contents+="Route=$pfx"$'\n'"LifetimeSec=0"$'\n'
   fi
-  local name dir
+  local name
   gbmc_br_ra_withdrawn_name name "$section" "$pfx"
   echo "gBMC Bridge withdrawing $section $pfx" >&2
-  for dir in "${GBMC_BR_WITHDRAWN_DIRS[@]}"; do
-    mkdir -p "$dir"
-    printf '%s' "$contents" >"$dir/$name"
-  done
+  gbmc_net_networkd_write_dropin gbmcbr "$name" "$contents" || true
 }
 
 # Stops withdrawing a prefix we advertise again.
@@ -129,11 +126,9 @@ gbmc_br_ra_withdraw() {
 #   $1: RA section, IPv6Prefix or IPv6RoutePrefix
 #   $2: Prefix with its length
 gbmc_br_ra_unwithdraw() {
-  local name dir
+  local name
   gbmc_br_ra_withdrawn_name name "$1" "$2"
-  for dir in "${GBMC_BR_WITHDRAWN_DIRS[@]}"; do
-    rm -f "$dir/$name"
-  done
+  gbmc_net_networkd_write_dropin gbmcbr "$name" '' || true
 }
 
 # Lists the prefixes advertised by our gbmcbr drop-ins as "<section> <prefix>".
@@ -192,7 +187,6 @@ gbmc_br_ra_withdrawn_expire() {
   local up _
   read -r up _ </proc/uptime || return
   local now="${up%.*}"
-  local changed=
   local file
   for file in "${GBMC_BR_WITHDRAWN_DIRS[0]}"/45-withdrawn-*.conf; do
     [[ -f $file ]] || continue
@@ -200,19 +194,11 @@ gbmc_br_ra_withdrawn_expire() {
     read -r hdr <"$file" || true
     [[ $hdr =~ ^'# until '([0-9]+)$ ]] && until="${BASH_REMATCH[1]}"
     if (( until <= now )); then
-      local dir
-      for dir in "${GBMC_BR_WITHDRAWN_DIRS[@]}"; do
-        rm -f "$dir/${file##*/}"
-      done
-      changed=1
+      gbmc_net_networkd_write_dropin gbmcbr "${file##*/}" '' || true
     elif [[ -z $withdrawn_next_out ]] || (( until < withdrawn_next_out )); then
       withdrawn_next_out="$until"
     fi
   done
-  if [[ -n $changed ]]; then
-    # shellcheck disable=SC2119
-    gbmc_net_networkd_reload
-  fi
   return 0
 }
 
@@ -239,12 +225,12 @@ gbmc_br_set_runtime_ip() {
   fi
   local -a old_ra=()
   gbmc_br_ra_conf_entries old_ra "50-ip-$name.conf"
+  gbmc_net_reload_queue_start
   if [ -z "$ip" ]; then
     echo "Removing runtime gbmcbr IP: $name" >&2
-    rm -f /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-"$name".conf
+    gbmc_net_networkd_write_dropin gbmcbr "50-ip-$name.conf" '' || true
     gbmc_br_ra_withdraw_stale "${old_ra[@]}"
-    # shellcheck disable=SC2119
-    gbmc_net_networkd_reload
+    gbmc_net_reload_queue_end || true
     return $rc
   fi
 
@@ -273,12 +259,11 @@ Route=$pfx/80
 LifetimeSec=$GBMC_BR_RA_LIFETIME
 EOF
   local scontents
-  if [[ -n $stateless_size ]]; then
-    # Downstream BMCs autoconfigure addresses in the advertised /80, so it
-    # needs an on-link route over gbmcbr. Otherwise the unreachable route
-    # covering the rest of the allocation swallows traffic to them, and they
-    # are only reachable while they also hold a statically assigned address.
-    read -r -d '' scontents <<EOF
+  # Downstream BMCs autoconfigure addresses in the advertised /80, so it
+  # needs an on-link route over gbmcbr. Otherwise the unreachable route
+  # covering the rest of the allocation swallows traffic to them, and they
+  # are only reachable while they also hold a statically assigned address.
+  read -r -d '' scontents <<EOF
 [IPv6Prefix]
 Prefix=$stateless_pfx/80
 PreferredLifetimeSec=$GBMC_BR_RA_LIFETIME
@@ -291,21 +276,12 @@ Destination=$stateless_pfx/$stateless_size
 Type=unreachable
 Metric=$GBMC_ROUTE_METRIC_CATCHALL
 EOF
-  fi
   echo "Adding runtime gbmcbr IP: $name $pfx stateless($stateless_pfx/$stateless_size)" >&2
 
-  local file
-  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-$name.conf; do
-    mkdir -p "$(dirname "$file")"
-    printf '%s\n%s' "$contents" "$scontents" >"$file"
-  done
+  gbmc_net_networkd_write_dropin gbmcbr "50-ip-$name.conf" \
+    "$contents"$'\n'"$scontents" || true
   gbmc_br_ra_withdraw_stale "${old_ra[@]}"
-
-  # A plain reload is enough, networkd reconfigures gbmcbr when its drop-ins
-  # change. Forcing a reconfigure would flush every address and route
-  # networkd owns on gbmcbr and drop any added outside of networkd.
-  # shellcheck disable=SC2119
-  gbmc_net_networkd_reload
+  gbmc_net_reload_queue_end || true
 }
 
 gbmc_br_reload_ips() {
@@ -317,10 +293,9 @@ gbmc_br_reload_ips() {
     gbmc_net_mask_or_rm "$d"
   done
 
-  # Remove existing loaded configurations
   local -a old_ra=()
   gbmc_br_ra_conf_entries old_ra '50-ip-static*.conf'
-  (shopt -s nullglob; rm -rf /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-static*.conf)
+  local -A keep=([50-ip-static.conf]=1)
 
   local cur_ip
   cur_ip="$(gbmc_br_get_ip)"
@@ -328,8 +303,14 @@ gbmc_br_reload_ips() {
   local ip
   local i=0
   for ip in $(shopt -s nullglob; cat /run/gbmc-br-ips/* 2>/dev/null); do
+    keep["50-ip-static$i.conf"]=1
     gbmc_br_set_runtime_ip static$i "$ip"
     (( i += 1 ))
+  done
+  local file
+  for file in "${GBMC_BR_WITHDRAWN_DIRS[0]}"/50-ip-static*.conf; do
+    [[ -f $file && -z ${keep["${file##*/}"]-} ]] || continue
+    gbmc_net_networkd_write_dropin gbmcbr "${file##*/}" '' || true
   done
   gbmc_br_ra_withdraw_stale "${old_ra[@]}"
   gbmc_net_reload_queue_end || true
@@ -363,17 +344,22 @@ gbmc_br_set_ip() {
   gbmc_net_reload_queue_start
   local rc=0
 
-  # Remove existing loaded configurations
   local -a old_ra=()
   gbmc_br_ra_conf_entries old_ra '50-ip-alt*.conf'
-  (shopt -s nullglob; rm -rf /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-alt*.conf)
+  local -A keep=()
 
   gbmc_br_set_runtime_ip static "$ip" || rc=$?
   local alt_ip
   local i=0
   for alt_ip in "${alt_ips[@]}"; do
+    keep["50-ip-alt$i.conf"]=1
     gbmc_br_set_runtime_ip alt$i "$alt_ip" || { rc=$?; break; }
     (( i += 1 ))
+  done
+  local file
+  for file in "${GBMC_BR_WITHDRAWN_DIRS[0]}"/50-ip-alt*.conf; do
+    [[ -f $file && -z ${keep["${file##*/}"]-} ]] || continue
+    gbmc_net_networkd_write_dropin gbmcbr "${file##*/}" '' || true
   done
   gbmc_br_ra_withdraw_stale "${old_ra[@]}"
 

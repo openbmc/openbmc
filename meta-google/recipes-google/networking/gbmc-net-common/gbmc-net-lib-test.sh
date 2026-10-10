@@ -359,6 +359,10 @@ testUnmaskAndWrite() {
     echo "Expected 'foo bar baz', got '$content'" >&2
     fail
   fi
+  local ino
+  ino="$(stat -c %i "$test_dir/subdir/testfile")"
+  gbmc_net_unmask_and_write "$test_dir/subdir/testfile" "foo" "bar" "baz"
+  expect_numeq "$(stat -c %i "$test_dir/subdir/testfile")" "$ino"
 
   # Writing without content touches the file
   gbmc_net_unmask_and_write "$test_dir/emptyfile"
@@ -406,6 +410,107 @@ testMaskFileSource() {
     /etc/systemd/network/00-bmc-ncsi.network "$root")" /dev/null
 
   rm -rf "$root"
+}
+
+testRuleReplace() {
+  local calls=()
+  ip() { calls+=("$*"); [[ $3 != add ]]; }
+  local rc=0
+  gbmc_net_rule_replace from 2001:db8::/64 lookup 1002 pref 1002 || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "${#calls[@]}" 2
+  expect_streq "${calls[0]}" '-6 rule del from 2001:db8::/64 lookup 1002 pref 1002'
+  expect_streq "${calls[1]}" '-6 rule add proto static from 2001:db8::/64 lookup 1002 pref 1002'
+  unset -f ip
+}
+
+testProxyNdpAdd() {
+  local calls=()
+  ip() { calls+=("$*"); [[ $5 != 2001:db8::2 ]]; }
+  sysctl() { calls+=("sysctl $*"); }
+  local rc=0
+  gbmc_net_proxy_ndp_add eth0 2001:db8::1 2001:db8::2 2001:db8::3 || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "${#calls[@]}" 4
+  expect_streq "${calls[0]}" 'sysctl net.ipv6.conf.eth0.proxy_ndp=1'
+  expect_streq "${calls[3]}" '-6 neigh replace proxy 2001:db8::3 dev eth0'
+  unset -f ip sysctl
+}
+
+testWriteIfChanged() {
+  local test_dir
+  test_dir="$(mktemp -d)"
+  local saved_netd saved_nft
+  saved_netd="$(declare -f gbmc_net_networkd_reload)"
+  saved_nft="$(declare -f gbmc_net_nftables_reload)"
+  local netd_reloads=0
+  local nft_reloads=0
+  gbmc_net_networkd_reload() { (( ++netd_reloads )); }
+  gbmc_net_nftables_reload() { (( ++nft_reloads )); }
+
+  local file="$test_dir/systemd/network/file.conf"
+  local file2="$test_dir/nftables/file2.rules"
+  local rc=0
+  gbmc_net_write_if_changed $'a\nb\n' "$file" "$file2" || rc=$?
+  expect_numeq "$rc" 0
+  expect_numeq "$netd_reloads" 1
+  expect_numeq "$nft_reloads" 1
+  local cur
+  IFS= read -r -d '' cur <"$file" || true
+  expect_streq "$cur" $'a\nb\n'
+  IFS= read -r -d '' cur <"$file2" || true
+  expect_streq "$cur" $'a\nb\n'
+  local ino
+  ino="$(stat -c %i "$file")"
+  # A missing trailing newline is added, so the contents still match
+  rc=0
+  gbmc_net_write_if_changed $'a\nb' "$file" "$file2" || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "$netd_reloads" 1
+  expect_numeq "$nft_reloads" 1
+  expect_numeq "$(stat -c %i "$file")" "$ino"
+  ! compgen -G "$file.tmp*" >/dev/null || fail
+  # Empty contents remove the files
+  rc=0
+  gbmc_net_write_if_changed '' "$file" "$file2" || rc=$?
+  expect_numeq "$rc" 0
+  expect_numeq "$netd_reloads" 2
+  expect_numeq "$nft_reloads" 2
+  [ ! -e "$file" ] || fail
+  [ ! -e "$file2" ] || fail
+  rc=0
+  gbmc_net_write_if_changed '' "$file" "$file2" || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "$netd_reloads" 2
+  expect_numeq "$nft_reloads" 2
+  # A failure on one file still writes and reloads for the others
+  touch "$test_dir/blocker"
+  rc=0
+  gbmc_net_write_if_changed 'c' "$test_dir/blocker/file" "$file" || rc=$?
+  expect_numeq "$rc" 2
+  expect_numeq "$netd_reloads" 3
+  IFS= read -r -d '' cur <"$file" || true
+  expect_streq "$cur" $'c\n'
+  ! compgen -G "$test_dir/blocker*.tmp*" >/dev/null || fail
+  ! compgen -G "$file.tmp*" >/dev/null || fail
+
+  eval "$saved_netd"
+  eval "$saved_nft"
+  rm -rf "$test_dir"
+}
+
+testRmIfExists() {
+  local test_dir
+  test_dir="$(mktemp -d)"
+  touch "$test_dir/a"
+  local rc=0
+  gbmc_net_rm_if_exists "$test_dir/a" "$test_dir/b" || rc=$?
+  expect_numeq "$rc" 0
+  [ ! -e "$test_dir/a" ] || fail
+  rc=0
+  gbmc_net_rm_if_exists "$test_dir/a" "$test_dir/b" || rc=$?
+  expect_numeq "$rc" 1
+  rm -rf "$test_dir"
 }
 
 main

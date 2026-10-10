@@ -54,46 +54,41 @@ add_rtr() {
 
   # Override any existing gateway information within files
   # Make sure we cover `00-*` and `-*` files
-  for file in /run/systemd/network/{00,}-bmc-$RA_IF.network; do
-    mkdir -p "$file.d"
-    printf '[Neighbor]\nMACAddress=%s\nAddress=%s\n' \
-      "$mac" "$rtr" >"$file.d"/10-gateway.conf
-    printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\nTable=%d\n' \
-      "$rtr" "$GBMC_ROUTE_METRIC_ONLINK" "$route_table" >>"$file.d"/10-gateway.conf
-    if [ -n "$ROUTE_METRIC" ]; then
-      printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\n' \
-        "$rtr" "$ROUTE_METRIC_LO" >>"$file.d"/10-gateway.conf
-    fi
-    if (( new == 1 )); then
-      if [ -n "$ROUTE_METRIC" ]; then
-        printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\n' \
-          "$rtr" "$ROUTE_METRIC" >"$file.d"/10-gateway-dyn.conf
-      else
-        rm -f "$file.d"/10-gateway-dyn.conf
-      fi
-      mkdir -p /run/last-ra
-      printf '%s\n%s\n' "$rtr" "$mac" >"/run/last-ra/$RA_IF"
-      if [ -z "${GBMC_AVOID_RWFS-}" ]; then
-        mkdir -p /var/google/last-ra
-        printf '%s\n%s\n' "$rtr" "$mac" >"/var/google/last-ra/$RA_IF"
-      fi
-    fi
-  done
-
-  # Don't force networkd to reload as this can break phosphor-networkd
-  # Fall back to reload only if ip link commands fail
-  local st=0
-  ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac" || st=$?
-  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" || st=$?
+  local conf route
+  printf -v conf '[Neighbor]\nMACAddress=%s\nAddress=%s\n' "$mac" "$rtr"
+  printf -v route '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\nTable=%d\n' \
+    "$rtr" "$GBMC_ROUTE_METRIC_ONLINK" "$route_table"
+  conf+="$route"
   if [ -n "$ROUTE_METRIC" ]; then
-    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC_LO" || st=$?
+    printf -v route '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\n' \
+      "$rtr" "$ROUTE_METRIC_LO"
+    conf+="$route"
+  fi
+  gbmc_net_reload_queue_start
+  gbmc_net_networkd_write_dropin "$RA_IF" 10-gateway.conf "$conf" || true
+  if (( new == 1 )); then
+    conf=
+    if [ -n "$ROUTE_METRIC" ]; then
+      printf -v conf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\n' \
+        "$rtr" "$ROUTE_METRIC"
+    fi
+    gbmc_net_networkd_write_dropin "$RA_IF" 10-gateway-dyn.conf "$conf" || true
+    gbmc_net_write_if_changed "$rtr"$'\n'"$mac" "/run/last-ra/$RA_IF" || true
+    if [ -z "${gbmc_net_avoid_rwfs-${GBMC_AVOID_RWFS-}}" ]; then
+      gbmc_net_write_if_changed "$rtr"$'\n'"$mac" "/var/google/last-ra/$RA_IF" || true
+    fi
+  fi
+
+  # Also apply to the kernel right away
+  ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac" || true
+  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" || true
+  if [ -n "$ROUTE_METRIC" ]; then
+    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC_LO" || true
   fi
   if (( new == 1 )) && [ -n "$ROUTE_METRIC" ]; then
-    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" || st=$?
+    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" || true
   fi
-  if (( st != 0 )); then
-    gbmc_net_networkd_reload || true
-  fi
+  gbmc_net_reload_queue_end || true
 }
 
 # Read the old info from persistent storage in case ToR is updating
@@ -131,14 +126,10 @@ default_update_rtr() {
     echo "Del router $rtr on $RA_IF" >&2
     # Override any existing gateway information within files
     # Make sure we cover `00-*` and `-*` files
-    for file in /run/systemd/network/{00,}-bmc-$RA_IF.network.d/10-gateway-dyn.conf; do
-      rm -rf "$file"
-    done
+    gbmc_net_networkd_write_dropin "$RA_IF" 10-gateway-dyn.conf '' || true
 
     [ -n "$ROUTE_METRIC" ] || return 0
-    # Fall back to reload if remove failed
-    ip -6 route del default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" || \
-      gbmc_net_networkd_reload || true
+    ip -6 route del default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" 2>/dev/null || true
   fi
 }
 

@@ -14,6 +14,7 @@ S = "${UNPACKDIR}"
 
 RDEPENDS:${PN} += " \
   bash \
+  gbmc-net-common \
   ipmi-fru-sh \
   network-sh \
   "

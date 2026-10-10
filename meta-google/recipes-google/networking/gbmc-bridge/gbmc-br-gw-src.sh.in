@@ -141,14 +141,8 @@ gbmc_br_set_router() {
   gbmc_br_gw_defgw="$defgw"
   echo "gBMC Bridge enabling router RA" >&2
 
-  local file
-  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-defgw.conf; do
-    mkdir -p "$(dirname "$file")"
-    printf '[IPv6SendRA]\nRouterLifetimeSec=%d\n' "$GBMC_BR_RA_LIFETIME" >"$file"
-  done
-
-  # shellcheck disable=SC2119
-  gbmc_net_networkd_reload
+  gbmc_net_networkd_write_dropin gbmcbr 50-defgw.conf \
+    "[IPv6SendRA]"$'\n'"RouterLifetimeSec=$GBMC_BR_RA_LIFETIME"
 }
 
 gbmc_br_config_primary_ip() {
@@ -239,24 +233,10 @@ gbmc_br_gw_src_adv_update() {
     contents+="LifetimeSec=$GBMC_BR_RA_LIFETIME"$'\n'
   done < <(printf '%s\n' "${!pfxs[@]}" | sort)
 
-  local need_reload=0
-  local file
-  for file in "${GBMC_BR_GW_SRC_ADV_CONFS[@]}"; do
-    if [[ -z $contents ]]; then
-      [ -f "$file" ] || continue
-      echo "gBMC Bridge removing default route advertisements: $file" >&2
-      rm -f "$file"
-    else
-      [[ "$(cat "$file" 2>/dev/null)"$'\n' == "$contents" ]] && continue
-      echo "gBMC Bridge advertising default routes (${!pfxs[*]}): $file" >&2
-      mkdir -p "$(dirname "$file")"
-      printf '%s' "$contents" >"$file"
-    fi
-    need_reload=1
-  done
-
-  # shellcheck disable=SC2119
-  (( need_reload == 1 )) && gbmc_net_networkd_reload
+  if gbmc_net_write_if_changed "$contents" "${GBMC_BR_GW_SRC_ADV_CONFS[@]}"; then
+    local adv_pfxs="${!pfxs[*]}"
+    echo "gBMC Bridge advertising default routes (${adv_pfxs:-none})" >&2
+  fi
   return 0
 }
 
@@ -277,20 +257,10 @@ gbmc_br_gw_src_adv_load
 gbmc_br_deprioritize_l2br() {
   # return success if no l2br
   [ -d "/sys/class/net/l2br" ] || return 0
-  local fpath="/run/systemd/network/00-bmc-l2br.network.d/50-ra-metric.conf"
-
-  [ -f "$fpath" ] && return
-  echo "gBMC Bridge deprioritizing l2br RA metric" >&2
-
-  read -r -d '' ra_metric <<EOF
-[IPv6AcceptRA]
-RouteMetric=$GBMC_ROUTE_METRIC_L2BR
-EOF
-  mkdir -p "$(dirname "$fpath")"
-  printf '%s\n' "$ra_metric" >"$fpath"
-
-  # shellcheck disable=SC2119
-  gbmc_net_networkd_reload
+  if gbmc_net_networkd_write_dropin l2br 50-ra-metric.conf \
+      "[IPv6AcceptRA]"$'\n'"RouteMetric=$GBMC_ROUTE_METRIC_L2BR"; then
+    echo "gBMC Bridge deprioritizing l2br RA metric" >&2
+  fi
 }
 
 # Our addresses in the <pfx>:fd00::/72 the NIC advertises (9th byte 0xfd)

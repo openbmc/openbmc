@@ -28,6 +28,7 @@ if systemctl is-active --quiet gbmc-br-dhcp@gbmcbr; then
   systemctl restart --no-block gbmc-br-dhcp@@NCSI_IF@
 fi
 
+gbmc_net_reload_queue_start
 read -r -d '' contents <<EOF
 table inet filter {
   chain ncsi_legacy_input {
@@ -38,9 +39,7 @@ table inet filter {
   }
 }
 EOF
-rfile=/run/nftables/40-gbmc-ncsi-smartnic.rules
-mkdir -p "$(dirname "$rfile")"
-printf '%s' "$contents" >"$rfile"
+gbmc_net_write_if_changed "$contents" /run/nftables/40-gbmc-ncsi-smartnic.rules || true
 
 read -r -d '' contents <<EOF
 table inet raw {
@@ -50,7 +49,5 @@ table inet raw {
   }
 }
 EOF
-rfile=/run/nftables/75-gbmc-ncsi-smartnic.rules
-mkdir -p "$(dirname "$rfile")"
-printf '%s' "$contents" >"$rfile"
-gbmc_net_nftables_reload
+gbmc_net_write_if_changed "$contents" /run/nftables/75-gbmc-ncsi-smartnic.rules || true
+gbmc_net_reload_queue_end

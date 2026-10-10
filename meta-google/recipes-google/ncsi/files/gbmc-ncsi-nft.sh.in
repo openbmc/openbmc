@@ -45,11 +45,7 @@ gbmc_ncsi_nft_update() {
   contents+='    }'$'\n'
   contents+='}'$'\n'
 
-  local rfile=/run/nftables/30-gbmc-ncsi-in.rules
-  mkdir -p -m 755 "$(dirname "$rfile")"
-  printf '%s' "$contents" >"$rfile"
-
-  gbmc_net_nftables_reload || true
+  gbmc_net_write_if_changed "$contents" /run/nftables/30-gbmc-ncsi-in.rules || true
 }
 
 gbmc_ncsi_nft_hook() {

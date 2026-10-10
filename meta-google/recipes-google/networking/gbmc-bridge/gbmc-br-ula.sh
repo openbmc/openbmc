@@ -49,24 +49,8 @@ gbmc_br_ula_write_conf() {
     contents+="[Address]"$'\n'"Address=$addr/64"$'\n'
   done < <(printf '%s\n' "$@" | sort)
 
-  local changed=
-  local file
-  for file in "${GBMC_BR_ULA_CONFS[@]}"; do
-    if [[ -z $contents ]]; then
-      [[ -e $file ]] || continue
-      rm -f "$file"
-    else
-      [[ "$(cat "$file" 2>/dev/null)"$'\n' == "$contents" ]] && continue
-      mkdir -p "$(dirname "$file")"
-      printf '%s' "$contents" >"$file.tmp"
-      mv -f "$file.tmp" "$file"
-    fi
-    changed=1
-  done
-  if [[ -n $changed ]]; then
+  if gbmc_net_write_if_changed "$contents" "${GBMC_BR_ULA_CONFS[@]}"; then
     echo "gBMC Bridge ULAs changed: ${*:-none}" >&2
-    # shellcheck disable=SC2119
-    gbmc_net_networkd_reload
   fi
 }
 

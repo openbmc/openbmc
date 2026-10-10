@@ -6,10 +6,12 @@ gbmc_net_reload_queue_start
 # shellcheck disable=SC2043
 for nic in @IFS@; do
   echo "Configuring devlab RA and firewall rules for $nic" >&2
-  netconfdir="/etc/systemd/network/-bmc-${nic}.network.d"
-  nftconfdir="/etc/nftables/"
-  mkdir -p "${netconfdir}"
-  mkdir -p "${nftconfdir}"
+  root=/etc
+  if [ -n "${gbmc_net_avoid_rwfs-${GBMC_AVOID_RWFS-}}" ]; then
+    root=/run
+  fi
+  netconfdir="$root/systemd/network/-bmc-${nic}.network.d"
+  nftconfdir="$root/nftables"
   read -r -d '' nfcontents <<EOF
 table inet filter {
   chain gbmc_br_pub_input {
@@ -18,11 +20,9 @@ table inet filter {
   }
 }
 EOF
-  printf "%s" "$nfcontents" > "${nftconfdir}/50-gbmc-$nic-lab.rules"
-  echo "[Network]" > "${netconfdir}/10-ra-config.conf"
-  echo "IPv6AcceptRA=true" >> "${netconfdir}/10-ra-config.conf"
-  gbmc_net_nftables_reload
-  gbmc_net_networkd_reload
+  gbmc_net_write_if_changed "$nfcontents" "${nftconfdir}/50-gbmc-$nic-lab.rules" || true
+  gbmc_net_write_if_changed "[Network]"$'\n'"IPv6AcceptRA=true" \
+    "${netconfdir}/10-ra-config.conf" || true
 done
 gbmc_net_reload_queue_end
 

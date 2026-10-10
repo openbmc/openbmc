@@ -78,8 +78,9 @@ gbmc_net_mask_or_rm() {
 }
 
 # Safely unmask any bind-mounts over a persistent target file and write content to it.
-# Unmounts any active mount over the target, ensures the parent directory exists,
-# touches the file up front to confirm it can be written to RWFS, and writes the contents.
+# Unmounts any active mount over the target and writes the contents, leaving
+# the file alone if it already holds them. Without contents, it only makes
+# sure the file exists.
 # Arguments:
 #   $1: Path to the target file
 #   $2+: Contents to write (if provided, written separated by spaces with trailing newline)
@@ -96,12 +97,12 @@ gbmc_net_unmask_and_write() {
     rm -f "$target" || return
   fi
 
-  mkdir -p "$(dirname "$target")" || return
-
-  touch "$target" || return
-
   if (( $# > 0 )); then
-    printf '%s\n' "$*" >"$target" || return
+    gbmc_net_write_if_changed "$*" "$target"
+    (( $? < 2 )) || return 1
+  else
+    mkdir -p "$(dirname "$target")" || return
+    touch "$target" || return
   fi
 }
 
@@ -477,6 +478,133 @@ gbmc_net_route_table_for_intf() {
   local idx=
   idx="$(cat /sys/class/net/"$intf"/ifindex)" || return
   echo $((GBMC_INTF_ROUTE_TABLE_BASE + idx))
+}
+
+# Replaces an IPv6 policy rule, removing an existing copy first so it never
+# gets duplicated.
+# Arguments:
+#   $@: ip rule selector and action (e.g. from <pfx> lookup <table> pref <n>)
+# Returns:
+#   The status of adding the rule.
+gbmc_net_rule_replace() {
+  ip -6 rule del "$@" 2>/dev/null
+  ip -6 rule add proto static "$@"
+}
+
+# Enables proxy NDP on an interface and proxies the addresses on it right
+# away, without waiting for networkd to apply the config.
+# Arguments:
+#   $1: Interface
+#   $2+: Addresses to proxy
+# Returns:
+#   0 on success, non-zero if any of them failed.
+gbmc_net_proxy_ndp_add() {
+  local intf="$1"
+  shift
+  local st=0
+  sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null || st=$?
+  local ip
+  for ip in "$@"; do
+    ip -6 neigh replace proxy "$ip" dev "$intf" || st=$?
+  done
+  return "$st"
+}
+
+# Triggers the reload for any networkd or nftables files among the paths.
+# Arguments:
+#   $@: Paths to the files that changed
+_gbmc_net_reload_for_paths() {
+  local need_networkd=0
+  local need_nftables=0
+  local file
+  for file in "$@"; do
+    case "$file" in
+      */systemd/network/*) need_networkd=1 ;;
+      */nftables/*) need_nftables=1 ;;
+    esac
+  done
+  (( need_networkd == 0 )) || gbmc_net_networkd_reload || true
+  (( need_nftables == 0 )) || gbmc_net_nftables_reload || true
+}
+
+# Writes contents to files unless they already hold them, or removes the
+# files when the contents are empty, and reloads networkd or nftables when a
+# file under systemd/network or nftables changed. Use it for every networkd
+# (.network, .netdev, .link and drop-ins) and nftables file we generate.
+# Unchanged files are left alone, as networkd reconfigures the interfaces of
+# every .network file that changed on its next reload. The contents go to a
+# temporary file first, which networkd and nft ignore by its name, so they
+# never read a partial file. A failure on one file doesn't stop the others
+# from being written, nor the reload for those that changed.
+# Arguments:
+#   $1: Contents, empty to remove the files
+#   $2+: Paths to the files
+# Returns:
+#   0 if any file was written or removed, 1 if none changed, 2 on failure.
+gbmc_net_write_if_changed() {
+  local contents="$1"
+  shift
+  [[ -n $contents ]] || { gbmc_net_rm_if_exists "$@"; return; }
+  [[ $contents == *$'\n' ]] || contents+=$'\n'
+  local changed=0
+  local failed=0
+  local file
+  for file in "$@"; do
+    if [[ -f $file ]]; then
+      local cur=
+      IFS= read -r -d '' cur <"$file" || true
+      [[ $cur == "$contents" ]] && continue
+    fi
+    local tmp="$file.tmp.$BASHPID"
+    if { [[ -d ${file%/*} ]] || mkdir -p "${file%/*}"; } &&
+        printf '%s' "$contents" >"$tmp" &&
+        mv -f "$tmp" "$file"; then
+      changed=1
+    else
+      rm -f "$tmp"
+      failed=1
+    fi
+  done
+  (( changed == 0 )) || _gbmc_net_reload_for_paths "$@"
+  (( failed == 0 )) || return 2
+  (( changed == 1 )) || return 1
+}
+
+# Removes files, for the networkd and nftables files we generate, and reloads
+# networkd or nftables when a file under systemd/network or nftables was
+# removed.
+# Arguments:
+#   $@: Paths to the files
+# Returns:
+#   0 if any file was removed, 1 if none existed, 2 on failure.
+gbmc_net_rm_if_exists() {
+  local changed=0
+  local failed=0
+  local file
+  for file in "$@"; do
+    [[ -e $file || -L $file ]] || continue
+    if rm -f "$file"; then
+      changed=1
+    else
+      failed=1
+    fi
+  done
+  (( changed == 0 )) || _gbmc_net_reload_for_paths "$@"
+  (( failed == 0 )) || return 2
+  (( changed == 1 )) || return 1
+}
+
+# Writes or removes a networkd drop-in in both {00,}-bmc-<intf>.network.d
+# directories, reloading networkd when it changed.
+# Arguments:
+#   $1: Interface
+#   $2: Drop-in file name
+#   $3: Contents, empty to remove the drop-in
+# Returns:
+#   0 if a drop-in was written or removed, 1 if unchanged, 2 on failure.
+gbmc_net_networkd_write_dropin() {
+  gbmc_net_write_if_changed "$3" \
+    /run/systemd/network/{00,}-bmc-"$1".network.d/"$2"
 }
 
 gbmc_net_lib_init=1

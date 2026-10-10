@@ -52,45 +52,40 @@ HELP
 
 gadget_start() {
     # Always provide a basic network configuration
-    mkdir -p /run/systemd/network || return
-    cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
-[Match]
-Name=${IFACE_NAME}
-EOF
-
+    local network="[Match]"$'\n'"Name=${IFACE_NAME}"$'\n'
+    local link=
     if [[ -n $IFACE_ALIAS ]]; then
-        cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".link <<EOF
-[Match]
-OriginalName=${IFACE_NAME}
-
-[Link]
-Alias=${IFACE_ALIAS}
-EOF
+        link="[Match]"$'\n'"OriginalName=${IFACE_NAME}"$'\n\n'
+        link+="[Link]"$'\n'"Alias=${IFACE_ALIAS}"$'\n'
     fi
 
     # Add the gbmcbr configuration if this is a relevant device
     if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b && NO_BRIDGE == 0 )); then
-        cat >>/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
-[Network]
-Bridge=gbmcbr
-[Bridge]
-Cost=85
-EOF
+        network+="[Network]"$'\n'"Bridge=gbmcbr"$'\n'"[Bridge]"$'\n'"Cost=85"$'\n'
     fi
 
     # Add standard l2 bridge configuration if this is a relevant device
     if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22c && NO_BRIDGE == 0 )); then
-        cat >>/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
-[Network]
-Bridge=l2br
-[Bridge]
-Cost=85
-EOF
+        network+="[Network]"$'\n'"Bridge=l2br"$'\n'"[Bridge]"$'\n'"Cost=85"$'\n'
     fi
 
+    gbmc_net_reload_queue_start
+    local rc=0
+    gbmc_net_write_if_changed "$network" \
+        /run/systemd/network/+-bmc-"${IFACE_NAME}".network || rc=$?
+    if (( rc == 2 )); then
+        gbmc_net_reload_queue_end || true
+        return 1
+    fi
+    rc=0
+    gbmc_net_write_if_changed "$link" \
+        /run/systemd/network/+-bmc-"${IFACE_NAME}".link || rc=$?
+    if (( rc == 2 )); then
+        gbmc_net_reload_queue_end || true
+        return 1
+    fi
     # Ignore any failures due to systemd being unavailable at boot
-    # shellcheck disable=SC2119
-    gbmc_net_networkd_reload || true
+    gbmc_net_reload_queue_end || true
 
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}" || return
@@ -151,10 +146,9 @@ gadget_stop() {
       "${gadget_dir}/strings/0x409" \
       "${gadget_dir}" || true
 
-    rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
-    rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".link
-    # shellcheck disable=SC2119
-    gbmc_net_networkd_reload || true
+    gbmc_net_rm_if_exists \
+        /run/systemd/network/+-bmc-"${IFACE_NAME}".network \
+        /run/systemd/network/+-bmc-"${IFACE_NAME}".link || true
 }
 
 opts="$(getopt \

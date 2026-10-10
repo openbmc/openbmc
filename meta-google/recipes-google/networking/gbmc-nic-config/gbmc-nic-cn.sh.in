@@ -26,53 +26,39 @@ gbmc_nic_cn_addr=
 gbmc_nic_cn_set() {
   local act="$1"
   local ip="$2"
+  local contents=
 
   echo "gBMC NIC CN $act $ip: ${gbmc_nic_cn_intfs[*]}" >&2
   local pfx_bytes=()
   ip_to_bytes pfx_bytes "$ip"
 
   local cn_ips=()
-  local failed_intfs=()
-
-  local intf
-  local contents
-  read -r -d '' contents <<EOF
-[Route]
-Destination=$ip/65
-Metric=$GBMC_ROUTE_METRIC_CATCHALL
-EOF
   local i
   local cn_ip
   for (( i=1; i<8; ++i )); do
     (( pfx_bytes[8] = i * 16 ))
     cn_ips+=("$(ip_bytes_to_str pfx_bytes)")
   done
-  for cn_ip in "${cn_ips[@]}"; do
-    contents+=$'\n'"IPv6ProxyNDPAddress=$cn_ip"
-  done
-  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network; do
-    mkdir -p "$file.d"
-    if [[ "$act" == add ]]; then
-      printf '%s' "$contents" >"$file.d"/10-nic-cn.conf
-    else
-      rm -f "$file.d"/10-nic-cn.conf
-    fi
-  done
+  if [[ "$act" == add ]]; then
+    read -r -d '' contents <<EOF
+[Route]
+Destination=$ip/65
+Metric=$GBMC_ROUTE_METRIC_CATCHALL
+EOF
+    for cn_ip in "${cn_ips[@]}"; do
+      contents+=$'\n'"IPv6ProxyNDPAddress=$cn_ip"
+    done
+  fi
+  gbmc_net_networkd_write_dropin gbmcbr 10-nic-cn.conf "$contents" || true
 
-  local st=0
   ip -6 route add "$ip/65" dev gbmcbr metric "$GBMC_ROUTE_METRIC_CATCHALL" 2>dev/null || true
   for intf in "${gbmc_nic_cn_intfs[@]}"; do
     if [[ "$act" == add ]]; then
       for cn_ip in "${cn_ips[@]}"; do
-        ip -6 neigh "$act" proxy "$cn_ip" dev "$intf" || st=$?
+        ip -6 neigh "$act" proxy "$cn_ip" dev "$intf" || true
       done
     fi
-    [[ "$st" == "0" ]] || failed_intfs+=("$intf")
   done
-
-  if (( "${#failed_intfs[@]}" > 0 )); then
-    gbmc_net_networkd_reload
-  fi
 }
 
 gbmc_nic_cn_hook() {

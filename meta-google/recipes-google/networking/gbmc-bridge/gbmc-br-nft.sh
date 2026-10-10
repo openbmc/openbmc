@@ -29,17 +29,13 @@ gbmc_br_nft_update() {
   contents+='table inet filter {'$'\n'
   contents+='    chain gbmc_br_int_input {'$'\n'
   local pfx
-  for pfx in "${!gbmc_br_nft_pfx[@]}"; do
-    contents+="        ip6 saddr $pfx accept"$'\n'
-  done
+  while IFS= read -r pfx; do
+    [[ -n $pfx ]] && contents+="        ip6 saddr $pfx accept"$'\n'
+  done < <(printf '%s\n' "${!gbmc_br_nft_pfx[@]}" | sort)
   contents+='    }'$'\n'
   contents+='}'$'\n'
 
-  local rfile=/run/nftables/40-gbmc-br-int.rules
-  mkdir -p "$(dirname "$rfile")"
-  printf '%s' "$contents" >"$rfile"
-
-  gbmc_net_nftables_reload || true
+  gbmc_net_write_if_changed "$contents" /run/nftables/40-gbmc-br-int.rules || true
 }
 
 gbmc_br_nft_hook() {
