@@ -392,7 +392,8 @@ GBMC_INTF_ROUTE_TABLE_BASE=1000
 #        its own live uplinks (800, 900) so a tray with its own ToR uses it.
 #   2080, 2090  The head's cached uplinks.
 #   2000 A head too old to encode the metric in its advertisement.
-#   2048 l2br RA routes once the head is advertising, so they lose to it.
+#   2500 l2br RA routes once the head is advertising, well past every route
+#        through the head (up to 2099) so a tray never prefers l2br to it.
 #
 # Prefix routes on gbmcbr:
 #   512  Specific on-link prefixes: the /80s downstream BMCs autoconfigure in,
@@ -417,7 +418,7 @@ GBMC_ROUTE_METRIC_PRIMARY_MAX=1536
 # shellcheck disable=SC2034
 GBMC_ROUTE_METRIC_TRAY_LEGACY=2000
 # shellcheck disable=SC2034
-GBMC_ROUTE_METRIC_L2BR=2048
+GBMC_ROUTE_METRIC_L2BR=$(( 2 * GBMC_ROUTE_METRIC_FALLBACK_OFFSET + 500 ))
 # shellcheck disable=SC2034
 GBMC_ROUTE_METRIC_ONLINK=512
 # shellcheck disable=SC2034
