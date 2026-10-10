@@ -738,23 +738,25 @@ gbmc_br_gw_src_br_update() {
 
   local metric
   for metric in "${!gbmc_br_gw_src_br_installed[@]}"; do
-    [[ ${want["$metric"]-} == "${gbmc_br_gw_src_br_installed["$metric"]}" ]] && continue
     local data
     read -ra data <<<"${gbmc_br_gw_src_br_installed["$metric"]}"
-    echo "gBMC Bridge removing default route via ${data[0]} src ${data[1]} metric $metric" >&2
+    [[ ${want["$metric"]-} == "${data[0]} "* ]] && continue
+    echo "gBMC Bridge removing default route via ${data[0]} src ${data[1]-} metric $metric" >&2
     unset 'gbmc_br_gw_src_br_installed[$metric]'
-    ip -6 route del default via "${data[0]}" dev gbmcbr metric "$metric" 2>/dev/null || true
+    gbmc_br_gw_src_conf_del gbmcbr "${data[0]}" "$metric" || true
   done
   for metric in "${!want[@]}"; do
-    [[ -n ${gbmc_br_gw_src_br_installed["$metric"]-} ]] && continue
+    [[ ${gbmc_br_gw_src_br_installed["$metric"]-} == "${want["$metric"]}" ]] && continue
     local data
     read -ra data <<<"${want["$metric"]}"
     echo "gBMC Bridge adding default route via ${data[0]} src ${data[1]} metric $metric" >&2
     # Mark it installed first so the route events for it are ignored
     gbmc_br_gw_src_br_installed["$metric"]="${want["$metric"]}"
-    if ! ip -6 route replace default via "${data[0]}" dev gbmcbr onlink \
-        src "${data[1]}" metric "$metric"; then
+    # Also in our gbmcbr drop-in, otherwise every gbmcbr reconfigure flushes
+    # it until we put it back
+    if ! gbmc_br_gw_src_conf_add gbmcbr "${data[0]}" "${data[1]}" "$metric"; then
       unset 'gbmc_br_gw_src_br_installed[$metric]'
+      gbmc_br_gw_src_conf_del gbmcbr "${data[0]}" "$metric" || true
     fi
   done
 
@@ -805,17 +807,27 @@ gbmc_br_gw_src_hook() {
   elif [[ $change == route && $route == 'default '*':'* ]]; then
     # ignore everything except main table
     [[ $route == *" table "* ]] && return
-    # ignore the routes through the head we install, but put them back if
-    # something else (like a networkd reconfigure) removes them
-    if [[ $route == *' dev gbmcbr '* && $route =~ ' metric '([0-9]+) ]]; then
-      local br_metric="${BASH_REMATCH[1]}"
-      if [[ -n ${gbmc_br_gw_src_br_installed["$br_metric"]-} ]]; then
-        if [[ $action == del ]]; then
-          unset 'gbmc_br_gw_src_br_installed[$br_metric]'
+    # Default routes on gbmcbr are only ever installed by
+    # gbmc_br_gw_src_br_update(). Put ours back if something else (like a
+    # networkd reconfigure) removes them or strips their source, and reconcile
+    # any left over from a previous instance.
+    if [[ $route == *' dev gbmcbr '* ]]; then
+      if [[ $route =~ ' via '([^ ]+).*' metric '([0-9]+) ]]; then
+        local br_gw="${BASH_REMATCH[1]}"
+        local br_metric="${BASH_REMATCH[2]}"
+        if [[ -n ${gbmc_br_gw_src_br_installed["$br_metric"]-} ]]; then
+          if [[ $action == del ]]; then
+            unset 'gbmc_br_gw_src_br_installed[$br_metric]'
+            gbmc_ip_monitor_defer
+          else
+            gbmc_br_gw_src_conf_check "$action" "$route" || true
+          fi
+        elif [[ $action == add ]]; then
+          gbmc_br_gw_src_br_installed["$br_metric"]="$br_gw"
           gbmc_ip_monitor_defer
         fi
-        return 0
       fi
+      return 0
     fi
     # ignore the primary route as this script fully controls it
     if [[ $route == *" metric $GBMC_ROUTE_METRIC_PRIMARY "* ]]; then
