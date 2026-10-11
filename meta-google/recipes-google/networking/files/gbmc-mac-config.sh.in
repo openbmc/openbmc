@@ -100,7 +100,7 @@ for (( i=0; i<num; i++ )); do
       eui64_tweak=$(mac_to_eui64 "$macstr" "0xff" "0xfd")
       eui64_tweak="${eui64_tweak:2}"
       gbmc_net_write_if_changed \
-        "[Address]"$'\n'"Address=fdb5:0481:10ce:0:$eui64_tweak/64" \
+        "[Address]"$'\n'"Address=fdb5:0481:10ce:0:$eui64_tweak/64"$'\n'"PreferredLifetime=0"$'\n'"AddPrefixRoute=false" \
         /run/systemd/network/-bmc-gbmcdhcp.network.d/10-ula.conf || true
     fi
     gbmc_net_write_if_changed "[NetDev]"$'\n'"MACAddress=$macstr" \
