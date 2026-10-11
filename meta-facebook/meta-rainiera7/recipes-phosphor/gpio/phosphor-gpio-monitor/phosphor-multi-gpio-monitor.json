@@ -95,8 +95,38 @@
         "LineName": "ID_RST_BTN_BMC_R_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["reset_btn@RISING.service"],
-            "FALLING": ["reset_btn@FALLING.service"]
+            "RISING": ["reset_btn@RISING.service", "button-event-logger@Released_ID_RST_BTN_BMC_R_N.service"],
+            "FALLING": ["reset_btn@FALLING.service", "button-event-logger@Pressed_ID_RST_BTN_BMC_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "AC_POWER_BTN",
+        "LineName": "AC_PWR_BMC_BTN_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Released_AC_PWR_BMC_BTN_R_N.service"],
+            "FALLING": ["button-event-logger@Pressed_AC_PWR_BMC_BTN_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LONG_BTN_EVENT",
+        "LineName": "wLONG_BTN_EVENT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Released_wLONG_BTN_EVENT.service"],
+            "FALLING": ["button-event-logger@Pressed_wLONG_BTN_EVENT.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWR_BTN_BMC_R1_N",
+        "LineName": "PWR_BTN_BMC_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Released_PWR_BTN_BMC_R1_N.service"],
+            "FALLING": ["button-event-logger@Pressed_PWR_BTN_BMC_R1_N.service"]
         },
         "Continue": true
     }

@@ -1,0 +1,48 @@
+#!/bin/sh
+
+message="$1"
+
+ACTION="${message%%_*}"
+BUTTON_NAME="${message#*_}"
+
+STASH_FILE="/run/${BUTTON_NAME}.log_entry"
+
+get_time_ms()
+{
+    awk '{printf "%d\n", $1 * 1000}' /proc/uptime
+}
+
+case "$ACTION" in
+    Pressed)
+        get_time_ms > "$STASH_FILE"
+        ;;
+
+    Released)
+        if [ -f "$STASH_FILE" ]; then
+            PRESS_TIME=$(cat "$STASH_FILE")
+            RELEASE_TIME=$(get_time_ms)
+
+            ENGAGE_DURATION=$((RELEASE_TIME - PRESS_TIME))
+
+            if [ "$ENGAGE_DURATION" -lt 0 ]; then
+                ENGAGE_DURATION=0
+            fi
+
+            log-create \
+                xyz.openbmc_project.Chassis.Buttons.Button.ButtonPressed \
+                --json "{
+                    \"BUTTON_NAME\": \"$BUTTON_NAME\",
+                    \"ENGAGE_DURATION\": $ENGAGE_DURATION
+                }"
+
+            rm -f "$STASH_FILE"
+        else
+            echo "Warning: No press record found for $BUTTON_NAME" >&2
+        fi
+        ;;
+
+    *)
+        echo "Unknown action: $ACTION" >&2
+        exit 1
+        ;;
+esac

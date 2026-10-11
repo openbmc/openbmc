@@ -21,6 +21,8 @@ SRC_URI:append = " \
     file://rainier-gpio-handler \
     file://rainier-gpio-handler@.service \
     file://rainier-mctp-ready@.target \
+    file://button-event-logger \
+    file://button-event-logger@.service \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -37,6 +39,7 @@ SYSTEMD_SERVICE:${PN} += " \
     smc-deassert-log@.service \
     uart-select-led@.service \
     rainier-gpio-handler@.service \
+    button-event-logger@.service \
     "
 
 do_install:append() {
@@ -57,6 +60,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/set-uart-select-led ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/rainier-gpio-handler ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/button-event-logger ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
 }
