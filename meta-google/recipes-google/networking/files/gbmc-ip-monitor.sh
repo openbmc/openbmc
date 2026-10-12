@@ -61,7 +61,7 @@ gbmc_ip_monitor_generate_init() {
     [[ "$line" =~ ^[[:space:]]*inet ]] && echo "[ADDR]$intf $line"
   done < <(ip addr)
   ip -4 route | sed 's,^,[ROUTE],'
-  ip -6 route | sed 's,^,[ROUTE],'
+  ip -6 route show table all | sed '/ table local /d; s,^,[ROUTE],'
   echo '[INIT]'
 }
 
@@ -118,6 +118,62 @@ gbmc_ip_monitor_timer() {
 }
 gbmc_ip_monitor_timer_cancel() {
   unset 'GBMC_IP_MONITOR_TIMERS[$1]'
+}
+
+# Grace periods for keys (e.g. prefixes) whose routes disappeared, as
+# networkd briefly flushes them on every reconfigure. A grace map is an
+# associative array of key -> uptime deadline after which the key is acted on,
+# if it is still gone.
+# Starts the grace period of a key, keeping an already pending deadline.
+# Arguments:
+#   $1: Name of the grace map
+#   $2: Key
+#   $3: Grace period in seconds
+#   $4: Timer to arm for the end of the grace period
+gbmc_ip_monitor_grace_start() {
+  local -n _gbmc_ip_monitor_grace_start_map="$1"
+  [[ -z ${_gbmc_ip_monitor_grace_start_map["$2"]-} ]] || return 0
+  local now
+  gbmc_ip_monitor_uptime now || return
+  _gbmc_ip_monitor_grace_start_map["$2"]=$(( now + $3 ))
+  gbmc_ip_monitor_timer "$4" "$3"
+}
+# Ends the grace period of a key that came back.
+# Arguments:
+#   $1: Name of the grace map
+#   $2: Key
+gbmc_ip_monitor_grace_clear() {
+  local -n _gbmc_ip_monitor_grace_clear_map="$1"
+  unset '_gbmc_ip_monitor_grace_clear_map[$2]'
+}
+# Calls `$3 <key>` for every key whose grace period ended, after removing it
+# from the map. The callback has to check whether it is still gone. The timer
+# is re-armed for the next pending deadline, if any.
+# Arguments:
+#   $1: Name of the grace map
+#   $2: Timer used for the grace map
+#   $3: Callback
+gbmc_ip_monitor_grace_expire() {
+  local -n _gbmc_ip_monitor_grace_expire_map="$1"
+  local timer="$2"
+  local cb="$3"
+  local now
+  gbmc_ip_monitor_uptime now || return
+  local next='' key
+  for key in "${!_gbmc_ip_monitor_grace_expire_map[@]}"; do
+    local deadline="${_gbmc_ip_monitor_grace_expire_map["$key"]}"
+    if (( deadline <= now )); then
+      unset '_gbmc_ip_monitor_grace_expire_map[$key]'
+      "$cb" "$key" || true
+    elif [[ -z $next ]] || (( deadline < next )); then
+      next=$deadline
+    fi
+  done
+  if [[ -n $next ]]; then
+    gbmc_ip_monitor_timer "$timer" $(( next - now ))
+  else
+    gbmc_ip_monitor_timer_cancel "$timer"
+  fi
 }
 
 gbmc_ip_monitor_parse_line() {

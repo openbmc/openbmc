@@ -54,7 +54,8 @@ declare -A gbmc_br_gw_src_adv_gone=()
 # Advertised route prefix -> gateway, for trays
 declare -A gbmc_br_gw_src_br_routes=()
 # Advertised route prefix -> uptime when we give up on it coming back, for
-# trays, after GBMC_BR_RA_GRACE seconds
+# trays, after GBMC_BR_RA_GRACE seconds. A gbmc_ip_monitor_grace_start() map.
+# shellcheck disable=SC2034  # used by name
 declare -A gbmc_br_gw_src_br_gone=()
 # Installed default route metric -> "<gateway> <source>", for trays
 declare -A gbmc_br_gw_src_br_installed=()
@@ -66,6 +67,8 @@ declare -A gbmc_br_gw_src_br_installed=()
 # GBMC_NET_ROUTE_SRC_DIR.
 declare -A gbmc_br_gw_src_conf=()
 GBMC_BR_GW_SRC_CONF=75-gw-src.conf
+# Gateway -> policy routing table, as last written to our gbmcbr drop-in
+declare -A gbmc_br_gw_src_br_rts=()
 # The drop-ins of a previous instance would bring back routes we don't know
 # about on the next networkd reload, start over
 rm -f /run/systemd/network/{00,}-bmc-*.network.d/"$GBMC_BR_GW_SRC_CONF"
@@ -146,6 +149,9 @@ gbmc_br_gw_src_conf_write() {
     [[ $key == "$intf "* ]] && metrics+=("${key#* }")
   done
   local contents=
+  local -A want_rules=()
+  local -A want_tables=()
+  [[ $intf != gbmcbr ]] || gbmc_br_gw_src_br_rts=()
   local metric
   while read -r metric; do
     [[ -n $metric ]] || continue
@@ -153,7 +159,36 @@ gbmc_br_gw_src_conf_write() {
     read -ra data <<<"${gbmc_br_gw_src_conf["$intf $metric"]}"
     contents+="[Route]"$'\n'"Gateway=${data[0]}"$'\n'"GatewayOnLink=true"$'\n'
     contents+="Metric=$metric"$'\n'"PreferredSource=${data[1]}"$'\n'
+    # Traffic from our /80 returns through its most preferred gateway
+    local rt=
+    if [[ $intf == gbmcbr ]] && gbmc_br_gw_table rt "${data[0]}"; then
+      want_tables["$rt"]=1
+      gbmc_br_gw_src_br_rts["${data[0]}"]="$rt"
+      if (( ${gbmc_br_gw_src_ips["${data[1]}"]-16} <= 9 )) &&
+         [[ -z ${want_rules["${data[1]}/80"]-} ]]; then
+        want_rules["${data[1]}/80"]="$rt"
+      fi
+    fi
   done < <(printf '%s\n' "${metrics[@]}" | sort -n)
+  if [[ $intf == gbmcbr ]]; then
+    local rt
+    while read -r rt; do
+      [[ -n $rt ]] || continue
+      gbmc_br_gw_table_route contents "$rt" || true
+    done < <(printf '%s\n' "${!want_tables[@]}" | sort -n)
+    local pfx
+    while read -r pfx; do
+      [[ -n $pfx ]] || continue
+      contents+="[RoutingPolicyRule]"$'\n'"From=$pfx"$'\n'"Table=${want_rules["$pfx"]}"$'\n'
+      contents+="Priority=$GBMC_BR_RA_RULE_PREF"$'\n'
+      gbmc_br_from_rule_set gw-src "$pfx" "${want_rules["$pfx"]}"
+    done < <(printf '%s\n' "${!want_rules[@]}" | sort)
+    local key
+    for key in "${!gbmc_br_from_rule_owners[@]}"; do
+      [[ $key == 'gw-src '* && -z ${want_rules["${key#* }"]-} ]] || continue
+      gbmc_br_from_rule_set gw-src "${key#* }"
+    done
+  fi
   gbmc_net_networkd_write_dropin "$intf" "$GBMC_BR_GW_SRC_CONF" "$contents" || true
 }
 
@@ -684,35 +719,31 @@ gbmc_br_gw_src_br_src() {
   [[ -n $br_src_out ]]
 }
 
-# Forgets advertisements from the head that were removed and didn't come back
-# within the grace period, and re-arms the timer for the remaining ones.
-gbmc_br_gw_src_br_expire() {
-  local now
-  gbmc_ip_monitor_uptime now || return
-  local next=
-  local pfx
-  for pfx in "${!gbmc_br_gw_src_br_gone[@]}"; do
-    local deadline="${gbmc_br_gw_src_br_gone["$pfx"]}"
-    if (( deadline <= now )); then
-      unset 'gbmc_br_gw_src_br_gone[$pfx]'
-      # Make sure we didn't miss it coming back
-      if [[ -n "$(ip -6 route show "$pfx/124" dev gbmcbr 2>/dev/null)" ]]; then
-        continue
-      fi
-      echo "gBMC Bridge default route advertisement removed: $pfx" >&2
-      unset 'gbmc_br_gw_src_br_routes[$pfx]'
-    elif [[ -z $next ]] || (( deadline < next )); then
-      next="$deadline"
-    fi
-  done
-  if [[ -n $next ]]; then
-    gbmc_ip_monitor_timer gbmc-br-gw-src-br $(( next - now ))
-  fi
+# Forgets an advertisement from the head that was removed and didn't come back
+# within the grace period, see gbmc_ip_monitor_grace_expire().
+# Arguments:
+#   $1: Advertised prefix (without length)
+gbmc_br_gw_src_br_forget() {
+  local pfx="$1"
+  # Make sure we didn't miss it coming back
+  [[ -z "$(ip -6 route show "$pfx/124" dev gbmcbr 2>/dev/null)" ]] || return 0
+  echo "gBMC Bridge default route advertisement removed: $pfx" >&2
+  unset 'gbmc_br_gw_src_br_routes[$pfx]'
+  # gbmc_br_from_ra_pfx_gw() can depend on it
+  gbmc_ip_monitor_defer
 }
 
 # Installs a default route through the head for every route it advertises,
 # see gbmc_br_tray_metric(), and removes the ones no longer advertised.
 gbmc_br_gw_src_br_update() {
+  # Several BMCs on gbmcbr can advertise routes with the same metric, offset
+  # them by the rank of their gateway so they don't replace each other
+  local -A gw_rank=()
+  local gw
+  while read -r gw; do
+    [[ -n $gw ]] && gw_rank["$gw"]=${#gw_rank[@]}
+  done < <(printf '%s\n' "${gbmc_br_gw_src_br_routes[@]}" | sort -u)
+
   local -A want=()
   local best_metric=
   local best_pfx=
@@ -727,6 +758,7 @@ gbmc_br_gw_src_br_update() {
     else
       gbmc_br_tray_metric tray_metric "$metric" || continue
     fi
+    (( tray_metric += gw_rank["$gw"] ))
     if [[ -z $best_metric ]] || (( metric < best_metric )); then
       best_metric="$metric"
       best_pfx="$pfx"
@@ -758,6 +790,16 @@ gbmc_br_gw_src_br_update() {
       unset 'gbmc_br_gw_src_br_installed[$metric]'
       gbmc_br_gw_src_conf_del gbmcbr "${data[0]}" "$metric" || true
     fi
+  done
+
+  # Follow a gateway moving to another policy routing table, see
+  # gbmc_br_gw_table_hook()
+  local rt
+  for gw in "${!gbmc_br_gw_src_br_rts[@]}"; do
+    gbmc_br_gw_table rt "$gw" && [[ $rt == "${gbmc_br_gw_src_br_rts["$gw"]}" ]] &&
+      continue
+    gbmc_br_gw_src_conf_write gbmcbr
+    break
   done
 
   # Prefer sourcing from the same /64 as the path the head is using
@@ -796,7 +838,8 @@ gbmc_br_gw_src_hook() {
   elif [[ $change == timer && $timer == gbmc-br-gw-src-adv ]]; then
     gbmc_br_gw_src_adv_update
   elif [[ $change == timer && $timer == gbmc-br-gw-src-br ]]; then
-    gbmc_br_gw_src_br_expire
+    gbmc_ip_monitor_grace_expire gbmc_br_gw_src_br_gone gbmc-br-gw-src-br \
+      gbmc_br_gw_src_br_forget
     gbmc_br_gw_src_br_update
   elif [[ $change == link ]]; then
     # Routes going linkdown don't generate route events
@@ -941,17 +984,14 @@ gbmc_br_gw_src_hook() {
     if [[ $action == add ]]; then
       [[ $route =~ ' via '([^ ]+) ]] || return 0
       local gw="${BASH_REMATCH[1]}"
-      unset 'gbmc_br_gw_src_br_gone[$brpfx]'
+      gbmc_ip_monitor_grace_clear gbmc_br_gw_src_br_gone "$brpfx"
       if [[ ${gbmc_br_gw_src_br_routes["$brpfx"]-} != "$gw" ]]; then
         gbmc_br_gw_src_br_routes["$brpfx"]="$gw"
         gbmc_ip_monitor_defer
       fi
     elif [[ -n ${gbmc_br_gw_src_br_routes["$brpfx"]-} ]]; then
-      [[ -z ${gbmc_br_gw_src_br_gone["$brpfx"]-} ]] || return 0
-      local now
-      gbmc_ip_monitor_uptime now || return
-      gbmc_br_gw_src_br_gone["$brpfx"]=$(( now + GBMC_BR_RA_GRACE ))
-      gbmc_ip_monitor_timer gbmc-br-gw-src-br "$GBMC_BR_RA_GRACE"
+      gbmc_ip_monitor_grace_start gbmc_br_gw_src_br_gone "$brpfx" \
+        "$GBMC_BR_RA_GRACE" gbmc-br-gw-src-br
     fi
   fi
 }

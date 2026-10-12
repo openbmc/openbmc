@@ -17,7 +17,7 @@
 source /usr/share/gbmc-br-lib.sh || exit
 
 update_rtr() {
-  default_update_rtr "$@"
+  true
 }
 
 update_fqdn() {
@@ -34,10 +34,14 @@ update_pfx() {
 
 RA_IF=gbmcbr
 IP_OFFSET=@IP_OFFSET@
-# Only route through the head BMC from the gbmcbr routing table here. The main
-# table default routes through the head come from the routes it advertises,
-# see gbmc_br_gw_src_br_update() in gbmc-br-gw-src.sh.
+# Default routes and per-gateway policy routing tables on gbmcbr are managed
+# by gbmc-br-from-ra.sh and gbmc-br-gw-src.sh.
 ROUTE_METRIC=
+
+gbmc_net_gateway_conf_write "$RA_IF" 10-gateway.conf ''
+gbmc_net_gateway_conf_write "$RA_IF" 10-gateway-dyn.conf ''
+rm -f "/run/last-ra/$RA_IF"
+gbmc_net_mask_or_rm "/var/google/last-ra/$RA_IF"
 
 echo "Waiting for ${RA_IF} configuration" >&2
 

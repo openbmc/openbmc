@@ -105,6 +105,8 @@ EOF
 ::1 dev lo proto kernel metric 256 pref medium
 fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium
 fe80::/64 dev eno2 proto kernel metric 100 pref medium
+default via fe80::1234 dev gbmcbr table 1100 proto static metric 512 onlink pref medium
+local ::1 dev lo table local proto kernel metric 0 pref medium
 EOF
     fi
     return 0
@@ -116,6 +118,7 @@ EOF
 [ROUTE]::1 dev lo proto kernel metric 256 pref medium
 [ROUTE]fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium
 [ROUTE]fe80::/64 dev eno2 proto kernel metric 100 pref medium
+[ROUTE]default via fe80::1234 dev gbmcbr table 1100 proto static metric 512 onlink pref medium
 [INIT]
 EOF
 }
@@ -274,6 +277,65 @@ testTimerArm() {
   gbmc_ip_monitor_timer_cancel foo
   wait
   expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 105'
+  GBMC_IP_MONITOR_TIMERS=()
+  eval "$saved"
+}
+
+testGrace() {
+  local saved
+  saved="$(declare -f gbmc_ip_monitor_timer_ gbmc_ip_monitor_uptime)"
+  gbmc_ip_monitor_timer_() { :; }
+  test_now=100
+  gbmc_ip_monitor_uptime() {
+    local -n out="$1"
+    # shellcheck disable=SC2034
+    out=$test_now
+  }
+  GBMC_IP_MONITOR_TIMERS=()
+  declare -gA test_grace=()
+  test_expired=()
+  test_grace_cb() {
+    test_expired+=("$1")
+    return 1
+  }
+
+  gbmc_ip_monitor_grace_start test_grace a 5 test-grace
+  expect_streq "${test_grace[a]}" '105'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '105'
+  # A pending deadline is kept
+  test_now=102
+  gbmc_ip_monitor_grace_start test_grace a 5 test-grace
+  gbmc_ip_monitor_grace_start test_grace b 5 test-grace
+  expect_streq "${test_grace[a]}" '105'
+  expect_streq "${test_grace[b]}" '107'
+  # Cleared keys don't expire
+  gbmc_ip_monitor_grace_start test_grace c 1 test-grace
+  gbmc_ip_monitor_grace_clear test_grace c
+  expect_streq "${test_grace[c]-unset}" 'unset'
+
+  # Nothing expired yet
+  gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
+  expect_streq "${#test_expired[@]}" '0'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '103'
+
+  # Only a expires, the timer is re-armed for b once it fired
+  test_now=105
+  expect_err 0 gbmc_ip_monitor_parse_line '[TIMER]test-grace 103'
+  gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
+  expect_streq "${test_expired[*]}" 'a'
+  expect_streq "${test_grace[a]-unset}" 'unset'
+  expect_streq "${test_grace[b]}" '107'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '107'
+
+  # Callback failures are ignored, the timer is cancelled once empty
+  test_now=200
+  gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
+  expect_streq "${test_expired[*]}" 'a b'
+  expect_streq "${#test_grace[@]}" '0'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]-unset}" 'unset'
+
+  wait
+  unset test_grace test_expired test_now
   GBMC_IP_MONITOR_TIMERS=()
   eval "$saved"
 }

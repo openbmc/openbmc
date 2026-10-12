@@ -119,12 +119,16 @@ elif [ -e "/var/google/last-ra/$RA_IF" ]; then
   rafile="/var/google/last-ra/$RA_IF"
 fi
 if [ -n "$rafile" ]; then
+  rtr='' mac=''
   exec {rafd}<"$rafile"
   read -r -u "$rafd" rtr
   read -r -u "$rafd" mac
   exec {rafd}<&-
-  echo "Loading old router $rtr($mac)" >&2
-  add_rtr "$rtr" "$mac" 0
+  # Masked (bind mounted empty) files have no router
+  if [ -n "$rtr" ]; then
+    echo "Loading old router $rtr($mac)" >&2
+    add_rtr "$rtr" "$mac" 0
+  fi
 fi
 
 # Process router reachability and prefix information received via RA.

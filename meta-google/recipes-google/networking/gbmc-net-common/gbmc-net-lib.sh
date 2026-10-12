@@ -366,6 +366,19 @@ _gbmc_net_nftables_reload_exec() {
 }
 
 GBMC_INTF_ROUTE_TABLE_BASE=1000
+# Per-gateway policy routing tables on gbmcbr (3000..3999), disjoint from the
+# per-interface tables (GBMC_INTF_ROUTE_TABLE_BASE + ifindex, 1001..1999).
+# shellcheck disable=SC2034
+GBMC_BR_GW_ROUTE_TABLE_BASE=3000
+# shellcheck disable=SC2034
+GBMC_BR_GW_ROUTE_TABLE_MAX=3999
+# Routing policy rule priority for From= rules on gbmcbr RA-discovered prefixes.
+# Placed after the per-interface From= rules (GBMC_INTF_ROUTE_TABLE_BASE +
+# ifindex, 1001..1999) so a BMC that owns the upstream NIC/uplink for a prefix
+# always routes its own addresses out that uplink, while peer BMCs on gbmcbr
+# route traffic sourced from that prefix into the gateway's gbmcbr routing table.
+# shellcheck disable=SC2034
+GBMC_BR_RA_RULE_PREF=$(( GBMC_INTF_ROUTE_TABLE_BASE + 1000 ))
 
 # Route metrics. The default route metrics form a preference order for
 # reaching the ToR (lower wins); the other metrics mostly keep a route we add
