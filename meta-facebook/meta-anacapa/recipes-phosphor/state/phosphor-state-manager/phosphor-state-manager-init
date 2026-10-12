@@ -13,6 +13,10 @@ devmem 0x1e6ee000 32 0xff00ba55
 devmem 0x1e6e2454 32 0xaa000000
 devmem 0x1e6e2094 32 0x00000003
 
+# Adjust I2C clock for bus 9 and bus 14
+devmem 0x1e78a484 32 0x00445004
+devmem 0x1e78a704 32 0x00445004
+
 # Change SSC to -0.3% Down-spread
 if [ -e "/dev/i2c-57" ] && i2cdetect -y 57 0x68 0x68 | grep -q -E "(68|UU)"; then
     i2cset -y 57 0x68 0x3c 0x34
