@@ -190,6 +190,106 @@
         "Continue": true
     },
     {
+        "Name": "LPDB_P50V_FUSE0_TVS1",
+        "LineName": "LPDB_P50V_FUSE0_TVS1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE0_TVS1.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE0_TVS1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FUSE0_TVS2",
+        "LineName": "LPDB_P50V_FUSE0_TVS2",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE0_TVS2.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE0_TVS2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FUSE1_TVS1",
+        "LineName": "LPDB_P50V_FUSE1_TVS1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE1_TVS1.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE1_TVS1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FUSE1_TVS2",
+        "LineName": "LPDB_P50V_FUSE1_TVS2",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE1_TVS2.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE1_TVS2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FUSE2_TVS1",
+        "LineName": "RPDB_P50V_FUSE2_TVS1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE2_TVS1.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE2_TVS1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FUSE2_TVS2",
+        "LineName": "RPDB_P50V_FUSE2_TVS2",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE2_TVS2.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE2_TVS2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FUSE3_TVS1",
+        "LineName": "RPDB_P50V_FUSE3_TVS1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE3_TVS1.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE3_TVS1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FUSE3_TVS2",
+        "LineName": "RPDB_P50V_FUSE3_TVS2",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE3_TVS2.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE3_TVS2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FUSE4_TVS1",
+        "LineName": "RPDB_P50V_FUSE4_TVS1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE4_TVS1.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-RPDB_P50V_FUSE4_TVS1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FUSE5_TVS1",
+        "LineName": "LPDB_P50V_FUSE5_TVS1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE5_TVS1.service"],
+            "FALLING":  ["power-rail-assert-log@Anacapa_PDB-LPDB_P50V_FUSE5_TVS1.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "FM_BIOS_POST_CMPLT_R_N",
         "LineName": "FM_BIOS_POST_CMPLT_R_N",
         "EventMon": "BOTH",
