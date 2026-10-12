@@ -7,7 +7,6 @@
                 MACAddress:
                     IPMIFruProperty: Custom Field 2
                     IPMIFruSection: Board
-            xyz.openbmc_project.Inventory.Item.Ethernet:
     /system/chassis/motherboard/bmc/ethernet1:
         entityID: 6
         entityInstance: 2
@@ -16,7 +15,6 @@
                 MACAddress:
                     IPMIFruProperty: Custom Field 3
                     IPMIFruSection: Board
-            xyz.openbmc_project.Inventory.Item.Ethernet:
     /system/chassis/motherboard/bmc/ethernet2:
         entityID: 6
         entityInstance: 3
@@ -25,5 +23,4 @@
                 MACAddress:
                     IPMIFruProperty: Custom Field 4
                     IPMIFruSection: Board
-            xyz.openbmc_project.Inventory.Item.Ethernet:
 
