@@ -24,6 +24,7 @@ SRC_URI += " \
   file://gbmc-br-ra.sh.in \
   file://gbmc-br-ra.service \
   file://gbmc-br-gw-src.sh.in \
+  file://gbmc-br-gw-src-test.sh \
   file://gbmc-br-dhcp.sh \
   file://50-gbmc-psu-hardreset.sh.in \
   file://51-gbmc-reboot.sh \
@@ -57,6 +58,8 @@ FILES:${PN}:append = " \
   ${systemd_unitdir}/network \
   ${sysconfdir}/nftables \
   "
+
+DEPENDS += "test-sh gbmc-net-common network-sh"
 
 RDEPENDS:${PN}:append = " \
   bash \
@@ -156,6 +159,10 @@ ethernet_bridge_install() {
 
   install -d ${D}/${sysconfdir}/systemd/network
   install -m 0644 ${UNPACKDIR}/-ether-bridge.network ${D}/${sysconfdir}/systemd/network/
+}
+
+do_compile() {
+  SYSROOT="${STAGING_DIR_HOST}" bash ${UNPACKDIR}/gbmc-br-gw-src-test.sh || exit
 }
 
 do_install() {
