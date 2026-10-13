@@ -7,6 +7,7 @@ SRC_URI:append = " \
     file://92-mctpusb-hotplug.rules \
     file://ncsi-bounce \
     file://ncsi-bounce.service \
+    file://ignore-usb0.conf \
     "
 
 FILES:${PN}:append = " \
@@ -14,6 +15,7 @@ FILES:${PN}:append = " \
     ${sysconfdir}/udev/rules.d/90-bmc-usb0-network.rules \
     ${sysconfdir}/udev/rules.d/91-bmc-mctpusb-network.rules \
     ${sysconfdir}/udev/rules.d/92-mctpusb-hotplug.rules \
+    ${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d/ignore-usb0.conf \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -31,4 +33,8 @@ do_install:append() {
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/ncsi-bounce ${D}${libexecdir}/${PN}/
     install -m 0644 ${UNPACKDIR}/ncsi-bounce.service ${D}${systemd_system_unitdir}
+
+    install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d
+    install -m 0644 ${UNPACKDIR}/ignore-usb0.conf \
+        ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d/ignore-usb0.conf
 }
