@@ -40,3 +40,9 @@ PACKAGECONFIG:append:huygens = " multi-chassis"
 PACKAGECONFIG:append:sbp1 = " json sensor-monitor"
 EXTRA_OEMESON:append:sbp1 = " -Duse-host-power-state=enabled"
 
+# Expand multi-chassis fan control JSON configs for Huygens
+do_install:append:huygens() {
+    ${S}/control/json/tools/expand.py -t events -i "${S}/control/config_files/huygens" -o "${D}${datadir}/phosphor-fan-presence/control"
+    ${S}/control/json/tools/expand.py -t groups -i "${S}/control/config_files/huygens" -o "${D}${datadir}/phosphor-fan-presence/control"
+}
+
