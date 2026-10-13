@@ -23,6 +23,7 @@ SERVICE_LIST = "assert-post-end.service \
 SERVICE_FILE_FMT = "file://{0}"
 
 SRC_URI += " \
+    file://assert-post-end.conf \
     file://assert-power-good-drop \
     file://bind-apml-driver \
     file://deassert-power-good-drop \
@@ -58,6 +59,9 @@ do_install:append() {
     done
 
     install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${systemd_system_unitdir}/assert-post-end.service.d
+    install -m 0644 ${UNPACKDIR}/assert-post-end.conf \
+        ${D}${systemd_system_unitdir}/assert-post-end.service.d/assert-post-end.conf
     install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/bind-apml-driver ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
