@@ -212,4 +212,38 @@ test_gbmc_nic_neigh_fallback_on_failure() {
   expect_numeq 0 "${#reloaded_intfs[@]}"
 }
 
+test_gbmc_nic_neigh_init_stale() {
+  reload_neigh_sh
+
+  gbmc_net_networkd_reload() { :; }
+  gbmc_net_nftables_reload() { :; }
+  local run_dir="$TEST_DIR/run_init"
+  eval "$(declare -f gbmc_nic_neigh_hook | sed "s#/run#$run_dir#g")"
+  eval "$(declare -f gbmc_net_networkd_write_dropin | sed "s#/run#$run_dir#g")"
+  local files=(
+    "$run_dir"/systemd/network/{00,}-bmc-eth0.network.d/10-nic-neigh-table.conf
+    "$run_dir"/nftables/40-gbmc-eth0-br.rules
+  )
+  local file
+  for file in "${files[@]}"; do
+    mkdir -p "${file%/*}"
+    touch "$file"
+  done
+
+  # Kept while we have an address
+  gbmc_nic_neigh_addr="2002:a05:7538:212b::"
+  change=init
+  gbmc_nic_neigh_hook
+  for file in "${files[@]}"; do
+    [ -f "$file" ] || fail
+  done
+
+  # Removed when the address went away while we weren't running
+  gbmc_nic_neigh_addr=
+  gbmc_nic_neigh_hook
+  for file in "${files[@]}"; do
+    [ ! -e "$file" ] || fail
+  done
+}
+
 expect_err 0 main

@@ -101,7 +101,16 @@ EOF
 
 gbmc_nic_neigh_hook() {
   # shellcheck disable=SC2154
-  if [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
+  if [[ $change == init && -z $gbmc_nic_neigh_addr ]]; then
+    # Our address went away while we weren't running, drop the config left
+    # for it, which networkd would otherwise keep applying
+    local neigh_intf
+    for neigh_intf in "${gbmc_nic_neigh_intfs[@]}"; do
+      gbmc_net_networkd_write_dropin "$neigh_intf" 10-nic-neigh-table.conf '' || true
+      gbmc_net_write_if_changed '' \
+        /run/nftables/40-gbmc-"$neigh_intf"-br.rules || true
+    done
+  elif [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
        [[ $fam == inet6 && $flags != *tentative* ]]; then
     local ip_bytes=()
     if ! ip_to_bytes ip_bytes "$ip"; then
