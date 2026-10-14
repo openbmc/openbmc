@@ -54,27 +54,16 @@ gbmc_nic_neigh_set() {
     rt="$(gbmc_net_route_table_for_intf "$intf")" || continue
     local neigh_ip
     if [[ "$act" == add ]]; then
-      local contents
-      read -r -d '' contents <<EOF
-[RoutingPolicyRule]
-To=$ip/64
-Table=main
-Priority=$GBMC_INTF_ROUTE_TABLE_BASE
-[RoutingPolicyRule]
-From=$ip/64
-Table=$rt
-Priority=$rt
-[Network]
-IPv6ProxyNDP=yes
-EOF
+      local contents=
+      gbmc_net_intf_rules_conf contents "$ip/64" "$rt"
+      contents+="[Network]"$'\n'"IPv6ProxyNDP=yes"
       for neigh_ip in "${neigh_ips[@]}"; do
         contents+=$'\n'"IPv6ProxyNDPAddress=$neigh_ip"
       done
       gbmc_net_networkd_write_dropin "$intf" 10-nic-neigh-table.conf "$contents" || true
 
       gbmc_net_proxy_ndp_add "$intf" "${neigh_ips[@]}" || true
-      gbmc_net_rule_replace to "$ip/64" lookup main pref "$GBMC_INTF_ROUTE_TABLE_BASE" || true
-      gbmc_net_rule_replace from "$ip/64" lookup "$rt" pref "$rt" || true
+      gbmc_net_intf_rules_set add "$ip/64" "$rt" || true
       # Write the necessary firewall rules to forward IP traffic
       local rules
       read -r -d '' rules <<EOF
@@ -91,8 +80,7 @@ EOF
       for neigh_ip in "${neigh_ips[@]}"; do
         ip -6 neigh del proxy "$neigh_ip" dev "$intf" 2>/dev/null || true
       done
-      ip -6 rule del to "$ip/64" lookup main pref "$GBMC_INTF_ROUTE_TABLE_BASE" 2>/dev/null || true
-      ip -6 rule del from "$ip/64" lookup "$rt" pref "$rt" 2>/dev/null || true
+      gbmc_net_intf_rules_set del "$ip/64" "$rt"
       gbmc_net_write_if_changed '' \
         /run/nftables/40-gbmc-"$intf"-br.rules || true
     fi

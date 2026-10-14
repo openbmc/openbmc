@@ -110,7 +110,7 @@ test_gbmc_nic_neigh_set_add_del() {
     [[ "$call" =~ "-6 rule add" ]] && (( rule_adds++ ))
   done
   expect_numeq 16 "$neigh_adds"
-  expect_numeq 2 "$rule_adds" # to main and from 1002
+  expect_numeq 3 "$rule_adds" # to main, from 1002 and from unreachable
 
   # Test del
   ip_calls=()
@@ -129,7 +129,7 @@ test_gbmc_nic_neigh_set_add_del() {
     [[ "$call" =~ "-6 rule del" ]] && (( rule_dels++ ))
   done
   expect_numeq 16 "$neigh_dels"
-  expect_numeq 2 "$rule_dels"
+  expect_numeq 3 "$rule_dels"
 }
 
 test_gbmc_nic_neigh_carrier_up() {

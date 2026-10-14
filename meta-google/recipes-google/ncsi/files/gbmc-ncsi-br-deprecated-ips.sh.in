@@ -89,15 +89,9 @@ IPv6ProxyNDPAddress=$pfx
 IPv6ProxyNDPAddress=$stateless_pfx
 ${host_pfx:+IPv6ProxyNDPAddress=}$host_pfx
 ${stateless_ip:+IPv6ProxyNDPAddress=}$stateless_ip
-[RoutingPolicyRule]
-To=$pfx/76
-Table=main
-Priority=$GBMC_INTF_ROUTE_TABLE_BASE
-[RoutingPolicyRule]
-From=$pfx/76
-Table=$rt
-Priority=$rt
 EOF
+    contents+=$'\n'
+    gbmc_net_intf_rules_conf contents "$pfx/76" "$rt"
   fi
   if [ -n "$intf_old" ]; then
     gbmc_net_networkd_write_dropin "$intf_old" "50-deprecated-$ip.conf" '' || true
@@ -133,8 +127,7 @@ EOF
     ip -6 rule del from $pfx/76 lookup $rt_old 2>/dev/null || true
   fi
   if [ -n "$del" ]; then
-    ip -6 rule del to "$pfx/76" pref $GBMC_INTF_ROUTE_TABLE_BASE lookup main 2>/dev/null || true
-    ip -6 rule del from "$pfx/76" pref $rt lookup $rt 2>/dev/null || true
+    gbmc_net_intf_rules_set del "$pfx/76" "$rt"
     unset 'gbmc_ncsi_br_deprecated_ips_savedconf["$pfx"]'
     ip -6 neigh del proxy $pfx dev $intf 2>/dev/null || true
     unset 'gbmc_ncsi_br_deprecated_ips_savedconf["$stateless_pfx"]'
@@ -151,8 +144,7 @@ EOF
       ip -6 route del "$brroute" dev gbmcbr metric "$GBMC_ROUTE_METRIC_ONLINK" 2>/dev/null || true
     fi
   else
-    gbmc_net_rule_replace to "$pfx/76" pref $GBMC_INTF_ROUTE_TABLE_BASE lookup main || true
-    gbmc_net_rule_replace from "$pfx/76" pref $rt lookup $rt || true
+    gbmc_net_intf_rules_set add "$pfx/76" "$rt" || true
     if [ -n "$brroute" ]; then
       ip -6 route replace "$brroute" dev gbmcbr metric "$GBMC_ROUTE_METRIC_ONLINK" || true
     fi

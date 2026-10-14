@@ -424,6 +424,27 @@ testRuleReplace() {
   unset -f ip
 }
 
+testIntfRules() {
+  local conf=
+  gbmc_net_intf_rules_conf conf 2001:db8::/64 1003
+  local want=$'[RoutingPolicyRule]\nTo=2001:db8::/64\nTable=main\nPriority=1000\n'
+  want+=$'[RoutingPolicyRule]\nFrom=2001:db8::/64\nTable=1003\nPriority=1003\n'
+  want+=$'[RoutingPolicyRule]\nFrom=2001:db8::/64\nType=unreachable\nPriority=1999\n'
+  expect_streq "$conf" "$want"
+
+  local calls=()
+  ip() { calls+=("$*"); }
+  gbmc_net_intf_rules_set add 2001:db8::/64 1003 || fail
+  expect_numeq "${#calls[@]}" 6
+  expect_streq "${calls[5]}" '-6 rule add proto static from 2001:db8::/64 unreachable pref 1999'
+  calls=()
+  gbmc_net_intf_rules_set del 2001:db8::/64 1003 || fail
+  expect_numeq "${#calls[@]}" 3
+  expect_streq "${calls[1]}" '-6 rule del from 2001:db8::/64 lookup 1003 pref 1003'
+  expect_streq "${calls[2]}" '-6 rule del from 2001:db8::/64 unreachable pref 1999'
+  unset -f ip
+}
+
 testProxyNdpAdd() {
   local calls=()
   ip() { calls+=("$*"); [[ $5 != 2001:db8::2 ]]; }

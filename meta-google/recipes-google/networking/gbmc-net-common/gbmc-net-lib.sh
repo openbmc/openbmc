@@ -379,6 +379,12 @@ GBMC_BR_GW_ROUTE_TABLE_MAX=3999
 # route traffic sourced from that prefix into the gateway's gbmcbr routing table.
 # shellcheck disable=SC2034
 GBMC_BR_RA_RULE_PREF=$(( GBMC_INTF_ROUTE_TABLE_BASE + 1000 ))
+# Routing policy rule priority that ends the lookup for traffic sourced from
+# an uplink's allocation, after its per-interface table. Each allocation only
+# has the single path out of its uplink, so when the uplink is down (and its
+# table is empty) the traffic is dropped rather than falling through to the
+# main table and out another uplink or back over gbmcbr.
+GBMC_INTF_RULE_END_PREF=$(( GBMC_BR_RA_RULE_PREF - 1 ))
 
 # Route metrics. The default route metrics form a preference order for
 # reaching the ToR (lower wins); the other metrics mostly keep a route we add
@@ -502,6 +508,52 @@ gbmc_net_route_table_for_intf() {
 gbmc_net_rule_replace() {
   ip -6 rule del "$@" 2>/dev/null
   ip -6 rule add proto static "$@"
+}
+
+# Appends the networkd config for the policy rules of an uplink allocation:
+# traffic to it uses the main table, and traffic from it only ever leaves
+# through the uplink's own table, see GBMC_INTF_RULE_END_PREF.
+# Arguments:
+#   $1: Variable to append the networkd config to
+#   $2: Allocation prefix with length
+#   $3: Per-interface routing table of the uplink
+gbmc_net_intf_rules_conf() {
+  local -n _gbmc_net_intf_rules_conf="$1"
+  local _pfx="$2"
+  local _rt="$3"
+  _gbmc_net_intf_rules_conf+="[RoutingPolicyRule]"$'\n'"To=$_pfx"$'\n'"Table=main"$'\n'
+  _gbmc_net_intf_rules_conf+="Priority=$GBMC_INTF_ROUTE_TABLE_BASE"$'\n'
+  _gbmc_net_intf_rules_conf+="[RoutingPolicyRule]"$'\n'"From=$_pfx"$'\n'"Table=$_rt"$'\n'
+  _gbmc_net_intf_rules_conf+="Priority=$_rt"$'\n'
+  _gbmc_net_intf_rules_conf+="[RoutingPolicyRule]"$'\n'"From=$_pfx"$'\n'"Type=unreachable"$'\n'
+  _gbmc_net_intf_rules_conf+="Priority=$GBMC_INTF_RULE_END_PREF"$'\n'
+}
+
+# Installs (or removes) the policy rules of gbmc_net_intf_rules_conf() right
+# away, without waiting for networkd.
+# Arguments:
+#   $1: add or del
+#   $2: Allocation prefix with length
+#   $3: Per-interface routing table of the uplink
+gbmc_net_intf_rules_set() {
+  local act="$1"
+  local pfx="$2"
+  local rt="$3"
+  local rules=(
+    "to $pfx lookup main pref $GBMC_INTF_ROUTE_TABLE_BASE"
+    "from $pfx lookup $rt pref $rt"
+    "from $pfx unreachable pref $GBMC_INTF_RULE_END_PREF"
+  )
+  local rule rc=0
+  for rule in "${rules[@]}"; do
+    # shellcheck disable=SC2086
+    if [[ $act == add ]]; then
+      gbmc_net_rule_replace $rule || rc=1
+    else
+      ip -6 rule del $rule 2>/dev/null || true
+    fi
+  done
+  return $rc
 }
 
 # Enables proxy NDP on an interface and proxies the addresses on it right
