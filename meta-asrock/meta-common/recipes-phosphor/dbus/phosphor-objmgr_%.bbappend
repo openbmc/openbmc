@@ -1,0 +1,2 @@
+PACKAGECONFIG:remove = " mappertool"
+
