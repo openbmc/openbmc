@@ -15,7 +15,10 @@ PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=https"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= " \
+        mappertool \
+        "
+PACKAGECONFIG[mappertool] = "-Dmappertool=enabled,-Dmappertool=disabled"
 PACKAGECONFIG[unit-failure-monitor] = "-Dunit-failure-monitor=enabled,-Dunit-failure-monitor=disabled,,"
 
 SYSTEMD_SERVICE:${PN} += " \

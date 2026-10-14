@@ -1,2 +1,2 @@
-PACKAGECONFIG = "unit-failure-monitor"
+PACKAGECONFIG:append = " unit-failure-monitor"
 
