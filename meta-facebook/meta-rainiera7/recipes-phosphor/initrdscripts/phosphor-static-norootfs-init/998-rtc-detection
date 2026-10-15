@@ -14,10 +14,10 @@ if [ "$DEVICE_ID" = "0x5c" ]; then
     fi
 
 elif [ "$DEVICE_ID" = "0x4e" ]; then
-    echo "PCF85053A rtc device detected"
+    echo "PCF85053 rtc device detected"
 
-    if ! echo pcf85053a 0x6f > /sys/class/i2c-dev/i2c-11/device/new_device; then
-        echo "PCF85053A rtc driver not bind"
+    if ! echo pcf85053 0x6f > /sys/class/i2c-dev/i2c-11/device/new_device; then
+        echo "PCF85053 rtc driver not bind"
     fi
 
 else
