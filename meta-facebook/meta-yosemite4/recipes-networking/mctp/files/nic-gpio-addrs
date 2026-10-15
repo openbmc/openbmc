@@ -24,7 +24,8 @@ then
 	PRSNT_NIC3=0xf0015004
 	BITMASK_NIC3=0x400000
 else
-	WIDTH=8
+	# Use word accesses: QEMU's ASPEED GPIO model rejects byte accesses.
+	WIDTH=32
 	# PRSNT_NIC0 is at the 6th bit (GPIOU5), 0 means NIC is present
 	PRSNT_NIC0=0x1e780088
 	BITMASK_NIC0=0x20

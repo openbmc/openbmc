@@ -12,7 +12,8 @@ setup_nic() {
 	address=$2
 	mask=$3
 
-	gpio_val=$(devmem "$address" "$WIDTH")
+	# A failed read must not be interpreted as an active-low presence signal.
+	gpio_val=$(devmem "$address" "$WIDTH") || return 1
 	if [ $((gpio_val & "$mask")) -eq 0 ]; then
 		systemctl start "setup-nic-endpoint-slot@${slot}.service"
 	fi
