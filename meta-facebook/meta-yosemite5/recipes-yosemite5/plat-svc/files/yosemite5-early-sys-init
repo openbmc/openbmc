@@ -2,6 +2,61 @@
 # shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
 source /usr/libexec/yosemite5-common-functions
 
+apml_recovery()
+{
+    local socket=0
+    local max_switches=3
+    local channel=0
+    local switches=0
+    local rmi_ok=0 tsi_ok=0
+    local result
+    local status=0
+
+    if [ "$(get_gpio PWRGD_CPU_PWROK_1)" -ne 1 ]; then
+        return 0
+    fi
+
+    # An unexpected reset of BMC in the middle of SBI transactions can leave
+    # the target device controllers in a hung state or RX/TX FIFOs in a
+    # non-empty state that could skew the data bytes associated with SBI
+    # requests. Execute SB-RMI and SB-TSI reset recovery flows to clear off
+    # stale state in the SBI targets.
+    #
+    # Recovery relies on one of SB-RMI/SB-TSI being healthy to recover the
+    # other, so a failed channel is retried on the other channel instead of
+    # itself. Switch back and forth until both channels have succeeded.
+    echo "Host state is Running, recovering APML..."
+
+    while :; do
+        echo "Recovering APML channel $channel..."
+        result=$(apml_tool "$socket" --apml_recovery "$channel")
+        echo "$result"
+
+        if echo "$result" | grep -q "Failed"; then
+            [ "$channel" -eq 0 ] && rmi_ok=0 || tsi_ok=0
+            echo "APML recovery on channel $channel failed"
+        else
+            [ "$channel" -eq 0 ] && rmi_ok=1 || tsi_ok=1
+        fi
+
+        if [ "$rmi_ok" -eq 1 ] && [ "$tsi_ok" -eq 1 ]; then
+            break
+        fi
+
+        if [ "$switches" -ge "$max_switches" ]; then
+            echo "APML recovery on socket $socket failed after $max_switches switches"
+            status=1
+            break
+        fi
+
+        switches=$((switches + 1))
+        echo "Switching to channel $((1 - channel))..."
+        channel=$((1 - channel))
+    done
+
+    return "$status"
+}
+
 set_product_versions_to_mb_cpld()
 {
     printf "Setting board product version to MB CPLD\n"
@@ -416,5 +471,7 @@ set_gpio HDT_HDR_RESET_R_N 1
 set_gpio FM_SMB_AUTH_MUX_OE_R_N 1
 set_gpio FM_SCM_LED_R_N 1
 set_gpio SGPIO_BMC_READY 1
+
+apml_recovery
 
 exit 0
