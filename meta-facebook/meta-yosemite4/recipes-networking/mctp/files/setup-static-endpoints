@@ -7,26 +7,18 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-networking/mctp/files/nic-gpio-addrs
 . /usr/libexec/mctp/nic-gpio-addrs
 
-# Setup slot1 NIC
-gpio_val=$(devmem "$PRSNT_NIC0" "$WIDTH")
-if [ $((gpio_val & "$BITMASK_NIC0")) -eq 0 ]; then
-	systemctl start setup-nic-endpoint-slot@0.service
-fi
+setup_nic() {
+	slot=$1
+	address=$2
+	mask=$3
 
-# Setup slot2 NIC
-gpio_val=$(devmem "$PRSNT_NIC1" "$WIDTH")
-if [ $((gpio_val & "$BITMASK_NIC1")) -eq 0 ]; then
-	systemctl start setup-nic-endpoint-slot@1.service
-fi
+	gpio_val=$(devmem "$address" "$WIDTH")
+	if [ $((gpio_val & "$mask")) -eq 0 ]; then
+		systemctl start "setup-nic-endpoint-slot@${slot}.service"
+	fi
+}
 
-# Setup slot3 NIC
-gpio_val=$(devmem "$PRSNT_NIC2" "$WIDTH")
-if [ $((gpio_val & "$BITMASK_NIC2")) -eq 0 ]; then
-	systemctl start setup-nic-endpoint-slot@2.service
-fi
-
-# Setup slot4 NIC
-gpio_val=$(devmem "$PRSNT_NIC3" "$WIDTH")
-if [ $((gpio_val & "$BITMASK_NIC3")) -eq 0 ]; then
-	systemctl start setup-nic-endpoint-slot@3.service
-fi
+setup_nic 0 "$PRSNT_NIC0" "$BITMASK_NIC0"
+setup_nic 1 "$PRSNT_NIC1" "$BITMASK_NIC1"
+setup_nic 2 "$PRSNT_NIC2" "$BITMASK_NIC2"
+setup_nic 3 "$PRSNT_NIC3" "$BITMASK_NIC3"
