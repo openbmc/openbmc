@@ -35,6 +35,7 @@ RDEPENDS:${PN}:append = " \
   gbmc-ip-monitor \
   gbmc-net-common \
   nftables-systemd \
+  phytool \
   "
 
 DHCP = "false"
