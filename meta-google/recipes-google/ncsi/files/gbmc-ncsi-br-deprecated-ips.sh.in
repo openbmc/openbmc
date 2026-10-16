@@ -19,6 +19,10 @@ source /usr/share/gbmc-net-lib.sh || exit
 
 gbmc_ncsi_br_deprecated_ips_init=
 declare -A gbmc_ncsi_br_deprecated_ips_confip=()
+# Routing table each IP's rules were configured with. It depends on the ifindex
+# of the interface, which changes when the interface is recreated (e.g. a USB
+# NIC re-enumerating) even though its name stays the same.
+declare -A gbmc_ncsi_br_deprecated_ips_confrt=()
 declare -A gbmc_ncsi_br_deprecated_ips_lastip=()
 declare -A gbmc_ncsi_br_deprecated_ips_del=()
 gbmc_ncsi_br_deprecated_ips_lastncsi=
@@ -44,7 +48,11 @@ gbmc_ncsi_br_deprecated_ips_update() {
   local intf_old="${gbmc_ncsi_br_deprecated_ips_confip["$ip"]-}"
   local del="${gbmc_ncsi_br_deprecated_ips_del["$ip"]-}"
 
-  if [ "$intf_old" = "$intf" ]; then
+  # Determine a unique routing table number for the IP
+  local rt="$(gbmc_net_route_table_for_intf "$intf")"
+  local rt_old="${gbmc_ncsi_br_deprecated_ips_confrt["$ip"]-}"
+
+  if [ "$intf_old" = "$intf" ] && [ "$rt_old" = "$rt" ]; then
     if [ "$intf" != '@NCSI_IF@' ] || [ "$gbmc_ncsi_br_deprecated_ips_confncsi" = "$gbmc_ncsi_br_deprecated_ips_lastncsi" ]; then
       return 0
     fi
@@ -77,9 +85,6 @@ gbmc_ncsi_br_deprecated_ips_update() {
     host_pfx="$(ip_bytes_to_str pfx_bytes)"
   fi
 
-  # Determine a unique routing table number for the IP
-  local rt="$(gbmc_net_route_table_for_intf "$intf")"
-
   local contents=
   if [ -z "$del" ]; then
     read -r -d '' contents <<EOF
@@ -93,7 +98,7 @@ EOF
     contents+=$'\n'
     gbmc_net_intf_rules_conf contents "$pfx/76" "$rt"
   fi
-  if [ -n "$intf_old" ]; then
+  if [ -n "$intf_old" ] && [ "$intf_old" != "$intf" ]; then
     gbmc_net_networkd_write_dropin "$intf_old" "50-deprecated-$ip.conf" '' || true
   fi
   gbmc_net_networkd_write_dropin "$intf" "50-deprecated-$ip.conf" "$contents" || true
@@ -114,7 +119,7 @@ EOF
     gbmc_net_networkd_write_dropin gbmcbr "50-deprecated-$ip.conf" "$brcontents" || true
   fi
 
-  if [ -n "$intf_old" ]; then
+  if [ -n "$intf_old" ] && [ "$intf_old" != "$intf" ]; then
     ip -6 neigh del proxy $pfx dev $intf_old 2>/dev/null || true
     ip -6 neigh del proxy $stateless_pfx dev $intf_old 2>/dev/null || true
     if [ -n "$host_pfx" ]; then
@@ -123,11 +128,12 @@ EOF
     if [ -n "$stateless_ip" ]; then
       ip -6 neigh del proxy $stateless_ip dev $intf_old 2>/dev/null || true
     fi
-    local rt_old="$(gbmc_net_route_table_for_intf "$intf_old")"
-    ip -6 rule del from $pfx/76 lookup $rt_old 2>/dev/null || true
+  fi
+  if [ -n "$rt_old" ] && [ "$rt_old" != "$rt" ]; then
+    ip -6 rule del from "$pfx/76" lookup "$rt_old" pref "$rt_old" 2>/dev/null || true
   fi
   if [ -n "$del" ]; then
-    gbmc_net_intf_rules_set del "$pfx/76" "$rt"
+    gbmc_net_intf_rules_set del "$pfx/76" "${rt:-$rt_old}"
     unset 'gbmc_ncsi_br_deprecated_ips_savedconf["$pfx"]'
     ip -6 neigh del proxy $pfx dev $intf 2>/dev/null || true
     unset 'gbmc_ncsi_br_deprecated_ips_savedconf["$stateless_pfx"]'
@@ -162,8 +168,10 @@ EOF
   if [ -n "$del" ]; then
     unset 'gbmc_ncsi_br_deprecated_ips_lastip["$ip"]'
     unset 'gbmc_ncsi_br_deprecated_ips_confip["$ip"]'
+    unset 'gbmc_ncsi_br_deprecated_ips_confrt["$ip"]'
   else
     gbmc_ncsi_br_deprecated_ips_confip["$ip"]="$intf"
+    gbmc_ncsi_br_deprecated_ips_confrt["$ip"]="$rt"
   fi
   if [ "$intf" = '@NCSI_IF@' ]; then
     gbmc_ncsi_br_deprecated_ips_confncsi="$gbmc_ncsi_br_deprecated_ips_lastncsi"
@@ -242,8 +250,17 @@ gbmc_ncsi_br_deprecated_ips_hook() {
     if [[ "$carrier" == 'UP' ]]; then
       gbmc_ncsi_br_deprecated_ips_add_neighs "$intf"
     fi
-  elif [ "$change" = 'link' -a "$action" = 'add' -a "$carrier" = 'UP' ]; then
-    if ip link show "$intf" | grep -q '^ *alias ncsi-usb-side$'; then
+  elif [ "$change" = 'link' -a "$action" = 'add' ]; then
+    # A recreated interface keeps its name but gets a new ifindex, and with it
+    # a new routing table, so the rules of its IPs have to be updated.
+    local cip
+    for cip in "${!gbmc_ncsi_br_deprecated_ips_confip[@]}"; do
+      if [ "${gbmc_ncsi_br_deprecated_ips_confip["$cip"]}" = "$intf" ]; then
+        gbmc_ip_monitor_defer
+        break
+      fi
+    done
+    if [ "$carrier" = 'UP' ] && ip link show "$intf" | grep -q '^ *alias ncsi-usb-side$'; then
       gbmc_ncsi_br_deprecated_ips_add_neighs "$intf"
     fi
   fi

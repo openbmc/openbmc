@@ -57,7 +57,7 @@ EOF
 
     gbmc_ncsi_usb_network "$intf"
 
-    systemctl start --no-block gbmc-ncsi-ra@"$intf"
+    systemctl restart --no-block gbmc-ncsi-ra@"$intf"
     numaddrs=${numaddrs-0}
   elif [[ "$change" = 'link' && "$action" = 'del' ]]; then
     [[ -n "${numaddrs-}" ]] || return 0

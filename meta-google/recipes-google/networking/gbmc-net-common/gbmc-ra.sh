@@ -32,6 +32,7 @@ fi
 # to use invalid
 old_rtr=invalid
 old_mac=invalid
+old_rt=invalid
 old_pfx=invalid
 old_fqdn=invalid
 
@@ -239,12 +240,14 @@ while true; do
       # We have some notoriously noisy lab environments with many routers being broadcast
       # We always prefer "fe80::1" in prod and labs for routing, so prefer that gateway.
       # We also want to take the first router we find to speed up acquisition on boot.
-      if [[ "$rtr" = "fe80::1" || "$old_rtr" = "invalid" ]]; then
-        if [[ "$rtr" != "$old_rtr" && "$mac" != "$old_mac" ]]; then
+      if [[ "$rtr" = "fe80::1" || "$old_rtr" = "invalid" || "$rtr" = "$old_rtr" ]]; then
+        rt="$(gbmc_net_route_table_for_intf "$RA_IF")" || rt=invalid
+        if [[ "$rtr" != "$old_rtr" || "$mac" != "$old_mac" || "$rt" != "$old_rt" ]]; then
           echo "Got defgw $rtr at $mac on $RA_IF" >&2
           update_rtr "$rtr" "$mac" || true
           old_mac="$mac"
           old_rtr="$rtr"
+          old_rt="$rt"
         fi
       fi
       # Only update router properties if we use this router
@@ -289,6 +292,7 @@ while true; do
       old_rtr="$rtr"
       old_pfx="$pfx"
       old_mac="$mac"
+      old_rt="$(gbmc_net_route_table_for_intf "$RA_IF")" || old_rt=invalid
       old_fqdn="$fqdn"
       found="true"
       break
@@ -298,6 +302,7 @@ while true; do
       update_rtr "$old_rtr" "$old_mac" "remove" || true
       old_rtr=invalid
       old_mac=invalid
+      old_rt=invalid
     fi
   fi
 
