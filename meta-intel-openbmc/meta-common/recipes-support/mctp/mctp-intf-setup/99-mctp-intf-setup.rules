@@ -1,0 +1,4 @@
+# i3c: bring up the CPU-facing link directly on add (no rename involved).
+# Assumes the only i3c link enabled on this board is the CPU-facing one;
+# revisit if a second i3c controller is ever enabled.
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="mctpi3c*", RUN+="/usr/bin/mctp link set %k up net 2 mtu 68"

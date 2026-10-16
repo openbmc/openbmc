@@ -1,0 +1,13 @@
+[Unit]
+Description=MCTP CPU rediscovery on eSPI platform reset for i3c bus %i
+Wants=mctpd.service
+After=mctpd.service xyz.openbmc_project.EntityManager.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/mctp-cpu-reset-watch.sh %i
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
