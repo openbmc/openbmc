@@ -23,6 +23,8 @@ SRC_URI += " \
   file://gbmc-br-hostname.service \
   file://gbmc-br-ra.sh.in \
   file://gbmc-br-ra.service \
+  file://gbmc-br-port-rs.sh \
+  file://gbmc-br-port-rs@.service \
   file://gbmc-br-gw-src.sh.in \
   file://gbmc-br-gw-src-test.sh \
   file://gbmc-br-dhcp.sh \
@@ -257,6 +259,8 @@ do_install() {
   sed 's,@IP_OFFSET@,${GBMC_BR_FIXED_OFFSET},' ${UNPACKDIR}/gbmc-br-ra.sh.in >${UNPACKDIR}/gbmc-br-ra.sh
   install -m0755 ${UNPACKDIR}/gbmc-br-ra.sh ${D}${libexecdir}/
   install -m0644 ${UNPACKDIR}/gbmc-br-ra.service ${D}${systemd_system_unitdir}/
+  install -m0755 ${UNPACKDIR}/gbmc-br-port-rs.sh ${D}${libexecdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-port-rs@.service ${D}${systemd_system_unitdir}/
 
   if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
     install -m0644 ${UNPACKDIR}/gbmc-br-dhcrelay.service ${D}${systemd_system_unitdir}/

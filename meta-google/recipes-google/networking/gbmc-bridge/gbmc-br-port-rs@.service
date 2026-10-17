@@ -1,0 +1,6 @@
+[Unit]
+Description=gBMC Bridge RA solicitation after %I gained carrier
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/gbmc-br-port-rs.sh %I

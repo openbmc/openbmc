@@ -35,6 +35,8 @@ declare -A gbmc_br_from_ra_routes=()
 # shellcheck disable=SC2034  # grace map, used by name
 declare -A gbmc_br_from_ra_routes_gone=()
 declare -A gbmc_br_from_ra_prev_routes=()
+# Last carrier state seen on each gbmcbr port
+declare -A gbmc_br_from_ra_port_carrier=()
 
 # The RA addresses are configured through networkd rather than only with
 # `ip addr`. networkd removes addresses it doesn't manage every time it
@@ -284,6 +286,24 @@ gbmc_br_from_ra_hook() {
     gbmc_br_from_ra_update
   elif [[ $change == timer && $timer == from-ra-* ]]; then
     gbmc_br_from_ra_update
+  elif [[ $change == link && $action == del &&
+          -n ${gbmc_br_from_ra_port_carrier["$intf"]-} ]]; then
+    # A port that comes back under the same name is new again
+    unset 'gbmc_br_from_ra_port_carrier[$intf]'
+  elif [[ $change == link && $intf != gbmcbr && $intf != gbmcbr?* &&
+          -e /sys/class/net/gbmcbr/brif/$intf ]]; then
+    # USB NCM/ECM ports report operstate UNKNOWN, so go by the carrier itself.
+    # The gbmcbr* ports (gbmcbrdhcp, gbmcbrdummy) are virtual and always up.
+    local up=0 c=
+    read -r c 2>/dev/null <"/sys/class/net/$intf/carrier"
+    [[ $c == 1 ]] && up=1
+    local prev="${gbmc_br_from_ra_port_carrier["$intf"]-0}"
+    gbmc_br_from_ra_port_carrier["$intf"]="$up"
+    if (( up == 1 && prev == 0 )); then
+      echo "gBMC Bridge port $intf carrier UP, soliciting RAs" >&2
+      # Waits for the answers, so never in the event loop
+      systemctl start --no-block gbmc-br-port-rs@"$intf".service || true
+    fi
   elif [[ $change == route && $route != *' table '* &&
           $route =~ ^([^ ]+/80)' dev gbmcbr proto ra ' ]]; then
     local pfx="${BASH_REMATCH[1]}"
@@ -313,7 +333,8 @@ gbmc_br_from_ra_hook() {
         "$GBMC_BR_RA_GRACE" from-ra-route
     fi
   elif [[ $change == link && $intf == gbmcbr ]]; then
-    rdisc6 -m gbmcbr -r 1 -w 100 >/dev/null 2>&1
+    # Asynchronous, and coalesced while one is still running
+    systemctl start --no-block gbmc-br-port-rs@gbmcbr.service || true
     if [[ $action == add && $mac != "$gbmc_br_from_ra_mac" ]]; then
       gbmc_br_from_ra_mac="$mac"
       gbmc_ip_monitor_defer
