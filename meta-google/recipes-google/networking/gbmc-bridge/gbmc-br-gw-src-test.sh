@@ -58,6 +58,13 @@ gbmc_ip_monitor_timer() {
   mock_timers["$1"]="$2"
 }
 gbmc_ip_monitor_defer() { :; }
+declare -A mock_idle=()
+gbmc_ip_monitor_idle() {
+  mock_idle["$1"]="$2"
+}
+gbmc_ip_monitor_timer_cancel() {
+  unset 'mock_timers[$1]' 'mock_idle[$1]'
+}
 
 # shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-gw-src.sh.in
 source "$TEST_DIR/gbmc-br-gw-src.sh" || exit
@@ -75,6 +82,7 @@ mock_defaults=()
 ip_calls=()
 ip() {
   if [[ $* == '-6 route get 2000:: from '* ]]; then
+    echo "$6" >>"$TEST_DIR/route_gets"
     [[ -n ${mock_route_get["$6"]-} ]] || return 2
     echo "${mock_route_get["$6"]}"
   elif [[ $* == '-6 route show default' ]]; then
@@ -101,6 +109,10 @@ reset_state() {
   mock_route_get=()
   mock_defaults=()
   mock_timers=()
+  mock_idle=()
+  gbmc_br_gw_src_rt_cache=()
+  gbmc_br_gw_src_rt_gen=0
+  : >"$TEST_DIR/route_gets"
   ip_calls=()
   MOCK_NOW=100
 }
@@ -194,7 +206,9 @@ test_stale_key_replace() {
   expect_keys gbmc_br_gw_src_disabled
   expect_numeq "${#primary_calls[@]}" 1
   expect_streq "${primary_calls[0]-}" "del $old"
-  expect_numeq "$update_calls" 1
+  # Recomputed once the pending events are processed
+  expect_numeq "$update_calls" 0
+  expect_streq "${mock_idle[gbmc-br-gw-src-update]-}" 1
 
   # Our own source change of it only replaces its key
   route='default via fe80::2 dev front0 proto static src 2001:db8::1 metric 800 pref medium'
@@ -270,6 +284,95 @@ test_disabled_gate() {
   expect_keys gbmc_br_gw_src_disabled "$route"
   expect_streq "${ip_calls[*]}" ''
   gbmc_br_from_ra_pfxs=()
+}
+
+# Counts the route lookups since the last reset_state
+# shellcheck disable=SC2034  # nameref
+route_gets() {
+  local -n route_gets_out="$1"
+  local -a lines=()
+  mapfile -t lines <"$TEST_DIR/route_gets"
+  route_gets_out=${#lines[@]}
+}
+
+test_rt_cache() {
+  reset_state
+  local ip=2001:db8::1
+  local eth9="2000:: from $ip via fe80::5 dev eth9 proto static metric 512 pref medium"
+  local eth8="2000:: from $ip via fe80::6 dev eth8 proto static metric 600 pref medium"
+  mock_route_get=(["$ip"]="$eth9")
+  local rt n
+  gbmc_br_gw_src_rt_get rt "$ip"
+  expect_streq "$rt" "$eth9"
+  gbmc_br_gw_src_rt_get rt "$ip"
+  expect_streq "$rt" "$eth9"
+  route_gets n
+  expect_numeq "$n" 1
+
+  # Events that can't change it keep it
+  mock_route_get=(["$ip"]="$eth8")
+  local ev
+  for ev in 'addr' \
+      'route 2001:db8::/64 dev gbmcbr proto kernel metric 256 pref medium' \
+      'route 2001:db8::3200/124 via fe80::9 dev gbmcbr proto ra metric 1024' \
+      'route local 2001:db8::1 dev gbmcbr table local proto kernel metric 0'; do
+    change="${ev%% *}"
+    route="${ev#* }"
+    expect_err 1 gbmc_br_gw_src_rt_invalidate
+  done
+  gbmc_br_gw_src_rt_get rt "$ip"
+  expect_streq "$rt" "$eth9"
+
+  # Default routes in any table, covering routes, rules and links drop it
+  for ev in 'route default via fe80::6 dev eth8 proto static metric 600' \
+      'route default via fe80::7 dev gbmcbr table 3001 proto static' \
+      'route unreachable default dev lo table 1003 metric 1024' \
+      'route 2000::/3 via fe80::6 dev eth8' \
+      'rule x' 'link x'; do
+    change="${ev%% *}"
+    route="${ev#* }"
+    gbmc_br_gw_src_rt_invalidate || fail
+    gbmc_br_gw_src_rt_get rt "$ip"
+    expect_streq "$rt" "$eth8"
+    gbmc_br_gw_src_rt_cache=(["$ip"]="$gbmc_br_gw_src_rt_gen $eth9")
+  done
+}
+
+test_update_batched() {
+  reset_state
+  gbmc_br_gw_src_ips=([2001:db8::1]=15)
+  mock_route_get=(
+    [2001:db8::1]='2000:: from 2001:db8::1 via fe80::1 dev front0 metric 800'
+    [2001:db8::2]='2000:: from 2001:db8::2 via fe80::2 dev front1 metric 801')
+  # A burst of route and address events only requests a recompute
+  change=route action=add
+  route='default via fe80::1 dev front0 proto ra metric 800 expires 1799sec pref medium'
+  gbmc_br_gw_src_hook
+  route='default via fe80::2 dev front1 proto ra metric 801 expires 1799sec pref medium'
+  gbmc_br_gw_src_hook
+  change=addr action=add intf=gbmcbr scope=global fam=inet6 flags='' ip=2001:db8::2
+  gbmc_br_gw_src_hook
+  expect_streq "${ip_calls[*]}" ''
+  local n
+  route_gets n
+  expect_numeq "$n" 0
+  expect_streq "${mock_idle[gbmc-br-gw-src-update]-}" 1
+  expect_streq "${mock_idle[gbmc-br-gw-src-br-update]-}" 1
+  # Which runs once, for everything
+  change=timer timer=gbmc-br-gw-src-update
+  gbmc_br_gw_src_hook
+  route_gets n
+  expect_numeq "$n" 2
+  local -a changes=()
+  local call
+  for call in "${ip_calls[@]}"; do
+    [[ $call == 'route change '* ]] && changes+=("$call")
+  done
+  expect_numeq "${#changes[@]}" 2
+  # Lookups are reused until something changes the routes
+  gbmc_br_gw_src_hook
+  route_gets n
+  expect_numeq "$n" 2
 }
 
 test_nic_dev() {

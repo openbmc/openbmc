@@ -212,6 +212,19 @@ gbmc_br_get_ip() {
   cat /var/google/gbmc-br-ip 2>/dev/null || true
 }
 
+# Same as gbmc_br_get_ip(), without forking, for hot paths.
+# Arguments:
+#   $1: Output variable for the address, empty if there is none
+# shellcheck disable=SC2034  # namerefs
+gbmc_br_read_ip() {
+  local -n read_ip_out="$1"
+  read_ip_out=
+  read -r read_ip_out 2>/dev/null </run/gbmc-br-ip
+  [[ -n $read_ip_out ]] && return 0
+  read -r read_ip_out 2>/dev/null </var/google/gbmc-br-ip
+  return 0
+}
+
 gbmc_br_set_runtime_ip() {
   local name="$1"
   local ip="$2"

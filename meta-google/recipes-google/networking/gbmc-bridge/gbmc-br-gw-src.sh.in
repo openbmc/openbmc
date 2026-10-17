@@ -36,6 +36,13 @@ gbmc_br_gw_src_ncsi_if='@NCSI_IF@'
 # For tray, priorize the route sent by host BMC
 primary_ip_from_br=""
 
+# Address -> "<generation> <ip -6 route get 2000:: from address>". Only the
+# default routes and the policy rules decide where an address routes out of,
+# and every event changing them bumps the generation, see
+# gbmc_br_gw_src_rt_invalidate().
+declare -A gbmc_br_gw_src_rt_cache=()
+gbmc_br_gw_src_rt_gen=0
+
 # Default routes are shared with the BMCs behind gbmcbr by advertising a /124
 # route prefix for each one. The first 64 bits are those of the route source
 # and the upper 12 bits of the last hextet hold the route metric (0..4095),
@@ -369,6 +376,7 @@ gbmc_br_gw_src_primary_reconcile() {
 # Advertise all of our default routes, other than those through gbmcbr, to the
 # BMCs behind gbmcbr in order of preference. See GBMC_BR_GW_SRC_ADV_CONFS.
 gbmc_br_gw_src_adv_update() {
+  gbmc_ip_monitor_timer_cancel gbmc-br-gw-src-adv-update
   local -A pfxs=()
   # Routes that are still there but unusable, withdrawn without a grace period
   local -A down=()
@@ -541,7 +549,58 @@ gbmc_br_gw_src_disabled_load() {
   done
 }
 
+# Invalidates the cached route lookups of our addresses on any event that
+# could change them.
+# Returns failure if the event can't change them.
+gbmc_br_gw_src_rt_invalidate() {
+  # shellcheck disable=SC2154
+  case "$change" in
+    rule|link) ;;
+    route)
+      # Only routes covering 2000::, e.g. default routes in any table
+      [[ $route =~ ^([a-z]+ )?(default|[0-9a-f:]+/[0-3])( |$) ]] || return
+      ;;
+    *) return 1 ;;
+  esac
+  (( ++gbmc_br_gw_src_rt_gen ))
+}
+
+# Looks up the route traffic from an address takes, see
+# gbmc_br_gw_src_rt_cache.
+# Arguments:
+#   $1: Output variable for the route
+#   $2: Address
+# shellcheck disable=SC2034  # namerefs
+gbmc_br_gw_src_rt_get() {
+  local -n rt_get_out="$1"
+  local ip="$2"
+  local cached="${gbmc_br_gw_src_rt_cache["$ip"]-}"
+  if [[ $cached == "$gbmc_br_gw_src_rt_gen "* ]]; then
+    rt_get_out="${cached#* }"
+    return 0
+  fi
+  rt_get_out="$(ip -6 route get 2000:: from "$ip" 2>/dev/null)"
+  gbmc_br_gw_src_rt_cache["$ip"]="$gbmc_br_gw_src_rt_gen $rt_get_out"
+}
+
+# Requests a gbmc_br_gw_src_update() once the pending events are processed,
+# as each of them can change the routes or addresses it picks from.
+gbmc_br_gw_src_update_later() {
+  gbmc_ip_monitor_idle gbmc-br-gw-src-update 1
+}
+
+# Same for gbmc_br_gw_src_adv_update()
+gbmc_br_gw_src_adv_update_later() {
+  gbmc_ip_monitor_idle gbmc-br-gw-src-adv-update 1
+}
+
+# Same for gbmc_br_gw_src_br_update()
+gbmc_br_gw_src_br_update_later() {
+  gbmc_ip_monitor_idle gbmc-br-gw-src-br-update 1
+}
+
 gbmc_br_gw_src_update() {
+  gbmc_ip_monitor_timer_cancel gbmc-br-gw-src-update
   local route
   local ip
   # The lookups below never land on the routes we disabled, so without a
@@ -561,7 +620,7 @@ gbmc_br_gw_src_update() {
   local -A dev_ip_to_metric=()
   for ip in "${!gbmc_br_gw_src_ips[@]}"; do
     local rt
-    rt="$(ip -6 route get 2000:: from "$ip" 2>/dev/null)"
+    gbmc_br_gw_src_rt_get rt "$ip"
     if [[ -n $dis_metric ]] && ! [[ "$rt" =~ ' metric '([0-9]+) &&
           ${BASH_REMATCH[1]} -le $dis_metric ]]; then
       dev_ip_to_metric["$dis_dev-$ip"]="$dis_metric"
@@ -572,7 +631,7 @@ gbmc_br_gw_src_update() {
     dev_ip_to_metric["$rt_dev-$ip"]="$rt_metric"
   done
   local primary_ip
-  primary_ip="$(gbmc_br_get_ip)"
+  gbmc_br_read_ip primary_ip
   # {ip} -> {interface} for the addresses that only belong on one path: the
   # NIC addresses, and the ones we configure in the gbmcbr prefixes of other
   # BMCs (gbmc-br-from-ra), which share the 0xfd byte and only ever route
@@ -736,6 +795,7 @@ gbmc_br_gw_src_br_forget() {
 # Installs a default route through the head for every route it advertises,
 # see gbmc_br_tray_metric(), and removes the ones no longer advertised.
 gbmc_br_gw_src_br_update() {
+  gbmc_ip_monitor_timer_cancel gbmc-br-gw-src-br-update
   # Several BMCs on gbmcbr can advertise routes with the same metric, offset
   # them by the rank of their gateway so they don't replace each other
   local -A gw_rank=()
@@ -812,12 +872,13 @@ gbmc_br_gw_src_br_update() {
       echo "Remove preferred src from bridge RA: $primary_ip_from_br" >&2
       primary_ip_from_br=""
     fi
-    gbmc_br_gw_src_update
+    gbmc_br_gw_src_update_later
   fi
 }
 
 gbmc_br_gw_src_hook() {
   local br_route_regex='^[0-9a-f:]+/124 .*dev gbmcbr( |$)'
+  gbmc_br_gw_src_rt_invalidate || true
   # shellcheck disable=SC2154
   if [[ $change == init || $change == defer ]]; then
     if [[ $change == init ]]; then
@@ -832,9 +893,13 @@ gbmc_br_gw_src_hook() {
   # update at most once a second.
   elif [[ $change == rule ]]; then
     [[ $rule == *'from '* && $rule != *'from all '* ]] || return 0
-    gbmc_ip_monitor_timer gbmc-br-gw-src-rule 1
-  elif [[ $change == timer && $timer == gbmc-br-gw-src-rule ]]; then
+    gbmc_br_gw_src_update_later
+  elif [[ $change == timer && $timer == gbmc-br-gw-src-update ]]; then
     gbmc_br_gw_src_update
+  elif [[ $change == timer && $timer == gbmc-br-gw-src-adv-update ]]; then
+    gbmc_br_gw_src_adv_update
+  elif [[ $change == timer && $timer == gbmc-br-gw-src-br-update ]]; then
+    gbmc_br_gw_src_br_update
   elif [[ $change == timer && $timer == gbmc-br-gw-src-adv ]]; then
     gbmc_br_gw_src_adv_update
   elif [[ $change == timer && $timer == gbmc-br-gw-src-br ]]; then
@@ -842,8 +907,9 @@ gbmc_br_gw_src_hook() {
       gbmc_br_gw_src_br_forget
     gbmc_br_gw_src_br_update
   elif [[ $change == link ]]; then
-    # Routes going linkdown don't generate route events
-    gbmc_br_gw_src_adv_update
+    # Routes going linkdown don't generate route events. Link events come in
+    # bursts and the update runs `ip route show`, so batch them.
+    gbmc_br_gw_src_adv_update_later
   # We only want to match default gateway routes that are dynamic
   # (have an expiration time). These will be updated with our preferred
   # source.
@@ -875,14 +941,14 @@ gbmc_br_gw_src_hook() {
     # ignore the primary route as this script fully controls it
     if [[ $route == *" metric $GBMC_ROUTE_METRIC_PRIMARY "* ]]; then
       gbmc_br_gw_src_conf_check "$action" "$route" || true
-      gbmc_br_gw_src_adv_update
+      gbmc_br_gw_src_adv_update_later
       return
     fi
     # ignore RA from systemd on standard RA
     [[ $route == *" proto ra "* && $route == *" dev l2br "* ]] && return
     # ignore dead route and linkdown route
     if [[ $route == *" dead "* || $route == *" linkdown "* ]]; then
-      gbmc_br_gw_src_adv_update
+      gbmc_br_gw_src_adv_update_later
       return
     fi
 
@@ -920,20 +986,20 @@ gbmc_br_gw_src_hook() {
       # Put back by its owner (e.g. a networkd reconfigure) while still
       # without a source, disable it again
       unset 'gbmc_br_gw_src_disabled[$route]'
-      gbmc_br_gw_src_update
+      gbmc_br_gw_src_update_later
     elif [[ $action == del && -n ${gbmc_br_gw_src_disabled["$route"]-} ]]; then
       # Our own removal
       return 0
     elif [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
       gbmc_br_gw_src_routes["$route"]=1
-      gbmc_br_gw_src_update
+      gbmc_br_gw_src_update_later
       gbmc_br_set_router
     elif [[ $action == del && -n "${gbmc_br_gw_src_routes["$route"]}" ]]; then
       if [[ $route =~ ' src '([^ ]+) ]]; then
         gbmc_br_config_primary_ip "$route" "del"
       fi
       unset 'gbmc_br_gw_src_routes[$route]'
-      gbmc_br_gw_src_update
+      gbmc_br_gw_src_update_later
       gbmc_br_set_router
     fi
   # Match only global IP addresses on the bridge that are non-ULA addresses.
@@ -961,6 +1027,7 @@ gbmc_br_gw_src_hook() {
       gbmc_br_gw_src_ips["$ip"]="$non_zero"
     elif [[ $action == del ]]; then
       unset 'gbmc_br_gw_src_ips[$ip]'
+      unset 'gbmc_br_gw_src_rt_cache[$ip]'
       # The kernel will remove source addresses on routes if none of the interfaces
       # have the source address any longer. Just assume it is pruned and
       # it will end up getting fixed later.
@@ -975,9 +1042,9 @@ gbmc_br_gw_src_hook() {
         fi
       done
     fi
-    gbmc_br_gw_src_update
+    gbmc_br_gw_src_update_later
     # Our sources for the routes through the head might have changed
-    gbmc_br_gw_src_br_update
+    gbmc_br_gw_src_br_update_later
   # check route on gbmcbr with /124 address
   elif [[ $change == route && $route =~ $br_route_regex ]]; then
     local brpfx="${route%%/124 *}"

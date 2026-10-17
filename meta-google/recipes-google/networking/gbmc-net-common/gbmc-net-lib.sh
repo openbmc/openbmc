@@ -352,8 +352,25 @@ _gbmc_net_networkd_reload_action() {
   return 1
 }
 
+# Set by long running event loops (gbmc-ip-monitor) to run the reloads in
+# the background instead of waiting for them, as `networkctl reload` and the
+# systemd round-trips can take seconds at boot. _gbmc_net_service_reload()
+# still serializes and coalesces them: the child takes its ticket after the
+# caller wrote the files it reloads for, so the batch covering it reads them.
+GBMC_NET_RELOAD_ASYNC=
+
+# Runs _gbmc_net_service_reload() with the arguments, in the background if
+# GBMC_NET_RELOAD_ASYNC is set.
+_gbmc_net_service_reload_maybe_async() {
+  if [[ -n $GBMC_NET_RELOAD_ASYNC ]]; then
+    _gbmc_net_service_reload "$@" &
+    return 0
+  fi
+  _gbmc_net_service_reload "$@"
+}
+
 _gbmc_net_networkd_reload_exec() {
-  _gbmc_net_service_reload "networkd" _gbmc_net_networkd_reload_action "$@"
+  _gbmc_net_service_reload_maybe_async "networkd" _gbmc_net_networkd_reload_action "$@"
 }
 
 _gbmc_net_nftables_reload_action() {
@@ -370,7 +387,7 @@ _gbmc_net_nftables_reload_action() {
 }
 
 _gbmc_net_nftables_reload_exec() {
-  _gbmc_net_service_reload "nftables" _gbmc_net_nftables_reload_action "$@"
+  _gbmc_net_service_reload_maybe_async "nftables" _gbmc_net_nftables_reload_action "$@"
 }
 
 GBMC_INTF_ROUTE_TABLE_BASE=1000

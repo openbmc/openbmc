@@ -91,6 +91,40 @@ testCrossProcessServiceReloadCoalesce() {
   rm -rf "$test_dir" "$TEST_RELOAD_DIR"
 }
 
+testReloadAsync() {
+  rm -rf "$TEST_RELOAD_DIR"
+  local test_dir
+  test_dir="$(mktemp -d)"
+  local saved
+  saved="$(declare -f _gbmc_net_networkd_reload_action)"
+  # Records the interfaces of each batch once the caller let go of it
+  _gbmc_net_networkd_reload_action() {
+    shift
+    while [[ ! -e $test_dir/go ]]; do sleep 0.05; done
+    echo "${*:-none}" >>"$test_dir/batches"
+  }
+
+  GBMC_NET_RELOAD_ASYNC=1
+  # Doesn't wait for the reload
+  gbmc_net_reload_queue_start
+  gbmc_net_networkd_reload eth0
+  gbmc_net_reload_queue_end || fail
+  [[ ! -e $test_dir/batches ]] || fail
+  gbmc_net_networkd_reload eth1 || fail
+  touch "$test_dir/go"
+  wait
+  GBMC_NET_RELOAD_ASYNC=
+
+  # Every request is covered, by at most one batch each
+  local -a batches=()
+  mapfile -t batches <"$test_dir/batches"
+  (( ${#batches[@]} >= 1 && ${#batches[@]} <= 2 )) || fail
+  [[ " ${batches[*]} " == *' eth0 '* && " ${batches[*]} " == *' eth1 '* ]] || fail
+
+  eval "$saved"
+  rm -rf "$test_dir" "$TEST_RELOAD_DIR"
+}
+
 testCrossProcessServiceReloadStatus() {
   rm -rf "$TEST_RELOAD_DIR"
 

@@ -227,71 +227,159 @@ testParseLinkUsb() {
   expect_streq "$carrier" 'UP'
 }
 
-testParseDefer() {
-  GBMC_IP_MONITOR_DEFER_OUTSTANDING=1
-  expect_err 0 gbmc_ip_monitor_parse_line '[DEFER]'
-  expect_streq "$change" 'defer'
-  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
+# Mocks the clock and whether events are pending, see mock_restore
+mock_setup() {
+  mock_saved="$(declare -f gbmc_ip_monitor_uptime_cs gbmc_ip_monitor_input_pending)"
+  mock_cs=10000
+  mock_busy=
+  gbmc_ip_monitor_uptime_cs() {
+    local -n out="$1"
+    # shellcheck disable=SC2034
+    out=$mock_cs
+  }
+  gbmc_ip_monitor_input_pending() {
+    [[ -n $mock_busy ]]
+  }
+  GBMC_IP_MONITOR_TIMERS=()
+  GBMC_IP_MONITOR_IDLE=()
+  GBMC_IP_MONITOR_DEFER_OUTSTANDING=
+  GBMC_IP_MONITOR_HOOKS=()
+  hook_calls=()
+  hook_record() {
+    hook_calls+=("$change${timer:+:$timer}")
+  }
+}
+mock_restore() {
+  GBMC_IP_MONITOR_TIMERS=()
+  GBMC_IP_MONITOR_IDLE=()
+  GBMC_IP_MONITOR_DEFER_OUTSTANDING=
+  GBMC_IP_MONITOR_HOOKS=()
+  eval "$mock_saved"
 }
 
-testParseTimer() {
-  GBMC_IP_MONITOR_TIMERS=([foo]=10 [bar]=20)
-  expect_err 0 gbmc_ip_monitor_parse_line '[TIMER]foo 10'
-  expect_streq "$change" 'timer'
-  expect_streq "$timer" 'foo'
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]-}" ''
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[bar]-}" '20'
-  # Replaced or cancelled timers are ignored
+testParseNoTokens() {
   change=
+  expect_err 2 gbmc_ip_monitor_parse_line '[DEFER]'
   expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 10'
-  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]bar 15'
   expect_streq "$change" ''
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[bar]-}" '20'
-  GBMC_IP_MONITOR_TIMERS=()
+}
+
+testUptime() {
+  local cs s
+  gbmc_ip_monitor_uptime_cs cs || fail
+  gbmc_ip_monitor_uptime s || fail
+  expect_numeq "$s" $(( cs / 100 ))
 }
 
 testTimerArm() {
-  local saved
-  saved="$(declare -f gbmc_ip_monitor_timer_ gbmc_ip_monitor_uptime)"
-  gbmc_ip_monitor_timer_() { :; }
-  gbmc_ip_monitor_uptime() {
-    local -n out="$1"
-    # shellcheck disable=SC2034
-    out=100
-  }
-  GBMC_IP_MONITOR_TIMERS=()
+  mock_setup
+  GBMC_IP_MONITOR_HOOKS=(hook_record)
   gbmc_ip_monitor_timer foo 30
-  wait
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '130'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '13000'
   # A later deadline keeps the pending timer
   gbmc_ip_monitor_timer foo 60
-  wait
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '130'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '13000'
   # An earlier deadline replaces it
   gbmc_ip_monitor_timer foo 10
-  wait
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '110'
-  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 130'
-  expect_err 0 gbmc_ip_monitor_parse_line '[TIMER]foo 110'
-  gbmc_ip_monitor_timer foo 5
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]}" '11000'
+  # Not due yet
+  mock_cs=10999
+  gbmc_ip_monitor_run_due
+  expect_streq "${hook_calls[*]}" ''
+  # Fires on time even with events pending
+  mock_cs=11000
+  mock_busy=1
+  timer=
+  gbmc_ip_monitor_run_due
+  expect_streq "${hook_calls[*]}" 'timer:foo'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[foo]-unset}" 'unset'
+  # Cancelled timers don't fire
+  gbmc_ip_monitor_timer foo 0
   gbmc_ip_monitor_timer_cancel foo
-  wait
-  expect_err 2 gbmc_ip_monitor_parse_line '[TIMER]foo 105'
-  GBMC_IP_MONITOR_TIMERS=()
-  eval "$saved"
+  gbmc_ip_monitor_run_due
+  expect_streq "${hook_calls[*]}" 'timer:foo'
+  mock_restore
+}
+
+testTimerRearm() {
+  mock_setup
+  # Hooks can re-arm the timer that fired, and cancel ones not fired yet
+  hook_rearm() {
+    [[ $change == timer ]] || return 0
+    hook_calls+=("$timer")
+    if [[ $timer == a ]]; then
+      gbmc_ip_monitor_timer a 5
+      gbmc_ip_monitor_timer_cancel b
+      gbmc_ip_monitor_timer_cancel c
+    fi
+  }
+  GBMC_IP_MONITOR_HOOKS=(hook_rearm)
+  GBMC_IP_MONITOR_TIMERS=([a]=9000 [b]=9000 [c]=9000)
+  gbmc_ip_monitor_run_due
+  # Whichever fires first, a always fires and is re-armed
+  [[ " ${hook_calls[*]} " == *' a '* ]] || fail
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[a]}" '10500'
+  mock_restore
+}
+
+testIdle() {
+  mock_setup
+  GBMC_IP_MONITOR_HOOKS=(hook_record)
+  gbmc_ip_monitor_idle foo 1
+  expect_streq "${GBMC_IP_MONITOR_IDLE[foo]}" '10100'
+  gbmc_ip_monitor_idle foo 5
+  expect_streq "${GBMC_IP_MONITOR_IDLE[foo]}" '10100'
+  # Waits for the pending events
+  mock_busy=1
+  timer=
+  gbmc_ip_monitor_run_due
+  expect_streq "${hook_calls[*]}" ''
+  # Fires once they drained
+  mock_busy=
+  gbmc_ip_monitor_run_due
+  expect_streq "${hook_calls[*]}" 'timer:foo'
+  expect_streq "${GBMC_IP_MONITOR_IDLE[foo]-unset}" 'unset'
+  # But no later than its deadline
+  gbmc_ip_monitor_idle bar 1
+  mock_busy=1
+  mock_cs=10100
+  gbmc_ip_monitor_run_due
+  expect_streq "${hook_calls[*]}" 'timer:foo timer:bar'
+  mock_restore
+}
+
+testTimeout() {
+  mock_setup
+  local t
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" ''
+  GBMC_IP_MONITOR_TIMERS=([a]=10500)
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" '5.00'
+  GBMC_IP_MONITOR_IDLE=([b]=10250)
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" '2.50'
+  GBMC_IP_MONITOR_DEFER_OUTSTANDING=1
+  GBMC_IP_MONITOR_DEFER_DUE=10100
+  GBMC_IP_MONITOR_DEFER_LATEST=10300
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" '1.00'
+  # Past the quiet period it waits for the latest deadline
+  mock_cs=10150
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" '1.00'
+  GBMC_IP_MONITOR_IDLE=()
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" '1.50'
+  # Never 0, which `read -t` takes as a poll
+  mock_cs=20000
+  gbmc_ip_monitor_timeout t
+  expect_streq "$t" '0.01'
+  mock_restore
 }
 
 testGrace() {
-  local saved
-  saved="$(declare -f gbmc_ip_monitor_timer_ gbmc_ip_monitor_uptime)"
-  gbmc_ip_monitor_timer_() { :; }
-  test_now=100
-  gbmc_ip_monitor_uptime() {
-    local -n out="$1"
-    # shellcheck disable=SC2034
-    out=$test_now
-  }
-  GBMC_IP_MONITOR_TIMERS=()
+  mock_setup
   declare -gA test_grace=()
   test_expired=()
   test_grace_cb() {
@@ -301,9 +389,9 @@ testGrace() {
 
   gbmc_ip_monitor_grace_start test_grace a 5 test-grace
   expect_streq "${test_grace[a]}" '105'
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '105'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '10500'
   # A pending deadline is kept
-  test_now=102
+  mock_cs=10200
   gbmc_ip_monitor_grace_start test_grace a 5 test-grace
   gbmc_ip_monitor_grace_start test_grace b 5 test-grace
   expect_streq "${test_grace[a]}" '105'
@@ -316,53 +404,48 @@ testGrace() {
   # Nothing expired yet
   gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
   expect_streq "${#test_expired[@]}" '0'
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '103'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '10300'
 
   # Only a expires, the timer is re-armed for b once it fired
-  test_now=105
-  expect_err 0 gbmc_ip_monitor_parse_line '[TIMER]test-grace 103'
+  mock_cs=10500
+  gbmc_ip_monitor_timer_cancel test-grace
   gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
   expect_streq "${test_expired[*]}" 'a'
   expect_streq "${test_grace[a]-unset}" 'unset'
   expect_streq "${test_grace[b]}" '107'
-  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '107'
+  expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]}" '10700'
+
+  # A timer firing in the middle of a second never ends the grace period
+  # early
+  mock_cs=10699
+  gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
+  expect_streq "${test_expired[*]}" 'a'
 
   # Callback failures are ignored, the timer is cancelled once empty
-  test_now=200
+  mock_cs=20000
   gbmc_ip_monitor_grace_expire test_grace test-grace test_grace_cb
   expect_streq "${test_expired[*]}" 'a b'
   expect_streq "${#test_grace[@]}" '0'
   expect_streq "${GBMC_IP_MONITOR_TIMERS[test-grace]-unset}" 'unset'
 
-  wait
-  unset test_grace test_expired test_now
-  GBMC_IP_MONITOR_TIMERS=()
-  eval "$saved"
+  unset test_grace test_expired
+  mock_restore
 }
 
 testReloadCoalesceLive() {
+  mock_setup
   local reload_exec_count=0
   _gbmc_net_networkd_reload_exec() {
     (( reload_exec_count += 1 ))
   }
-
-  gbmc_ip_monitor_defer_() {
-    printf '[DEFER]\n' >&"$GBMC_IP_MONITOR_DEFER"
-  }
-
-  local test_fifo
-  test_fifo="$(mktemp -u)"
-  mkfifo "$test_fifo"
-  exec {GBMC_IP_MONITOR_DEFER}<>"$test_fifo"
-  rm -f "$test_fifo"
+  local refs="$GBMC_NET_RELOAD_REFCOUNT"
 
   gbmc_ip_monitor_init_done=1
-  GBMC_IP_MONITOR_HOOKS=()
-
   hook_reload() {
+    [[ $change == link || $change == addr ]] || return 0
     gbmc_net_networkd_reload "$intf"
   }
-  GBMC_IP_MONITOR_HOOKS+=(hook_reload)
+  GBMC_IP_MONITOR_HOOKS=(hook_reload)
 
   change='link'
   intf=eth0
@@ -371,48 +454,97 @@ testReloadCoalesceLive() {
   expect_streq "$reload_exec_count" '0'
 
   # Burst: another event arrives during deferral window
+  mock_cs=10050
   change=addr
   intf=gbmcbr
   gbmc_ip_monitor_run_hooks
   expect_streq "$reload_exec_count" '0'
+  # Merged into the pending deferral, which keeps its deadlines
+  expect_streq "$GBMC_IP_MONITOR_DEFER_DUE" '10100'
 
-  # Read [DEFER] from FIFO
-  local def_line
-  read -r -u "$GBMC_IP_MONITOR_DEFER" def_line
-  gbmc_ip_monitor_parse_line "$def_line"
-  expect_streq "$change" 'defer'
-  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
-
-  GBMC_IP_MONITOR_HOOKS=()
-  gbmc_ip_monitor_run_hooks
+  # The quiet period isn't over
+  gbmc_ip_monitor_run_due
   expect_streq "$reload_exec_count" '0'
-
-  # End defer queue (simulating while loop handling of change=defer)
-  gbmc_net_reload_queue_end
+  # Over, but more events are pending
+  mock_cs=10100
+  mock_busy=1
+  gbmc_ip_monitor_run_due
+  expect_streq "$reload_exec_count" '0'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
+  # Drained
+  mock_busy=
+  gbmc_ip_monitor_run_due
   expect_streq "$reload_exec_count" '1'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
+  expect_numeq "$GBMC_NET_RELOAD_REFCOUNT" "$refs"
 
-  exec {GBMC_IP_MONITOR_DEFER}>&-
+  # The next batch gets its own deferral, which a backlog only holds back
+  # until its latest deadline
+  change='link'
+  intf=eth1
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
+  mock_busy=1
+  mock_cs=10399
+  gbmc_ip_monitor_run_due
+  expect_streq "$reload_exec_count" '1'
+  mock_cs=10400
+  gbmc_ip_monitor_run_due
+  expect_streq "$reload_exec_count" '2'
+  expect_numeq "$GBMC_NET_RELOAD_REFCOUNT" "$refs"
+  mock_restore
 }
 
-testReloadCoalesceInit() {
+testReloadDeferAfterIdle() {
+  mock_setup
   local reload_exec_count=0
   _gbmc_net_networkd_reload_exec() {
     (( reload_exec_count += 1 ))
   }
-
-  gbmc_ip_monitor_defer_() {
-    printf '[DEFER]\n' >&"$GBMC_IP_MONITOR_DEFER"
+  local refs="$GBMC_NET_RELOAD_REFCOUNT"
+  gbmc_ip_monitor_init_done=1
+  hook_idle_reload() {
+    if [[ $change == timer && $timer == recompute ]]; then
+      gbmc_net_networkd_reload gbmcbr
+    elif [[ $change == link ]]; then
+      gbmc_net_networkd_reload eth0
+      gbmc_ip_monitor_idle recompute 5
+    fi
   }
+  GBMC_IP_MONITOR_HOOKS=(hook_idle_reload)
+  change='link'
+  gbmc_ip_monitor_run_hooks
+  mock_cs=10100
+  # The deferral and the idle request are both due, the reload requested by
+  # the latter is flushed along with the first
+  gbmc_ip_monitor_run_due
+  expect_streq "$reload_exec_count" '1'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
+  expect_numeq "$GBMC_NET_RELOAD_REFCOUNT" "$refs"
 
-  local test_fifo
-  test_fifo="$(mktemp -u)"
-  mkfifo "$test_fifo"
-  exec {GBMC_IP_MONITOR_DEFER}<>"$test_fifo"
-  rm -f "$test_fifo"
+  # An idle request on its own starts a deferral for its reloads
+  timer=
+  gbmc_ip_monitor_idle recompute 5
+  gbmc_ip_monitor_run_due
+  expect_streq "$reload_exec_count" '1'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
+  mock_cs=10200
+  gbmc_ip_monitor_run_due
+  expect_streq "$reload_exec_count" '2'
+  expect_numeq "$GBMC_NET_RELOAD_REFCOUNT" "$refs"
+  mock_restore
+}
+
+testReloadCoalesceInit() {
+  mock_setup
+  local reload_exec_count=0
+  _gbmc_net_networkd_reload_exec() {
+    (( reload_exec_count += 1 ))
+  }
+  systemd-notify() { :; }
 
   gbmc_net_reload_queue_start
   gbmc_ip_monitor_init_done=
-  GBMC_IP_MONITOR_HOOKS=()
 
   hook_init_reload() {
     if [ "$change" = 'link' ]; then
@@ -421,30 +553,65 @@ testReloadCoalesceInit() {
       gbmc_ip_monitor_defer
     fi
   }
-  GBMC_IP_MONITOR_HOOKS+=(hook_init_reload)
+  GBMC_IP_MONITOR_HOOKS=(hook_init_reload)
 
-  change='link'
-  gbmc_ip_monitor_run_hooks
+  gbmc_ip_monitor_handle_line '[LINK]2: eth0: <UP> mtu 1500 state UP' \
+    < <(echo 'link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff')
   expect_streq "$reload_exec_count" '0'
 
-  change=init
-  gbmc_ip_monitor_run_hooks
-  gbmc_ip_monitor_init_done=1
-  gbmc_net_reload_queue_end
+  gbmc_ip_monitor_handle_line '[INIT]'
+  expect_streq "$gbmc_ip_monitor_init_done" '1'
   expect_streq "$reload_exec_count" '0'
   expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
 
-  local def_line
-  read -r -u "$GBMC_IP_MONITOR_DEFER" def_line
-  gbmc_ip_monitor_parse_line "$def_line"
-  expect_streq "$change" 'defer'
-
-  GBMC_IP_MONITOR_HOOKS=()
-  gbmc_ip_monitor_run_hooks
-  gbmc_net_reload_queue_end
+  mock_cs=10100
+  gbmc_ip_monitor_run_due
   expect_streq "$reload_exec_count" '1'
+  unset -f systemd-notify
+  mock_restore
+}
 
-  exec {GBMC_IP_MONITOR_DEFER}>&-
+testLoop() {
+  mock_setup
+  # The real check, on the stream below
+  gbmc_ip_monitor_input_pending() { read -r -t 0; }
+  systemd-notify() { hook_calls+=(ready); }
+  hook_loop() {
+    hook_record
+    [[ $change == init ]] && gbmc_ip_monitor_timer after-init 0
+    [[ $change == link ]] && gbmc_ip_monitor_idle drained 5
+    return 0
+  }
+  GBMC_IP_MONITOR_HOOKS=(hook_loop)
+  gbmc_ip_monitor_init_done=
+  gbmc_net_reload_queue_start
+  timer=
+  gbmc_ip_monitor_loop < <(printf '%s\n' \
+    '[LINK]2: eth0: <UP> mtu 1500 state UP' \
+    '    link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff' \
+    '[LINK]3: eth1: <UP> mtu 1500 state UP' \
+    '    link/ether aa:aa:aa:aa:aa:ab brd ff:ff:ff:ff:ff:ff' \
+    '[INIT]'; sleep 0.5)
+  # The idle request waits for the whole burst
+  expect_streq "${hook_calls[*]}" 'link link init ready timer:after-init timer:drained'
+
+  # A read timeout mid-line at a space boundary must not strip the space
+  local seen_routes=()
+  hook_partial() {
+    [[ $change == route ]] && seen_routes+=("$route")
+  }
+  GBMC_IP_MONITOR_HOOKS=(hook_partial)
+  gbmc_ip_monitor_timer partial-test 0
+  gbmc_ip_monitor_loop < <(
+    printf '[ROUTE]2002:a05:6469:4046:fd02::/80 via '
+    sleep 0.1
+    printf 'fe80::1 dev gbmcbr proto ra metric 1056\n'
+  )
+  expect_streq "${seen_routes[*]}" \
+    '2002:a05:6469:4046:fd02::/80 via fe80::1 dev gbmcbr proto ra metric 1056'
+
+  unset -f systemd-notify
+  mock_restore
 }
 
 testNftablesReloadCoalesceInit() {
@@ -490,64 +657,5 @@ testNftablesReloadCoalesceInit() {
   expect_streq "$net_exec_count" '1'
 }
 
-testCombinedReloadCoalesceLive() {
-  local net_exec_count=0
-  local nft_exec_count=0
-  _gbmc_net_networkd_reload_exec() {
-    (( net_exec_count += 1 ))
-  }
-  _gbmc_net_nftables_reload_exec() {
-    (( nft_exec_count += 1 ))
-  }
-
-  gbmc_ip_monitor_defer_() {
-    printf '[DEFER]\n' >&"$GBMC_IP_MONITOR_DEFER"
-  }
-
-  local test_fifo
-  test_fifo="$(mktemp -u)"
-  mkfifo "$test_fifo"
-  exec {GBMC_IP_MONITOR_DEFER}<>"$test_fifo"
-  rm -f "$test_fifo"
-
-  gbmc_ip_monitor_init_done=1
-  GBMC_IP_MONITOR_HOOKS=()
-
-  hook_combined() {
-    if [ "$change" = 'link' ]; then
-      gbmc_net_networkd_reload "$intf"
-    elif [ "$change" = 'addr' ]; then
-      gbmc_net_nftables_reload
-    fi
-  }
-  GBMC_IP_MONITOR_HOOKS+=(hook_combined)
-
-  change='link'
-  intf=eth0
-  gbmc_ip_monitor_run_hooks
-  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
-  expect_streq "$net_exec_count" '0'
-  expect_streq "$nft_exec_count" '0'
-
-  change='addr'
-  intf=gbmcbr
-  gbmc_ip_monitor_run_hooks
-  expect_streq "$net_exec_count" '0'
-  expect_streq "$nft_exec_count" '0'
-
-  local def_line
-  read -r -u "$GBMC_IP_MONITOR_DEFER" def_line
-  gbmc_ip_monitor_parse_line "$def_line"
-  expect_streq "$change" 'defer'
-
-  GBMC_IP_MONITOR_HOOKS=()
-  gbmc_ip_monitor_run_hooks
-  gbmc_net_reload_queue_end
-
-  expect_streq "$net_exec_count" '1'
-  expect_streq "$nft_exec_count" '1'
-
-  exec {GBMC_IP_MONITOR_DEFER}>&-
-}
 
 main
