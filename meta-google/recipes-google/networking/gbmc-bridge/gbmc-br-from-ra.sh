@@ -148,6 +148,10 @@ gbmc_br_from_ra_pfx_del() {
 # to peer BMCs in the main table ahead of any local uplink From= rule, and the
 # From= rule routes traffic sourced from a peer's RA prefix back through that
 # gateway's gbmcbr routing table.
+#
+# Each address also declares its /80's address label, so networkd puts the
+# label back whenever it reconfigures gbmcbr. We add it to the kernel right
+# away too, and networkd tolerates finding it already there.
 gbmc_br_from_ra_write_conf() {
   local contents=
   local ll
@@ -162,6 +166,7 @@ gbmc_br_from_ra_write_conf() {
     if [[ $second == */* ]]; then
       pfx="$second"
       contents+="[Address]"$'\n'"Address=$first"$'\n'"AddPrefixRoute=no"$'\n'
+      contents+="[IPv6AddressLabel]"$'\n'"Prefix=$pfx"$'\n'"Label=$GBMC_SLAAC_ADDRLABEL"$'\n'
       contents+="[Route]"$'\n'"Destination=$pfx"$'\n'"Metric=$GBMC_ROUTE_METRIC_ONLINK"$'\n'
     else
       pfx="$first"
@@ -216,7 +221,7 @@ gbmc_br_from_ra_addr_expire() {
   addr="$(ip_pfx_concat "$pfx" "$sfx")" || return
   echo "gBMC Bridge RA Addr Del: $addr (pfx $pfx label $GBMC_SLAAC_ADDRLABEL)" >&2
   ip addr del "$addr" dev gbmcbr 2>/dev/null || true
-  ip addrlabel del prefix "$pfx" label "$GBMC_SLAAC_ADDRLABEL" 2>/dev/null || true
+  ip addrlabel del prefix "$pfx" dev gbmcbr label "$GBMC_SLAAC_ADDRLABEL" 2>/dev/null || true
   unset 'gbmc_br_from_ra_prev_addrs[$addr]'
   gbmc_br_from_ra_pfx_del "$pfx" ''
 }
@@ -262,7 +267,7 @@ gbmc_br_from_ra_update() {
       gbmc_br_from_ra_prev_addrs["$addr"]="$rt"
       # Usable right away, networkd takes it over once it reloads
       ip addr replace "$addr" dev gbmcbr noprefixroute
-      ip addrlabel add prefix "$pfx" label "$GBMC_SLAAC_ADDRLABEL" 2>/dev/null || true
+      ip addrlabel add prefix "$pfx" dev gbmcbr label "$GBMC_SLAAC_ADDRLABEL" 2>/dev/null || true
       gbmc_br_from_ra_pfx_add "$pfx" '' "$rt"
     fi
   done
