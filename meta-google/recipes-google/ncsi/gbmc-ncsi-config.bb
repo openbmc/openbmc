@@ -14,6 +14,7 @@ SRC_URI += " \
   file://50-gbmc-ncsi.rules.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.sh.in'} \
   file://gbmc-ncsi-ra@.service \
+  file://gbmc-ncsi-clear-gw@.service \
   file://gbmc-ncsi-ra.sh.in \
   file://gbmc-ncsi-smartnic-wa.sh.in \
   file://gbmc-ncsi-sslh.socket.in \
@@ -101,6 +102,12 @@ do_install:append() {
   ln -sv ../gbmc-ncsi-alias.service "${D}${systemd_system_unitdir}/nic-hostless@$if_name.target.wants"/
   install -d -m0755 "${D}${systemd_system_unitdir}/nic-hostful@$if_name.target.wants"
   ln -sv ../gbmc-ncsi-alias.service "${D}${systemd_system_unitdir}/nic-hostful@$if_name.target.wants"/
+  # Dumb NICs: clear the gateway phosphor-networkd persisted once ncsid
+  # knows the NIC mode, also covering routers gbmc-ncsi-ra@ saw earlier
+  for mode in hostless hostful; do
+    ln -sv ../gbmc-ncsi-clear-gw@.service \
+      "${D}${systemd_system_unitdir}/nic-$mode@$if_name.target.wants"/gbmc-ncsi-clear-gw@$if_name.service
+  done
 
   install -m 0644 ${UNPACKDIR}/gbmc-ncsi-sslh.service ${D}${systemd_system_unitdir}
   sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-sslh.socket.in \
@@ -148,6 +155,7 @@ do_install:append() {
   fi
 
   install -m0644 ${UNPACKDIR}/gbmc-ncsi-ra@.service ${D}${systemd_system_unitdir}
+  install -m0644 ${UNPACKDIR}/gbmc-ncsi-clear-gw@.service ${D}${systemd_system_unitdir}
   install -d -m0755 ${D}${libexecdir}
   sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-ra.sh.in >${WORKDIR}/gbmc-ncsi-ra.sh
   install -m0755 ${WORKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/

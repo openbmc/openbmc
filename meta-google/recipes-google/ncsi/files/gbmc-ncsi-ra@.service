@@ -1,7 +1,8 @@
 [Unit]
 Description=RA Gateway Updater
-Wants=gbmc-ncsi-networkd-wait.target
-After=gbmc-ncsi-networkd-wait.target
+# Doesn't depend on phosphor-networkd: the gateways it persisted for dumb
+# NICs are cleared by gbmc-ncsi-clear-gw@, which we start without waiting.
+After=systemd-networkd.service
 After=ncsid@%i.service
 StartLimitIntervalSec=1min
 StartLimitBurst=5

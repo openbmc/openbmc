@@ -1,0 +1,15 @@
+[Unit]
+Description=Clear the IPv6 gateway phosphor-networkd persisted on %I
+# Pulled in by the nic-hostful@/nic-hostless@ targets ncsid reaches for
+# dumb NICs, and started by gbmc-ncsi-ra@%i.service on router changes.
+# Neither waits for it.
+Wants=gbmc-ncsi-networkd-wait.target
+After=gbmc-ncsi-networkd-wait.target
+
+[Service]
+Type=oneshot
+# Skip when there is nothing to clear or the file is read-only, as
+# phosphor-networkd exits on failure. access(W_OK) fails with EROFS on a
+# read-only fs even for root.
+ExecCondition=/bin/sh -c 'f=/etc/systemd/network/00-bmc-%i.network; grep -q "^Gateway=.*:" "$f" && [ -w "$f" ]'
+ExecStart=/usr/bin/busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/%i xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s ""
