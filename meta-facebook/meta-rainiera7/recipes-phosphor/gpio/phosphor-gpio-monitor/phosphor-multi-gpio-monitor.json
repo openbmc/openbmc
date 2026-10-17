@@ -91,6 +91,174 @@
         "Continue": true
     },
     {
+        "Name": "SOC_DRAM_0_HOT",
+        "LineName": "SOC_DRAM_0_HOT_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "thermal-assert-log@thermtrip-SOC_DRAM_0_HOT_N_CPLD-SOC_DRAM_0_HOT_N_CPLD.service",
+        "Continue": true
+    },
+    {
+        "Name": "SOC_DRAM_1_HOT",
+        "LineName": "SOC_DRAM_1_HOT_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "thermal-assert-log@thermtrip-SOC_DRAM_1_HOT_N_CPLD-SOC_DRAM_1_HOT_N_CPLD.service",
+        "Continue": true
+    },
+    {
+        "Name": "SOC_DRAM_2_HOT",
+        "LineName": "SOC_DRAM_2_HOT_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "thermal-assert-log@thermtrip-SOC_DRAM_2_HOT_N_CPLD-SOC_DRAM_2_HOT_N_CPLD.service",
+        "Continue": true
+    },
+    {
+        "Name": "SOC_DRAM_3_HOT",
+        "LineName": "SOC_DRAM_3_HOT_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "thermal-assert-log@thermtrip-SOC_DRAM_3_HOT_N_CPLD-SOC_DRAM_3_HOT_N_CPLD.service",
+        "Continue": true
+    },
+    {
+        "Name": "SOC_PMBUS_0_ALERT",
+        "LineName": "SOC_PMBUS_0_ALERT_R_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-SOC_PMBUS_0_ALERT_R_CPLD.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-SOC_PMBUS_0_ALERT_R_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SOC_PMBUS_1_ALERT",
+        "LineName": "SOC_PMBUS_1_ALERT_R_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-SOC_PMBUS_1_ALERT_R_CPLD.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-SOC_PMBUS_1_ALERT_R_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+	{
+        "Name": "IRQ_INA230_E1S_1_ALERT",
+        "LineName": "IRQ_INA230_E1S_1_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-IRQ_INA230_E1S_1_ALERT_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-IRQ_INA230_E1S_1_ALERT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IRQ_INA230_P12V_SCM_ALERT",
+        "LineName": "IRQ_INA230_P12V_SCM_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-IRQ_INA230_P12V_SCM_ALERT_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-IRQ_INA230_P12V_SCM_ALERT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IRQ_P3V3_NIC_FLT_MOS",
+        "LineName": "IRQ_P3V3_NIC_FLT_MOS_N_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-IRQ_P3V3_NIC_FLT_MOS_N_CPLD.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-IRQ_P3V3_NIC_FLT_MOS_N_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_SCM_FAULT",
+        "LineName": "P12V_SCM_FAULT_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-P12V_SCM_FAULT_R_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-P12V_SCM_FAULT_R_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "VRHOT_VCPUC1_VCPUMC1",
+        "LineName": "VRHOT_VCPUC1_VCPUMC1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-VRHOT_VCPUC1_VCPUMC1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-VRHOT_VCPUC1_VCPUMC1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "VRHOT_VSYSC0_VSOCC0",
+        "LineName": "VRHOT_VSYSC0_VSOCC0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-VRHOT_VSYSC0_VSOCC0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-VRHOT_VSYSC0_VSOCC0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "VRHOT_VSYSC1_VSOCC1",
+        "LineName": "VRHOT_VSYSC1_VSOCC1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-VRHOT_VSYSC1_VSOCC1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-VRHOT_VSYSC1_VSOCC1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "VRHOT_VCPUC0_VCPUMC0",
+        "LineName": "VRHOT_VCPUC0_VCPUMC0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-VRHOT_VCPUC0_VCPUMC0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-VRHOT_VCPUC0_VCPUMC0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "ID_RST_BTN_BMC_R_N",
         "LineName": "ID_RST_BTN_BMC_R_N",
         "EventMon": "BOTH",
