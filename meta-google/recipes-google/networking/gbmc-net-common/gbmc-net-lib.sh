@@ -595,12 +595,14 @@ _gbmc_net_reload_for_paths() {
 # Writes contents to files unless they already hold them, or removes the
 # files when the contents are empty, and reloads networkd or nftables when a
 # file under systemd/network or nftables changed. Use it for every networkd
-# (.network, .netdev, .link and drop-ins) and nftables file we generate.
-# Unchanged files are left alone, as networkd reconfigures the interfaces of
-# every .network file that changed on its next reload. The contents go to a
-# temporary file first, which networkd and nft ignore by its name, so they
-# never read a partial file. A failure on one file doesn't stop the others
-# from being written, nor the reload for those that changed.
+# (.network, .netdev, .link and drop-ins) and nftables file we generate, and
+# for every persistent file. Unchanged files are left alone, as networkd
+# reconfigures the interfaces of every .network file that changed on its next
+# reload. The contents go to a temporary file in the same directory first,
+# which networkd and nft ignore by its name, and are renamed over the file, so
+# readers, and the file left after a power loss, only ever hold the old or the
+# new contents. A failure on one file doesn't stop the others from being
+# written, nor the reload for those that changed.
 # Arguments:
 #   $1: Contents, empty to remove the files
 #   $2+: Paths to the files

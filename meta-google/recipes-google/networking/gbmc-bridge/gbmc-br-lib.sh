@@ -331,7 +331,8 @@ gbmc_br_set_ip() {
     if [ -z "${GBMC_AVOID_RWFS-}" ]; then
       gbmc_net_unmask_and_write /var/google/gbmc-br-ip "$ip" || return
     fi
-    echo "$ip" >/run/gbmc-br-ip || return
+    gbmc_net_write_if_changed "$ip" /run/gbmc-br-ip
+    (( $? < 2 )) || return 1
   else
     local cur_ip
     cur_ip="$(gbmc_br_get_ip)"
