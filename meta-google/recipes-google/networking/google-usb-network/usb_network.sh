@@ -23,6 +23,7 @@ ARGUMENT_LIST=(
     "product-id:"
     "product-name:"
     "host-mac:"
+    "host-mac-idx:"
     "bind-device:"
     "dev-mac:"
     "dev-type:"
@@ -39,6 +40,8 @@ $0 [OPTIONS] [stop|start]
         --product-id USB Product Id for the gadget.
         --product-name Product name string (en) for the gadget.
         --host-mac MAC address of the host part of the connection. Optional.
+        --host-mac-idx Index into the gbmc-mac-config MAC list to use as the
+                       host MAC, overrides --host-mac. Optional.
         --dev-mac MAC address of the device (gadget) part of the connection. Optional.
         --dev-type Type of gadget to instantiate. Default: "eem"
         --bind-device Name of the device to bind, as listed in /sys/class/udc/
@@ -137,6 +140,19 @@ gadget_start() {
     ip link set dev "$IFACE_NAME" up || return
 }
 
+resolve_host_mac_idx() {
+    [[ -n $HOST_MAC_IDX ]] || return 0
+    local macs=()
+    if [[ $HOST_MAC_IDX =~ ^[0-9]+$ ]] &&
+            mapfile -t macs <"$MAC_LIST" &&
+            [[ -n ${macs[HOST_MAC_IDX]-} ]]; then
+        HOST_MAC_ADDR="${macs[HOST_MAC_IDX]}"
+        echo "Using host MAC $HOST_MAC_ADDR from idx $HOST_MAC_IDX" >&2
+    else
+        echo "Failed to get host MAC for idx $HOST_MAC_IDX" >&2
+    fi
+}
+
 gadget_stop() {
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     rm -f "${gadget_dir}/configs/c.1/${DEV_TYPE}.${IFACE_NAME}"
@@ -168,6 +184,8 @@ STR_EN_PRODUCT=""
 DEV_MAC_ADDR=""
 DEV_TYPE="eem"
 HOST_MAC_ADDR=""
+HOST_MAC_IDX=""
+MAC_LIST=${MAC_LIST:-/run/gbmc-mac-config/gbmc-mac-list}
 BIND_DEVICE=""
 ACTION="start"
 GADGET_DIR_NAME=""
@@ -185,6 +203,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --host-mac)
             HOST_MAC_ADDR=$2
+            shift 2
+            ;;
+        --host-mac-idx)
+            HOST_MAC_IDX=$2
             shift 2
             ;;
         --dev-mac)
@@ -275,6 +297,8 @@ else
         echo "Bind device is missing" >&2
         exit 1
     fi
+
+    resolve_host_mac_idx
 
     rc=0
     gadget_start || rc=$?

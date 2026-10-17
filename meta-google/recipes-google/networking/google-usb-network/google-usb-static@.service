@@ -1,0 +1,37 @@
+[Unit]
+Description=USB Gadget %i
+# The UDC is a built-in platform device, so it is present as soon as configfs
+# is mounted. Don't wait on udev, entity-manager or the object mapper.
+DefaultDependencies=no
+Wants=sys-kernel-config.mount
+After=sys-kernel-config.mount systemd-modules-load.service
+# Machines with a bare metal mode add a condition on it, see
+# BMC_USB_GADGETS_BM, instead of waiting for their bare metal setup services
+PartOf=google-usb-static.target
+# Targets only order themselves after the units they want by default when
+# those have default dependencies
+Before=google-usb-static.target
+Conflicts=shutdown.target
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/usr/share/google-usb-network/%i.conf
+ExecStart=/usr/bin/usb_network.sh \
+    --product-id ${PRODUCT_ID} \
+    --product-name ${PRODUCT_NAME} \
+    --bind-device ${BIND_DEVICE} \
+    --dev-type ${DEV_TYPE} \
+    --host-mac ${HOST_MAC} \
+    --host-mac-idx ${HOST_MAC_IDX} \
+    --dev-mac ${DEV_MAC} \
+    --iface-alias ${IFACE_ALIAS} \
+    --no-bridge ${NO_BRIDGE} \
+    --iface-name %i
+ExecStop=/usr/bin/usb_network.sh stop \
+    --dev-type ${DEV_TYPE} \
+    --iface-name %i
+
+[Install]
+WantedBy=google-usb-static.target
