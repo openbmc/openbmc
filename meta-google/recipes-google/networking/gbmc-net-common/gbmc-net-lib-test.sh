@@ -33,6 +33,24 @@ if ! mkdir -p "$TEST_RELOAD_DIR" 2>/dev/null; then
   eval "$(declare -f _gbmc_net_service_reload | sed "s#/run/gbmc-net-reload#$TEST_RELOAD_DIR#g")"
 fi
 
+# Pretend networkd is running unless a test says otherwise
+GBMC_NET_NETWORKD_SOCK="$(mktemp)"
+
+testNetworkdReloadActionNotStarted() {
+  local saved_sock="$GBMC_NET_NETWORKD_SOCK"
+  GBMC_NET_NETWORKD_SOCK=/nonexistent/io.systemd.Network
+  local calls=''
+  systemctl() { calls+="systemctl "; }
+  networkctl() { calls+="networkctl "; }
+  local rc=0
+  _gbmc_net_networkd_reload_action 1 gbmcbr || rc=$?
+  expect_numeq "$rc" 0
+  # Without networkd's socket it doesn't even ask systemd
+  expect_streq "$calls" ''
+  unset -f systemctl networkctl
+  GBMC_NET_NETWORKD_SOCK="$saved_sock"
+}
+
 testCrossProcessServiceReloadCoalesce() {
   rm -rf "$TEST_RELOAD_DIR"
   local test_dir

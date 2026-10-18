@@ -60,7 +60,7 @@ gbmc_net_mask_or_rm() {
     if grep -q " $target " /proc/mounts 2>/dev/null; then
       return 0
     fi
-    echo "Masking RWFS path $target from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Masking RWFS path $target from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     if [ -d "$target" ]; then
       local empty_dir="/run/gbmc-empty-d"
       mkdir -p "$empty_dir"
@@ -69,7 +69,7 @@ gbmc_net_mask_or_rm() {
       mount --bind "$(gbmc_net_mask_file_source "$target")" "$target" || return
     fi
   else
-    echo "Removing path $target from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Removing path $target from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     if grep -q " $target " /proc/mounts 2>/dev/null; then
       umount "$target" 2>/dev/null || true
     fi
@@ -89,7 +89,7 @@ gbmc_net_unmask_and_write() {
   shift
 
   while grep -q " $target " /proc/mounts 2>/dev/null; do
-    echo "Unmasking RWFS path $target from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Unmasking RWFS path $target from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     umount "$target" 2>/dev/null || break
   done
 
@@ -128,7 +128,7 @@ gbmc_net_reload_queue_end() {
   if (( GBMC_NET_RELOAD_REFCOUNT > 0 )); then
     GBMC_NET_RELOAD_REFCOUNT=$(( GBMC_NET_RELOAD_REFCOUNT - 1 ))
   else
-    echo "Reload queue refcount underflow from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Reload queue refcount underflow from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     return 1
   fi
   if (( GBMC_NET_RELOAD_REFCOUNT == 0 )); then
@@ -159,7 +159,7 @@ gbmc_net_networkd_reload() {
   local reconf=""
   (( $# > 0 )) && reconf=" + reconfiguring ($*)"
   if (( GBMC_NET_RELOAD_REFCOUNT > 0 )); then
-    echo "Queuing networkd reload$reconf from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Queuing networkd reload$reconf from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     GBMC_NET_NETWORKD_RELOAD_PENDING=1
     local intf
     for intf in "$@"; do
@@ -167,7 +167,7 @@ gbmc_net_networkd_reload() {
     done
     return 0
   fi
-  echo "Requesting networkd reload$reconf from $(caller 0 2>/dev/null || echo unknown)" >&2
+  echo "Requesting networkd reload$reconf from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
   _gbmc_net_networkd_reload_exec "$@"
 }
 
@@ -176,11 +176,11 @@ gbmc_net_networkd_reload() {
 # Otherwise, triggers an immediate cross-process coalesced reload of nftables.
 gbmc_net_nftables_reload() {
   if (( GBMC_NET_RELOAD_REFCOUNT > 0 )); then
-    echo "Queuing nftables reload from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Queuing nftables reload from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     GBMC_NET_NFTABLES_RELOAD_PENDING=1
     return 0
   fi
-  echo "Requesting nftables reload from $(caller 0 2>/dev/null || echo unknown)" >&2
+  echo "Requesting nftables reload from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
   _gbmc_net_nftables_reload_exec
 }
 
@@ -246,7 +246,7 @@ _gbmc_net_service_reload() {
     echo "$gen"
   ) {mfd}>"$mutex" )"
   if ! [[ "$my_gen" =~ ^[0-9]+$ ]]; then
-    echo "Failed to queue $svc reload from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Failed to queue $svc reload from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     return 1
   fi
 
@@ -254,7 +254,7 @@ _gbmc_net_service_reload() {
   local lfd
   exec {lfd}>"$state_dir/lock"
   if ! flock -x "$lfd"; then
-    echo "Failed to acquire $svc reload lock from $(caller 0 2>/dev/null || echo unknown)" >&2
+    echo "Failed to acquire $svc reload lock from ${BASH_LINENO[0]} ${FUNCNAME[1]-main} ${BASH_SOURCE[1]-unknown}" >&2
     exec {lfd}>&-
     return 1
   fi
@@ -310,6 +310,9 @@ _gbmc_net_service_reload() {
   return "$rc"
 }
 
+# networkd's varlink socket, created when it starts
+GBMC_NET_NETWORKD_SOCK=/run/systemd/netif/io.systemd.Network
+
 _gbmc_net_networkd_reload_action() {
   local gen="$1"
   shift
@@ -317,6 +320,11 @@ _gbmc_net_networkd_reload_action() {
   local retry
   for (( retry = 1; retry <= 10; retry++ )); do
     (( retry == 1 )) || sleep 1
+    # networkd creates its varlink socket when it starts, before it loads the
+    # configs. Without it there is nothing to reload yet. Checking for it
+    # first skips a round-trip to systemd, which stalls for as long as a
+    # daemon-reload runs (~10s at boot on some machines).
+    [[ -e $GBMC_NET_NETWORKD_SOCK ]] || return 0
     local st
     st="$(systemctl is-active systemd-networkd 2>/dev/null || true)"
     if [ "$st" = 'inactive' ]; then
@@ -623,7 +631,8 @@ gbmc_net_write_if_changed() {
       [[ $cur == "$contents" ]] && continue
     fi
     local tmp="$file.tmp.$BASHPID"
-    if mkdir -p "${file%/*}" && printf '%s' "$contents" >"$tmp" &&
+    if { [[ -d ${file%/*} ]] || mkdir -p "${file%/*}"; } &&
+        printf '%s' "$contents" >"$tmp" &&
         mv -f "$tmp" "$file"; then
       changed=1
     else
