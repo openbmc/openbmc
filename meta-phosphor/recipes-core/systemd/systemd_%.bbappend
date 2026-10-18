@@ -70,4 +70,4 @@ ALTERNATIVE_LINK_NAME[init] = "${base_sbindir}/init"
 ALTERNATIVE_PRIORITY[init] ?= "300"
 
 ALTERNATIVE:${PN} += "init"
-ALTERNATIVE_TARGET[init] = "${rootlibexecdir}/systemd/systemd"
+ALTERNATIVE_TARGET[init] = "${nonarch_libdir}/systemd/systemd"
