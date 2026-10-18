@@ -503,7 +503,7 @@ GBMC_BR_RA_GRACE=5
 gbmc_net_route_table_for_intf() {
   local intf="$1"
   local idx=
-  idx="$(cat /sys/class/net/"$intf"/ifindex)" || return
+  read -r idx <"/sys/class/net/$intf/ifindex" || return
   echo $((GBMC_INTF_ROUTE_TABLE_BASE + idx))
 }
 

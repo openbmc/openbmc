@@ -72,7 +72,8 @@ gbmc_ncsi_br_deprecated_ips_update() {
   local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
   local stateless_ip=
   if [ -e /sys/class/net/gbmcbr ]; then
-    local gbmcbr_mac="$(ip link show gbmcbr | tail -n 1 | awk '{print $2}')"
+    local gbmcbr_mac=
+    read -r gbmcbr_mac </sys/class/net/gbmcbr/address || return
     local gbmcbr_eui48="$(mac_to_eui48 "$gbmcbr_mac")"
     stateless_ip="$(ip_pfx_concat "$stateless_pfx/80" "$gbmcbr_eui48")"
     stateless_ip="${stateless_ip%/*}"
@@ -240,11 +241,11 @@ gbmc_ncsi_br_deprecated_ips_hook() {
       gbmc_ip_monitor_defer
     fi
   elif [ "$change" = 'link' -a "$action" = 'add' -a "$intf" = '@NCSI_IF@' ]; then
-    if ip link show '@NCSI_IF@' | grep -q '^ *alias ncsi$'; then
-      gbmc_ncsi_br_deprecated_ips_lastncsi=1
-      gbmc_ip_monitor_defer
-    else
-      gbmc_ncsi_br_deprecated_ips_lastncsi=
+    local alias= lastncsi=
+    read -r alias <"/sys/class/net/@NCSI_IF@/ifalias" 2>/dev/null || true
+    [ "$alias" = 'ncsi' ] && lastncsi=1
+    if [ "$gbmc_ncsi_br_deprecated_ips_lastncsi" != "$lastncsi" ]; then
+      gbmc_ncsi_br_deprecated_ips_lastncsi="$lastncsi"
       gbmc_ip_monitor_defer
     fi
     if [[ "$carrier" == 'UP' ]]; then
@@ -260,7 +261,10 @@ gbmc_ncsi_br_deprecated_ips_hook() {
         break
       fi
     done
-    if [ "$carrier" = 'UP' ] && ip link show "$intf" | grep -q '^ *alias ncsi-usb-side$'; then
+    local alias=
+    if [ "$carrier" = 'UP' ] &&
+        read -r alias <"/sys/class/net/$intf/ifalias" 2>/dev/null &&
+        [ "$alias" = 'ncsi-usb-side' ]; then
       gbmc_ncsi_br_deprecated_ips_add_neighs "$intf"
     fi
   fi

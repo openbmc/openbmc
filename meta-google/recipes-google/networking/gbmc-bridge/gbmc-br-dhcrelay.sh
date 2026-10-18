@@ -30,16 +30,19 @@ gbmc_br_dhcrelay_hook() {
     else
       (( numaddrs -= 1 ))
     fi
-    local svc=
-    svc=gbmc-br-dhcrelay.service
-    file=/run/gbmc-br-dhcrelay/uppers/"$intf"
+    local svc=gbmc-br-dhcrelay.service
+    local dir=/run/gbmc-br-dhcrelay/uppers
+    local file="$dir/$intf"
     if (( numaddrs == 1 )); then
-      mkdir -p "$(dirname "$file")"
+      [[ -d $dir ]] || mkdir -p "$dir"
       printf 'ff02::1:2%%%s' "$intf" >"$file"
       echo "Adding dhcrelay upper $intf" >&2
     elif (( numaddrs == 0 )); then
       rm -f "$file"
       echo "Removing dhcrelay upper $intf" >&2
+    else
+      # The uppers only change when the first address comes or the last goes
+      return 0
     fi
     systemctl reset-failed "$svc"
     systemctl restart --no-block "$svc"

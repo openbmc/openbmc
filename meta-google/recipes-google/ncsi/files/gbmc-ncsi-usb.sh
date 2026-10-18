@@ -26,7 +26,11 @@ gbmc_ncsi_dynamic_hook() {
   local -n numaddrs=gbmc_br_dhcrelay_linkaddrs["$intf"]
   # shellcheck disable=SC2154
   if [[ "$change" = 'link' && "$action" = 'add' ]]; then
-    ip link show "$intf" | grep -q '^ *alias ncsi-usb-side$' || return
+    # Builtins only: this runs for every link added, and short lived ones
+    # (e.g. USB devices udev renames right away) may already be gone
+    local alias=
+    read -r alias 2>/dev/null <"/sys/class/net/$intf/ifalias"
+    [[ $alias == ncsi-usb-side ]] || return
     echo "NCSI USB Link Add $intf" >&2
 
     local contents
