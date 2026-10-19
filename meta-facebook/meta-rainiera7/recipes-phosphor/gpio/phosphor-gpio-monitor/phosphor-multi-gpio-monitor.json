@@ -46,10 +46,10 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "thermal-deassert-log@prochot_SOC_HOT_N_CPLD.service"
+                "thermal-deassert-log@prochot-SOC_HOT_N_CPLD-SOC_HOT_N_CPLD.service"
             ],
             "FALLING": [
-                "thermal-assert-log@prochot_SOC_HOT_N_CPLD.service"
+                "thermal-assert-log@prochot-SOC_HOT_N_CPLD-SOC_HOT_N_CPLD.service"
             ]
         },
         "Continue": true
@@ -261,16 +261,6 @@
         "Targets": {
             "RISING": ["button-event-logger@Released_AC_PWR_BMC_BTN_R_N.service"],
             "FALLING": ["button-event-logger@Pressed_AC_PWR_BMC_BTN_R_N.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "LONG_BTN_EVENT",
-        "LineName": "wLONG_BTN_EVENT",
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["button-event-logger@Released_wLONG_BTN_EVENT.service"],
-            "FALLING": ["button-event-logger@Pressed_wLONG_BTN_EVENT.service"]
         },
         "Continue": true
     },
