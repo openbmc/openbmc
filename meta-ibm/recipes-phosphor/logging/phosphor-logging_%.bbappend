@@ -2,6 +2,9 @@ PACKAGECONFIG:append:ibm-enterprise = " openpower-pels"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
+SRC_URI:append = " file://eventfilter.json"
+EXTRA_OEMESON:append = " -Devent-filter=${UNPACKDIR}/eventfilter.json"
+
 SRC_URI:append:p10bmc = " file://com.ibm.Hardware.Chassis.Model.Rainier2U_dev_callouts.json"
 SRC_URI:append:p10bmc = " file://com.ibm.Hardware.Chassis.Model.Rainier4U_dev_callouts.json"
 SRC_URI:append:p10bmc = " file://com.ibm.Hardware.Chassis.Model.Everest_dev_callouts.json"

@@ -1,0 +1,9 @@
+{
+  "events": {
+    "default": "blocked",
+    "ids": ["xyz.openbmc_project.Logging.Cleared"]
+  },
+  "errors": {
+    "default": "allowed"
+  }
+}
