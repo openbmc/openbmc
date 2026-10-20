@@ -10,14 +10,10 @@ readonly MIN_VOLT=2
 readonly MAX_FLOWRATE=333               # UNIT: LPM
 readonly DEFAULT_FLOWRATE=150           # UNIT: LPM
 readonly VALVE_CONFIG_FILE="/var/lib/valvemonitor/valve-config.json"
+readonly MAX_ATTEMPTS=10
+readonly RETRY_INTERVAL=0.5
 
-BUS=${I2C_DEV%%-*}
 ADDR=${I2C_DEV##*-}
-
-if ! i2cget -y -f "$BUS" "0x$ADDR" 0x00 >/dev/null 2>&1; then
-    echo "[$I2C_DEV] I2C device not responding" >&2
-    exit 1
-fi
 
 flowrate_to_volt() {
     local flowrate="$1"
@@ -35,6 +31,7 @@ declare -A ADDR_MAP=(
 )
 
 FLOWRATE="$DEFAULT_FLOWRATE"
+CONFIG_SOURCE="default"
 
 VALVE_NAME="${ADDR_MAP[$ADDR]}"
 if [ -z "$VALVE_NAME" ]; then
@@ -46,13 +43,19 @@ else
             '.Valves[] | select(.Name == $name) | .FlowRate' \
         "$VALVE_CONFIG_FILE")
     if [[ "$_flowrate" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-        FLOWRATE="$_flowrate"
+        if awk -v flow="$_flowrate" -v max="$MAX_FLOWRATE" \
+            'BEGIN { exit !(flow >= 0 && flow <= max) }'; then
+            FLOWRATE="$_flowrate"
+            CONFIG_SOURCE="config"
+        else
+            echo "[$I2C_DEV] FlowRate '$_flowrate' out of range (0..$MAX_FLOWRATE) for '$VALVE_NAME', using default flowrate: ${DEFAULT_FLOWRATE} LPM" >&2
+        fi
     else
-        echo "[$I2C_DEV] '$VALVE_NAME' not found in $VALVE_CONFIG_FILE, using default flowrate: ${DEFAULT_FLOWRATE} LPM" >&2
+        echo "[$I2C_DEV] Unable to read a single valid FlowRate for '$VALVE_NAME' from '$VALVE_CONFIG_FILE', using default flowrate: ${DEFAULT_FLOWRATE} LPM" >&2
     fi
 fi
-echo "[$I2C_DEV] Flowrate set to: ${FLOWRATE} LPM" >&2
 VOLT=$(flowrate_to_volt "$FLOWRATE")
+echo "[$I2C_DEV] source=$CONFIG_SOURCE valve=$VALVE_NAME flowrate=$FLOWRATE LPM target_volt=$VOLT"
 
 dac_volt_set() {
     local dev="$1" volt="$2"
@@ -67,29 +70,29 @@ dac_volt_set() {
     [ "$raw" -lt 0 ] && raw=0
     echo "[$dev] volt=$volt raw=$raw"
 
-    if ! echo 0 > "$iio/out_voltage0_powerdown" 2>/dev/null; then
-        echo "[$dev] write powerdown failed" >&2
+    if ! echo "$raw" > "$iio/out_voltage0_raw"; then
+        echo "[$dev] Write failed: $iio/out_voltage0_raw value=$raw" >&2
         return 1
     fi
 
-    if ! echo "$raw" > "$iio/out_voltage0_raw" 2>/dev/null; then
-        echo "[$dev] write raw failed" >&2
+    if ! echo 0 > "$iio/out_voltage0_powerdown"; then
+        echo "[$dev] Write failed: $iio/out_voltage0_powerdown value=0" >&2
         return 1
     fi
 
-    echo "[$dev] DAC set request sent"
     return 0
 }
 
-retry=5
-while [ $retry -gt 0 ]; do
+for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
+    echo "[$I2C_DEV] DAC programming attempt=$attempt/$MAX_ATTEMPTS"
     if dac_volt_set "$I2C_DEV" "$VOLT"; then
-        echo "[$I2C_DEV] DAC init success"
+        echo "[$I2C_DEV] DAC programming completed attempt=$attempt"
         exit 0
     fi
-    retry=$((retry - 1))
-    sleep 0.1
+    if ((attempt < MAX_ATTEMPTS)); then
+        sleep "$RETRY_INTERVAL"
+    fi
 done
 
-echo "[$I2C_DEV] DAC init failed after retry" >&2
+echo "[$I2C_DEV] DAC programming failed after $MAX_ATTEMPTS attempts" >&2
 exit 1

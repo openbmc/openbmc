@@ -1,15 +1,15 @@
 # EVT: valve DACs on I2C bus 6
 # OP_SETPOINT1 -> 0x0f
-SUBSYSTEM=="i2c", ACTION=="add", KERNEL=="6-000f", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@%k.service"
+ACTION=="add", SUBSYSTEM=="iio", KERNEL=="iio:device*", SUBSYSTEMS=="i2c", KERNELS=="6-000f", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@6-000f.service"
 # OP_SETPOINT2 -> 0x0c
-SUBSYSTEM=="i2c", ACTION=="add", KERNEL=="6-000c", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@%k.service"
+ACTION=="add", SUBSYSTEM=="iio", KERNEL=="iio:device*", SUBSYSTEMS=="i2c", KERNELS=="6-000c", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@6-000c.service"
 # OP_SETPOINT3 -> 0x0e
-SUBSYSTEM=="i2c", ACTION=="add", KERNEL=="6-000e", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@%k.service"
+ACTION=="add", SUBSYSTEM=="iio", KERNEL=="iio:device*", SUBSYSTEMS=="i2c", KERNELS=="6-000e", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@6-000e.service"
 
 # PVT: valve DACs on I2C bus 3
 # OP_SETPOINT1 -> 0x0f
-SUBSYSTEM=="i2c", ACTION=="add", KERNEL=="3-000f", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@%k.service"
+ACTION=="add", SUBSYSTEM=="iio", KERNEL=="iio:device*", SUBSYSTEMS=="i2c", KERNELS=="3-000f", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@3-000f.service"
 # OP_SETPOINT2 -> 0x0c
-SUBSYSTEM=="i2c", ACTION=="add", KERNEL=="3-000c", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@%k.service"
+ACTION=="add", SUBSYSTEM=="iio", KERNEL=="iio:device*", SUBSYSTEMS=="i2c", KERNELS=="3-000c", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@3-000c.service"
 # OP_SETPOINT3 -> 0x0e
-SUBSYSTEM=="i2c", ACTION=="add", KERNEL=="3-000e", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@%k.service"
+ACTION=="add", SUBSYSTEM=="iio", KERNEL=="iio:device*", SUBSYSTEMS=="i2c", KERNELS=="3-000e", TAG+="systemd", ENV{SYSTEMD_WANTS}+="valve-dac-init@3-000e.service"

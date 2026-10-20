@@ -4,4 +4,5 @@ Description=Valve DAC output voltage init (%i)
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/plat-svc/valve-dac-init %i
+TimeoutStartSec=15s
 RemainAfterExit=yes
