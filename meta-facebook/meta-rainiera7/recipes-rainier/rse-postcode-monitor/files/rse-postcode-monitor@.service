@@ -3,12 +3,16 @@ Description=RSE postcode monitor (%i)
 After=dbus.service
 Requires=dbus.service
 Before=obmc-host-start-pre@0.target
+Conflicts=obmc-host-stopped@0.target
+Before=obmc-host-stopped@0.target
 
 [Service]
 Type=simple
+RemainAfterExit=yes
 EnvironmentFile=-/etc/default/rse-postcode-monitor.env
 EnvironmentFile=-/etc/default/rse-postcode-monitor-%i.env
 ExecStart=/usr/libexec/rse-postcode-monitor/rse-postcode-monitor.sh %i
+ExecStopPost=/usr/libexec/rse-postcode-monitor/rse-postcode-monitor.sh %i stop
 
 [Install]
 WantedBy=obmc-host-start-pre@0.target
