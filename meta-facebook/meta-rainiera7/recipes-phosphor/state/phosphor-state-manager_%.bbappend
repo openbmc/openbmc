@@ -8,8 +8,7 @@ PACKAGECONFIG:append = " host-gpio"
 
 # NOTE: The Yv5 SCM shares the blade/chassis standby power rail.
 # As a result, the chassis is always powered on and does not support
-# independent chassis power on/off control; only chassis power cycle
-# is supported.
+# independent chassis power on/off control; only chassis power cycle is supported.
 
 # Chassis ON
 CHASSIS_DEFAULT_TARGETS:remove = " \
@@ -51,8 +50,6 @@ HOST_DEFAULT_TARGETS:append = " \
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
     obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
-    obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
-    obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     obmc-host-graceful-quiesce@{}.target.wants/pldmSoftPowerOff.service \
     obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
     obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
@@ -121,7 +118,7 @@ SRC_URI:append = " \
     file://power-cmd \
     file://phosphor-state-manager-init \
     file://phosphor-state-manager-init.conf \
-    "
+"
 
 RDEPENDS:${PN}:append = " bash"
 

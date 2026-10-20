@@ -17,19 +17,16 @@ SYSTEMD_SERVICE:${PN}:append = " \
     mctp_init.service \
     mctp_remove@.service \
     mctp_setup@.service \
+    rainier-mctp-i3c@0.service \
 "
 
 FILES:${PN}:append = " \
     ${systemd_system_unitdir}/rainier-mctp-i3c@.service \
 "
 
-FILES:${PN}:append = " \
-    ${systemd_system_unitdir}/rainier-mctp-i3c@.service \
-"
+RDEPENDS:${PN}:append = " bash"
 
-RDEPENDS:${PN}:append = "bash"
-
-do_install:append () {
+do_install:append() {
     install -d ${D}${libexecdir}/mctp
     install -m 0755 ${UNPACKDIR}/*.sh ${D}${libexecdir}/mctp
 

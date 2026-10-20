@@ -1,5 +1,10 @@
 [Unit]
 Description=Host Power Reset: %i
+Wants=obmc-host-stop@%i.target
+Wants=obmc-host-stopped@%i.target
+After=obmc-host-stop@%i.target
+After=obmc-host-stopped@%i.target
+Before=phosphor-reboot-host@%i.service
 
 [Service]
 Type=oneshot
