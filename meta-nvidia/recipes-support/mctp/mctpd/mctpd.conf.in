@@ -5,4 +5,4 @@
 # A value of 0 disables polling.
 # Valid values are between [0.5 * T_RECLAIM, 10] seconds.
 # T_RECLAIM for MCTP USB Binding is 5 seconds.
-endpoint_poll_ms = 2500
+endpoint_poll_ms = @MCTPD_POLL_INTERVAL_MS@
