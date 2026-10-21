@@ -1,5 +1,7 @@
 inherit uboot-config
 
+UBOOT_ARCH = "${@oe.kernel.map_uboot_arch(d)}"
+
 CONVERSIONTYPES += "fitImage"
 
 CONVERSION_CMD:fitImage = "run_assemble_fitimage ${IMAGE_NAME}.${type}"
