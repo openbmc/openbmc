@@ -196,7 +196,7 @@ RDEPENDS:${PN}-user-mgmt-ldap = " \
 SUMMARY:${PN}-dmtf-pmci = "DMTF PMCI Protocol Implementations"
 RDEPENDS:${PN}-dmtf-pmci = ""
 RDEPENDS:${PN}-dmtf-pmci:append:df-pldm = " pldm"
-RDEPENDS:${PN}-dmtf-pmci:append:df-mctp = " mctp"
+RDEPENDS:${PN}-dmtf-pmci:append:df-mctp = " mctp mctpd"
 
 SUMMARY:${PN}-dmtf-spdm = "DMTF SPDM Implementations"
 RDEPENDS:${PN}-dmtf-spdm = ""
