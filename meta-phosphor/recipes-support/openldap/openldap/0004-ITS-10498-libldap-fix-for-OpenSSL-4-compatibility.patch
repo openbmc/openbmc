@@ -1,0 +1,160 @@
+From 6ce8cda841209334577db5a179bf95513c667090 Mon Sep 17 00:00:00 2001
+From: Howard Chu <hyc@openldap.org>
+Date: Thu, 22 Oct 2026 12:42:26 +0530
+Subject: [PATCH 4/4] ITS-10498-libldap-fix-for-OpenSSL-4-compatibility
+
+Upstream-Status: Backport [https://github.com/openldap/openldap/commit/8db14ac862bd9730851a280007a899c113b7958d]
+Signed-off-by: Vijaysankar Ravi <vijaysankarr@ami.com>
+---
+ libraries/libldap/tls_o.c       | 53 ++++++++++++++++++---------------
+ servers/slapd/overlays/autoca.c |  7 ++++-
+ 2 files changed, 35 insertions(+), 25 deletions(-)
+
+diff --git a/libraries/libldap/tls_o.c b/libraries/libldap/tls_o.c
+index cad42f8..8d247e1 100644
+--- a/libraries/libldap/tls_o.c
++++ b/libraries/libldap/tls_o.c
+@@ -194,8 +194,8 @@ tlso_ca_list( char * bundle, char * dir, X509 *cert )
+ 		ldap_charray_free( dirs );
+ 	}
+ 	if ( cert ) {
+-		X509_NAME *xn = X509_get_subject_name( cert );
+-		xn = X509_NAME_dup( xn );
++		const X509_NAME *cxn = X509_get_subject_name( cert );
++		X509_NAME *xn = X509_NAME_dup( cxn );
+ 		if ( !ca_list )
+ 			ca_list = sk_X509_NAME_new_null();
+ 		if ( xn && ca_list )
+@@ -751,7 +751,7 @@ tlso_session_my_dn( tls_session *sess, struct berval *der_dn )
+ {
+ 	tlso_session *s = (tlso_session *)sess;
+ 	X509 *x;
+-	X509_NAME *xn;
++	const X509_NAME *xn;
+ 
+ 	x = SSL_get_certificate( s );
+ 
+@@ -788,7 +788,7 @@ tlso_session_peer_dn( tls_session *sess, struct berval *der_dn )
+ {
+ 	tlso_session *s = (tlso_session *)sess;
+ 	X509 *x = tlso_get_cert( s );
+-	X509_NAME *xn;
++	const X509_NAME *xn;
+ 
+ 	if ( !x )
+ 		return LDAP_INVALID_CREDENTIALS;
+@@ -864,7 +864,7 @@ tlso_session_chkhost( LDAP *ld, tls_session *sess, const char *name_in )
+ 		X509_EXTENSION *ex;
+ 		STACK_OF(GENERAL_NAME) *alt;
+ 
+-		ex = X509_get_ext(x, i);
++		ex = (X509_EXTENSION *)X509_get_ext(x, i);
+ 		alt = X509V3_EXT_d2i(ex);
+ 		if (alt) {
+ 			int n, len2 = 0;
+@@ -967,10 +967,12 @@ tlso_session_chkhost( LDAP *ld, tls_session *sess, const char *name_in )
+ 	}
+ 
+ 	if (ret != LDAP_SUCCESS) {
+-		X509_NAME *xn;
+-		X509_NAME_ENTRY *ne;
++		const X509_NAME *xn;
++		const X509_NAME_ENTRY *ne;
+ 		ASN1_OBJECT *obj;
+-		ASN1_STRING *cn = NULL;
++		const ASN1_STRING *cn = NULL;
++		char *cnstr;
++		int cnlen;
+ 		int navas;
+ 
+ 		/* find the last CN */
+@@ -998,22 +1000,25 @@ no_cn:
+ 			}
+ 			ld->ld_error = LDAP_STRDUP(
+ 				_("TLS: unable to get CN from peer certificate"));
++		} else {
++			cnlen = ASN1_STRING_length( cn );
++			cnstr = (char *)ASN1_STRING_get0_data( cn );
++			if ( cnlen == nlen &&
++				strncasecmp( name, (char *) cnstr, nlen ) == 0 ) {
++				ret = LDAP_SUCCESS;
+ 
+-		} else if ( cn->length == nlen &&
+-			strncasecmp( name, (char *) cn->data, nlen ) == 0 ) {
+-			ret = LDAP_SUCCESS;
+-
+-		} else if (( cn->data[0] == '*' ) && ( cn->data[1] == '.' )) {
+-			char *domain = strchr(name, '.');
+-			if( domain ) {
+-				int dlen;
++			} else if (( cnstr[0] == '*' ) && ( cnstr[1] == '.' )) {
++				char *domain = strchr(name, '.');
++				if( domain ) {
++					int dlen;
+ 
+-				dlen = nlen - (domain-name);
++					dlen = nlen - (domain-name);
+ 
+-				/* Is this a wildcard match? */
+-				if ((dlen == cn->length-1) &&
+-					!strncasecmp(domain, (char *) &cn->data[1], dlen)) {
+-					ret = LDAP_SUCCESS;
++					/* Is this a wildcard match? */
++					if ((dlen == cnlen-1) &&
++						!strncasecmp(domain, cnstr+1, dlen)) {
++						ret = LDAP_SUCCESS;
++					}
+ 				}
+ 			}
+ 		}
+@@ -1021,7 +1026,7 @@ no_cn:
+ 		if( ret == LDAP_LOCAL_ERROR ) {
+ 			Debug3( LDAP_DEBUG_ANY, "TLS: hostname (%s) does not match "
+ 				"common name in certificate (%.*s).\n", 
+-				name, cn->length, cn->data );
++				name, cnlen, cnstr );
+ 			ret = LDAP_CONNECT_ERROR;
+ 			if ( ld->ld_error ) {
+ 				LDAP_FREE( ld->ld_error );
+@@ -1561,8 +1566,8 @@ tlso_verify_cb( int ok, X509_STORE_CTX *ctx )
+ 	X509 *cert;
+ 	int errnum;
+ 	int errdepth;
+-	X509_NAME *subject;
+-	X509_NAME *issuer;
++	const X509_NAME *subject;
++	const X509_NAME *issuer;
+ 	char *sname;
+ 	char *iname;
+ 	char *certerr = NULL;
+diff --git a/servers/slapd/overlays/autoca.c b/servers/slapd/overlays/autoca.c
+index a99a93a..3eee6a8 100644
+--- a/servers/slapd/overlays/autoca.c
++++ b/servers/slapd/overlays/autoca.c
+@@ -44,9 +44,13 @@
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x10100000
+ #include <openssl/rsa.h>
++#ifndef X509_get_notBefore
+ #define X509_get_notBefore(x)	X509_getm_notBefore(x)
++#endif
++#ifndef X509_get_notAfter
+ #define X509_get_notAfter(x)	X509_getm_notAfter(x)
+ #endif
++#endif
+ 
+ #if OPENSSL_VERSION_MAJOR >= 3
+ #define BN_pseudo_rand(bn, bits, top, bottom)	BN_rand(bn, bits, top, bottom)
+@@ -272,7 +276,8 @@ typedef struct genargs {
+ 
+ static int autoca_gencert( Operation *op, genargs *args )
+ {
+-	X509_NAME *subj_name, *issuer_name;
++	X509_NAME *subj_name;
++	const X509_NAME *issuer_name;
+ 	X509 *subj_cert;
+ 	struct berval derdn;
+ 	unsigned char *pp;
+-- 
+2.43.0
+
