@@ -5,8 +5,11 @@ SRC_URI += " \
     file://setup-local-eid \
 "
 
-RDEPENDS:${PN} += " bash"
-FILES:${PN} += "${systemd_system_unitdir}/*"
+RDEPENDS:${PN} += " bash mctp"
+FILES:${PN}:append = " \
+    ${systemd_system_unitdir}/* \
+    ${libexecdir}/mctp \
+"
 
 do_install:append () {
     override_dir=${D}${systemd_system_unitdir}/mctpd.service.d
@@ -23,7 +26,9 @@ do_install:append () {
 # it for mctp-usb devices by adding another link file.
 SRC_URI:append:clemente = "file://80-mctp-usb.link "
 
-FILES:${PN}:append:clemente = " ${systemd_unitdir}"
+FILES:${PN}:append:clemente = " \
+    ${systemd_unitdir} \
+"
 
 do_install:append:clemente() {
     install -d 0755 ${D}${systemd_unitdir}/network

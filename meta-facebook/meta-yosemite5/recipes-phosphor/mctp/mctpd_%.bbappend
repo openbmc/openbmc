@@ -3,35 +3,29 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 inherit systemd
 
 SRC_URI:append = " \
-    file://mctpd.conf \
     file://mctp_init.service \
     file://mctp_init.sh \
     file://mctp_remove@.service \
     file://mctp_setup@.service \
     file://mctp_setup.sh \
-    file://rainier-mctp-i3c@.service \
-    file://rainier-mctp-i3c.sh \
 "
 
 SYSTEMD_SERVICE:${PN}:append = " \
     mctp_init.service \
     mctp_remove@.service \
     mctp_setup@.service \
-    rainier-mctp-i3c@0.service \
 "
 
 FILES:${PN}:append = " \
-    ${systemd_system_unitdir}/rainier-mctp-i3c@.service \
+    ${systemd_system_unitdir}/* \
+    ${libexecdir}/mctp \
 "
 
-RDEPENDS:${PN}:append = " bash"
+RDEPENDS:${PN}:append = " bash mctp"
 
-do_install:append() {
+do_install:append () {
     install -d ${D}${libexecdir}/mctp
     install -m 0755 ${UNPACKDIR}/*.sh ${D}${libexecdir}/mctp
-
-    install -d ${D}${sysconfdir}
-    install -m 0644 ${UNPACKDIR}/mctpd.conf ${D}${sysconfdir}/mctpd.conf
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}

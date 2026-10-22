@@ -10,11 +10,13 @@ SRC_URI:append = " \
     file://sma-mctp-eid-config@.service \
     "
 
-RDEPENDS:${PN} += " bash"
+RDEPENDS:${PN} += " bash mctp"
 
 FILES:${PN}:append = " \
     ${systemd_unitdir}/network/80-mctp-usb.link \
     ${systemd_system_unitdir}/sma-mctp-eid-config@.service \
+    ${libexecdir}/mctp \
+    ${sysconfdir}/udev/rules.d/* \
     "
 
 SYSTEMD_SERVICE_FMT = "sma-mctp-eid-config@{0}.service"

@@ -5,8 +5,11 @@ SRC_URI += " \
     file://setup-local-eid \
 "
 
-RDEPENDS:${PN} += " bash"
-FILES:${PN} += "${systemd_system_unitdir}/*"
+RDEPENDS:${PN} += " bash mctp"
+FILES:${PN}:append = " \
+    ${systemd_system_unitdir}/* \
+    ${libexecdir}/mctp \
+"
 
 do_install:append () {
     override_dir=${D}${systemd_system_unitdir}/mctpd.service.d
