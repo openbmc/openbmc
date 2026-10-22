@@ -10,6 +10,7 @@ S = "${UNPACKDIR}/sources"
 RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "fb-common-functions"
+RDEPENDS:${PN} += "platform-common-functions"
 
 # udev rules
 SRC_URI:append = " \

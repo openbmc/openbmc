@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-sanmiguel/recipes-sanmiguel/plat-tools/files/platform-common-functions
+source /usr/libexec/platform-common-functions
 
 MCTP_INTF=$1
 MAX_RETRIES=60
@@ -160,10 +162,20 @@ learn_iob_downstream_eid() {
 }
 
 learn_clover_downstream_eid() {
-    local rc=0
+    local eid i
 
-    learn_eid "$((MCTP_EID + 2))" || rc=$?  # NIC
-    return $rc
+    # The slot holds a Clover CX9 or a BlueField-4 with different NIC EIDs;
+    # wait for EM to probe the slot FRU, then learn the matching one.
+    for ((i=1; i<=MAX_RETRIES; i++)); do
+        if eid=$(plat_get_ns_nic_eid); then
+            learn_eid "$eid"
+            return
+        fi
+        sleep "$RETRY_DELAY"
+    done
+
+    echo "ERROR: Bay C slot card not identified (no Clover/BlueField-4 inventory)."
+    return 1
 }
 
 success=false

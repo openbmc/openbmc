@@ -11,6 +11,7 @@ SRC_URI:append = " \
     "
 
 RDEPENDS:${PN} += " bash mctp"
+RDEPENDS:${PN} += " platform-common-functions"
 
 FILES:${PN}:append = " \
     ${systemd_unitdir}/network/80-mctp-usb.link \

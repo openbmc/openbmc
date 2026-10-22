@@ -125,3 +125,27 @@ wait_gpios_value()
     echo "------------------------------------------------"
     return 1
 }
+
+# The Bay C slot (SMA bridge EID 70) holds either a Clover CX9 or a
+# BlueField-4. Identify it from the EM inventory created by its FRU probe.
+plat_get_ns_nic_type()
+{
+    local board="/xyz/openbmc_project/inventory/system/board"
+
+    if mapper get-service "${board}/NVIDIA_VR_NVL72_Clover" >/dev/null 2>&1; then
+        echo "clover"
+    elif mapper get-service "${board}/NVIDIA_VR_NVL72_BlueField4" >/dev/null 2>&1; then
+        echo "bf4"
+    else
+        return 1
+    fi
+}
+
+plat_get_ns_nic_eid()
+{
+    case "$(plat_get_ns_nic_type)" in
+        clover) echo 72 ;;
+        bf4)    echo 71 ;;
+        *)      return 1 ;;
+    esac
+}
