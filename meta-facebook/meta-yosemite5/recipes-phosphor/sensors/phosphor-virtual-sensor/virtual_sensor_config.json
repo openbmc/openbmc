@@ -31,12 +31,34 @@
                         "Name": "PDB_FAN_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
-                }
-            ],
-            "ConstParam": [
+                },
                 {
-                    "ParamName": "fan_imp",
-                    "Value": 0.1875
+                    "ParamName": "PDB_BRICK0_TEMP_C",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK0_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK1_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK1_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK2_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK2_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
                 }
             ]
         },
@@ -44,6 +66,8 @@
             "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
             "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
             "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "var BRICK_EXIST:=maxIgnoreNaN(PDB_BRICK0_TEMP_C, PDB_BRICK0_VOUT_VOLT_V, PDB_BRICK1_VOUT_VOLT_V, PDB_BRICK2_VOUT_VOLT_V);",
+            "var fan_imp:=ifNan(BRICK_EXIST * 0 + 0.1875, 0.1464);",
             "switch {",
             "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
             "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
@@ -121,12 +145,34 @@
                         "Name": "PDB_FAN_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
-                }
-            ],
-            "ConstParam": [
+                },
                 {
-                    "ParamName": "fan_imp",
-                    "Value": 0.1875
+                    "ParamName": "PDB_BRICK0_TEMP_C",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK0_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK1_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK1_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK2_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK2_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
                 }
             ]
         },
@@ -134,6 +180,8 @@
             "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
             "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
             "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "var BRICK_EXIST:=maxIgnoreNaN(PDB_BRICK0_TEMP_C, PDB_BRICK0_VOUT_VOLT_V, PDB_BRICK1_VOUT_VOLT_V, PDB_BRICK2_VOUT_VOLT_V);",
+            "var fan_imp:=ifNan(BRICK_EXIST * 0 + 0.1875, 0.1464);",
             "switch {",
             "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
             "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
@@ -211,12 +259,34 @@
                         "Name": "PDB_FAN_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
-                }
-            ],
-            "ConstParam": [
+                },
                 {
-                    "ParamName": "fan_imp",
-                    "Value": 0.1875
+                    "ParamName": "PDB_BRICK0_TEMP_C",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK0_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK1_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK1_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK2_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK2_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
                 }
             ]
         },
@@ -224,6 +294,8 @@
             "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
             "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
             "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "var BRICK_EXIST:=maxIgnoreNaN(PDB_BRICK0_TEMP_C, PDB_BRICK0_VOUT_VOLT_V, PDB_BRICK1_VOUT_VOLT_V, PDB_BRICK2_VOUT_VOLT_V);",
+            "var fan_imp:=ifNan(BRICK_EXIST * 0 + 0.1875, 0.1464);",
             "switch {",
             "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
             "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
@@ -301,12 +373,34 @@
                         "Name": "PDB_FAN_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
-                }
-            ],
-            "ConstParam": [
+                },
                 {
-                    "ParamName": "fan_imp",
-                    "Value": 0.1875
+                    "ParamName": "PDB_BRICK0_TEMP_C",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK0_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK0_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK1_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK1_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_BRICK2_VOUT_VOLT_V",
+                    "Desc": {
+                        "Name": "PDB_BRICK2_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
                 }
             ]
         },
@@ -314,6 +408,8 @@
             "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
             "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
             "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "var BRICK_EXIST:=maxIgnoreNaN(PDB_BRICK0_TEMP_C, PDB_BRICK0_VOUT_VOLT_V, PDB_BRICK1_VOUT_VOLT_V, PDB_BRICK2_VOUT_VOLT_V);",
+            "var fan_imp:=ifNan(BRICK_EXIST * 0 + 0.1875, 0.1464);",
             "switch {",
             "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
             "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
