@@ -11,3 +11,5 @@ DEPENDS = "openssl libcheck jansson"
 
 inherit pkgconfig autotools
 
+CVE_STATUS[CVE-2026-53938] = "fixed-version: Fixed since v0.6.2.5"
+CVE_STATUS[CVE-2026-53939] = "fixed-version: Fixed since v0.6.2.6"

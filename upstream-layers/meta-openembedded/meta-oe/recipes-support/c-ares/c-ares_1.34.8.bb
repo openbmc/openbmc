@@ -30,3 +30,6 @@ FILES:${PN}-utils = "${bindir}"
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_STATUS[CVE-2025-31498] = "fixed-version: Fixed since 1.34.5"
+CVE_STATUS[CVE-2026-33630] = "fixed-version: Fixed since 1.34.7"
+CVE_STATUS[CVE-2026-69184] = "fixed-version: Fixed since 1.34.7"
+CVE_STATUS[CVE-2026-69186] = "fixed-version: Fixed since 1.34.7"

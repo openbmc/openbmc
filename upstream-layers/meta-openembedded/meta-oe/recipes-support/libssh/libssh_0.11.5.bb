@@ -15,6 +15,7 @@ SRC_URI:append:toolchain-clang = " file://0001-CompilerChecks.cmake-drop-Wunused
 
 SRCREV = "a09fdd00416e53b6ed436df6ff14339a4f884601"
 
+CVE_PRODUCT = "libssh:libssh"
 
 inherit cmake ptest
 
@@ -58,3 +59,4 @@ CVE_STATUS[CVE-2026-59847] = "fixed-version: fixed in v0.11.5"
 CVE_STATUS[CVE-2026-59848] = "fixed-version: fixed in v0.11.5"
 CVE_STATUS[CVE-2026-59849] = "fixed-version: fixed in v0.11.5"
 CVE_STATUS[CVE-2026-59850] = "fixed-version: fixed in v0.11.5"
+CVE_STATUS[CVE-2026-59842] = "cpe-incorrect: the current version (0.11.5) is not affected"

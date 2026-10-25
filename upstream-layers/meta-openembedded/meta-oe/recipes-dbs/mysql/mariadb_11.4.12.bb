@@ -1,5 +1,7 @@
 require mariadb.inc
 
+CVE_PRODUCT = "mariadb:mariadb"
+
 inherit ptest
 inherit useradd
 

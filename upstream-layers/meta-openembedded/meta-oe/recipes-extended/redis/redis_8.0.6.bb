@@ -15,6 +15,7 @@ SRC_URI = "http://download.redis.io/releases/${BP}.tar.gz \
            file://0003-hack-to-force-use-of-libc-malloc.patch \
            file://0004-src-Do-not-reset-FINAL_LIBS.patch \
            file://0005-Define-_GNU_SOURCE-to-get-PTHREAD_MUTEX_INITIALIZER.patch \
+           file://CVE-2026-81934.patch \
           "
 SRC_URI[sha256sum] = "6d0a9913887a4972536f9da226f1575859c34d86354129163260a5f9c6bd4229"
 

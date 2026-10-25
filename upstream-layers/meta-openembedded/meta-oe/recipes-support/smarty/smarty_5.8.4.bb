@@ -35,3 +35,7 @@ FILES:${PN} += "${datadir}/php/smarty3/"
 RDEPENDS:${PN} = "php"
 
 CVE_PRODUCT = "smarty:smarty smarty-php:smarty"
+
+CVE_STATUS[CVE-2024-35226] = "fixed-version: fixed since v5.2.0"
+CVE_STATUS[CVE-2026-62992] = "fixed-version: fixed since v5.8.2"
+CVE_STATUS[CVE-2026-62996] = "fixed-version: fixed in v5.8.4"

@@ -32,6 +32,8 @@ SRC_URI = "git://github.com/jqlang/jq.git;protocol=https;branch=master;tag=jq-${
 
 CVE_STATUS[CVE-2025-49014] = "fixed-version: fixed in v1.8.1"
 
+CVE_PRODUCT = "jq_project:jq jqlang:jq"
+
 inherit autotools ptest
 
 UPSTREAM_CHECK_GITTAGREGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"

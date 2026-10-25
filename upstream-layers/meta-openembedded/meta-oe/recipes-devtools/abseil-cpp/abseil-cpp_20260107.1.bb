@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=df52c6edb7adc22e533b2bacc3bd3915"
 SRC_URI = "https://github.com/abseil/${BPN}/releases/download/${PV}/${BP}.tar.gz \
            file://0001-absl-always-use-asm-sgidefs.h.patch \
            file://0002-abseil-ppc-fixes.patch \
+           file://0003-hash-restrict-x86-AES-SIMD-path-to-64-bit-targets.patch \
            "
 SRC_URI[sha256sum] = "4314e2a7cbac89cac25a2f2322870f343d81579756ceff7f431803c2c9090195"
 

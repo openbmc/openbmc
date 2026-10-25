@@ -1,0 +1,42 @@
+From 2c7d43e13909886bbb0b6b5dcd5e718c67818031 Mon Sep 17 00:00:00 2001
+From: Ankur Tyagi <ankur.tyagi85@gmail.com>
+Date: Mon, 14 Sep 2026 11:37:53 +1200
+Subject: [PATCH] Revert "Bumped minimum setuptools version to 83."
+
+This reverts commit 8362cdc7efc9c881fdba48ce19e89b9194de7c46.
+
+Upstream precautionarily bumped minimum setuptools version[1]
+Revert the change to allow building new versions of Django.
+
+[1]https://github.com/django/django/pull/21691
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ docs/intro/reusable-apps.txt | 2 +-
+ pyproject.toml               | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/docs/intro/reusable-apps.txt b/docs/intro/reusable-apps.txt
+index 41122dff9a..bb33dc0197 100644
+--- a/docs/intro/reusable-apps.txt
++++ b/docs/intro/reusable-apps.txt
+@@ -211,7 +211,7 @@ this. For a small app like polls, this process isn't too difficult.
+        :caption: ``django-polls/pyproject.toml``
+ 
+        [build-system]
+-       requires = ["setuptools>83"]
++       requires = ["setuptools>=77.0.3"]
+        build-backend = "setuptools.build_meta"
+ 
+        [project]
+diff --git a/pyproject.toml b/pyproject.toml
+index 1c5f5fbbe0..2b8ddbf314 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=83"]
++requires = ["setuptools>=77.0.3"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]

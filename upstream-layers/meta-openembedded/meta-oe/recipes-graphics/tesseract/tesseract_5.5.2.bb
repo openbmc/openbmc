@@ -10,6 +10,13 @@ SRC_URI = "git://github.com/${BPN}-ocr/${BPN}.git;branch=main;protocol=https;tag
            file://CVE-2026-73066.patch \
            file://CVE-2026-73067-1.patch \
            file://CVE-2026-73067-2.patch \
+           file://CVE-2026-88052.patch \
+           file://CVE-2026-88048.patch \
+           file://CVE-2026-88049.patch \
+           file://CVE-2026-88050.patch \
+           file://CVE-2026-88047.patch \
+           file://CVE-2026-88051.patch \
+           file://CVE-2026-88054.patch \
 "
 
 

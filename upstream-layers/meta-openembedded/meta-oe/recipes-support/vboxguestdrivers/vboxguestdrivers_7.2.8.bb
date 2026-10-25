@@ -14,6 +14,7 @@ VBOX_NAME = "VirtualBox-${PV}"
 
 SRC_URI = "http://download.virtualbox.org/virtualbox/${PV}/${VBOX_NAME}.tar.bz2 \
     file://Makefile.utils \
+    file://0001-vboxvideo-let-the-build-decide-if-drm_fb_helper_alloc.patch \
 "
 SRC_URI[sha256sum] = "0642ed4a12b7204cd30c0abbc2c10c1cc7ad55ce1756a01e86a16d4b6b066592"
 
@@ -62,7 +63,13 @@ do_configure:prepend() {
 
 # compile and install mount utility
 do_compile() {
-    oe_runmake all
+    vbox_kcflags=""
+    if [ -e "${STAGING_KERNEL_DIR}/include/drm/drm_fb_helper.h" ] &&
+       ! grep -q drm_fb_helper_alloc_info "${STAGING_KERNEL_DIR}/include/drm/drm_fb_helper.h"; then
+        vbox_kcflags="-DVBOX_NO_DRM_FB_HELPER_ALLOC_INFO"
+    fi
+
+    oe_runmake all KCFLAGS="$vbox_kcflags"
     oe_runmake 'LD=${CC}' 'EXTRA_CFLAGS=-I${STAGING_KERNEL_BUILDDIR}/include/' 'LDFLAGS=${LDFLAGS}' -C ${S}/utils
     if ! [ -e vboxguest.ko -a -e vboxsf.ko -a -e vboxvideo.ko ] ; then
         echo "ERROR: One of vbox*.ko modules wasn't built"

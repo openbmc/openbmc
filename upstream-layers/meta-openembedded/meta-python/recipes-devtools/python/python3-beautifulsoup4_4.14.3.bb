@@ -1,5 +1,5 @@
 SUMMARY = "Screen-scraping library"
-HOMEPAGE = " https://www.crummy.com/software/BeautifulSoup/bs4"
+HOMEPAGE = "https://www.crummy.com/software/BeautifulSoup/bs4"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=96e0034f7c9443910c486773aa1ed9ac"
 

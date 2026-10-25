@@ -8,6 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRC_URI[sha256sum] = "66c513a76cda70d53907bc27cf1447557699c2e95aa48ba27a442ff61c3ddfc2"
 
+SRC_URI += "file://CVE-2026-91990.patch \
+            file://CVE-2026-82397.patch \
+            file://CVE-2026-91991.patch \
+"
+
 inherit pypi python_setuptools_build_meta
 
 # Requires _compression which is currently located in misc
@@ -41,3 +46,7 @@ FILES:${PN}-test = " \
 CVE_PRODUCT = "tornadoweb:tornado"
 
 BBCLASSEXTEND  += "native nativesdk"
+
+CVE_STATUS[CVE-2026-49853] = "fixed-version: fixed since v6.5.6"
+CVE_STATUS[CVE-2026-49854] = "fixed-version: fixed since v6.5.6"
+CVE_STATUS[CVE-2026-49855] = "fixed-version: fixed since v6.5.6"

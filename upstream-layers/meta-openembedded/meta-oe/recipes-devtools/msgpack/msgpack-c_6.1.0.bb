@@ -7,7 +7,9 @@ LIC_FILES_CHKSUM = "file://NOTICE;md5=7a858c074723608e08614061dc044352 \
                     file://LICENSE_1_0.txt;md5=e4224ccaecb14d942c71d31bef20d78c \
                    "
 
-SRC_URI = "git://github.com/msgpack/msgpack-c;branch=c_master;protocol=https"
+SRC_URI = "git://github.com/msgpack/msgpack-c;branch=c_master;protocol=https \
+    file://CVE-2026-72854.patch \
+"
 SRCREV = "445880108a1d171f755ff6ac77e03fbebbb23729"
 
 inherit cmake pkgconfig

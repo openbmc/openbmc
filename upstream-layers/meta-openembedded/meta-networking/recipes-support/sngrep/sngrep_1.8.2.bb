@@ -15,7 +15,9 @@ DEPENDS = "\
     ncurses \
 "
 
-SRC_URI = "git://github.com/irontec/sngrep.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/irontec/sngrep.git;protocol=https;branch=master \
+           file://CVE-2026-90558.patch \
+"
 SRCREV = "dad1033640f249fa4994f976cf6ee96826c15702"
 
 

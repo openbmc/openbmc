@@ -1,6 +1,6 @@
 SUMMARY = "Flask extension for sending email"
 DESCRIPTION = "A Flask extension for sending email"
-HOMEPAGE = " https://github.com/rduplain/flask-email"
+HOMEPAGE = "https://github.com/rduplain/flask-email"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=201f2b80112efa61b78515bd54e9f138"
 

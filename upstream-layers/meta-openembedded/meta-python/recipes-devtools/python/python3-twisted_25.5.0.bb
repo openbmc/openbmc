@@ -16,7 +16,7 @@ SRC_URI += "file://CVE-2026-42304_p1.patch \
 
 SRC_URI[sha256sum] = "1deb272358cb6be1e3e8fc6f9c8b36f78eb0fa7c2233d2dbe11ec6fee04ea316"
 
-CVE_PRODUCT = "twisted"
+CVE_PRODUCT = "twisted:twisted"
 
 inherit pypi python_hatchling
 

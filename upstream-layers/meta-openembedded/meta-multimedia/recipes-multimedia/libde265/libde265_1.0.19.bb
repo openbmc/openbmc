@@ -12,6 +12,7 @@ SRC_URI = "git://github.com/strukturag/libde265.git;branch=master;protocol=https
            file://CVE-2026-49295.patch \
            file://CVE-2026-49337.patch \
            file://CVE-2026-49346.patch \
+           file://CVE-2026-54240-CVE-2026-54241.patch \
 "
 SRCREV = "824b4138ecd51611d7073f1b50d5d6f982609b06"
 

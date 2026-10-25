@@ -54,3 +54,4 @@ do_install:append() {
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --user-group --shell /bin/false --no-create-home --home-dir ${localstatedir}/lib/colord colord"
 
+CVE_STATUS[CVE-2026-85062] = "cpe-incorrect: this CVE is for JavaScript colord tool"

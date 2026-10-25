@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=34330f15b2b4abbbaaa7623f79a6a019"
 SRC_URI = "https://www.nlnetlabs.nl/downloads/ldns/ldns-${PV}.tar.gz"
 SRC_URI[sha256sum] = "b524fa21994b6e834200ceb8c27f1b84bda5982fe35706f058196c079db94d5d"
 
+CVE_PRODUCT = "nlnetlabs:ldns"
+
 DEPENDS = "openssl"
 
 inherit autotools-brokensep

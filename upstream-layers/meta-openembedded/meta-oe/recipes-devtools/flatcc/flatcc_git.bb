@@ -12,6 +12,8 @@ SRC_URI = " \
            git://github.com/dvidelabs/flatcc.git;protocol=https;branch=master \
            file://0001-Check-for-C-standard-version-23-for-__fallthrough__.patch \
            file://0002-allow-build-with-cmake-4.patch \
+           file://CVE-2026-90786.patch \
+           file://CVE-2026-90785.patch \
 "
 SRCREV = "1653ec964730ec7d9892a08a1695ada6d20f5196"
 

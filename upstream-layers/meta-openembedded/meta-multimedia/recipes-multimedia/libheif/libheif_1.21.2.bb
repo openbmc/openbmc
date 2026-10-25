@@ -34,3 +34,5 @@ PACKAGECONFIG[jpeg2000] = "-DWITH_OpenJPEG_ENCODER=ON -DWITH_OpenJPEG_DECODER=ON
 PACKAGECONFIG[openh264] = ",,openh264"
 
 FILES:${PN} += "${libdir}/libheif ${datadir}/thumbnailers ${libdir}/gdk-pixbuf*"
+
+CVE_STATUS[CVE-2026-84383] = "cpe-incorrect: This vulnerability was introduced in v1.22"

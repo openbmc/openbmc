@@ -1,7 +1,7 @@
 SUMMARY = "Python expectaton library"
 DESCRIPTION = "Minimal but very flexible implementation of the expect pattern"
 SECTION = "devel/python"
-HOMEPAGE = " https://bitbucket.org/dwt/pyexpect"
+HOMEPAGE = "https://bitbucket.org/dwt/pyexpect"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://README.md;md5=a6aa1e7097aca5955f9a2e1c8b0ce158"
 

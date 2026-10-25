@@ -18,6 +18,8 @@ SRC_URI = "gitsm://github.com/ntop/ntopng;protocol=https;branch=6.6-stable \
            file://0001-configure.ac.in-Allow-dynamic-linking-against-ndpi-3.patch \
            file://0001-luaengine-Use-lua-5.5-API-signature-for-lua_newstate.patch \
            file://ntopng.service \
+           file://CVE-2026-84990.patch \
+           file://CVE-2026-86090-CVE-2026-86091.patch \
            "
 
 # don't use the lua under thirdparty as it supports cross compiling badly
@@ -49,3 +51,5 @@ do_configure:prepend() {
 }
 
 SYSTEMD_SERVICE:${PN} = "ntopng.service"
+
+CVE_STATUS[CVE-2026-84989] = "cpe-incorrect: This vulnerability was introduced in v6.7"

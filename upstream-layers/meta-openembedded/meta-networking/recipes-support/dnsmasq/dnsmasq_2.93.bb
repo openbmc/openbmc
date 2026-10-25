@@ -18,6 +18,8 @@ SRC_URI = "http://www.thekelleys.org.uk/dnsmasq/${@['archive/', ''][float(d.getV
 "
 SRC_URI[sha256sum] = "cc967771abdafeb43d10db18932d6b59fd4bed2c69c22acf8cb96aff6920d55f"
 
+CVE_PRODUCT = "dnsmasq:dnsmasq the_kelleys:dnsmasq thekelleys:dnsmasq"
+
 inherit pkgconfig update-rc.d systemd
 
 INITSCRIPT_NAME = "dnsmasq"
