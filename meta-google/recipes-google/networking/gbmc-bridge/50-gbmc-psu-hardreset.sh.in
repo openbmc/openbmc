@@ -22,7 +22,7 @@ COORDINATED_POWERCYCLE=@COORDINATED_POWERCYCLE@
 
 gbmc_psu_hardreset_hook() {
   update_netboot_status "pwr_check" "Power cycle / reboot netboot hook starting" "START"
-  if [ -n "${gbmc_reboot_needed-}" ] && [ -n "${UPGRADE_REBOOT}" ]; then
+  if [ -n "${gbmc_reboot_needed-}" ] && [ -n "${UPGRADE_REBOOT}" ] && [ "${UPGRADE_REBOOT}" != "0" ]; then
     update_netboot_status "pwr_check" "upgrade bmc reboot into powercycle" "ONGOING"
     gbmc_psu_hardreset_needed=1
   fi
