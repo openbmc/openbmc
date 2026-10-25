@@ -1,5 +1,6 @@
 [Unit]
 Before=network-pre.target
+After=gbmc-ip-monitor.service
 
 [Service]
 Type=oneshot
