@@ -29,8 +29,13 @@ REPOS=" \
     https://git.yoctoproject.org/meta-yocto \
 "
 for repo in $REPOS; do
-    log "Cloning $repo on branch $BASE_REF..."
-    git clone --depth 1 --branch "$BASE_REF" "$repo"
+    branch="$BASE_REF"
+    # bitbake uses version-numbered branches instead of release names
+    case "$repo:$BASE_REF" in
+        */bitbake:wrynose) branch="2.18" ;;
+    esac
+    log "Cloning $repo on branch $branch..."
+    git clone --depth 1 --branch "$branch" "$repo"
 done
 
 # shellcheck disable=SC1091,SC2240
