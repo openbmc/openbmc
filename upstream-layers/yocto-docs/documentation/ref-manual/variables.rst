@@ -4570,7 +4570,7 @@ system and gives an overview of their function and contents.
       When using Wic tool, beware that a second overhead factor is also applied.
       This overhead value is defined by the ``--overhead-factor`` option, which
       defaults to "1.3" when omitted. See the
-      :ref:`ref-manual/kickstart:command: part or partition` chapter in
+      :ref:`ref-manual/kickstart:command: part` chapter in
       :doc:`/ref-manual/kickstart` for details.
 
    :term:`IMAGE_PKGTYPE`

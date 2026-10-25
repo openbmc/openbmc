@@ -159,6 +159,9 @@ of stable and :term:`LTS` releases.
 
 This documentation was built for the &DISTRO_NAME; release.
 
+The diagram below shows the currently supported releases (in blue) and
+out-of-date/future releases (in grey):
+
 .. image:: svg/releases.*
    :width: 100%
 

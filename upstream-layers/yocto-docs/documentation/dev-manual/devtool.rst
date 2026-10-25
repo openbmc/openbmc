@@ -231,15 +231,27 @@ command:
       append file within the workspace while the recipe remains in its
       original location.
 
-      Additionally, if you have any non-patch local files (i.e. files
-      referred to with ``file://`` entries in :term:`SRC_URI` statement
-      excluding ``*.patch/`` or ``*.diff``), these files are copied to
-      an ``oe-local-files`` folder under the newly created source tree.
-      Copying the files here gives you a convenient area from which you
-      can modify the files. Any changes or additions you make to those
-      files are incorporated into the build the next time you build the
-      software just as are other changes you might have made to the
-      source.
+      Additionally, any non-patch local files (i.e. files referred to
+      with ``file://`` entries in the recipe's :term:`SRC_URI`
+      statement, excluding ``*.patch`` or ``*.diff`` files) only end up
+      in the extracted source tree if the recipe sets
+      ``S = "${UNPACKDIR}"``. In that case, they are unpacked directly
+      into the source tree at the same location as the upstream source,
+      mixed in with the rest of the unpacked source with no separate
+      area to identify them, so you need to check the recipe's
+      :term:`SRC_URI` to tell which files came from local ``file://``
+      entries. You can edit them directly in the source tree, and any
+      changes you make are incorporated into the build the next time
+      you build the software just as are other changes you might have
+      made to the upstream source.
+
+      If instead :term:`S` is a subdirectory of :term:`UNPACKDIR` (the
+      traditional default, e.g. ``S = "${UNPACKDIR}/${BP}"``), these
+      local files are unpacked into :term:`UNPACKDIR` but outside of
+      :term:`S`, so they never end up in the source tree at all. They
+      remain purely recipe-side, and are unpacked again into the
+      recipe's real :term:`WORKDIR` on every subsequent build regardless
+      of ``devtool modify``; edit them next to the recipe instead.
 
    -  *Middle*: The middle scenario in the figure represents a situation
       where the source code also does not exist locally. In this case,
@@ -260,8 +272,10 @@ command:
 
       As with all extractions, the command uses the recipe's :term:`SRC_URI`
       statements to locate the source files and any associated patch
-      files. Non-patch files are copied to an ``oe-local-files`` folder
-      under the newly created source tree.
+      files. Non-patch files only end up in ``srctree`` if the recipe
+      sets ``S = "${UNPACKDIR}"``; otherwise they are unpacked into
+      :term:`UNPACKDIR` but outside of :term:`S` and never reach
+      ``srctree`` at all.
 
       Once the files are located, the command by default extracts them
       into ``srctree``.
@@ -283,12 +297,15 @@ command:
 
          $ devtool modify -n recipe srctree
 
-      If an ``oe-local-files`` subdirectory happens to exist and it
-      contains non-patch files, the files are used. However, if the
-      subdirectory does not exist and you run the ``devtool finish``
-      command, any non-patch files that might exist next to the recipe
-      are removed because it appears to ``devtool`` that you have
-      deleted those files.
+      For a recipe that sets ``S = "${UNPACKDIR}"``, non-patch local
+      files are expected to already be present directly in ``srctree``
+      at the same location as the upstream source. If they are missing
+      there and you run the ``devtool finish`` command, any non-patch
+      files that might exist next to the recipe are removed because it
+      appears to ``devtool`` that you have deleted those files. This
+      does not apply if :term:`S` is a subdirectory of
+      :term:`UNPACKDIR`, since in that case the local files never lived
+      in ``srctree`` to begin with.
 
       Once the ``devtool modify`` command finishes, it creates only an
       append file for the recipe in the ``devtool`` workspace. The
@@ -356,9 +373,10 @@ command:
    Because there is no need to move the recipe, ``devtool finish``
    either updates the original recipe in the original layer or the
    command creates a ``.bbappend`` file in a different layer as provided
-   by layer. Any work you did in the ``oe-local-files`` directory is
-   preserved in the original files next to the recipe during the
-   ``devtool finish`` command.
+   by layer. If the recipe sets ``S = "${UNPACKDIR}"``, any changes you
+   made directly to local files in the source tree are written back to
+   the original files next to the recipe during the ``devtool finish``
+   command.
 
    As a final process of the ``devtool finish`` command, the state of
    the standard layers and the upstream source is restored so that you
@@ -811,14 +829,26 @@ The following diagram shows the common development flow used with the
    the new version of the recipe, and an append file all within the
    workspace.
 
-   Additionally, if you have any non-patch local files (i.e. files
-   referred to with ``file://`` entries in :term:`SRC_URI` statement
-   excluding ``*.patch/`` or ``*.diff``), these files are copied to an
-   ``oe-local-files`` folder under the newly created source tree.
-   Copying the files here gives you a convenient area from which you can
-   modify the files. Any changes or additions you make to those files
-   are incorporated into the build the next time you build the software
-   just as are other changes you might have made to the source.
+   Additionally, any non-patch local files (i.e. files referred to with
+   ``file://`` entries in the recipe's :term:`SRC_URI` statement,
+   excluding ``*.patch`` or ``*.diff`` files) only end up in the
+   extracted source tree if the recipe sets ``S = "${UNPACKDIR}"``. In
+   that case, they are unpacked directly into the source tree at the
+   same location as the upstream source, mixed in with the rest of the
+   unpacked source with no separate area to identify them, so you need
+   to check the recipe's :term:`SRC_URI` to tell which files came from
+   local ``file://`` entries. You can edit them directly in the source
+   tree, and any changes you make are incorporated into the build the
+   next time you build the software just as are other changes you might
+   have made to the upstream source.
+
+   If instead :term:`S` is a subdirectory of :term:`UNPACKDIR` (the
+   traditional default, e.g. ``S = "${UNPACKDIR}/${BP}"``), these local
+   files are unpacked into :term:`UNPACKDIR` but outside of :term:`S`,
+   so they never end up in the source tree at all. They remain purely
+   recipe-side, and are unpacked again into the recipe's real
+   :term:`WORKDIR` on every subsequent build regardless of
+   ``devtool upgrade``; edit them next to the recipe instead.
 
 #. *Resolve any Conflicts created by the Upgrade*: Conflicts could happen
    after upgrading the software to a new version. Conflicts occur
@@ -877,8 +907,9 @@ The following diagram shows the common development flow used with the
    resets the recipe so that the recipe is built normally rather than
    from the workspace.
 
-   Any work you did in the ``oe-local-files`` directory is preserved in
-   the original files next to the recipe during the ``devtool finish``
+   If the recipe sets ``S = "${UNPACKDIR}"``, any changes you made
+   directly to local files in the source tree are written back to the
+   original files next to the recipe during the ``devtool finish``
    command.
 
    If you specify a destination layer that is the same as the original

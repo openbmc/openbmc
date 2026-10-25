@@ -309,7 +309,7 @@ following two locations:
 .. code-block:: text
 
    meta-yocto/meta-yocto-bsp/files/wic
-   openembedded-core/files/wic
+   openembedded-core/meta/files/wic
 
 Use the following command to list the available kickstart files:
 
