@@ -34,6 +34,7 @@ update_pfx() {
 
 RA_IF=gbmcbr
 IP_OFFSET=@IP_OFFSET@
+: "${IP_OFFSET:=0}"
 # Default routes and per-gateway policy routing tables on gbmcbr are managed
 # by gbmc-br-from-ra.sh and gbmc-br-gw-src.sh.
 ROUTE_METRIC=

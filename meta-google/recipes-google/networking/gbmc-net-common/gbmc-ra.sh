@@ -19,7 +19,7 @@ source /usr/share/network/lib.sh || exit
 source /usr/share/gbmc-net-lib.sh || exit
 
 : "${RA_IF:?No RA interface set}"
-: "${IP_OFFSET=?1}"
+: "${IP_OFFSET:=1}"
 : "${ROUTE_METRIC?No Metric set}"
 # An empty ROUTE_METRIC means the RA router is only used for the interface
 # routing table, without any default routes in the main table.
