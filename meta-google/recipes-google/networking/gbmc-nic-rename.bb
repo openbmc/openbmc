@@ -16,7 +16,7 @@ do_install() {
   install -d -m0755 $netdir
 
   # install dev renaming files if any
-  if [ -z "${GBMC_ETHER_MAP}"]; then
+  if [ -z "${GBMC_ETHER_MAP}" ]; then
     return
   fi
   devmap="${GBMC_ETHER_MAP}"
