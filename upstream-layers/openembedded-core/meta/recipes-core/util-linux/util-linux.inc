@@ -21,9 +21,12 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/util-linux/v${MAJOR_VERSION}/util-lin
            file://0001-ts-kill-decode-use-RTMIN-from-kill-L-instead-of-hard.patch \
            file://0001-tests-script-Disable-size-option-test.patch \
            file://CVE-2026-3184.patch \
+           file://0001-libmount-add-missing-fileutils.h-include-to-hook_idm.patch \
+           file://CVE-2026-78408.patch \
+           file://CVE-2026-78410.patch \
            "
 
-SRC_URI[sha256sum] = "f586e35d320ff537aab3ffeca37e9ecd482ccbe013590db4429a414d8aa6a728"
+SRC_URI[sha256sum] = "e596083744e746be7d2823b62b43f4418dd7bf56303b4dc09e6fe8112fe3d7ed"
 
 CVE_PRODUCT = "util-linux"
 

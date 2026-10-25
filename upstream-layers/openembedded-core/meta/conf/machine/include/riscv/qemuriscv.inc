@@ -29,7 +29,10 @@ QB_SMP ?= "-smp 4"
 QB_KERNEL_CMDLINE_APPEND = "earlycon=sbi"
 QB_CPU:riscv64 ?= "-cpu rva23s64,pmp=true"
 QB_MACHINE = "-machine virt"
-QB_DEFAULT_BIOS = "fw_jump.elf"
+# fw_jump.elf's memory layout can be overrun by a sufficiently large kernel Image,
+# causing it to overlap the FDT load address and hang QEMU at boot (see [YOCTO #16409]),
+# so use fw_dynamic.elf in that case instead, which avoids the overlap.
+QB_DEFAULT_BIOS = "fw_dynamic.elf"
 QB_TAP_OPT = "-netdev tap,id=net0,ifname=@TAP@,script=no,downscript=no"
 QB_NETWORK_DEVICE = "-device virtio-net-device,netdev=net0,mac=@MAC@"
 QB_ROOTFS_OPT = "-drive id=disk0,file=@ROOTFS@,if=none,format=raw -device virtio-blk-device,drive=disk0"

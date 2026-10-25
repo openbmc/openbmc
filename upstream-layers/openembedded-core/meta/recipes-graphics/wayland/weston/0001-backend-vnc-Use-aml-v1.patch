@@ -1,0 +1,24 @@
+From: Frieder Schrempf <frieder.schrempf@kontron.de>
+Subject: [PATCH] backend-vnc: Use aml v1
+
+aml 1.0 installs aml1.pc and neatvnc already uses it. Only the aml part
+of the upstream commit is taken, as the rest needs Neat VNC 1.0.
+
+Upstream-Status: Backport [partial, https://gitlab.freedesktop.org/wayland/weston/-/commit/8a1c91e7]
+Signed-off-by: Frieder Schrempf <frieder.schrempf@kontron.de>
+---
+ libweston/backend-vnc/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libweston/backend-vnc/meson.build b/libweston/backend-vnc/meson.build
+--- a/libweston/backend-vnc/meson.build
++++ b/libweston/backend-vnc/meson.build
+@@ -8,7 +8,7 @@ if not dep_neatvnc.found()
+ 	error('VNC backend requires neatvnc which was not found. Or, you can use \'-Dbackend-vnc=false\'.')
+ endif
+ 
+-dep_aml = dependency('aml', version: ['>= 0.3.0', '< 0.4.0'], required: false, fallback: ['aml', 'aml_dep'])
++dep_aml = dependency('aml1', version: ['>= 1.0.0', '< 2.0.0'], required: false, fallback: ['aml', 'aml_dep'])
+ if not dep_aml.found()
+ 	error('VNC backend requires libaml which was not found. Or, you can use \'-Dbackend-vnc=false\'.')
+ endif

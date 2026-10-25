@@ -147,3 +147,5 @@ do_install:append () {
 	chown -R rpcuser:rpcuser ${D}${localstatedir}/lib/nfs/statd
 	chmod 0644 ${D}${localstatedir}/lib/nfs/statd/state
 }
+
+CVE_STATUS[CVE-2025-12801] = "fixed-version: Fixed since v2.8.6"

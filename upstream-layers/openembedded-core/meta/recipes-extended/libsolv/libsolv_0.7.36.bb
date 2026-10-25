@@ -13,6 +13,7 @@ SRC_URI = "git://github.com/openSUSE/libsolv.git;branch=master;protocol=https;ta
            file://run-ptest \
            file://CVE-2026-9150.patch \
            file://CVE-2026-9149.patch \
+           file://CVE-2026-48863.patch \
 "
 
 SRCREV = "1e377699be108ec82bb798ec9c223d45d84a733c"

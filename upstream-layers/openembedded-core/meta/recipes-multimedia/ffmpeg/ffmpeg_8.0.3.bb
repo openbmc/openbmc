@@ -40,6 +40,9 @@ SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
            file://CVE-2026-66037.patch \
            file://CVE-2026-66038.patch \
            file://CVE-2026-66039.patch \
+           file://CVE-2026-66036_p1.patch \
+           file://CVE-2026-66036_p2.patch \
+           file://CVE-2026-66041.patch \
            "
 
 SRC_URI[sha256sum] = "6136812ea6d4e68bdba27e33c2a94382711cdf4f8602ffef056ff792bd6f9818"

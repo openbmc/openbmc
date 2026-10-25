@@ -79,3 +79,4 @@ SUMMARY:${PN}-password = "Plugin for PPP to get passwords via a pipe"
 SUMMARY:${PN}-l2tp     = "Plugin for PPP for l2tp support"
 SUMMARY:${PN}-tools    = "Additional tools for the PPP package"
 
+CVE_STATUS[CVE-2020-15704] = "not-applicable-platform: specific to Ubuntu"

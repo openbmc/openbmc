@@ -42,6 +42,15 @@ SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar
            file://CVE-2026-42010.patch \
            file://CVE-2026-33845.patch \
            file://CVE-2026-5419.patch \
+           file://CVE-2026-42012-pre1.patch \
+           file://CVE-2026-42012-pre2.patch \
+           file://CVE-2026-42012.patch \
+           file://CVE-2026-42013-pre1.patch \
+           file://CVE-2026-42013.patch \
+           file://CVE-2026-42014.patch \
+           file://CVE-2026-42015.patch \
+           file://CVE-2026-5260_p1.patch \
+           file://CVE-2026-5260_p2.patch \
            "
 
 SRC_URI[sha256sum] = "a7b341421bfd459acf7a374ca4af3b9e06608dcd7bd792b2bf470bea012b8e51"
@@ -123,6 +132,7 @@ pkg_postinst_ontarget:${PN}-fips () {
     fi
 }
 
+CVE_STATUS[CVE-2023-0361] = "fixed-version: fixed in version 3.8.0"
 CVE_STATUS[CVE-2025-32989] = "fixed-version: fixed in version 3.8.10"
 CVE_STATUS[CVE-2025-32990] = "fixed-version: fixed in version 3.8.10"
 CVE_STATUS[CVE-2026-1584] = "fixed-version: fixed in version 3.8.12"

@@ -52,6 +52,9 @@ SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https;tag=v${PV} 
 PV .= ".0340"
 SRCREV = "6addd6c101117706bc9b3609d3a418e26e92618f"
 
+CVE_STATUS[CVE-2026-51400] = "not-applicable-platform: Vulnerable code is in src/os_vms.c, which is not compiled for Linux builds."
+CVE_STATUS[CVE-2026-51401] = "not-applicable-platform: Vulnerable code is in src/os_vms.c, which is not compiled for Linux builds."
+
 # Do not consider .z in x.y.z, as that is updated with every commit
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+)\.0"
 # Ignore that the upstream version .z in x.y.z is always newer

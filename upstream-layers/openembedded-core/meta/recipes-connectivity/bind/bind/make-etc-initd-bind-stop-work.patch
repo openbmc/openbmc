@@ -1,4 +1,4 @@
-From 26c988eee9d2eae7c7dec8c529176352017b2ce1 Mon Sep 17 00:00:00 2001
+From 2e1314f2e71be15704ba18756250185b36a5c0da Mon Sep 17 00:00:00 2001
 From: Roy Li <rongqing.li@windriver.com>
 Date: Thu, 15 Nov 2012 02:27:54 +0000
 Subject: [PATCH] bind: make "/etc/init.d/bind stop" work

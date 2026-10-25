@@ -24,6 +24,7 @@ SRC_URI = "${GNU_MIRROR}/wget/wget-${PV}.tar.gz \
            file://CVE-2026-16599.patch \
            file://CVE-2026-58470.patch \
            file://CVE-2026-58470-regression.patch \
+           file://CVE-2026-15146.patch \
            "
 
 SRC_URI[sha256sum] = "766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784"

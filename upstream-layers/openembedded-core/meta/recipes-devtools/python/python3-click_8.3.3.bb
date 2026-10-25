@@ -30,6 +30,7 @@ CLEANBROKEN = "1"
 RDEPENDS:${PN} += "\
     python3-io \
     python3-threading \
+    python3-shell \
     "
 RDEPENDS:${PN}-ptest += "coreutils less"
 

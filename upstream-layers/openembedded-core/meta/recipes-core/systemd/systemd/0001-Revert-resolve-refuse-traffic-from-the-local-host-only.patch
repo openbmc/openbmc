@@ -1,0 +1,61 @@
+From 658e5ac06f80ee2078b034f7cc483204d7f91c5e Mon Sep 17 00:00:00 2001
+From: Bret Comnes <bret@comnes.org>
+Date: Thu, 26 Mar 2026 05:59:09 +0000
+Subject: [PATCH] Revert "resolve: refuse traffic from the local host only for
+ queries"
+
+This reverts commit 526f1594daec073269c3e70ee7914f6dd8740d5c.
+
+This revert is necessary because the change breaks mDNS hostname stability
+whenever a DNS-SD service calls UnregisterService. When a service
+unregisters (e.g. on process restart), manager_refresh_rrs() clears and
+re-adds all RRs in PROBING state, which sends a multicast announcement
+(QR=1). The kernel reflects this back to resolved's own socket. Because
+the local-address check was moved inside the query-only branch by the
+reverted commit, the reply path in on_mdns_packet() is now unguarded.
+The looped-back announcement matches the pending probe transaction and
+completes it with DNS_TRANSACTION_SUCCESS. Since the zone item is still
+in PROBING state (not ESTABLISHED), dns_zone_item_notify() sets
+we_lost=true and calls dns_zone_item_conflict(), which invokes
+manager_next_hostname() and renames the hostname (e.g. foo.local to
+foo4.local). This happens reliably on every restart of any service using
+RegisterService/UnregisterService (homebridge, avahi-compat wrappers,
+etc.).
+
+The top-level local-address check in on_mdns_packet() suppresses all
+looped-back multicast traffic before the reply/query split. Restoring it
+there is consistent with the overall design: dns_scope_check_conflicts()
+already has its own manager_packet_from_local_address() guard and is
+unaffected.
+
+A more targeted long-term fix (e.g. guarding dns_transaction_process_reply()
+for mDNS, or avoiding unnecessary re-probing of already-established records
+in manager_refresh_rrs()) can be pursued separately.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/658e5ac06f80ee2078b034f7cc483204d7f91c5e]
+Signed-off-by: Peter Tatrai <peter.tatrai.ext@siemens.com>
+---
+ src/resolve/resolved-mdns.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/resolve/resolved-mdns.c b/src/resolve/resolved-mdns.c
+--- a/src/resolve/resolved-mdns.c
++++ b/src/resolve/resolved-mdns.c
+@@ -415,0 +416,8 @@
++        /* Refuse traffic from the local host, to avoid query loops. However, allow legacy mDNS
++         * unicast queries through anyway (we never send those ourselves, hence no risk).
++         * i.e. check for the source port nr. */
++        if (p->sender_port == MDNS_PORT && manager_packet_from_local_address(m, p)) {
++                log_debug("Got mDNS UDP packet from local host, ignoring.");
++                return 0;
++        }
++
+@@ -532,8 +539,0 @@
+-                /* Refuse traffic from the local host, to avoid query loops. However, allow legacy mDNS
+-                 * unicast queries through anyway (we never send those ourselves, hence no risk).
+-                 * i.e. check for the source port nr. */
+-                if (p->sender_port == MDNS_PORT && manager_packet_from_local_address(m, p)) {
+-                        log_debug("Got mDNS UDP packet from local host, ignoring.");
+-                        return 0;
+-                }
+-

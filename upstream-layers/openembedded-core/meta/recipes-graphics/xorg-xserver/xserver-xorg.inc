@@ -31,6 +31,8 @@ available for this flaw."
 CVE_STATUS[CVE-2022-3553] = "cpe-incorrect: This is specific to XQuartz, which is the macOS X server port"
 CVE_STATUS[CVE-2026-34000] = "fixed-version: fixed since v21.1.22"
 CVE_STATUS[CVE-2026-34002] = "fixed-version: fixed since v21.1.22"
+CVE_STATUS[CVE-2026-55999] = "fixed-version: fixed since v21.1.24"
+CVE_STATUS[CVE-2026-56000] = "fixed-version: fixed since v21.1.24"
 
 S = "${UNPACKDIR}/${XORG_PN}-${PV}"
 
