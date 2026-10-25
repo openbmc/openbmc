@@ -375,8 +375,10 @@ _gbmc_net_networkd_reload_exec() {
 
 _gbmc_net_nftables_reload_action() {
   local gen="$1"
+  local st
+  st="$(systemctl is-active nftables 2>/dev/null || true)"
   # Nothing to reload, nftables loads our rules when it starts
-  if [ "$(systemctl is-active nftables 2>/dev/null || true)" = 'inactive' ]; then
+  if [ "${st:-inactive}" = 'inactive' ] || [ "$st" = 'activating' ]; then
     return 0
   fi
   echo "Reloading nftables (gen $gen)" >&2

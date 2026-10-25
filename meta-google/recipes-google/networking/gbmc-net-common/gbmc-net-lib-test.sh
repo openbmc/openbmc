@@ -333,6 +333,14 @@ testNftablesReloadActionInactive() {
   expect_err 0 _gbmc_net_nftables_reload_action 1
   expect_streq "$calls" ''
 
+  systemctl() {
+    [ "$1" = 'is-active' ] && { echo activating; return 0; }
+    calls+="$* "
+  }
+
+  expect_err 0 _gbmc_net_nftables_reload_action 1
+  expect_streq "$calls" ''
+
   unset -f systemctl
 }
 
