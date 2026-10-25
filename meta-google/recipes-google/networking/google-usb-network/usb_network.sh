@@ -279,6 +279,12 @@ validate_safe_string "iface-name" "$IFACE_NAME"
 validate_safe_string "gadget-dir-name" "$GADGET_DIR_NAME"
 validate_safe_string "dev-type" "$DEV_TYPE"
 
+lock_file="${USB_NETWORK_LOCK:-/run/usb_network.lock}"
+if [[ ! -w $(dirname "$lock_file") ]]; then
+    lock_file="${CONFIGFS_HOME}/.usb_network.lock"
+fi
+exec {lock_fd}>"$lock_file" || exit
+flock "$lock_fd" || exit
 
 if [[ $ACTION == "stop" ]]; then
     gadget_stop
