@@ -3,3 +3,8 @@ owners:
 - ed@tanous.net
 - geissonator@yahoo.com
 - patrick@stwcx.xyz
+
+matchers:
+- exact: meta-phosphor/docs/supported-machines.md
+  owners:
+  - group/Registered Users
