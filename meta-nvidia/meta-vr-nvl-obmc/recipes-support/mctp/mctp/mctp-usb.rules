@@ -1,1 +1,2 @@
+SUBSYSTEM=="usb", ACTION=="add", ATTR{idVendor}=="0955", ATTR{idProduct}=="7410", RUN+="/bin/sh -c 'echo 0955 7410 14 > /sys/bus/usb/drivers/mctp-usb/new_id'"
 SUBSYSTEM=="net", ACTION=="add", KERNEL=="mctpusb*",NAME="%E{INTERFACE}", RUN+="/bin/sh -c '/usr/bin/mctp addr add 8 dev $env{INTERFACE}; /usr/bin/mctp link set $env{INTERFACE} up;'"
