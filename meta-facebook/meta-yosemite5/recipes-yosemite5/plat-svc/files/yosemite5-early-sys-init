@@ -149,24 +149,14 @@ verify_reg()
     fi
 }
 
-ti_hsc_init()
+T2_init()
 {
-    local BOARD="1KW_paddle_BD"
+    local BOARD_PADDLE="1KW_paddle_BD"
     local FRU_NAME
     local SOURCE
 
-    if ! FRU_NAME=$(find_fru_name "$BOARD"); then
-        echo "Can't find ${BOARD} FRU."
-        return
-    fi
-
-    SOURCE=$(get_product_source "$FRU_NAME")
-    if [ "$SOURCE" = "Unknown" ]; then
-        echo "Unknown Paddle HSC source."
-        return
-    fi
-
-    if [ "$SOURCE" = "HSC-TIC" ]; then
+    ti_hsc_init()
+    {
         local BUS="8"
         local ADDR="0x47"
         local REG_CLEAR_FAULTS="0x03"
@@ -209,7 +199,34 @@ ti_hsc_init()
         verify_reg "$BUS" "$ADDR" "$REG_VIN_UV_WARN" "$VIN_UV_WARN_VAL" "w" "VIN UV warning"
         verify_reg "$BUS" "$ADDR" "$REG_IIN_OC_WARN" "$IIN_OC_WARN_VAL" "w" "IIN OC warning"
         verify_reg "$BUS" "$ADDR" "$REG_PIN_OP_WARN" "$PIN_OP_WARN_VAL" "w" "PIN OP warning"
+    }
+
+    rds_hsc_init()
+    {
+        local BUS="8"
+        local ADDR="0x4B"
+        local REG_CLEAR_FAULTS="0x03"
+
+        echo "Initializing RDS HSC"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_CLEAR_FAULTS" || echo "Failed to clear faults"
+    }
+
+    if ! FRU_NAME=$(find_fru_name "$BOARD_PADDLE"); then
+        echo "Can't find ${BOARD_PADDLE} FRU."
+        return
     fi
+
+    SOURCE=$(get_product_source "$FRU_NAME")
+    if [ "$SOURCE" = "Unknown" ]; then
+        echo "Unknown Paddle HSC source."
+        return
+    fi
+
+    case "$SOURCE" in
+        HSC-TIC)  ti_hsc_init ;;
+        HSC-RDS)  rds_hsc_init ;;
+        *)        : ;;
+    esac
 }
 
 T22_init(){
@@ -398,7 +415,7 @@ case "${sku}" in
         T22_init
     ;;
     *)
-        ti_hsc_init
+        T2_init
     ;;
 esac
 
