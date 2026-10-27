@@ -49,7 +49,11 @@ gbmc_ncsi_br_deprecated_ips_update() {
   local del="${gbmc_ncsi_br_deprecated_ips_del["$ip"]-}"
 
   # Determine a unique routing table number for the IP
-  local rt="$(gbmc_net_route_table_for_intf "$intf")"
+  local rt
+  rt="$(gbmc_net_route_table_for_intf "$intf")" || rt=
+  if [ -z "$del" ] && [ -z "$rt" ]; then
+    return 0
+  fi
   local rt_old="${gbmc_ncsi_br_deprecated_ips_confrt["$ip"]-}"
 
   if [ "$intf_old" = "$intf" ] && [ "$rt_old" = "$rt" ]; then
