@@ -1,18 +1,35 @@
 table bridge filter {
   chain gbmc_br_prerouting {
     type filter hook prerouting priority 0;
+    iifname == {@INT_IFS@} ether type ip6 @nh,7,1 set 1
     iifname != gbmcbr accept
     # Sometimes our links are over NCSI and we don't want to broadcast
     # those packets over the entire bridge. They are only relevant P2P.
     ether type 0x88F8 drop
   }
+  chain gbmc_br_postrouting {
+    type filter hook postrouting priority 0;
+    oifname == {@INT_IFS@} ether type ip6 @nh,7,1 set 0
+  }
 }
 
 table inet filter {
+  chain gbmc_br_output {
+    type filter hook output priority 0;
+    oifname == {gbmcbr,gbmcdhcp} meta nfproto ipv6 @nh,7,1 set 1
+  }
+  # Routed traffic can't carry the tag onto or off the gbmcbr segment. Only
+  # forwarded traffic is touched, local traffic on other links keeps its DSCP.
+  chain gbmc_br_forward {
+    type filter hook forward priority 0;
+    iifname != {gbmcbr,gbmcdhcp} oifname == {gbmcbr,gbmcdhcp} meta nfproto ipv6 @nh,7,1 set 0
+    iifname == {gbmcbr,gbmcdhcp} oifname != {gbmcbr,gbmcdhcp} meta nfproto ipv6 @nh,7,1 set 0
+  }
   chain gbmc_br_input {
     type filter hook input priority 0; policy drop;
     iifname != gbmcbr accept
     mark 0xff drop
+    meta nfproto ipv6 @nh,7,1 1 @nh,7,1 set 0 accept
     ct state established accept
     jump gbmc_br_int_input
     jump gbmc_br_pub_input
@@ -35,4 +52,3 @@ table inet filter {
     ip6 nexthdr icmpv6 accept
   }
 }
-
