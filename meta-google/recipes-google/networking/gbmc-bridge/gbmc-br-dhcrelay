@@ -3,8 +3,10 @@ shopt -s nullglob
 args=(-d --no-pid -l gbmcdhcp)
 upper=
 for file in /{usr/share,run}/gbmc-br-dhcrelay/uppers/*; do
+  intf="$(<"$file")"
+  [[ -e /sys/class/net/${intf#*%} ]] || continue
   upper=1
-  args+=(-u "$(<"$file")")
+  args+=(-u "$intf")
 done
 if [ -n "$upper" ]; then
   exec dhcrelay "${args[@]}"
