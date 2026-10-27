@@ -1,0 +1,15 @@
+[
+  {
+    "name": "NO_DIMM",
+    "description": "Error for No Dimm Present",
+    "primary": "0x0380A18190000002",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "DIMM Error (0380 A181 9000 0002) DIMM Failure Event: No DIMM in System",
+        "RAW_EVENT": ""
+      }
+    }
+  }
+]
