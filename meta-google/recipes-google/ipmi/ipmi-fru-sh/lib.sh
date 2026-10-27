@@ -29,6 +29,9 @@ IPMI_FRU_COMMON_HEADER_MULTI_RECORD_OFFSET_IDX=5
 IPMI_FRU_AREA_HEADER_SIZE_IDX=1
 # shellcheck disable=SC2034
 IPMI_FRU_CHECKSUM_IDX=-1
+# If non-zero, checksum failures in read_header and read_area emit a warning
+# instead of returning a fatal error (10).
+IPMI_FRU_WARN_CHECKSUM=${IPMI_FRU_WARN_CHECKSUM-0}
 
 offset_1bw() {
   local addr="$1"
@@ -217,7 +220,14 @@ read_header() {
   local sum
   sum="$(checksum header_arr)" || return
   # Checksums should be valid
-  (( sum == 0 )) || return 10
+  if (( sum != 0 )); then
+    if (( IPMI_FRU_WARN_CHECKSUM )); then
+      echo "WARNING: $eeprom FRU Header checksum invalid ($sum), continuing" >&2
+      return 0
+    fi
+    echo "ERROR: $eeprom FRU Header checksum invalid ($sum)" >&2
+    return 10
+  fi
 }
 
 read_area() {
@@ -241,7 +251,14 @@ read_area() {
   local sum
   sum="$(checksum area_arr)" || return
   # Checksums should be valid
-  (( sum == 0 )) || return 10
+  if (( sum != 0 )); then
+    if (( IPMI_FRU_WARN_CHECKSUM )); then
+      echo "WARNING: $eeprom $offset FRU Area checksum invalid ($sum), continuing" >&2
+      return 0
+    fi
+    echo "ERROR: $eeprom $offset FRU Area checksum invalid ($sum)" >&2
+    return 10
+  fi
 }
 
 ipmi_fru_init=1
