@@ -1,31 +1,6 @@
 [
     {
         "Desc": {
-            "Name": "FCB_0_FAN_0_CURR_A",
-            "SensorType": "current"
-        },
-        "Associations": [
-            [
-                "board",
-                "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Ventura2_Fan_Board"
-            ]
-        ],
-        "Params": {
-            "DbusParam": [
-                {
-                    "ParamName": "FCB_0_FAN_0_IMON_VOLT_V",
-                    "Desc": {
-                        "Name": "FCB_0_FAN_0_IMON_VOLT_V",
-                        "SensorType": "voltage"
-                    }
-                }
-            ]
-        },
-        "Expression": "FCB_0_FAN_0_IMON_VOLT_V / 0.2"
-    },
-    {
-        "Desc": {
             "Name": "FCB_0_FAN_1_CURR_A",
             "SensorType": "current"
         },
@@ -101,6 +76,31 @@
     },
     {
         "Desc": {
+            "Name": "FCB_0_FAN_4_CURR_A",
+            "SensorType": "current"
+        },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_Fan_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FCB_0_FAN_4_IMON_VOLT_V",
+                    "Desc": {
+                        "Name": "FCB_0_FAN_4_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "FCB_0_FAN_4_IMON_VOLT_V / 0.2"
+    },
+    {
+        "Desc": {
             "Name": "VIRTUAL_SCM_INLET_TEMP_C",
             "SensorType": "temperature",
             "MaxValue": 127,
@@ -128,13 +128,6 @@
                     }
                 },
                 {
-                    "ParamName": "FCB_0_FAN0_PWM_PCT",
-                    "Desc": {
-                        "Name": "FCB_0_FAN0_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                },
-                {
                     "ParamName": "FCB_0_FAN1_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN1_PWM_PCT",
@@ -154,11 +147,18 @@
                         "Name": "FCB_0_FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
+                },
+                {
+                    "ParamName": "FCB_0_FAN4_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN4_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_AVG:=avg(FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT, FCB_0_FAN4_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={-1.5, -1.5, -1.5, -1.5, -1.5, -1.5, -2.0, -3.0, -3.0, -3.0, -3.0};",
             "switch {",
@@ -205,37 +205,37 @@
                     }
                 },
                 {
-                    "ParamName": "FCB_0_FAN0_PWM_PCT",
-                    "Desc": {
-                        "Name": "FCB_0_FAN0_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                },
-                {
                     "ParamName": "FCB_0_FAN1_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN1_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
-		{
+                {
                     "ParamName": "FCB_0_FAN2_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN2_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
-                {
+		{
                     "ParamName": "FCB_0_FAN3_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN3_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN4_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN4_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_AVG:=avg(FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT, FCB_0_FAN4_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0, 2.5, 2.5, 2.5, 2.5};",
             "switch {",
@@ -282,13 +282,6 @@
                     }
                 },
                 {
-                    "ParamName": "FCB_0_FAN0_PWM_PCT",
-                    "Desc": {
-                        "Name": "FCB_0_FAN0_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                },
-                {
                     "ParamName": "FCB_0_FAN1_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN1_PWM_PCT",
@@ -308,11 +301,18 @@
                         "Name": "FCB_0_FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
+                },
+                {
+                    "ParamName": "FCB_0_FAN4_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN4_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_AVG:=avg(FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT, FCB_0_FAN4_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 1.5, 1.5, 1.5, 1.5};",
             "switch {",
@@ -359,13 +359,6 @@
                     }
                 },
                 {
-                    "ParamName": "FCB_0_FAN0_PWM_PCT",
-                    "Desc": {
-                        "Name": "FCB_0_FAN0_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                },
-                {
                     "ParamName": "FCB_0_FAN1_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN1_PWM_PCT",
@@ -385,11 +378,18 @@
                         "Name": "FCB_0_FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
+                },
+                {
+                    "ParamName": "FCB_0_FAN4_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN4_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_AVG:=avg(FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT, FCB_0_FAN4_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};",
             "switch {",
@@ -436,13 +436,6 @@
                     }
                 },
                 {
-                    "ParamName": "FCB_0_FAN0_PWM_PCT",
-                    "Desc": {
-                        "Name": "FCB_0_FAN0_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                },
-                {
                     "ParamName": "FCB_0_FAN1_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN1_PWM_PCT",
@@ -462,11 +455,18 @@
                         "Name": "FCB_0_FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
+                },
+                {
+                    "ParamName": "FCB_0_FAN4_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN4_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_AVG:=avg(FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT, FCB_0_FAN4_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={4.5, 4.5, 5.0, 4.0, 4.0, 5.0, 4.0, 4.0, 4.0, 4.0, 4.0};",
             "switch {",
@@ -501,13 +501,6 @@
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "FCB_0_FAN0_PWM_PCT",
-                    "Desc": {
-                        "Name": "FCB_0_FAN0_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                },
-                {
                     "ParamName": "FCB_0_FAN1_PWM_PCT",
                     "Desc": {
                         "Name": "FCB_0_FAN1_PWM_PCT",
@@ -527,11 +520,18 @@
                         "Name": "FCB_0_FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
+                },
+                {
+                    "ParamName": "FCB_0_FAN4_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN4_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT) / 100;",
+            "var DUTY_AVG:=avg(FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT, FCB_0_FAN4_PWM_PCT) / 100;",
             "211.18 * pow(DUTY_AVG, 4) - 480.8 * pow(DUTY_AVG, 3) + 372.72 * pow(DUTY_AVG, 2) - 9.4858 * DUTY_AVG + 8.6427"
         ]
     }

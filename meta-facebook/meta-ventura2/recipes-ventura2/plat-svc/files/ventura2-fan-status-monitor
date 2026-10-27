@@ -51,7 +51,7 @@ check_fcb_fan_status()
     # Each FCB contain four fan trays
     for index in $(seq 0 $((FAN_NUM_PER_FCB - 1)))
     do
-        local fan_number=$(((fcb_num * FAN_NUM_PER_FCB) + index ))
+        local fan_number=$(((fcb_num * FAN_NUM_PER_FCB) + index + 1))
         local NoCritical=0
 
         for io in "${in_out[@]}"; do
