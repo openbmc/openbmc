@@ -121,8 +121,12 @@ pkg_prerm:${PN}-chassis-check-power-status:append() {
     done
 }
 
+# On SMP enabled systems, only log power-on events for chassis 0.
+# Otherwise, log power-on events for all configured chassis instances.
+CHASSIS_POWERON_LOG_INSTANCES = "${@bb.utils.contains('PACKAGECONFIG', 'multi-chassis-smp', '0', d.getVar('OBMC_CHASSIS_INSTANCES'), d)}"
+
 pkg_postinst:${PN}-chassis-poweron-log:append() {
-    for i in ${OBMC_CHASSIS_INSTANCES};
+    for i in ${CHASSIS_POWERON_LOG_INSTANCES};
     do
         mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.wants
         LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.wants/phosphor-create-chassis-poweron-log@${i}.service"
@@ -132,7 +136,7 @@ pkg_postinst:${PN}-chassis-poweron-log:append() {
 }
 
 pkg_prerm:${PN}-chassis-poweron-log:append() {
-    for i in ${OBMC_CHASSIS_INSTANCES};
+    for i in ${CHASSIS_POWERON_LOG_INSTANCES};
     do
         LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.wants/phosphor-create-chassis-poweron-log@${i}.service"
         rm $LINK
