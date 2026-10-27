@@ -19,8 +19,14 @@ DEPENDS += " \
     nlohmann-json \
     sdbusplus \
     phosphor-logging \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
   "
 FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.Chassis.Control.Power@.service"
+
+EXTRA_OEMESON:append = " \
+    -Dtests=${@bb.utils.contains('PTEST_ENABLED', '1', 'enabled', 'disabled', d)} \
+"
 
 pkg_postinst:${PN}:append() {
     mkdir -p $D$systemd_system_unitdir/sysinit.target.wants
