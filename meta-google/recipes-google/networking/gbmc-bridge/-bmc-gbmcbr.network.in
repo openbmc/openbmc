@@ -7,6 +7,7 @@ LLMNR=true
 MulticastDNS=true
 LinkLocalAddressing=ipv6
 IPv6SendRA=yes
+IPv6DuplicateAddressDetection=0
 @ADDR@
 [IPv6AcceptRA]
 DHCPv6Client=false
