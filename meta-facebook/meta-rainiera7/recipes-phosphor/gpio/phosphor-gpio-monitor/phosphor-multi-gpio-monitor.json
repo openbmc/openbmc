@@ -67,12 +67,10 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "rainier-gpio-handler@wALL_POWER_OK_1:RISING.service",
-                "deassert-power-good-drop.service"
+                "rainier-gpio-handler@wALL_POWER_OK_1:RISING.service"
             ],
             "FALLING": [
-                "rainier-gpio-handler@wALL_POWER_OK_1:FALLING.service",
-                "assert-power-good-drop.service"
+                "rainier-gpio-handler@wALL_POWER_OK_1:FALLING.service"
             ],
             "INIT_HIGH": [
                 "rainier-gpio-handler@wALL_POWER_OK_1:INIT_HIGH.service"
@@ -278,6 +276,20 @@
         "Targets": {
             "RISING": ["button-event-logger@Released_PWR_BTN_BMC_R1_N.service"],
             "FALLING": ["button-event-logger@Pressed_PWR_BTN_BMC_R1_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ANDGATE_ALL_POWER_GD",
+        "LineName": "wANDGATE_ALL_POWER_GD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-power-good-drop.service"
+            ],
+            "FALLING": [
+                "assert-power-good-drop.service"
+            ]
         },
         "Continue": true
     }
