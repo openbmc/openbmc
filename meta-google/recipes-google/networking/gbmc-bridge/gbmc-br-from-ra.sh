@@ -38,9 +38,8 @@ declare -A gbmc_br_from_ra_prev_addrs=()
 # solicits right away. Route deletions therefore don't immediately mean the
 # prefix is gone, and acting on them would rewrite our config and reload
 # networkd, flushing the routes again. Instead, a prefix is only dropped once
-# its route stayed gone for GBMC_BR_FROM_RA_GRACE seconds. This also covers
+# its route stayed gone for GBMC_BR_RA_GRACE seconds. This also covers
 # prefixes networkd removes because they were withdrawn or expired.
-GBMC_BR_FROM_RA_GRACE=5
 GBMC_BR_FROM_RA_CONFS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/65-ra-addrs.conf)
 
 # Writes the networkd config for the given "<addr> <pfx>" entries, only
@@ -67,7 +66,7 @@ gbmc_br_from_ra_write_conf() {
   while read -r addr pfx; do
     [[ -n $addr ]] || continue
     contents+="[Address]"$'\n'"Address=$addr"$'\n'"AddPrefixRoute=no"$'\n'
-    contents+="[Route]"$'\n'"Destination=$pfx"$'\n'"Metric=512"$'\n'
+    contents+="[Route]"$'\n'"Destination=$pfx"$'\n'"Metric=$GBMC_ROUTE_METRIC_ONLINK"$'\n'
   done < <(printf '%s\n' "$@" | sort)
 
   local changed=
@@ -125,10 +124,10 @@ gbmc_br_from_ra_update() {
       unset 'gbmc_br_from_ra_gone[$pfx]'
       # Make sure we didn't miss it coming back
       if [[ -z "$(ip -6 route show "$pfx" dev gbmcbr proto ra 2>/dev/null)" ]]; then
-        echo "gBMC Bridge RA Addr Del: $addr (pfx $pfx label 99)" >&2
+        echo "gBMC Bridge RA Addr Del: $addr (pfx $pfx label $GBMC_SLAAC_ADDRLABEL)" >&2
         unset 'gbmc_br_from_ra_prev_addrs[$addr]'
         ip addr del "$addr" dev gbmcbr 2>/dev/null || true
-        ip addrlabel del prefix "$pfx" label 99 2>/dev/null || true
+        ip addrlabel del prefix "$pfx" label "$GBMC_SLAAC_ADDRLABEL" 2>/dev/null || true
         unset 'gbmc_br_from_ra_pfxs[$pfx]'
         continue
       fi
@@ -139,12 +138,12 @@ gbmc_br_from_ra_update() {
     fi
     addrs+=("$addr $pfx")
     if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
-      echo "gBMC Bridge RA Addr Add: $addr (pfx $pfx label 99)" >&2
+      echo "gBMC Bridge RA Addr Add: $addr (pfx $pfx label $GBMC_SLAAC_ADDRLABEL)" >&2
       gbmc_br_from_ra_prev_addrs["$addr"]=1
       # Usable right away, networkd takes it over once it reloads
       ip addr replace "$addr" dev gbmcbr noprefixroute
-      ip -6 route replace "$pfx" dev gbmcbr metric 512 2>/dev/null || true
-      ip addrlabel add prefix "$pfx" label 99 2>/dev/null || true
+      ip -6 route replace "$pfx" dev gbmcbr metric "$GBMC_ROUTE_METRIC_ONLINK" 2>/dev/null || true
+      ip addrlabel add prefix "$pfx" label "$GBMC_SLAAC_ADDRLABEL" 2>/dev/null || true
     fi
   done
   if [[ -n $next ]]; then
@@ -179,8 +178,8 @@ gbmc_br_from_ra_hook() {
       [[ -z ${gbmc_br_from_ra_gone["$pfx"]-} ]] || return 0
       local now
       gbmc_ip_monitor_uptime now || return
-      gbmc_br_from_ra_gone["$pfx"]=$(( now + GBMC_BR_FROM_RA_GRACE ))
-      gbmc_ip_monitor_timer from-ra "$GBMC_BR_FROM_RA_GRACE"
+      gbmc_br_from_ra_gone["$pfx"]=$(( now + GBMC_BR_RA_GRACE ))
+      gbmc_ip_monitor_timer from-ra "$GBMC_BR_RA_GRACE"
     fi
   elif [[ $change == link && $intf == gbmcbr ]]; then
     rdisc6 -m gbmcbr -r 1 -w 100 >/dev/null 2>&1

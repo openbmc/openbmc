@@ -33,9 +33,6 @@ gbmc_br_gw_defgw=
 # The NCSI interface, empty if there isn't one
 gbmc_br_gw_src_ncsi_if='@NCSI_IF@'
 
-# primary IP priority should be higher than NCSI and NIC
-primary_rt_metric=700
-
 # For tray, priorize the route sent by host BMC
 primary_ip_from_br=""
 
@@ -50,26 +47,15 @@ GBMC_BR_GW_SRC_ADV_CONFS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-
 # just leaving them out don't remove them. Advertised route prefixes, starting
 # with the ones a previous instance left behind, see gbmc_br_gw_src_adv_load().
 declare -A gbmc_br_gw_src_adv_cur=()
-# A networkd reconfigure of an uplink drops the source we gave its default
-# routes, and we only put it back once networkd re-adds them. Keep advertising
-# routes that go missing for less than this many seconds, so the BMCs behind
-# gbmcbr don't lose them for a moment, and we don't reload networkd twice.
-GBMC_BR_GW_SRC_ADV_GRACE=5
-# Advertised route prefix that went missing -> uptime when we withdraw it
+# Advertised route prefix that went missing -> uptime when we withdraw it,
+# after GBMC_BR_RA_GRACE seconds
 declare -A gbmc_br_gw_src_adv_gone=()
-# The metric used on the tray for /124s from BMCs predating the metric
-# encoding, the same as the fallback route they used to get from gbmc-br-ra.
-GBMC_BR_GW_SRC_LEGACY_METRIC=2000
 
 # Advertised route prefix -> gateway, for trays
 declare -A gbmc_br_gw_src_br_routes=()
 # Advertised route prefix -> uptime when we give up on it coming back, for
-# trays. See GBMC_BR_GW_SRC_BR_GRACE.
+# trays, after GBMC_BR_RA_GRACE seconds
 declare -A gbmc_br_gw_src_br_gone=()
-# networkd flushes RA learned routes whenever it reconfigures gbmcbr, and they
-# only come back with the next RA (it solicits one right away). Only forget
-# an advertised route if it stays gone for this many seconds.
-GBMC_BR_GW_SRC_BR_GRACE=5
 # Installed default route metric -> "<gateway> <source>", for trays
 declare -A gbmc_br_gw_src_br_installed=()
 
@@ -85,9 +71,10 @@ declare -A gbmc_br_gw_src_br_installed=()
 gbmc_br_tray_metric() {
   local -n tray_metric_out="$1"
   local metric="$2"
+  local base="$GBMC_ROUTE_METRIC_FALLBACK_OFFSET"
   [[ $metric =~ ^[0-9]+$ ]] || return 1
-  (( metric < 2000 && metric % 1000 >= 100 && metric % 10 == 0 )) || return 1
-  tray_metric_out=$(( (metric / 1000 + 1) * 1000 + metric % 1000 / 10 ))
+  (( metric < 2 * base && metric % base >= 100 && metric % 10 == 0 )) || return 1
+  tray_metric_out=$(( (metric / base + 1) * base + metric % base / 10 ))
 }
 
 # Builds the advertised /124 prefix (without length) for a head default route.
@@ -170,13 +157,13 @@ gbmc_br_config_primary_ip() {
 
    local route_new
    route_new=$(echo "$route" | sed -E 's/ metric [0-9]+//')
-   echo "gBMC Bridge primary IP route $op (metric $primary_rt_metric): $route_new" >&2
+   echo "gBMC Bridge primary IP route $op (metric $GBMC_ROUTE_METRIC_PRIMARY): $route_new" >&2
    if [[ "$op" == "del" ]]; then
      # shellcheck disable=SC2086
-     ip route "$op" $route_new metric "$primary_rt_metric" 2>/dev/null
+     ip route "$op" $route_new metric "$GBMC_ROUTE_METRIC_PRIMARY" 2>/dev/null
    else
      # shellcheck disable=SC2086
-     ip route "$op" $route_new metric "$primary_rt_metric"
+     ip route "$op" $route_new metric "$GBMC_ROUTE_METRIC_PRIMARY"
    fi
 }
 
@@ -221,7 +208,7 @@ gbmc_br_gw_src_adv_update() {
       # networkd reconfigures its interface and we put its source back
       local deadline="${gbmc_br_gw_src_adv_gone["$pfx"]-}"
       if [[ -z $deadline ]]; then
-        deadline=$(( now + GBMC_BR_GW_SRC_ADV_GRACE ))
+        deadline=$(( now + GBMC_BR_RA_GRACE ))
         gbmc_br_gw_src_adv_gone["$pfx"]=$deadline
       fi
       if (( deadline > now )); then
@@ -297,7 +284,7 @@ gbmc_br_deprioritize_l2br() {
 
   read -r -d '' ra_metric <<EOF
 [IPv6AcceptRA]
-RouteMetric=2048
+RouteMetric=$GBMC_ROUTE_METRIC_L2BR
 EOF
   mkdir -p "$(dirname "$fpath")"
   printf '%s\n' "$ra_metric" >"$fpath"
@@ -429,7 +416,7 @@ gbmc_br_gw_src_update() {
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
     local new_src=
     local new_len=16
-    local new_metric=4096
+    local new_metric="$GBMC_ROUTE_METRIC_UNSET"
     [[ "$route" =~ dev' '([^ ]+) ]] || continue
     local dev="${BASH_REMATCH[1]}"
     for ip in "${!gbmc_br_gw_src_ips[@]}"; do
@@ -449,11 +436,11 @@ gbmc_br_gw_src_update() {
       #      From the NIC over NCSI with the /64 shared with the CN
       #   3. BMC stateless (2620:15c:2c3:aaae:fd00:3c8d:20dc:263e/80)
       #      From the NIC, but derived from the MAC and typically never used
-      local metric="${dev_ip_to_metric["$dev-$ip"]-4097}"
+      local metric="${dev_ip_to_metric["$dev-$ip"]-$(( GBMC_ROUTE_METRIC_UNSET + 1 ))}"
       # NIC addresses always belong on their NIC path, even before the policy
       # rules routing them out there exist
-      if [[ -n ${ip_nic["$ip"]-} ]] && (( metric > 4095 )); then
-        metric=4095
+      if [[ -n ${ip_nic["$ip"]-} ]] && (( metric > GBMC_ROUTE_METRIC_NIC_FALLBACK )); then
+        metric="$GBMC_ROUTE_METRIC_NIC_FALLBACK"
       fi
       local ip_len="${gbmc_br_gw_src_ips["$ip"]}"
       if (( metric < new_metric || (metric == new_metric && ip_len < new_len) )); then
@@ -493,11 +480,11 @@ gbmc_br_gw_src_update() {
       ip route del $base_route 2>/dev/null || true
       continue
     fi
-    local rt_metric=4096  # Use a default that will be recognized as invalid
+    local rt_metric="$GBMC_ROUTE_METRIC_UNSET"  # Use a default that will be recognized as invalid
     if [[ "$route" =~ ' metric '([^ ]+) ]]; then
       rt_metric="${BASH_REMATCH[1]}"
     fi
-    if (( rt_metric <= 1536 )) && [[ "$new_src" == "$primary_ip" ]]; then
+    if (( rt_metric <= GBMC_ROUTE_METRIC_PRIMARY_MAX )) && [[ "$new_src" == "$primary_ip" ]]; then
       # Add primary src ip for the GW
       gbmc_br_config_primary_ip "$base_route src $new_src" "replace"
     fi
@@ -584,8 +571,8 @@ gbmc_br_gw_src_br_update() {
     local metric tray_metric
     gbmc_br_adv_metric metric "$pfx" || continue
     if (( metric == 0 )); then
-      tray_metric="$GBMC_BR_GW_SRC_LEGACY_METRIC"
-      metric=$(( tray_metric - 1000 ))
+      tray_metric="$GBMC_ROUTE_METRIC_TRAY_LEGACY"
+      metric=$(( tray_metric - GBMC_ROUTE_METRIC_FALLBACK_OFFSET ))
     else
       gbmc_br_tray_metric tray_metric "$metric" || continue
     fi
@@ -679,7 +666,7 @@ gbmc_br_gw_src_hook() {
       fi
     fi
     # ignore the primary route as this script fully controls it
-    if [[ $route == *" metric $primary_rt_metric "* ]]; then
+    if [[ $route == *" metric $GBMC_ROUTE_METRIC_PRIMARY "* ]]; then
       gbmc_br_gw_src_adv_update
       return
     fi
@@ -776,8 +763,8 @@ gbmc_br_gw_src_hook() {
       [[ -z ${gbmc_br_gw_src_br_gone["$brpfx"]-} ]] || return 0
       local now
       gbmc_ip_monitor_uptime now || return
-      gbmc_br_gw_src_br_gone["$brpfx"]=$(( now + GBMC_BR_GW_SRC_BR_GRACE ))
-      gbmc_ip_monitor_timer gbmc-br-gw-src-br "$GBMC_BR_GW_SRC_BR_GRACE"
+      gbmc_br_gw_src_br_gone["$brpfx"]=$(( now + GBMC_BR_RA_GRACE ))
+      gbmc_ip_monitor_timer gbmc-br-gw-src-br "$GBMC_BR_RA_GRACE"
     fi
   fi
 }

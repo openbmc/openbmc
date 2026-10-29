@@ -39,7 +39,7 @@ gbmc_nic_cn_set() {
   read -r -d '' contents <<EOF
 [Route]
 Destination=$ip/65
-Metric=1024
+Metric=$GBMC_ROUTE_METRIC_CATCHALL
 EOF
   local i
   local cn_ip
@@ -60,7 +60,7 @@ EOF
   done
 
   local st=0
-  ip -6 route add "$ip/65" dev gbmcbr metric 1024 2>dev/null || true
+  ip -6 route add "$ip/65" dev gbmcbr metric "$GBMC_ROUTE_METRIC_CATCHALL" 2>dev/null || true
   for intf in "${gbmc_nic_cn_intfs[@]}"; do
     if [[ "$act" == add ]]; then
       for cn_ip in "${cn_ips[@]}"; do

@@ -89,10 +89,6 @@ gbmc_br_run_hooks() {
   return $rc
 }
 
-# Lifetime of everything we advertise to the BMCs behind gbmcbr, the same as
-# our RouterLifetimeSec. networkd sends unsolicited RAs at least that often
-# and the BMCs behind us solicit one every 30s.
-GBMC_BR_RA_LIFETIME=120
 GBMC_BR_WITHDRAWN_DIRS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d)
 
 # shellcheck disable=SC2034  # nameref
@@ -289,11 +285,11 @@ PreferredLifetimeSec=$GBMC_BR_RA_LIFETIME
 ValidLifetimeSec=$GBMC_BR_RA_LIFETIME
 [Route]
 Destination=$stateless_pfx/80
-Metric=512
+Metric=$GBMC_ROUTE_METRIC_ONLINK
 [Route]
 Destination=$stateless_pfx/$stateless_size
 Type=unreachable
-Metric=1024
+Metric=$GBMC_ROUTE_METRIC_CATCHALL
 EOF
   fi
   echo "Adding runtime gbmcbr IP: $name $pfx stateless($stateless_pfx/$stateless_size)" >&2

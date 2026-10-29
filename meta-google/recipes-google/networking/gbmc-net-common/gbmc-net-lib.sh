@@ -366,6 +366,102 @@ _gbmc_net_nftables_reload_exec() {
 
 GBMC_INTF_ROUTE_TABLE_BASE=1000
 
+# Route metrics. The default route metrics form a preference order for
+# reaching the ToR (lower wins); the other metrics mostly keep a route we add
+# with `ip route` identical to the copy networkd installs from our drop-ins,
+# so the two merge instead of duplicating, and distinct from the kernel's own
+# prefix routes (256) and networkd's RA routes (RouteMetric=1056 on gbmcbr).
+#
+# Default routes in the main table, by uplink:
+#   700  Whichever uplink route below is sourced from the primary IP, copied
+#        to this metric so the primary address always wins source selection.
+#   800  Front panel RJ45, from a live RA (gbmc-nic-ra). Closest to the ToR.
+#   900  NCSI / in-band NIC, from a live RA (gbmc-ncsi-ra).
+#   +1000 (1800, 1900)  The same uplinks from the last RA we saw, cached in
+#        /run and /var so we have a gateway before the first live RA arrives.
+#   1536 Highest metric still eligible for the 700 copy, i.e. live uplinks
+#        only, never a cached route. Routes through gbmcbr never get copied
+#        either, whatever their metric.
+#
+# Default routes on a tray, through the head BMC over gbmcbr. The head
+# advertises each of its uplinks with its metric (see gbmc_br_adv_pfx) and the
+# tray bumps it to the next thousand, keeping the uplink digit in the tens
+# (800 -> 1080, 1800 -> 2080, see gbmc_br_tray_metric):
+#   1070, 1080, 1090  The head's live uplinks. Below the tray's own cached
+#        routes (1800+) so a head with a live ToR beats a stale cache, above
+#        its own live uplinks (800, 900) so a tray with its own ToR uses it.
+#   2080, 2090  The head's cached uplinks.
+#   2000 A head too old to encode the metric in its advertisement.
+#   2048 l2br RA routes once the head is advertising, so they lose to it.
+#
+# Prefix routes on gbmcbr:
+#   512  Specific on-link prefixes: the /80s downstream BMCs autoconfigure in,
+#        RA prefixes we hold an address in, and the per-interface routing
+#        table (GBMC_INTF_ROUTE_TABLE_BASE + ifindex) default routes.
+#   1024 Catch-all routes for a whole allocation: unreachable for the unused
+#        rest of a /64 or /76, and the compute node's half (/65) of its /64.
+#
+# Source selection pseudo-metrics in gbmc-br-gw-src, not installed anywhere:
+#   4095 An NCSI NIC address on its own NIC before its policy rules exist.
+#   4096 No route / unknown metric.
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_PRIMARY=700
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_FRONT_PANEL=800
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_NCSI=900
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_FALLBACK_OFFSET=1000
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_PRIMARY_MAX=1536
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_TRAY_LEGACY=2000
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_L2BR=2048
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_ONLINK=512
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_CATCHALL=1024
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_NIC_FALLBACK=4095
+# shellcheck disable=SC2034
+GBMC_ROUTE_METRIC_UNSET=4096
+
+# Address label (RFC 6724 rule 6) for the /80 prefixes we autoconfigure an
+# address in from gbmcbr RAs. Global destinations carry the default label 1,
+# as does our primary /128, so a source with a different label only gets
+# picked for destinations inside its own /80 or when a route names it.
+# shellcheck disable=SC2034
+GBMC_SLAAC_ADDRLABEL=99
+
+# Router discovery timers, in seconds:
+#   GBMC_RA_TIMEOUT      How long each rdisc6 solicitation waits for RAs.
+#   GBMC_RA_MIN_RETRY    Solicitation interval until we have a router.
+#   GBMC_RA_RS_INTERVAL  Solicitation interval once we do.
+#   GBMC_RA_EXPIRE       Without an RA for this long a router is dropped and
+#                        the next one we heard from takes over.
+#   GBMC_BR_RA_LIFETIME  Lifetime of the router, prefixes and routes we
+#                        advertise on gbmcbr, 4 solicitation intervals so the
+#                        BMCs behind us refresh well before it runs out.
+#   GBMC_BR_RA_GRACE     How long an RA route may be missing before we act on
+#                        it. A networkd reconfigure flushes the RA routes and
+#                        strips the source off our uplink routes; it solicits a
+#                        new RA right away and we put the source back, so
+#                        waiting this long avoids tearing down addresses and
+#                        advertisements that are about to come back.
+# shellcheck disable=SC2034
+GBMC_RA_TIMEOUT=10
+# shellcheck disable=SC2034
+GBMC_RA_MIN_RETRY=10
+# shellcheck disable=SC2034
+GBMC_RA_RS_INTERVAL=30
+# shellcheck disable=SC2034
+GBMC_RA_EXPIRE=180
+# shellcheck disable=SC2034
+GBMC_BR_RA_LIFETIME=120
+# shellcheck disable=SC2034
+GBMC_BR_RA_GRACE=5
+
 # Calculate and print the deterministic routing table number for a network
 # interface based on its kernel ifindex.
 # The table number is calculated as GBMC_INTF_ROUTE_TABLE_BASE (1000) + ifindex.

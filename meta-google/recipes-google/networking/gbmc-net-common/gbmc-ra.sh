@@ -25,7 +25,7 @@ source /usr/share/gbmc-net-lib.sh || exit
 # routing table, without any default routes in the main table.
 ROUTE_METRIC_LO=
 if [ -n "$ROUTE_METRIC" ]; then
-  ROUTE_METRIC_LO="$((ROUTE_METRIC+1000))"
+  ROUTE_METRIC_LO="$((ROUTE_METRIC + GBMC_ROUTE_METRIC_FALLBACK_OFFSET))"
 fi
 
 # We would prefer empty string but it's easier for associative array handling
@@ -58,8 +58,8 @@ add_rtr() {
     mkdir -p "$file.d"
     printf '[Neighbor]\nMACAddress=%s\nAddress=%s\n' \
       "$mac" "$rtr" >"$file.d"/10-gateway.conf
-    printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=512\nTable=%d\n' \
-      "$rtr" "$route_table" >>"$file.d"/10-gateway.conf
+    printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\nTable=%d\n' \
+      "$rtr" "$GBMC_ROUTE_METRIC_ONLINK" "$route_table" >>"$file.d"/10-gateway.conf
     if [ -n "$ROUTE_METRIC" ]; then
       printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=%d\n' \
         "$rtr" "$ROUTE_METRIC_LO" >>"$file.d"/10-gateway.conf
@@ -84,7 +84,7 @@ add_rtr() {
   # Fall back to reload only if ip link commands fail
   local st=0
   ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac" || st=$?
-  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric 512 table "$route_table" || st=$?
+  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" || st=$?
   if [ -n "$ROUTE_METRIC" ]; then
     ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC_LO" || st=$?
   fi
@@ -153,13 +153,13 @@ default_update_fqdn() {
 }
 
 # mininum retry time
-min_w=10
+min_w="$GBMC_RA_MIN_RETRY"
 # rdisc time
-r_timeout=10
+r_timeout="$GBMC_RA_TIMEOUT"
 # routing expiration time
-expire_time=180
+expire_time="$GBMC_RA_EXPIRE"
 # rs intervals
-rs_intervals=30
+rs_intervals="$GBMC_RA_RS_INTERVAL"
 declare -A rtrs
 rtrs=()
 while true; do

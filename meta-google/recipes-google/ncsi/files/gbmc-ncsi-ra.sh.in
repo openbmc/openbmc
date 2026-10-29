@@ -21,7 +21,7 @@ source /usr/share/gbmc-br-lib.sh || exit
 RA_IF=$1
 IP_OFFSET=1
 # NCSI is known to be closer to the ToR than bridge routes. Prefer over bridge routes.
-ROUTE_METRIC=900
+ROUTE_METRIC="$GBMC_ROUTE_METRIC_NCSI"
 
 update_rtr() {
   local op="${3-add}"

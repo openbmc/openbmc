@@ -25,11 +25,14 @@ update_pfx() {
   true
 }
 
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+
 RA_IF=$1
 IP_OFFSET=0
 # This is guaranteed to be closer to the ToR than NCSI, for reliability
 # and bandwidth we want to prefer this path.
-ROUTE_METRIC=800
+ROUTE_METRIC="$GBMC_ROUTE_METRIC_FRONT_PANEL"
 
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh
 source /usr/share/gbmc-ra.sh || exit
