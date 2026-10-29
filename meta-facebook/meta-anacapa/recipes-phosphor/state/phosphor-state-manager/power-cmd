@@ -36,7 +36,7 @@ is_amc_ready() {
 
 # Power Good Status
 power_status() {
-    if [ "$(get_gpio "FM_CPU0_PWRGD")" -eq 1 ] ; then
+    if [ "$(get_gpio "host0-ready")" -eq 1 ] ; then
         echo "on"
     else
         echo "off"
