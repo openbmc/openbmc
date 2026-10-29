@@ -1,1 +1,3 @@
-ACTION!="remove", SUBSYSTEM=="net", SUBSYSTEMS=="usb", ATTRS{busnum}=="?*", ENV{ID_NET_NAME_PATH}=="enu*", ENV{ID_NET_NAME_PATH}="$env{ID_NET_NAME_PATH}b$attr{busnum}"
+# Keep interfaces on different USB host controllers apart. Bus 1 keeps the
+# plain predictable name, which is what single controller BMCs always had.
+ACTION!="remove", SUBSYSTEM=="net", SUBSYSTEMS=="usb", ATTRS{busnum}=="[2-9]*|1?*", ENV{ID_NET_NAME_PATH}=="enu*", ENV{ID_NET_NAME_PATH}="$env{ID_NET_NAME_PATH}b$attr{busnum}"
