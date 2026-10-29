@@ -34,9 +34,10 @@ update_pfx() {
 
 RA_IF=gbmcbr
 IP_OFFSET=@IP_OFFSET@
-# Use the lowest priority, except for kernel RA discovered routes.
-# We want closer NICs to provide a default route if existing.
-ROUTE_METRIC=1000
+# Only route through the head BMC from the gbmcbr routing table here. The main
+# table default routes through the head come from the routes it advertises,
+# see gbmc_br_gw_src_br_update() in gbmc-br-gw-src.sh.
+ROUTE_METRIC=
 
 echo "Waiting for ${RA_IF} configuration" >&2
 

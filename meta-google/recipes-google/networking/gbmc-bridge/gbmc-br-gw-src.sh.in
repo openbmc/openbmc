@@ -33,7 +33,103 @@ primary_rt_metric=700
 
 # For tray, priorize the route sent by host BMC
 primary_ip_from_br=""
+
+# Default routes are shared with the BMCs behind gbmcbr by advertising a /124
+# route prefix for each one. The first 64 bits are those of the route source
+# and the upper 12 bits of the last hextet hold the route metric (0..4095),
+# e.g. 2002:a05:66d0:476a::3200/124 for a front panel route (metric 800 = 0x320)
+# sourced from 2002:a05:66d0:476a::. The /124 only clears the last nibble,
+# which is always 0.
+GBMC_BR_GW_SRC_ADV_CONFS=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf)
+# Routes we stop advertising are withdrawn with gbmc_br_ra_withdraw(), as RAs
+# just leaving them out don't remove them. Advertised route prefixes, starting
+# with the ones a previous instance left behind, see gbmc_br_gw_src_adv_load().
+declare -A gbmc_br_gw_src_adv_cur=()
+# A networkd reconfigure of an uplink drops the source we gave its default
+# routes, and we only put it back once networkd re-adds them. Keep advertising
+# routes that go missing for less than this many seconds, so the BMCs behind
+# gbmcbr don't lose them for a moment, and we don't reload networkd twice.
+GBMC_BR_GW_SRC_ADV_GRACE=5
+# Advertised route prefix that went missing -> uptime when we withdraw it
+declare -A gbmc_br_gw_src_adv_gone=()
+# The metric used on the tray for /124s from BMCs predating the metric
+# encoding, the same as the fallback route they used to get from gbmc-br-ra.
+GBMC_BR_GW_SRC_LEGACY_METRIC=2000
+
+# Advertised route prefix -> gateway, for trays
 declare -A gbmc_br_gw_src_br_routes=()
+# Advertised route prefix -> uptime when we give up on it coming back, for
+# trays. See GBMC_BR_GW_SRC_BR_GRACE.
+declare -A gbmc_br_gw_src_br_gone=()
+# networkd flushes RA learned routes whenever it reconfigures gbmcbr, and they
+# only come back with the next RA (it solicits one right away). Only forget
+# an advertised route if it stays gone for this many seconds.
+GBMC_BR_GW_SRC_BR_GRACE=5
+# Installed default route metric -> "<gateway> <source>", for trays
+declare -A gbmc_br_gw_src_br_installed=()
+
+# Maps a head default route metric to the metric of the tray route through the
+# head. The primary, front panel and NCSI routes (700, 800, 900) become 1070,
+# 1080 and 1090, and the always present front panel and NCSI fallbacks (1800,
+# 1900) become 2080 and 2090, so the tray picks the path the head is using
+# while still preferring any uplinks of its own.
+# Arguments:
+#   $1: Output variable for the tray metric
+#   $2: Head route metric
+# shellcheck disable=SC2034  # namerefs
+gbmc_br_tray_metric() {
+  local -n tray_metric_out="$1"
+  local metric="$2"
+  [[ $metric =~ ^[0-9]+$ ]] || return 1
+  (( metric < 2000 && metric % 1000 >= 100 && metric % 10 == 0 )) || return 1
+  tray_metric_out=$(( (metric / 1000 + 1) * 1000 + metric % 1000 / 10 ))
+}
+
+# Builds the advertised /124 prefix (without length) for a head default route.
+# Arguments:
+#   $1: Output variable for the prefix
+#   $2: Route source address
+#   $3: Route metric (0..4095)
+# shellcheck disable=SC2034  # namerefs
+gbmc_br_adv_pfx() {
+  local -n adv_pfx_out="$1"
+  local src="$2"
+  local metric="$3"
+  [[ $metric =~ ^[0-9]+$ ]] && (( metric <= 4095 )) || return 1
+  local adv_bytes=()
+  ip_to_bytes adv_bytes "$src" || return
+  local i
+  for (( i = 8; i < 14; ++i )); do
+    adv_bytes[i]=0
+  done
+  adv_bytes[14]=$(( metric >> 4 ))
+  adv_bytes[15]=$(( (metric & 0x0f) << 4 ))
+  adv_pfx_out="$(ip_bytes_to_str adv_bytes)"
+}
+
+# Decodes the head route metric from an advertised /124 prefix. Prefixes from
+# BMCs predating the encoding decode as 0, including ones whose last hextet
+# isn't a head route metric.
+# Arguments:
+#   $1: Output variable for the metric
+#   $2: Advertised prefix (without length)
+# shellcheck disable=SC2034  # namerefs
+gbmc_br_adv_metric() {
+  local -n adv_metric_out="$1"
+  local pfx="$2"
+  local adv_bytes=()
+  ip_to_bytes adv_bytes "$pfx" || return
+  adv_metric_out=0
+  local i
+  for (( i = 8; i < 14; ++i )); do
+    (( adv_bytes[i] == 0 )) || return 0
+  done
+  (( (adv_bytes[15] & 0x0f) == 0 )) || return 0
+  local m=$(( (adv_bytes[14] << 4) | (adv_bytes[15] >> 4) ))
+  local tray
+  gbmc_br_tray_metric tray "$m" || return 0
+  adv_metric_out="$m"
+}
 
 gbmc_br_set_router() {
   local defgw=
@@ -56,7 +152,7 @@ gbmc_br_set_router() {
   local file
   for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-defgw.conf; do
     mkdir -p "$(dirname "$file")"
-    printf '[IPv6SendRA]\nRouterLifetimeSec=120\n' >"$file"
+    printf '[IPv6SendRA]\nRouterLifetimeSec=%d\n' "$GBMC_BR_RA_LIFETIME" >"$file"
   done
 
   # shellcheck disable=SC2119
@@ -79,45 +175,112 @@ gbmc_br_config_primary_ip() {
    fi
 }
 
-# Notify the tray BMC with the preferred src ip
-primary_route_to_br_update() {
-  local rt
+# Advertise all of our default routes, other than those through gbmcbr, to the
+# BMCs behind gbmcbr in order of preference. See GBMC_BR_GW_SRC_ADV_CONFS.
+gbmc_br_gw_src_adv_update() {
+  local -A pfxs=()
+  # Routes that are still there but unusable, withdrawn without a grace period
+  local -A down=()
+  if (( ${#gbmc_br_gw_src_ips[@]} > 0 )); then
+    local route
+    while read -r route; do
+      [[ $route =~ ' dev '([^ ]+) ]] || continue
+      [[ ${BASH_REMATCH[1]} == gbmcbr ]] && continue
+      [[ $route =~ ' src '([^ ]+) ]] || continue
+      local src="${BASH_REMATCH[1]}"
+      [[ $route =~ ' metric '([0-9]+) ]] || continue
+      local metric="${BASH_REMATCH[1]}"
+      local tray_metric
+      gbmc_br_tray_metric tray_metric "$metric" || continue
+      local pfx
+      gbmc_br_adv_pfx pfx "$src" "$metric" || continue
+      if [[ $route == *' dead '* || $route == *' linkdown '* ]]; then
+        down["$pfx"]=1
+      else
+        pfxs["$pfx"]=1
+      fi
+    done < <(ip -6 route show default 2>/dev/null)
+  fi
+
+  local now
+  gbmc_ip_monitor_uptime now || return
+  local pfx
+  local next=
+  for pfx in "${!gbmc_br_gw_src_adv_cur[@]}"; do
+    if [[ -n ${pfxs["$pfx"]-} ]]; then
+      unset 'gbmc_br_gw_src_adv_gone[$pfx]'
+      continue
+    fi
+    if [[ -z ${down["$pfx"]-} ]]; then
+      # Keep advertising a route that went missing for a moment, e.g. while
+      # networkd reconfigures its interface and we put its source back
+      local deadline="${gbmc_br_gw_src_adv_gone["$pfx"]-}"
+      if [[ -z $deadline ]]; then
+        deadline=$(( now + GBMC_BR_GW_SRC_ADV_GRACE ))
+        gbmc_br_gw_src_adv_gone["$pfx"]=$deadline
+      fi
+      if (( deadline > now )); then
+        pfxs["$pfx"]=1
+        if [[ -z $next ]] || (( deadline < next )); then
+          next="$deadline"
+        fi
+        continue
+      fi
+    fi
+    unset 'gbmc_br_gw_src_adv_gone[$pfx]'
+    unset 'gbmc_br_gw_src_adv_cur[$pfx]'
+    gbmc_br_ra_withdraw IPv6RoutePrefix "$pfx/124"
+  done
+  for pfx in "${!pfxs[@]}"; do
+    [[ -z ${gbmc_br_gw_src_adv_cur["$pfx"]-} ]] || continue
+    gbmc_br_gw_src_adv_cur["$pfx"]=1
+    gbmc_br_ra_unwithdraw IPv6RoutePrefix "$pfx/124"
+  done
+  if [[ -n $next ]]; then
+    gbmc_ip_monitor_timer gbmc-br-gw-src-adv $(( next - now ))
+  fi
+
+  local contents=
+  while read -r pfx; do
+    [[ -n $pfx ]] || continue
+    contents+="[IPv6RoutePrefix]"$'\n'"Route=$pfx/124"$'\n'
+    contents+="LifetimeSec=$GBMC_BR_RA_LIFETIME"$'\n'
+  done < <(printf '%s\n' "${!pfxs[@]}" | sort)
+
   local need_reload=0
-  local new_src=""
-  local dev=""
-  # no need to notify if it does not have default gw
-  rt="$(ip -6 route get 2000:: 2>/dev/null)"
-
-  if [[ "$rt" =~ dev' '([^ ]+).*' src '([^ ]+) ]]; then
-    dev="${BASH_REMATCH[1]}"
-    [[ "$dev" != "gbmcbr" ]] && new_src="${BASH_REMATCH[2]}"
-  fi
-
-  if [[ -z "$new_src" || ${#gbmc_br_gw_src_ips[@]} -eq 0 ]]; then
-    for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
+  local file
+  for file in "${GBMC_BR_GW_SRC_ADV_CONFS[@]}"; do
+    if [[ -z $contents ]]; then
       [ -f "$file" ] || continue
-      echo "gBMC Bridge removing hybrid route notification: $file" >&2
-      rm -rf "$file"
-      need_reload=1
-    done
-  else
-    read -r -d '' notify_route <<EOF
-[IPv6RoutePrefix]
-Route=$new_src/124
-LifetimeSec=90
-EOF
-    for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
-      grep -q "Route=$new_src/124" "$file" 2>/dev/null && continue
-      echo "gBMC Bridge notifying hybrid route $new_src/124 via $dev: $file" >&2
+      echo "gBMC Bridge removing default route advertisements: $file" >&2
+      rm -f "$file"
+    else
+      [[ "$(cat "$file" 2>/dev/null)"$'\n' == "$contents" ]] && continue
+      echo "gBMC Bridge advertising default routes (${!pfxs[*]}): $file" >&2
       mkdir -p "$(dirname "$file")"
-      printf '%s\n' "$notify_route" >"$file"
-      need_reload=1
-    done
-  fi
+      printf '%s' "$contents" >"$file"
+    fi
+    need_reload=1
+  done
 
   # shellcheck disable=SC2119
   (( need_reload == 1 )) && gbmc_net_networkd_reload
+  return 0
 }
+
+# Picks up the routes a previous instance advertised, so the ones that are
+# gone get withdrawn.
+gbmc_br_gw_src_adv_load() {
+  local -a entries=()
+  gbmc_br_ra_conf_entries entries "${GBMC_BR_GW_SRC_ADV_CONFS[0]##*/}"
+  local entry
+  for entry in "${entries[@]}"; do
+    [[ $entry == 'IPv6RoutePrefix '*/124 ]] || continue
+    entry="${entry#* }"
+    gbmc_br_gw_src_adv_cur["${entry%/124}"]=1
+  done
+}
+gbmc_br_gw_src_adv_load
 
 gbmc_br_deprioritize_l2br() {
   # return success if no l2br
@@ -280,21 +443,109 @@ gbmc_br_gw_src_update() {
     # shellcheck disable=SC2086
     ip route change $base_route src "$new_src" && unset 'gbmc_br_gw_src_routes[$route]'
   done
-  primary_route_to_br_update
+  gbmc_br_gw_src_adv_update
 }
 
+# Picks our gbmcbr address to source traffic through the head for an
+# advertised prefix, the shortest one in the same /64.
+# Arguments:
+#   $1: Output variable for the source address
+#   $2: Advertised prefix (without length)
+gbmc_br_gw_src_br_src() {
+  local -n br_src_out="$1"
+  local pfx="$2"
+  br_src_out=
+  local best_len=16
+  local ip
+  for ip in "${!gbmc_br_gw_src_ips[@]}"; do
+    local len="${gbmc_br_gw_src_ips["$ip"]}"
+    (( len < best_len )) || continue
+    ip_same_pfx "$ip" "$pfx" 64 || continue
+    br_src_out="$ip"
+    best_len="$len"
+  done
+  [[ -n $br_src_out ]]
+}
+
+# Forgets advertisements from the head that were removed and didn't come back
+# within the grace period, and re-arms the timer for the remaining ones.
+gbmc_br_gw_src_br_expire() {
+  local now
+  gbmc_ip_monitor_uptime now || return
+  local next=
+  local pfx
+  for pfx in "${!gbmc_br_gw_src_br_gone[@]}"; do
+    local deadline="${gbmc_br_gw_src_br_gone["$pfx"]}"
+    if (( deadline <= now )); then
+      unset 'gbmc_br_gw_src_br_gone[$pfx]'
+      # Make sure we didn't miss it coming back
+      if [[ -n "$(ip -6 route show "$pfx/124" dev gbmcbr 2>/dev/null)" ]]; then
+        continue
+      fi
+      echo "gBMC Bridge default route advertisement removed: $pfx" >&2
+      unset 'gbmc_br_gw_src_br_routes[$pfx]'
+    elif [[ -z $next ]] || (( deadline < next )); then
+      next="$deadline"
+    fi
+  done
+  if [[ -n $next ]]; then
+    gbmc_ip_monitor_timer gbmc-br-gw-src-br $(( next - now ))
+  fi
+}
+
+# Installs a default route through the head for every route it advertises,
+# see gbmc_br_tray_metric(), and removes the ones no longer advertised.
 gbmc_br_gw_src_br_update() {
-  local new_brip=""
-  local brip
-  for brip in "${!gbmc_br_gw_src_br_routes[@]}"; do
-    new_brip="$brip"
-    break
+  local -A want=()
+  local best_metric=
+  local best_pfx=
+  local pfx
+  for pfx in "${!gbmc_br_gw_src_br_routes[@]}"; do
+    local gw="${gbmc_br_gw_src_br_routes["$pfx"]}"
+    local metric tray_metric
+    gbmc_br_adv_metric metric "$pfx" || continue
+    if (( metric == 0 )); then
+      tray_metric="$GBMC_BR_GW_SRC_LEGACY_METRIC"
+      metric=$(( tray_metric - 1000 ))
+    else
+      gbmc_br_tray_metric tray_metric "$metric" || continue
+    fi
+    if [[ -z $best_metric ]] || (( metric < best_metric )); then
+      best_metric="$metric"
+      best_pfx="$pfx"
+    fi
+    local src
+    gbmc_br_gw_src_br_src src "$pfx" || continue
+    want["$tray_metric"]="$gw $src"
   done
 
-  if [[ "$new_brip" != "$primary_ip_from_br" ]]; then
-    if [[ -n "$new_brip" ]]; then
-      echo "Change preferred src from bridge RA: ${gbmc_br_gw_src_br_routes["$new_brip"]}" >&2
-      primary_ip_from_br="$new_brip"
+  local metric
+  for metric in "${!gbmc_br_gw_src_br_installed[@]}"; do
+    [[ ${want["$metric"]-} == "${gbmc_br_gw_src_br_installed["$metric"]}" ]] && continue
+    local data
+    read -ra data <<<"${gbmc_br_gw_src_br_installed["$metric"]}"
+    echo "gBMC Bridge removing default route via ${data[0]} src ${data[1]} metric $metric" >&2
+    unset 'gbmc_br_gw_src_br_installed[$metric]'
+    ip -6 route del default via "${data[0]}" dev gbmcbr metric "$metric" 2>/dev/null || true
+  done
+  for metric in "${!want[@]}"; do
+    [[ -n ${gbmc_br_gw_src_br_installed["$metric"]-} ]] && continue
+    local data
+    read -ra data <<<"${want["$metric"]}"
+    echo "gBMC Bridge adding default route via ${data[0]} src ${data[1]} metric $metric" >&2
+    # Mark it installed first so the route events for it are ignored
+    gbmc_br_gw_src_br_installed["$metric"]="${want["$metric"]}"
+    if ! ip -6 route replace default via "${data[0]}" dev gbmcbr onlink \
+        src "${data[1]}" metric "$metric"; then
+      unset 'gbmc_br_gw_src_br_installed[$metric]'
+    fi
+  done
+
+  # Prefer sourcing from the same /64 as the path the head is using
+  if [[ "$best_pfx" != "$primary_ip_from_br" ]]; then
+    if [[ -n "$best_pfx" ]]; then
+      echo "Change preferred src from bridge RA: $best_pfx" >&2
+      primary_ip_from_br="$best_pfx"
       gbmc_br_deprioritize_l2br
     else
       echo "Remove preferred src from bridge RA: $primary_ip_from_br" >&2
@@ -318,19 +569,44 @@ gbmc_br_gw_src_hook() {
     gbmc_ip_monitor_timer gbmc-br-gw-src-rule 1
   elif [[ $change == timer && $timer == gbmc-br-gw-src-rule ]]; then
     gbmc_br_gw_src_update
+  elif [[ $change == timer && $timer == gbmc-br-gw-src-adv ]]; then
+    gbmc_br_gw_src_adv_update
+  elif [[ $change == timer && $timer == gbmc-br-gw-src-br ]]; then
+    gbmc_br_gw_src_br_expire
+    gbmc_br_gw_src_br_update
+  elif [[ $change == link ]]; then
+    # Routes going linkdown don't generate route events
+    gbmc_br_gw_src_adv_update
   # We only want to match default gateway routes that are dynamic
   # (have an expiration time). These will be updated with our preferred
   # source.
   elif [[ $change == route && $route == 'default '*':'* ]]; then
     # ignore everything except main table
     [[ $route == *" table "* ]] && return
+    # ignore the routes through the head we install, but put them back if
+    # something else (like a networkd reconfigure) removes them
+    if [[ $route == *' dev gbmcbr '* && $route =~ ' metric '([0-9]+) ]]; then
+      local br_metric="${BASH_REMATCH[1]}"
+      if [[ -n ${gbmc_br_gw_src_br_installed["$br_metric"]-} ]]; then
+        if [[ $action == del ]]; then
+          unset 'gbmc_br_gw_src_br_installed[$br_metric]'
+          gbmc_ip_monitor_defer
+        fi
+        return 0
+      fi
+    fi
     # ignore the primary route as this script fully controls it
-    [[ $route == *" metric $primary_rt_metric "* ]] && return
+    if [[ $route == *" metric $primary_rt_metric "* ]]; then
+      gbmc_br_gw_src_adv_update
+      return
+    fi
     # ignore RA from systemd on standard RA
     [[ $route == *" proto ra "* && $route == *" dev l2br "* ]] && return
     # ignore dead route and linkdown route
-    [[ $route == *" dead "* ]] && return
-    [[ $route == *" linkdown "* ]] && return
+    if [[ $route == *" dead "* || $route == *" linkdown "* ]]; then
+      gbmc_br_gw_src_adv_update
+      return
+    fi
 
     local expires_regex='^(.*)( +expires +[^ ]+)(.*)$'
     if [[ $route =~ $expires_regex ]]; then
@@ -392,24 +668,25 @@ gbmc_br_gw_src_hook() {
       done
     fi
     gbmc_br_gw_src_update
+    # Our sources for the routes through the head might have changed
+    gbmc_br_gw_src_br_update
   # check route on gbmcbr with /124 address
   elif [[ $change == route && $route =~ $br_route_regex ]]; then
-    local br_expires_regex='^(.*)( +expires +[^ ]+)(.*)$'
-    if [[ $route =~ $br_expires_regex ]]; then
-      route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
-    fi
-    local brip="${route%%/124 *}"
+    local brpfx="${route%%/124 *}"
     if [[ $action == add ]]; then
-      local old="${gbmc_br_gw_src_br_routes["$brip"]-}"
-      gbmc_br_gw_src_br_routes["$brip"]="$route"
-      if [[ -z "$old" || "$brip" != "$primary_ip_from_br" ]]; then
+      [[ $route =~ ' via '([^ ]+) ]] || return 0
+      local gw="${BASH_REMATCH[1]}"
+      unset 'gbmc_br_gw_src_br_gone[$brpfx]'
+      if [[ ${gbmc_br_gw_src_br_routes["$brpfx"]-} != "$gw" ]]; then
+        gbmc_br_gw_src_br_routes["$brpfx"]="$gw"
         gbmc_ip_monitor_defer
       fi
-    elif [[ $action == del ]]; then
-      if [[ -n ${gbmc_br_gw_src_br_routes["$brip"]-} ]]; then
-        unset 'gbmc_br_gw_src_br_routes["$brip"]'
-        gbmc_ip_monitor_defer
-      fi
+    elif [[ -n ${gbmc_br_gw_src_br_routes["$brpfx"]-} ]]; then
+      [[ -z ${gbmc_br_gw_src_br_gone["$brpfx"]-} ]] || return 0
+      local now
+      gbmc_ip_monitor_uptime now || return
+      gbmc_br_gw_src_br_gone["$brpfx"]=$(( now + GBMC_BR_GW_SRC_BR_GRACE ))
+      gbmc_ip_monitor_timer gbmc-br-gw-src-br "$GBMC_BR_GW_SRC_BR_GRACE"
     fi
   fi
 }
