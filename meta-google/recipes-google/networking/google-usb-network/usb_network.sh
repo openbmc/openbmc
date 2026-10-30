@@ -31,6 +31,7 @@ ARGUMENT_LIST=(
     "iface-name:"
     "iface-alias:"
     "no-bridge:"
+    "link-up:"
 )
 
 print_usage() {
@@ -49,6 +50,10 @@ $0 [OPTIONS] [stop|start]
         --iface-name name of the network interface.
         --iface-alias alias name of the network interface.
         --no-bridge don't bridge the usb link.
+        --link-up Set to 0 to leave bringing the link up to systemd-networkd,
+                  which does it once it is running from the generated network
+                  config. NCM and ECM hosts only see carrier once the link is
+                  up. Default: 1
         --help  Print this help and exit.
 HELP
 }
@@ -137,7 +142,9 @@ gadget_start() {
         ip link set dev "$IFACE_NAME" alias "$IFACE_ALIAS" || return
     fi
 
-    ip link set dev "$IFACE_NAME" up || return
+    if (( LINK_UP == 1 )); then
+        ip link set dev "$IFACE_NAME" up || return
+    fi
 }
 
 resolve_host_mac_idx() {
@@ -191,6 +198,7 @@ ACTION="start"
 GADGET_DIR_NAME=""
 IFACE_NAME=""
 NO_BRIDGE=0
+LINK_UP=1
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --product-id)
@@ -237,6 +245,10 @@ while [[ $# -gt 0 ]]; do
             NO_BRIDGE=$2
             shift 2
             ;;
+        --link-up)
+            LINK_UP=$2
+            shift 2
+            ;;
         --help)
             print_usage
             exit 0
@@ -278,6 +290,11 @@ validate_safe_string() {
 validate_safe_string "iface-name" "$IFACE_NAME"
 validate_safe_string "gadget-dir-name" "$GADGET_DIR_NAME"
 validate_safe_string "dev-type" "$DEV_TYPE"
+
+if [[ $LINK_UP != [01] ]]; then
+    echo "Error: Invalid link-up: '$LINK_UP'. Must be 0 or 1." >&2
+    exit 1
+fi
 
 lock_file="${USB_NETWORK_LOCK:-/run/usb_network.lock}"
 if [[ ! -w $(dirname "$lock_file") ]]; then

@@ -25,6 +25,8 @@ BMC_USB_IFACE ??= "gusb0"
 
 # Statically configured gadgets, each created early at boot by its own
 # google-usb-static@<iface>.service, without waiting on entity-manager.
+# They are attached once systemd-networkd is running, which brings their
+# links up.
 # BMC_USB_GADGETS is a space separated list of interface names. Each one is
 # described by BMC_USB_GADGET_<iface>, a ';' separated list of key=value pairs:
 #   product-id    USB product id (required)
