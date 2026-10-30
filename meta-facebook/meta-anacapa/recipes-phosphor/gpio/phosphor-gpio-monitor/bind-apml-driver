@@ -14,6 +14,9 @@ case "$1" in
         echo "1e7a2000.i3c" > /sys/bus/platform/drivers/ast2600-i3c-master/unbind
     fi
     echo 1e7a2000.i3c > /sys/bus/platform/drivers/ast2600-i3c-master/bind
+    sleep 2
+    systemctl try-restart xyz.openbmc_project.psusensor.service
+    systemctl try-restart xyz.openbmc_project.hwmontempsensor.service
     ;;
   off)
     if [ -d "/sys/bus/platform/drivers/ast2600-i3c-master/1e7a2000.i3c" ]; then
