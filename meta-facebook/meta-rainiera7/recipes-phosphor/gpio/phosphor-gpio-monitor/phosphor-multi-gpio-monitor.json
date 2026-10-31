@@ -41,6 +41,13 @@
         "Continue": true
     },
     {
+        "Name": "SOC_ERROR",
+        "LineName": "SOC_ERROR_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "rainier-gpio-handler@SOC_ERROR_N_CPLD:FALLING.service",
+        "Continue": true
+    },
+    {
         "Name": "SOC_HOT_N_CPLD",
         "LineName": "SOC_HOT_N_CPLD",
         "EventMon": "BOTH",

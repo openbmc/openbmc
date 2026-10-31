@@ -16,12 +16,6 @@ RTC_DEVICE=0x6F
 REG_OFFSET=0x0b
 CLEAR_BIT=0x07
 
-trigger_ext_warm_reset() {
-    set_gpio RST_SOC_EXTWARMRESET_CPLD 1
-    sleep 1
-    set_gpio RST_SOC_EXTWARMRESET_CPLD 0
-}
-
 trigger_host_reboot() {
     systemctl start obmc-host-reboot@0.target
 }
@@ -30,7 +24,7 @@ trigger_host_poweroff() {
     systemctl start obmc-host-shutdown@0.target
 }
 
-press_reset_button() {
+trigger_external_warm_reset() {
     busctl set-property xyz.openbmc_project.State.Host0 \
         /xyz/openbmc_project/state/host0 \
         xyz.openbmc_project.State.Host \
@@ -69,7 +63,8 @@ case "$GPIO_NET" in
         trigger_host_reboot
         ;;
     SOC_RESETREQ)
-        press_reset_button
+        echo "Rainier SoC requested for an external warm reset $GPIO_NET"
+        trigger_external_warm_reset
         ;;
     wALL_POWER_OK_1)
         handle_all_power_ok
@@ -79,6 +74,10 @@ case "$GPIO_NET" in
         ;;
     FM_CLEAR_RTC)
         restore_clear_rtc_bit
+        ;;
+    SOC_ERROR_N_CPLD)
+        echo "Rainier SoC entered an error state; triggering external warm reset $GPIO_NET"
+        trigger_external_warm_reset
         ;;
     *)
         ;;
