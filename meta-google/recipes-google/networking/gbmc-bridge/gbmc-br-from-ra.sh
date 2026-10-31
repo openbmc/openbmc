@@ -301,8 +301,9 @@ gbmc_br_from_ra_hook() {
     gbmc_br_from_ra_port_carrier["$intf"]="$up"
     if (( up == 1 && prev == 0 )); then
       echo "gBMC Bridge port $intf carrier UP, soliciting RAs" >&2
-      # Waits for the answers, so never in the event loop
-      systemctl start --no-block gbmc-br-port-rs@"$intf".service || true
+      # Waits for the answers, so never in the event loop. Restart a run that
+      # is still going, it is soliciting for a link that has since bounced.
+      systemctl restart --no-block gbmc-br-port-rs@"$intf".service || true
     fi
   elif [[ $change == route && $route != *' table '* &&
           $route =~ ^([^ ]+/80)' dev gbmcbr proto ra ' ]]; then
