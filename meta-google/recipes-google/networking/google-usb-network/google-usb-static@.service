@@ -23,8 +23,10 @@ Before=shutdown.target
 Type=oneshot
 RemainAfterExit=yes
 EnvironmentFile=/usr/share/google-usb-network/%i.conf
-# systemd-networkd brings the link up from the network config the script
-# writes, keeping NCM and ECM hosts without carrier until it manages the link
+# systemd-networkd brings the link up from the network config installed with
+# the image, keeping NCM and ECM hosts without carrier until it manages the
+# link. With the config in place when networkd starts, attaching the gadget
+# doesn't need a networkd reload.
 ExecStart=/usr/bin/usb_network.sh \
     --product-id ${PRODUCT_ID} \
     --product-name ${PRODUCT_NAME} \
@@ -36,9 +38,11 @@ ExecStart=/usr/bin/usb_network.sh \
     --iface-alias ${IFACE_ALIAS} \
     --no-bridge ${NO_BRIDGE} \
     --link-up 0 \
+    --network-config 0 \
     --iface-name %i
 ExecStop=/usr/bin/usb_network.sh stop \
     --dev-type ${DEV_TYPE} \
+    --network-config 0 \
     --iface-name %i
 
 [Install]

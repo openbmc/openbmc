@@ -69,6 +69,7 @@ SYSTEMD_SERVICE:${PN} = "${@'usb_network.service' if d.getVar('BMC_USB_ECM_PRODU
 SYSTEMD_SERVICE:${PN} += "${@' '.join(['google-usb-static.target'] + ['google-usb-static@%s.service' % i for i in d.getVar('BMC_USB_GADGETS').split()]) if d.getVar('BMC_USB_GADGETS').split() else ''}"
 FILES:${PN} += "${systemd_system_unitdir}/google-usb-static@.service"
 FILES:${PN} += "${systemd_system_unitdir}/google-usb-static@*.service.d"
+FILES:${PN} += "${systemd_unitdir}/network/+-bmc-*"
 
 python google_usb_static_gen() {
     import os
@@ -132,6 +133,26 @@ python google_usb_static_gen() {
                 if key == 'condition-path':
                     continue
                 f.write('%s="%s"\n' % (key.upper().replace('-', '_'), cfg.get(key, '')))
+        # The systemd-networkd config usb_network.sh would write at runtime.
+        # Installed with the image, it is loaded when networkd starts, so
+        # attaching the gadget afterwards doesn't need a networkd reload.
+        netdir = os.path.join(outdir, 'network')
+        bb.utils.mkdirhier(netdir)
+        try:
+            pid = int(cfg['product-id'], 0)
+            no_bridge = int(cfg['no-bridge'] or '0', 0)
+        except ValueError:
+            bb.fatal('BMC_USB_GADGET_%s: invalid product-id or no-bridge' % iface)
+        network = '[Match]\nName=%s\n' % iface
+        bridge = {0x22b: 'gbmcbr', 0x22c: 'l2br'}.get(pid)
+        if bridge and no_bridge == 0:
+            network += '[Network]\nBridge=%s\n[Bridge]\nCost=85\n' % bridge
+        with open(os.path.join(netdir, '+-bmc-%s.network' % iface), 'w') as f:
+            f.write(network)
+        if cfg.get('iface-alias'):
+            with open(os.path.join(netdir, '+-bmc-%s.link' % iface), 'w') as f:
+                f.write('[Match]\nOriginalName=%s\n\n[Link]\nAlias=%s\n' %
+                        (iface, cfg['iface-alias']))
         dropin = os.path.join(outdir, 'google-usb-static@%s.service.d' % iface)
         if cfg.get('host-mac-idx'):
             bb.utils.mkdirhier(dropin)
@@ -184,6 +205,9 @@ do_install:append() {
       install -m 0644 ${UNPACKDIR}/google-usb-static/google-usb-static@.service.d/* \
         ${D}${systemd_system_unitdir}/google-usb-static@.service.d/
     fi
+    install -d ${D}${systemd_unitdir}/network
+    install -m 0644 ${UNPACKDIR}/google-usb-static/network/* \
+      ${D}${systemd_unitdir}/network/
     install -d ${D}${datadir}/${BPN}
     for iface in ${BMC_USB_GADGETS}; do
       install -m 0644 ${UNPACKDIR}/google-usb-static/$iface.conf ${D}${datadir}/${BPN}/

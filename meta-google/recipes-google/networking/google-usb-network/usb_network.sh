@@ -32,6 +32,7 @@ ARGUMENT_LIST=(
     "iface-alias:"
     "no-bridge:"
     "link-up:"
+    "network-config:"
 )
 
 print_usage() {
@@ -54,6 +55,9 @@ $0 [OPTIONS] [stop|start]
                   which does it once it is running from the generated network
                   config. NCM and ECM hosts only see carrier once the link is
                   up. Default: 1
+        --network-config Set to 0 when the image installs the systemd-networkd
+                  config of the link, instead of writing it at runtime.
+                  Default: 1
         --help  Print this help and exit.
 HELP
 }
@@ -77,23 +81,25 @@ gadget_start() {
         network+="[Network]"$'\n'"Bridge=l2br"$'\n'"[Bridge]"$'\n'"Cost=85"$'\n'
     fi
 
-    gbmc_net_reload_queue_start
-    local rc=0
-    gbmc_net_write_if_changed "$network" \
-        /run/systemd/network/+-bmc-"${IFACE_NAME}".network || rc=$?
-    if (( rc == 2 )); then
+    if (( NETWORK_CONFIG == 1 )); then
+        gbmc_net_reload_queue_start
+        local rc=0
+        gbmc_net_write_if_changed "$network" \
+            /run/systemd/network/+-bmc-"${IFACE_NAME}".network || rc=$?
+        if (( rc == 2 )); then
+            gbmc_net_reload_queue_end || true
+            return 1
+        fi
+        rc=0
+        gbmc_net_write_if_changed "$link" \
+            /run/systemd/network/+-bmc-"${IFACE_NAME}".link || rc=$?
+        if (( rc == 2 )); then
+            gbmc_net_reload_queue_end || true
+            return 1
+        fi
+        # Ignore any failures due to systemd being unavailable at boot
         gbmc_net_reload_queue_end || true
-        return 1
     fi
-    rc=0
-    gbmc_net_write_if_changed "$link" \
-        /run/systemd/network/+-bmc-"${IFACE_NAME}".link || rc=$?
-    if (( rc == 2 )); then
-        gbmc_net_reload_queue_end || true
-        return 1
-    fi
-    # Ignore any failures due to systemd being unavailable at boot
-    gbmc_net_reload_queue_end || true
 
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}" || return
@@ -169,9 +175,11 @@ gadget_stop() {
       "${gadget_dir}/strings/0x409" \
       "${gadget_dir}" || true
 
-    gbmc_net_rm_if_exists \
-        /run/systemd/network/+-bmc-"${IFACE_NAME}".network \
-        /run/systemd/network/+-bmc-"${IFACE_NAME}".link || true
+    if (( NETWORK_CONFIG == 1 )); then
+        gbmc_net_rm_if_exists \
+            /run/systemd/network/+-bmc-"${IFACE_NAME}".network \
+            /run/systemd/network/+-bmc-"${IFACE_NAME}".link || true
+    fi
 }
 
 opts="$(getopt \
@@ -199,6 +207,7 @@ GADGET_DIR_NAME=""
 IFACE_NAME=""
 NO_BRIDGE=0
 LINK_UP=1
+NETWORK_CONFIG=1
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --product-id)
@@ -249,6 +258,10 @@ while [[ $# -gt 0 ]]; do
             LINK_UP=$2
             shift 2
             ;;
+        --network-config)
+            NETWORK_CONFIG=$2
+            shift 2
+            ;;
         --help)
             print_usage
             exit 0
@@ -293,6 +306,11 @@ validate_safe_string "dev-type" "$DEV_TYPE"
 
 if [[ $LINK_UP != [01] ]]; then
     echo "Error: Invalid link-up: '$LINK_UP'. Must be 0 or 1." >&2
+    exit 1
+fi
+
+if [[ $NETWORK_CONFIG != [01] ]]; then
+    echo "Error: Invalid network-config: '$NETWORK_CONFIG'. Must be 0 or 1." >&2
     exit 1
 fi
 
