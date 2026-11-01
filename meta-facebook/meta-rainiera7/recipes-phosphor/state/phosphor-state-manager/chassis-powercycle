@@ -21,6 +21,7 @@ chassis-power-cycle() {
     if ! i2cset -f -y 8 0x0F 0x11 0xFE; then
         return 1
     fi
+    i2cset -y 9 0x21 0x05 0x0E
 }
 
 blade-power-cycle() {
@@ -28,6 +29,7 @@ blade-power-cycle() {
     if ! i2cset -f -y 8 0x0F 0x10 0xFE; then
         return 1
     fi
+    i2cset -y 9 0x21 0x05 0x0E
 }
 
 ChassisNumber=$1
