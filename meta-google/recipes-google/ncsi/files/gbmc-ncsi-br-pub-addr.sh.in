@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,11 @@
 
 [ ! -e /usr/share/gbmc-br-lib.sh ] && return
 
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
 source /usr/share/gbmc-br-lib.sh || exit
 
 gbmc_ncsi_br_pub_addr_init=
@@ -40,7 +45,7 @@ gbmc_ncsi_br_pub_addr_update() {
     if (( pfx_bytes[8] != 0xfd || pfx_bytes[9] == 0 )); then
       local i
       for (( i = 8; i < 16; ++i )); do
-        if (( pfx_bytes[$i] != 0 )); then
+        if (( pfx_bytes[i] != 0 )); then
           pfx_bytes=()
           break
         fi
@@ -48,7 +53,6 @@ gbmc_ncsi_br_pub_addr_update() {
     fi
   fi
 
-  local contents=
   if (( ${#pfx_bytes[@]} != 0 )); then
     pfx_bytes[8]=0xfd
     # We never want to use the stateless pfx
@@ -64,15 +68,17 @@ gbmc_ncsi_br_pub_addr_update() {
     # unassigned and never stops the DHCP client. This can't use
     # `GBMC_AVOID_RWFS=1 gbmc_br_set_ip`, its hooks remove the NCSI network
     # file the host provisioned, which this address is derived from.
-    echo "$br_ip" >/run/gbmc-br-ip || true
+    gbmc_net_write_if_changed "$br_ip" /run/gbmc-br-ip || true
     gbmc_ncsi_br_pub_addr_brip="$br_ip"
     # Load the IP to the bridge non-persistently
     gbmc_br_set_runtime_ip static "$br_ip"
   else
     # Only drop our own IP, not one gbmc-br-dhcp or gbmc_br_reload_ips set
     # since, which also replaced the runtime IP
+    local cur_ip=
+    read -r cur_ip 2>/dev/null </run/gbmc-br-ip
     if [[ -n $gbmc_ncsi_br_pub_addr_brip &&
-          "$(cat /run/gbmc-br-ip 2>/dev/null)" == "$gbmc_ncsi_br_pub_addr_brip" ]]; then
+          $cur_ip == "$gbmc_ncsi_br_pub_addr_brip" ]]; then
       rm -f /run/gbmc-br-ip
       gbmc_br_set_runtime_ip static
     fi
@@ -81,19 +87,20 @@ gbmc_ncsi_br_pub_addr_update() {
 }
 
 gbmc_ncsi_br_pub_addr_hook() {
-  if [ "$change" = 'init' ]; then
+  # shellcheck disable=SC2154
+  if [[ $change == init ]]; then
     gbmc_ncsi_br_pub_addr_init=1
     gbmc_ip_monitor_defer
-  elif [ "$change" = 'defer' ]; then
+  elif [[ $change == defer ]]; then
     gbmc_ncsi_br_pub_addr_update
-  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' ] &&
-     [ "$scope" = 'global' -a "$fam" = 'inet6' ] &&
-     [[ "$flags" != *deprecated* ]]; then
-    if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+  elif [[ $change == addr && $intf == '@NCSI_IF@' &&
+          $scope == global && $fam == inet6 &&
+          $flags != *deprecated* ]]; then
+    if [[ $action == add && $ip != "$gbmc_ncsi_br_pub_addr_lastip" ]]; then
       gbmc_ncsi_br_pub_addr_lastip="$ip"
       gbmc_ip_monitor_defer
     fi
-    if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+    if [[ $action == del && $ip == "$gbmc_ncsi_br_pub_addr_lastip" ]]; then
       gbmc_ncsi_br_pub_addr_lastip=
       gbmc_ip_monitor_defer
     fi
