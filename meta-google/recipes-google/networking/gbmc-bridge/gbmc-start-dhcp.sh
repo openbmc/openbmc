@@ -22,6 +22,9 @@ rm -f /run/netboot_done /run/gbmc-br-dhcp.pid
 systemctl restart dhcp-done
 
 # start the dhcp service
+declare -A started=()
 for intf in gbmcbr $(cat /run/gbmc-br-dhcp-intfs 2>/dev/null); do
+  [[ -z ${started["$intf"]-} ]] || continue
+  started["$intf"]=1
   systemctl start gbmc-br-dhcp@"$intf"
 done

@@ -22,7 +22,11 @@ source /usr/share/gbmc-net-lib.sh || exit
 HAS_DHCRELAY='@GBMC_DHCP_RELAY@'
 
 echo "Configuring NCSI SmartNIC workaround for @NCSI_IF@" >&2
-echo '@NCSI_IF@' >>/run/gbmc-br-dhcp-intfs
+if ! grep -qxF '@NCSI_IF@' /run/gbmc-br-dhcp-intfs 2>/dev/null; then
+  dhcp_intfs="$(cat /run/gbmc-br-dhcp-intfs 2>/dev/null)"
+  gbmc_net_write_if_changed "${dhcp_intfs:+$dhcp_intfs$'\n'}@NCSI_IF@" \
+    /run/gbmc-br-dhcp-intfs || true
+fi
 if systemctl is-active --quiet gbmc-br-dhcp@gbmcbr; then
   systemctl reset-failed gbmc-br-dhcp@@NCSI_IF@
   systemctl restart --no-block gbmc-br-dhcp@@NCSI_IF@
