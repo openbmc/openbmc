@@ -221,12 +221,20 @@ gbmc_net_nftables_reload() {
 #   - status:
 #       The exit code of the last completed batch, read and returned by
 #       callers whose requests were already covered by done_gen.
+#   - dirty:
+#       Marker created before a /run or /etc config file for $svc is
+#       written or removed. Promoted to running/.dirty when a batch is
+#       claimed and cleared once $action_fn succeeds (restored if it fails
+#       or its owner dies), so a caller killed after modifying a file still
+#       triggers the reload on retry when the file contents already match.
+GBMC_NET_RELOAD_DIR=/run/gbmc-net-reload
+
 _gbmc_net_service_reload() {
   local svc="$1"
   local action_fn="$2"
   shift 2
 
-  local state_dir="/run/gbmc-net-reload/$svc"
+  local state_dir="$GBMC_NET_RELOAD_DIR/$svc"
   local mutex="$state_dir/mutex"
   mkdir -p "$state_dir/pending" || return 1
 
@@ -272,8 +280,10 @@ _gbmc_net_service_reload() {
     for f in "$state_dir"/running/*; do
       [[ -e "$f" ]] && mv "$f" "$state_dir/pending/"
     done
+    [[ ! -e $state_dir/running/.dirty ]] || : >"$state_dir/dirty"
     rm -rf "$state_dir/running"
     mv "$state_dir/pending" "$state_dir/running" || exit 2
+    [[ ! -e $state_dir/dirty ]] || mv -f "$state_dir/dirty" "$state_dir/running/.dirty"
     mkdir -p "$state_dir/pending" || exit 2
     cat "$state_dir/req_gen"
   ) {mfd}>"$mutex" )"
@@ -301,6 +311,9 @@ _gbmc_net_service_reload() {
       flock -x "$mfd" || exit
       echo "$rc" >"$state_dir/status"
       echo "$claimed" >"$state_dir/done_gen"
+      if (( rc != 0 )) && [[ -e $state_dir/running/.dirty ]]; then
+        : >"$state_dir/dirty"
+      fi
       rm -rf "$state_dir/running"
     ) {mfd}>"$mutex" ||
       echo "Warning: failed to record $svc reload completion" >&2
@@ -602,21 +615,69 @@ gbmc_net_proxy_ndp_add() {
   return "$st"
 }
 
-# Triggers the reload for any networkd or nftables files among the paths.
+# Marks the target service dirty before a config file under /run or /etc is
+# committed or removed so a retry still reloads if this caller exits first.
+_gbmc_net_mark_dirty_for_path() {
+  local root="${GBMC_NET_CONF_ROOT-}"
+  local svc=
+  case "$1" in
+    "$root"/run/systemd/network/*|"$root"/etc/systemd/network/*)
+      svc=networkd ;;
+    "$root"/run/nftables/*|"$root"/etc/nftables/*)
+      svc=nftables ;;
+    *) return 0 ;;
+  esac
+  local dir="$GBMC_NET_RELOAD_DIR/$svc"
+  { [[ -d $dir ]] || mkdir -p "$dir" 2>/dev/null; } &&
+    : >"$dir/dirty" 2>/dev/null || true
+}
+
+_gbmc_net_service_is_dirty() {
+  [[ -e $GBMC_NET_RELOAD_DIR/$1/dirty ||
+     -e $GBMC_NET_RELOAD_DIR/$1/running/.dirty ]]
+}
+
+# Triggers the reload for any networkd or nftables files among the paths,
+# including when an earlier caller modified a file and exited before its
+# reload finished.
 # Arguments:
-#   $@: Paths to the files that changed
+#   $1: 1 if any file changed in this call, 0 otherwise
+#   $2+: Paths to the files
 _gbmc_net_reload_for_paths() {
-  local need_networkd=0
-  local need_nftables=0
+  local changed="$1"
+  shift
+  local root="${GBMC_NET_CONF_ROOT-}"
+  local need_networkd=0 check_networkd_dirty=0
+  local need_nftables=0 check_nftables_dirty=0
   local file
   for file in "$@"; do
     case "$file" in
-      */systemd/network/*) need_networkd=1 ;;
-      */nftables/*) need_nftables=1 ;;
+      "$root"/run/systemd/network/*|"$root"/etc/systemd/network/*)
+        need_networkd=1
+        check_networkd_dirty=1
+        ;;
+      */systemd/network/*)
+        need_networkd=1
+        ;;
+      "$root"/run/nftables/*|"$root"/etc/nftables/*)
+        need_nftables=1
+        check_nftables_dirty=1
+        ;;
+      */nftables/*)
+        need_nftables=1
+        ;;
     esac
   done
-  (( need_networkd == 0 )) || gbmc_net_networkd_reload || true
-  (( need_nftables == 0 )) || gbmc_net_nftables_reload || true
+  if (( need_networkd == 1 )) &&
+     { (( changed == 1 )) ||
+       { (( check_networkd_dirty == 1 )) && _gbmc_net_service_is_dirty networkd; }; }; then
+    gbmc_net_networkd_reload || true
+  fi
+  if (( need_nftables == 1 )) &&
+     { (( changed == 1 )) ||
+       { (( check_nftables_dirty == 1 )) && _gbmc_net_service_is_dirty nftables; }; }; then
+    gbmc_net_nftables_reload || true
+  fi
 }
 
 # Writes contents to files unless they already hold them, or removes the
@@ -652,14 +713,16 @@ gbmc_net_write_if_changed() {
     local tmp="$file.tmp.$BASHPID"
     if { [[ -d ${file%/*} ]] || mkdir -p "${file%/*}"; } &&
         printf '%s' "$contents" >"$tmp" &&
+        _gbmc_net_mark_dirty_for_path "$file" &&
         mv -f "$tmp" "$file"; then
+      _gbmc_net_mark_dirty_for_path "$file"
       changed=1
     else
       rm -f "$tmp"
       failed=1
     fi
   done
-  (( changed == 0 )) || _gbmc_net_reload_for_paths "$@"
+  _gbmc_net_reload_for_paths "$changed" "$@"
   (( failed == 0 )) || return 2
   (( changed == 1 )) || return 1
 }
@@ -677,13 +740,15 @@ gbmc_net_rm_if_exists() {
   local file
   for file in "$@"; do
     [[ -e $file || -L $file ]] || continue
+    _gbmc_net_mark_dirty_for_path "$file"
     if rm -f "$file"; then
+      _gbmc_net_mark_dirty_for_path "$file"
       changed=1
     else
       failed=1
     fi
   done
-  (( changed == 0 )) || _gbmc_net_reload_for_paths "$@"
+  _gbmc_net_reload_for_paths "$changed" "$@"
   (( failed == 0 )) || return 2
   (( changed == 1 )) || return 1
 }

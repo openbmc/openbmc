@@ -30,7 +30,7 @@ source gbmc-net-lib.sh
 TEST_RELOAD_DIR="/run/gbmc-net-reload"
 if ! mkdir -p "$TEST_RELOAD_DIR" 2>/dev/null; then
   TEST_RELOAD_DIR="$(mktemp -d)"
-  eval "$(declare -f _gbmc_net_service_reload | sed "s#/run/gbmc-net-reload#$TEST_RELOAD_DIR#g")"
+  GBMC_NET_RELOAD_DIR="$TEST_RELOAD_DIR"
 fi
 
 # Pretend networkd is running unless a test says otherwise
@@ -381,6 +381,9 @@ testReloadQueuedMessages() {
     fail
   fi
 
+  local saved_netd_exec saved_nft_exec
+  saved_netd_exec="$(declare -f _gbmc_net_networkd_reload_exec)"
+  saved_nft_exec="$(declare -f _gbmc_net_nftables_reload_exec)"
   _gbmc_net_networkd_reload_exec() { :; }
   _gbmc_net_nftables_reload_exec() { :; }
   gbmc_net_reload_queue_end
@@ -396,7 +399,8 @@ testReloadQueuedMessages() {
     echo "Expected Requesting nftables reload message, got: $err" >&2
     fail
   fi
-  unset -f _gbmc_net_networkd_reload_exec _gbmc_net_nftables_reload_exec
+  eval "$saved_netd_exec"
+  eval "$saved_nft_exec"
 }
 
 testUnmaskAndWrite() {
@@ -578,6 +582,81 @@ testWriteIfChanged() {
   eval "$saved_netd"
   eval "$saved_nft"
   rm -rf "$test_dir"
+}
+
+testWriteIfChangedInterruptedReload() {
+  rm -rf "$TEST_RELOAD_DIR"
+  local test_dir
+  test_dir="$(mktemp -d)"
+  local GBMC_NET_CONF_ROOT="$test_dir"
+  local saved_netd saved_nft
+  saved_netd="$(declare -f _gbmc_net_networkd_reload_action)"
+  saved_nft="$(declare -f _gbmc_net_nftables_reload_action)"
+
+  local netd_runs=0 nft_runs=0 nft_rc=0
+  _gbmc_net_networkd_reload_action() { (( ++netd_runs )); return 0; }
+  _gbmc_net_nftables_reload_action() { (( ++nft_runs )); return "$nft_rc"; }
+
+  local net_file="$test_dir/run/systemd/network/10-test.conf"
+  local nft_file="$test_dir/run/nftables/40-test.rules"
+
+  # Simulate a service killed after committing files before flushing its queue
+  (
+    gbmc_net_reload_queue_start
+    gbmc_net_write_if_changed $'rule-a\n' "$net_file" "$nft_file"
+    exit 0
+  )
+  expect_numeq "$netd_runs" 0
+  expect_numeq "$nft_runs" 0
+  [ -e "$TEST_RELOAD_DIR/networkd/dirty" ] || fail
+  [ -e "$TEST_RELOAD_DIR/nftables/dirty" ] || fail
+
+  # Restarted writer sees identical file contents (rc=1) yet finishes reloads;
+  # a failed nftables reload preserves dirty for the next retry.
+  nft_rc=1
+  local rc=0
+  gbmc_net_write_if_changed $'rule-a\n' "$net_file" "$nft_file" || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "$netd_runs" 1
+  expect_numeq "$nft_runs" 1
+  [ ! -e "$TEST_RELOAD_DIR/networkd/dirty" ] || fail
+  [ -e "$TEST_RELOAD_DIR/nftables/dirty" ] || fail
+
+  # Next retry only reloads the still-dirty nftables service and clears dirty
+  nft_rc=0
+  rc=0
+  gbmc_net_write_if_changed $'rule-a\n' "$net_file" "$nft_file" || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "$netd_runs" 1
+  expect_numeq "$nft_runs" 2
+  [ ! -e "$TEST_RELOAD_DIR/nftables/dirty" ] || fail
+
+  # Steady-state unchanged call triggers no reloads
+  rc=0
+  gbmc_net_write_if_changed $'rule-a\n' "$net_file" "$nft_file" || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "$netd_runs" 1
+  expect_numeq "$nft_runs" 2
+
+  # Interrupted removal + crashed reload runner (running/.dirty) also recover
+  (
+    gbmc_net_reload_queue_start
+    gbmc_net_rm_if_exists "$nft_file"
+    exit 0
+  )
+  [ ! -e "$nft_file" ] || fail
+  mkdir -p "$TEST_RELOAD_DIR/nftables/running"
+  mv "$TEST_RELOAD_DIR/nftables/dirty" "$TEST_RELOAD_DIR/nftables/running/.dirty"
+  rc=0
+  gbmc_net_rm_if_exists "$nft_file" || rc=$?
+  expect_numeq "$rc" 1
+  expect_numeq "$nft_runs" 3
+  [ ! -e "$TEST_RELOAD_DIR/nftables/dirty" ] || fail
+  [ ! -d "$TEST_RELOAD_DIR/nftables/running" ] || fail
+
+  eval "$saved_netd"
+  eval "$saved_nft"
+  rm -rf "$test_dir" "$TEST_RELOAD_DIR"
 }
 
 testRmIfExists() {
