@@ -320,6 +320,15 @@ testNftablesReloadAction() {
   expect_err 0 _gbmc_net_nftables_reload_action 1
   expect_streq "$calls" 'reset-failed nftables --no-block reload-or-restart nftables '
 
+  calls=
+  systemctl() {
+    [ "$1" = 'is-active' ] && { echo reloading; return 0; }
+    calls+="$* "
+  }
+
+  expect_err 0 _gbmc_net_nftables_reload_action 1
+  expect_streq "$calls" 'reset-failed nftables --no-block reload-or-restart nftables '
+
   unset -f systemctl
 }
 
@@ -333,15 +342,75 @@ testNftablesReloadActionInactive() {
   expect_err 0 _gbmc_net_nftables_reload_action 1
   expect_streq "$calls" ''
 
+  unset -f systemctl
+}
+
+testNftablesReloadActionActivating() {
+  local count_file
+  count_file="$(mktemp)"
+  echo 0 >"$count_file"
+  local calls=
   systemctl() {
-    [ "$1" = 'is-active' ] && { echo activating; return 0; }
+    if [ "$1" = 'is-active' ]; then
+      local n
+      n="$(<"$count_file")"
+      echo $(( n + 1 )) >"$count_file"
+      (( n < 2 )) && { echo activating; return 0; }
+      echo active
+      return 0
+    fi
+    calls+="$* "
+  }
+  sleep() { :; }
+
+  expect_err 0 _gbmc_net_nftables_reload_action 1
+  expect_streq "$calls" 'reset-failed nftables --no-block reload-or-restart nftables '
+  expect_numeq "$(<"$count_file")" 3
+
+  # deactivating -> inactive waits and then skips without starting nftables
+  echo 0 >"$count_file"
+  calls=
+  systemctl() {
+    if [ "$1" = 'is-active' ]; then
+      local n
+      n="$(<"$count_file")"
+      echo $(( n + 1 )) >"$count_file"
+      (( n < 1 )) && { echo deactivating; return 0; }
+      echo inactive
+      return 0
+    fi
     calls+="$* "
   }
 
   expect_err 0 _gbmc_net_nftables_reload_action 1
   expect_streq "$calls" ''
+  expect_numeq "$(<"$count_file")" 2
 
-  unset -f systemctl
+  rm -f "$count_file"
+  unset -f systemctl sleep
+}
+
+testNftablesReloadActionGivesUp() {
+  local count_file
+  count_file="$(mktemp)"
+  echo 0 >"$count_file"
+  local sleep_args=''
+  systemctl() {
+    if [ "$1" = 'is-active' ]; then
+      echo $(( $(<"$count_file") + 1 )) >"$count_file"
+      echo activating
+      return 0
+    fi
+    fail
+  }
+  sleep() { sleep_args+="$* "; }
+
+  expect_err 1 _gbmc_net_nftables_reload_action 1
+  expect_numeq "$(<"$count_file")" 10
+  expect_streq "$sleep_args" '1 1 1 1 1 1 1 1 1 '
+
+  rm -f "$count_file"
+  unset -f systemctl sleep
 }
 
 testReloadQueueUnderflow() {
