@@ -24,7 +24,7 @@ declare -A gbmc_ncsi_usb_ifindex=()
 
 gbmc_ncsi_dynamic_hook() {
   # shellcheck disable=SC2154
-  local -n numaddrs=gbmc_br_dhcrelay_linkaddrs["$intf"]
+  local -n linkaddrs=gbmc_br_dhcrelay_linkaddrs["$intf"]
   # shellcheck disable=SC2154
   if [[ "$change" = 'link' && "$action" = 'add' ]]; then
     # Builtins only: this runs for every link event, and short lived ones
@@ -67,7 +67,7 @@ EOF
 
     rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
     # shellcheck disable=SC2034
-    numaddrs=0
+    linkaddrs=''
     systemctl restart --no-block gbmc-ncsi-ra@"$intf"
   elif [[ "$change" = 'link' && "$action" = 'del' ]]; then
     [[ -n "${gbmc_ncsi_usb_ifindex["$intf"]-}" ]] || return 0
@@ -78,7 +78,7 @@ EOF
     systemctl stop --no-block gbmc-ncsi-ra@"$intf" || true
     rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
     unset 'gbmc_ncsi_usb_ifindex[$intf]'
-    unset numaddrs
+    unset linkaddrs
   fi
 }
 

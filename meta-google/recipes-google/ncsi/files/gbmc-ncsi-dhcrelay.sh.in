@@ -17,6 +17,6 @@
 
 declare -A gbmc_br_dhcrelay_linkaddrs
 # shellcheck disable=SC2034
-gbmc_br_dhcrelay_linkaddrs['@NCSI_IF@']=0
+gbmc_br_dhcrelay_linkaddrs['@NCSI_IF@']=
 
 gbmc_ncsi_dhcrelay_lib=1

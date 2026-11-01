@@ -19,7 +19,7 @@ declare -A gbmc_br_dhcrelay_linkaddrs
 # shellcheck disable=SC2043
 for intf in @IFS@; do
   # shellcheck disable=SC2034
-  gbmc_br_dhcrelay_linkaddrs["$intf"]=0
+  gbmc_br_dhcrelay_linkaddrs["$intf"]=
 done
 
 gbmc_nic_dhcrelay_lib=1

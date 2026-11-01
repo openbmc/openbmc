@@ -40,8 +40,9 @@ SRC_URI += " \
   file://gbmc-br-load-ip.service \
   file://gbmc-start-dhcp.sh \
   file://50-gbmc-br-cn-redirect.rules \
+  file://gbmc-br-dhcrelay.sh \
+  file://gbmc-br-dhcrelay-test.sh \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-br-dhcrelay.service'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-br-dhcrelay.sh'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-br-dhcrelay'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://50-gbmc-br-dhcp.rules'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcdhcp.netdev'} \
@@ -165,6 +166,7 @@ ethernet_bridge_install() {
 
 do_compile() {
   SYSROOT="${STAGING_DIR_HOST}" bash ${UNPACKDIR}/gbmc-br-gw-src-test.sh || exit
+  SYSROOT="${STAGING_DIR_HOST}" bash ${UNPACKDIR}/gbmc-br-dhcrelay-test.sh || exit
 }
 
 do_install() {

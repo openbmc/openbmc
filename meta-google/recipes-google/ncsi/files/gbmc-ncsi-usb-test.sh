@@ -89,12 +89,13 @@ testUsbNcsiSkipsSameIfindexUpdates() {
   expect_numeq "$networkd_reloads" 1
   expect_numeq "${#systemctl_calls[@]}" 1
   expect_streq "${systemctl_calls[0]}" "restart --no-block gbmc-ncsi-ra@enu1u1u2u1u1"
-  expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" "0"
+  [ -n "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]+1}" ] || fail
+  expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" ""
   [ -f "$RUN_DIR/nftables/50-gbmc-ncsi-enu1u1u2u1u1.rules" ] || fail
   [ -f "$RUN_DIR/systemd/network/-bmc-enu1u1u2u1u1.network" ] || fail
 
   # Simulate dhcrelay tracking an active link-local address on ifindex 14
-  gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]=1
+  gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]='fe80::1'
   mkdir -p "$RUN_DIR/gbmc-br-dhcrelay/uppers"
   touch "$RUN_DIR/gbmc-br-dhcrelay/uppers/enu1u1u2u1u1"
 
@@ -106,7 +107,7 @@ testUsbNcsiSkipsSameIfindexUpdates() {
   expect_numeq "${#systemctl_calls[@]}" 0
   expect_numeq "$nft_reloads" 1
   expect_numeq "$networkd_reloads" 1
-  expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" "1"
+  expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" "fe80::1"
   [ -e "$RUN_DIR/gbmc-br-dhcrelay/uppers/enu1u1u2u1u1" ] || fail
 
   # Rapid USB re-enumeration under a new ifindex (even without seeing del)
@@ -115,7 +116,8 @@ testUsbNcsiSkipsSameIfindexUpdates() {
   link_event add enu1u1u2u1u1
   expect_numeq "${#systemctl_calls[@]}" 1
   expect_streq "${systemctl_calls[0]}" "restart --no-block gbmc-ncsi-ra@enu1u1u2u1u1"
-  expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" "0"
+  [ -n "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]+1}" ] || fail
+  expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" ""
   [ ! -e "$RUN_DIR/gbmc-br-dhcrelay/uppers/enu1u1u2u1u1" ] || fail
 
   # Link deletion cleans up configs, stops RA, and allows re-add with same ifindex

@@ -20,29 +20,38 @@ declare -A gbmc_br_dhcrelay_linkaddrs
 
 gbmc_br_dhcrelay_hook() {
   # shellcheck disable=SC2154
-  if [[ $change == addr && $scope == link && $fam == inet6 && $flags != *tentative* ]]; then
-    local -n numaddrs=gbmc_br_dhcrelay_linkaddrs["$intf"]
-    if [[ -z ${numaddrs+1} ]]; then
+  if [[ $change == addr && $scope == link && $fam == inet6 ]]; then
+    local -n addrs=gbmc_br_dhcrelay_linkaddrs["$intf"]
+    if [[ -z ${addrs+1} ]]; then
       return 0
     fi
-    if [[ $action == add ]]; then
-      (( numaddrs += 1 ))
+    [[ $addrs != 0 ]] || addrs=
+    local had_addrs=0
+    [[ -n $addrs ]] && had_addrs=1
+    if [[ $action == add && $flags != *tentative* ]]; then
+      [[ " $addrs " != *" $ip "* ]] || return 0
+      addrs="${addrs:+$addrs }$ip"
     else
-      (( numaddrs -= 1 ))
+      [[ " $addrs " == *" $ip "* ]] || return 0
+      local padded=" $addrs "
+      padded="${padded//" $ip "/ }"
+      padded="${padded# }"
+      addrs="${padded% }"
     fi
+    local has_addrs=0
+    [[ -n $addrs ]] && has_addrs=1
+    (( had_addrs != has_addrs )) || return 0
     local svc=gbmc-br-dhcrelay.service
     local dir=/run/gbmc-br-dhcrelay/uppers
     local file="$dir/$intf"
-    if (( numaddrs == 1 )); then
+    if (( has_addrs == 1 )); then
+      local tmp="$dir/.$intf.tmp.$BASHPID"
       [[ -d $dir ]] || mkdir -p "$dir"
-      printf 'ff02::1:2%%%s' "$intf" >"$file"
+      printf 'ff02::1:2%%%s' "$intf" >"$tmp" && mv -f "$tmp" "$file"
       echo "Adding dhcrelay upper $intf" >&2
-    elif (( numaddrs == 0 )); then
+    else
       rm -f "$file"
       echo "Removing dhcrelay upper $intf" >&2
-    else
-      # The uppers only change when the first address comes or the last goes
-      return 0
     fi
     systemctl reset-failed "$svc"
     systemctl restart --no-block "$svc"
