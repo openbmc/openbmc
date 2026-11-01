@@ -101,15 +101,17 @@ add_rtr() {
   fi
 
   # Also apply to the kernel right away
-  ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac" || true
-  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" proto static || true
+  local rc=0
+  ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac" || rc=$?
+  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$GBMC_ROUTE_METRIC_ONLINK" table "$route_table" proto static || rc=$?
   if [ -n "$ROUTE_METRIC" ]; then
-    rtr_route_replace "$rtr" "$ROUTE_METRIC_LO" || true
+    rtr_route_replace "$rtr" "$ROUTE_METRIC_LO" || rc=$?
   fi
   if (( new == 1 )) && [ -n "$ROUTE_METRIC" ]; then
-    rtr_route_replace "$rtr" "$ROUTE_METRIC" || true
+    rtr_route_replace "$rtr" "$ROUTE_METRIC" || rc=$?
   fi
-  gbmc_net_reload_queue_end || true
+  gbmc_net_reload_queue_end || rc=$?
+  return "$rc"
 }
 
 # Read the old info from persistent storage in case ToR is updating
@@ -128,7 +130,7 @@ if [ -n "$rafile" ]; then
   # Masked (bind mounted empty) files have no router
   if [ -n "$rtr" ]; then
     echo "Loading old router $rtr($mac)" >&2
-    add_rtr "$rtr" "$mac" 0
+    add_rtr "$rtr" "$mac" 0 || true
   fi
 fi
 
@@ -164,8 +166,12 @@ default_update_rtr() {
 default_update_fqdn() {
   local fqdn="$1"
   [ -z "$fqdn" ] && return
-  hostnamectl set-hostname "$fqdn" || true
+  hostnamectl set-hostname "$fqdn" || return
   echo "Set hostname $fqdn on $RA_IF" >&2
+}
+
+gbmc_ra_rdisc6() {
+  exec script -q -c "rdisc6 $*" /dev/null 2>/dev/null
 }
 
 # mininum retry time
@@ -176,13 +182,16 @@ r_timeout="$GBMC_RA_TIMEOUT"
 expire_time="$GBMC_RA_EXPIRE"
 # rs intervals
 rs_intervals="$GBMC_RA_RS_INTERVAL"
-declare -A rtrs
-rtrs=()
-while true; do
+declare -gA rtrs=()
+
+gbmc_ra_step() {
+  local -a data args t_pfx_b
+  local next_rs line lifetime=-1 mac='' hextet='' pfx='' host='' domain=''
+  local t_pfx t_pfx_len rtr dl fqdn rt found timeout
   # shellcheck disable=SC2206
   data=(${rtrs["${old_rtr}"]-})
   next_rs=
-  if [ -z "${data[1]}" ]; then
+  if [ -z "${data[1]-}" ]; then
     next_rs=$(( min_w + SECONDS ))
   else
     next_rs=$(( rs_intervals + SECONDS ))
@@ -244,26 +253,29 @@ while true; do
         rt="$(gbmc_net_route_table_for_intf "$RA_IF")" || rt=invalid
         if [[ "$rtr" != "$old_rtr" || "$mac" != "$old_mac" || "$rt" != "$old_rt" ]]; then
           echo "Got defgw $rtr at $mac on $RA_IF" >&2
-          update_rtr "$rtr" "$mac" || true
-          old_mac="$mac"
-          old_rtr="$rtr"
-          old_rt="$rt"
+          if update_rtr "$rtr" "$mac"; then
+            old_mac="$mac"
+            old_rtr="$rtr"
+            old_rt="$rt"
+          fi
         fi
       fi
       # Only update router properties if we use this router
       [[ "$rtr" == "$old_rtr" ]] || continue
       if [[ $pfx != "$old_pfx" ]]; then
         echo "Got PFX $pfx from $rtr on $RA_IF" >&2
-        old_pfx="$pfx"
-        update_pfx "$pfx" || true
+        if update_pfx "$pfx"; then
+          old_pfx="$pfx"
+        fi
       fi
       if [[ $fqdn != "$old_fqdn" ]]; then
         echo "Got FQDN $fqdn from $rtr on $RA_IF" >&2
-        old_fqdn="$fqdn"
-        update_fqdn "$fqdn" || true
+        if update_fqdn "$fqdn"; then
+          old_fqdn="$fqdn"
+        fi
       fi
     fi
-  done < <(exec script -q -c "rdisc6 ${args[*]}" /dev/null 2>/dev/null)
+  done < <(gbmc_ra_rdisc6 "${args[@]}")
   # Purge any expired routers
   for rtr in "${!rtrs[@]}"; do
     # shellcheck disable=SC2206
@@ -284,29 +296,39 @@ while true; do
       data=(${rtrs["$rtr"]})
       mac=${data[0]}
       dl=${data[1]}
-      pfx=${data[2]}
-      fqdn=${data[3]}
-      update_rtr "$rtr" "$mac" || true
-      update_pfx "$pfx" || true
-      update_fqdn "$fqdn" || true
-      old_rtr="$rtr"
-      old_pfx="$pfx"
-      old_mac="$mac"
-      old_rt="$(gbmc_net_route_table_for_intf "$RA_IF")" || old_rt=invalid
-      old_fqdn="$fqdn"
-      found="true"
-      break
+      pfx=${data[2]-}
+      fqdn=${data[3]-}
+      if update_rtr "$rtr" "$mac"; then
+        old_rtr="$rtr"
+        old_mac="$mac"
+        old_rt="$(gbmc_net_route_table_for_intf "$RA_IF")" || old_rt=invalid
+        if update_pfx "$pfx"; then
+          old_pfx="$pfx"
+        fi
+        if update_fqdn "$fqdn"; then
+          old_fqdn="$fqdn"
+        fi
+        found="true"
+        break
+      fi
     done
     # no other route exsits, removing the route
     if [[ "$found" = "false" ]]; then
-      update_rtr "$old_rtr" "$old_mac" "remove" || true
-      old_rtr=invalid
-      old_mac=invalid
-      old_rt=invalid
+      if update_rtr "$old_rtr" "$old_mac" "remove"; then
+        old_rtr=invalid
+        old_mac=invalid
+        old_rt=invalid
+      fi
     fi
   fi
 
   # If rdisc6 exits early we still want to wait for the deadline before retrying
   (( timeout = next_rs - SECONDS ))
   sleep $(( timeout < 0 ? 0 : timeout ))
+}
+
+[ -n "${GBMC_RA_NO_LOOP-}" ] && return 0
+
+while true; do
+  gbmc_ra_step
 done

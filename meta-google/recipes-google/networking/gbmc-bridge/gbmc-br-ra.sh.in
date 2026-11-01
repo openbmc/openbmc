@@ -28,7 +28,7 @@ update_fqdn() {
 update_pfx() {
   local pfx="$1"
   (( IP_OFFSET == 0 )) && return
-  gbmc_br_set_ip "$pfx" || true
+  gbmc_br_set_ip "$pfx" || return
   echo "IP $pfx set on $RA_IF" >&2
 }
 

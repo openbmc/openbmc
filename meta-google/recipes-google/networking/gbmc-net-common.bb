@@ -7,6 +7,7 @@ SRC_URI += " \
   file://gbmc-net-lib.sh \
   file://gbmc-net-lib-test.sh \
   file://gbmc-ra.sh \
+  file://gbmc-ra-test.sh \
   "
 S = "${UNPACKDIR}"
 
@@ -14,7 +15,7 @@ FILES:${PN} += " \
   ${datadir}/ \
   "
 
-DEPENDS += "test-sh"
+DEPENDS += "test-sh network-sh"
 
 RDEPENDS:${PN}:append = " \
   bash \
@@ -24,6 +25,7 @@ RDEPENDS:${PN}:append = " \
 
 do_compile() {
   SYSROOT="${STAGING_DIR_HOST}" bash gbmc-net-lib-test.sh || exit
+  SYSROOT="${STAGING_DIR_HOST}" bash gbmc-ra-test.sh || exit
 }
 
 do_install() {

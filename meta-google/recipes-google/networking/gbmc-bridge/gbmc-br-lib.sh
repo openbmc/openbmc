@@ -227,11 +227,11 @@ gbmc_br_read_ip() {
 
 gbmc_br_set_runtime_ip() {
   local name="$1"
-  local ip="$2"
+  local ip="${2-}"
 
   local pfx_bytes=()
   local rc=0
-  if ! ip_to_bytes pfx_bytes "$ip"; then
+  if [ -n "$ip" ] && ! ip_to_bytes pfx_bytes "$ip"; then
     echo "Invalid IPv6 for $name: $ip" >&2
     ip=
     rc=1

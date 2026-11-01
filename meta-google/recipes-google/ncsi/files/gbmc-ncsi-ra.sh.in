@@ -59,7 +59,7 @@ update_pfx() {
 
   # DHCP Relay workaround until alternate source port is supported
   # TODO: Remove this once internal relaying cleanups land
-  gbmc-ncsi-smartnic-wa.sh "$RA_IF" || true
+  gbmc-ncsi-smartnic-wa.sh "$RA_IF" || return
 
   # The firewall needs to allow inbound traffic, we don't need to worry about
   # the primary NCSI interface because it is already handled by
@@ -74,11 +74,13 @@ table inet filter {
 }
 EOF
     gbmc_net_write_if_changed "$rules" \
-      /run/nftables/40-gbmc-ncsi-"$RA_IF"-br.rules || true
+      /run/nftables/40-gbmc-ncsi-"$RA_IF"-br.rules
+    (( $? < 2 )) || return 1
   fi
 
   # We need to know which NCSI path has which route
-  gbmc_net_write_if_changed "$pfx" /run/ncsi-ips/"$RA_IF" || true
+  gbmc_net_write_if_changed "$pfx" /run/ncsi-ips/"$RA_IF"
+  (( $? < 2 )) || return 1
 
   gbmc_br_set_runtime_ip "$RA_IF-ra" "$pfx"
 }
