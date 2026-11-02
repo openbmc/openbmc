@@ -6,6 +6,12 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 #Sled cycle
 echo "Starting Chassis Power Cycle"
 
+isolate-apml-alerts() {
+    # Isolate APML alerts to prevent false events during power cycles.
+    i2cset -f -y 11 0x0F 0x12 0x01
+    sleep 0.1
+}
+
 chassis-power-cycle() {
     # If any slot is updating CM, do not allow chassis AC cycle.
     for i in {1..6}
@@ -17,6 +23,8 @@ chassis-power-cycle() {
         fi
     done
 
+    isolate-apml-alerts
+
     # PDB CPLD
     if ! i2cset -f -y 8 0x0F 0x11 0xFE; then
         return 1
@@ -27,6 +35,8 @@ chassis-power-cycle() {
 }
 
 blade-power-cycle() {
+    isolate-apml-alerts
+
     # PDB CPLD
     if ! i2cset -f -y 8 0x0F 0x10 0xFE; then
         return 1
