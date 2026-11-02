@@ -15,14 +15,67 @@ e.g. AALC_RPU_READY
 gpio_name="$2"
 stash_file="/var/lib/phosphor-gpio-monitor/${gpio_name}.log_entry"
 
-# For VT cooling systems, AALC-related signals should be ignored.
-if [[ "$gpio_name" == *RPU* || "$gpio_name" == *PUMP* ]] &&
-    { [ "$(get_gpio_val_by_name IT_GEAR_RPU_LINK_PRSNT_N_R)"      == "1" ] &&
-      [ "$(get_gpio_val_by_name IT_GEAR_RPU_LINK_PRSNT_SPARE_N_)" == "1" ] &&
-      [ "$(get_gpio_val_by_name IT_GEAR_RPU_2_LINK_PRSNT_N_R)"    == "1" ] &&
-      [ "$(get_gpio_val_by_name IT_GEAR_RPU_2_LINK_PRSNT_SPARE_)" == "1" ]; }; then
-    exit 0
-fi
+# Present pins of the RPU links, active-low.
+RPU0_PRSNT="IT_GEAR_RPU_LINK_PRSNT_N_R"
+RPU0_SPARE_PRSNT="IT_GEAR_RPU_LINK_PRSNT_SPARE_N_"
+RPU1_PRSNT="IT_GEAR_RPU_2_LINK_PRSNT_N_R"
+RPU1_SPARE_PRSNT="IT_GEAR_RPU_2_LINK_PRSNT_SPARE_"
+ALL_RPU_PRSNT=("$RPU0_PRSNT" "$RPU0_SPARE_PRSNT" "$RPU1_PRSNT" "$RPU1_SPARE_PRSNT")
+
+# A pin that cannot be read counts as present, so that an event is logged
+# rather than missed.
+is_prsnt() {
+    [ "$(get_gpio_val_by_name "$1")" != "1" ]
+}
+
+is_all_rpu_prsnt() {
+    local pin
+    for pin in "${ALL_RPU_PRSNT[@]}"; do
+        is_prsnt "$pin" || return 1
+    done
+    return 0
+}
+
+is_any_rpu_prsnt() {
+    local pin
+    for pin in "${ALL_RPU_PRSNT[@]}"; do
+        is_prsnt "$pin" && return 0
+    done
+    return 1
+}
+
+# Whether the RPU links required for <gpio_name> to fail are installed, so
+# that signals of absent links are ignored.
+# The CPLD only deasserts a present pin after the RPU ready and IT stop pump
+# signals of that link have changed, so the pins can be checked right at the
+# assert edge.
+is_rpu_link_ok() {
+    case "$1" in
+    RPU_READY_PLD_R)
+        is_prsnt "$RPU0_PRSNT"
+        ;;
+    RPU_READY_SPARE_PLD_R)
+        is_prsnt "$RPU0_SPARE_PRSNT"
+        ;;
+    RPU_2_READY_PLD_R)
+        is_prsnt "$RPU1_PRSNT"
+        ;;
+    RPU_2_READY_SPARE_PLD_R)
+        is_prsnt "$RPU1_SPARE_PRSNT"
+        ;;
+    AALC_RPU_READY)
+        # Only goes high with all RPU links installed.
+        is_all_rpu_prsnt
+        ;;
+    IT_STOP_PUMP_*)
+        # Asserted together for all pumps when any link drops.
+        is_any_rpu_prsnt
+        ;;
+    *)
+        return 0
+        ;;
+    esac
+}
 
 get_failure_type() {
     if [ "$1" = "AALC_RPU_READY" ]; then
@@ -78,6 +131,10 @@ case "$1" in
     ;;
 
 "assert")
+    if ! is_rpu_link_ok "$gpio_name"; then
+        exit 0
+    fi
+
     log-create "xyz.openbmc_project.State.SMC.SMCFailed" --json \
         "{\"IDENTIFIER\": \"$(get_identifier "$gpio_name")\", \"FAILURE_TYPE\": \"$(get_failure_type "$gpio_name")\"}" \
         >"${stash_file}"
