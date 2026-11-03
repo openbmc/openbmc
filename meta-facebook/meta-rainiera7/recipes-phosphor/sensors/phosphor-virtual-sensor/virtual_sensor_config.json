@@ -501,63 +501,6 @@
     },
     {
         "Desc": {
-            "Name": "SCM_VIRTUAL_CALIBRATED_INLET_TEMP_C",
-            "SensorType": "temperature",
-            "MaxValue": 127,
-            "MinValue": -127
-        },
-        "Threshold": {
-            "CriticalLow": 5,
-            "CriticalHigh": 45
-        },
-        "Associations": [
-            [
-                "chassis",
-                "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Rainier_SCM"
-            ]
-        ],
-        "Params": {
-            "DbusParam": [
-                {
-                    "ParamName": "INLET_TEMP",
-                    "Desc": {
-                        "Name": "SCM_INLET_TEMP_C",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "FAN_DUTY",
-                    "Desc": {
-                        "Name": "PDB_FAN_PWM_PCT",
-                        "SensorType": "fan_pwm"
-                    }
-                }
-            ]
-        },
-        "Expression": [
-            "var ARRAY_SIZE:=10;",
-            "var DUTY_OFS[10]:={90,80,70,60,50,40,30,20,10,0};",
-            "var CAL_OFS[10]:={-1.6,-1.7,-1.8,-1.9,-2.2,-2.4,-3.0,-3.8,-4.8,-4.8};",
-
-            "var DUTY_VALID:=ifnan(FAN_DUTY,999);",
-            "var OFFSET:=CAL_OFS[ARRAY_SIZE-1];",
-            "var FOUND:=0;",
-
-            "for(var i:=0; i<ARRAY_SIZE-1; i+=1)",
-            "{",
-            "  if((FOUND == 0) and (DUTY_VALID > DUTY_OFS[i]))",
-            "  {",
-            "    OFFSET:=CAL_OFS[i];",
-            "    FOUND:=1;",
-            "  };",
-            "};",
-
-            "INLET_TEMP + OFFSET"
-        ]
-    },
-    {
-        "Desc": {
             "Name": "SYSTEM_AIRFLOW_CFM",
             "SensorType": "airflow"
         },
@@ -615,7 +558,7 @@
         },
         "Threshold": {
             "CriticalLow": 5,
-            "CriticalHigh": 95,
+            "CriticalHigh": 90,
             "HardShutdownHigh": 115
         },
         "Associations": [
@@ -2633,5 +2576,62 @@
             ]
         },
         "Expression": "DIMM_POWER"
+    },
+    {
+        "Desc": {
+            "Name": "SCM_VIRTUAL_CALIBRATED_INLET_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 45
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Rainier_SCM"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "INLET_TEMP",
+                    "Desc": {
+                        "Name": "SCM_INLET_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var ARRAY_SIZE:=10;",
+            "var DUTY_OFS[10]:={90,80,70,60,50,40,30,20,10,0};",
+            "var CAL_OFS[10]:={-1.9,-2.0,-2.0,-2.2,-2.3,-2.6,-3.0,-3.5,-4.7,-6.0};",
+
+            "var DUTY_VALID:=ifnan(FAN_DUTY,999);",
+            "var OFFSET:=CAL_OFS[ARRAY_SIZE-1];",
+            "var FOUND:=0;",
+
+            "for(var i:=0; i<ARRAY_SIZE-1; i+=1)",
+            "{",
+            "  if((FOUND == 0) and (DUTY_VALID > DUTY_OFS[i]))",
+            "  {",
+            "    OFFSET:=CAL_OFS[i];",
+            "    FOUND:=1;",
+            "  };",
+            "};",
+
+            "INLET_TEMP + OFFSET"
+        ]
     }
 ]
