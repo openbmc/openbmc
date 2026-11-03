@@ -60,11 +60,18 @@ restore_clear_rtc_bit() {
 
 case "$GPIO_NET" in
     SOC_PORQ)
+        echo "Rainier SoC requested for a cold reboot $GPIO_NET"
         trigger_host_reboot
         ;;
     SOC_RESETREQ)
         echo "Rainier SoC requested for an external warm reset $GPIO_NET"
         trigger_external_warm_reset
+        ;;
+    SOC_POST_COMPLETE_CPLD)
+        echo "Rainier SoC post complete $GPIO_NET"
+        ;;
+    FM_BIOS_POST_CMPLT)
+        echo "Rainier BIOS post complete $GPIO_NET"
         ;;
     wALL_POWER_OK_1)
         handle_all_power_ok
@@ -78,6 +85,9 @@ case "$GPIO_NET" in
     SOC_ERROR_N_CPLD)
         echo "Rainier SoC entered an error state; triggering external warm reset $GPIO_NET"
         trigger_external_warm_reset
+        ;;
+    SOC_PLATHOT_N_CPLD)
+        echo "Rainier Soc platform is hot $GPIO_NET"
         ;;
     *)
         ;;

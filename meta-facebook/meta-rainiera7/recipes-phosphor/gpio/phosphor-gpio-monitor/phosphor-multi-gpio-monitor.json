@@ -17,6 +17,7 @@
         "Name": "SOC_POST_COMPLETE",
         "LineName": "SOC_POST_COMPLETE_CPLD",
         "EventMon": "BOTH",
+	"Target": "rainier-gpio-handler@SOC_POST_COMPLETE_CPLD:RISING.service",
         "Continue": true
     },
     {
@@ -31,6 +32,13 @@
         "LineName": "SOC_SYS_PWRDN_CPLD",
         "EventMon": "RISING",
         "Target": "rainier-gpio-handler@SOC_SYS_PWRDN_CPLD:RISING.service",
+        "Continue": true
+    },
+    {
+        "Name": "FM_BIOS_POST_CMPLT",
+        "LineName": "FM_BIOS_POST_CMPLT",
+        "EventMon": "RISING",
+        "Target": "rainier-gpio-handler@FM_BIOS_POST_CMPLT:RISING.service",
         "Continue": true
     },
     {
@@ -110,6 +118,13 @@
         "Continue": true
     },
     {
+        "Name": "SOC_PLATHOT",
+        "LineName": "SOC_PLATHOT_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "rainier-gpio-handler@SOC_PLATHOT_N_CPLD:FALLING.service",
+        "Continue": true
+    },
+    {
         "Name": "SOC_PMBUS_0_ALERT",
         "LineName": "SOC_PMBUS_0_ALERT_R_CPLD",
         "EventMon": "BOTH",
@@ -161,6 +176,20 @@
             ],
             "FALLING": [
                 "vr-fault-assert-log@Rainier_MB-IRQ_INA230_P12V_SCM_ALERT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IRQ_INA230_P12V_NIC_ALERT",
+        "LineName": "IRQ_INA230_P12V_NIC_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-IRQ_INA230_P12V_NIC_ALERT_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-IRQ_INA230_P12V_NIC_ALERT_N.service"
             ]
         },
         "Continue": true
@@ -245,6 +274,20 @@
             ],
             "FALLING": [
                 "vr-fault-assert-log@Rainier_MB-VRHOT_VCPUC0_VCPUMC0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "VRHOT_V0P75_PCIE_VDDQ",
+        "LineName": "VRHOT_V0P75_PCIE_VDDQ_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@Rainier_MB-VRHOT_V0P75_PCIE_VDDQ_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@Rainier_MB-VRHOT_V0P75_PCIE_VDDQ_N.service"
             ]
         },
         "Continue": true
