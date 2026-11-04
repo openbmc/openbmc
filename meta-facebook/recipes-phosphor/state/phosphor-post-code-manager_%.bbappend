@@ -1,6 +1,8 @@
 # Add post code event log configurations
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
+EXTRA_OEMESON:append:fb-compute-arm = " -Dmax-post-code-size-per-cycle=1024"
+
 SRC_URI:append:fb-compute-amd = " \
     file://amd-post-code-handlers.json \
 "
