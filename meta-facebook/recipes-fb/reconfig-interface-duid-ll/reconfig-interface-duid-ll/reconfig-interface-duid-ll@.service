@@ -1,6 +1,7 @@
 [Unit]
 Description=Reconfig %i to get the IPv6 LL
-Before=xyz.openbmc_project.Network.service
+DefaultDependencies=no
+Before=systemd-networkd.service xyz.openbmc_project.Network.service
 
 [Service]
 ExecStart=/usr/libexec/reconfig-interface-duid-ll %i
@@ -8,4 +9,4 @@ SyslogIdentifier=reconfig-interface-duid-ll-%i
 Type=oneshot
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target systemd-networkd.service
