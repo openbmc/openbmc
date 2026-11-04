@@ -52,8 +52,37 @@ if [ "$host_status" == "$STATE_ON" ]; then
     # Wait for the host to power off
     sleep 10s
 
-    # Get host status again after attempting to power off
+    # Get host status again after attempting to power off. PWRGD can bounce
+    # while the CPU is being reset, so read it twice, 5 seconds apart.
     get_host_status
+    first_read=$host_status
+    sleep 5s
+    get_host_status
+    second_read=$host_status
+
+    # After a fatal RAS error the first power-off request may only reset the
+    # CPU: PWRGD stays high (or just bounces) and the host keeps its power.
+    # Request the power-off a second time in that case.
+    if [ "$first_read" != "$STATE_OFF" ] || [ "$second_read" != "$STATE_OFF" ]; then
+        echo "Host$CHASSIS_ID DC power is still on after the first DC off request (PWRGD $first_read/$second_read), request DC off again"
+
+        pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"
+        sleep 10s
+
+        # Require PWRGD to be low in both reads, 3 seconds apart
+        get_host_status
+        third_read=$host_status
+        sleep 3s
+        get_host_status
+        fourth_read=$host_status
+        echo "Host$CHASSIS_ID DC power after the second DC off request: PWRGD $third_read/$fourth_read"
+
+        if [ "$third_read" != "$STATE_OFF" ]; then
+            host_status=$third_read
+        else
+            host_status=$fourth_read
+        fi
+    fi
 
     if [ "$host_status" != "$STATE_OFF" ]; then
         busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
