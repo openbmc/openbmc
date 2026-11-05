@@ -697,7 +697,7 @@ class KernelFitImageBase(FitImageTestCase):
         if bb_vars['INITRAMFS_IMAGE'] and bb_vars['INITRAMFS_IMAGE_BUNDLE'] != "1":
             sign_images += ', "ramdisk"'
         if bb_vars['FIT_UBOOT_ENV']:
-            sign_images += ', "bootscr"'
+            sign_images += ', "script"'
         req_sigvalues_config = {
             'algo': '"%s,%s"' % (bb_vars['FIT_HASH_ALG'], bb_vars['FIT_SIGN_ALG']),
             'key-name-hint': '"%s"' % bb_vars['UBOOT_SIGN_KEYNAME'],

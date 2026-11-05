@@ -75,6 +75,7 @@ SRC_URI = "${BASEURI} \
            file://0028-fix-gcc-libitm-false-postives-02.patch \
 	    file://0025-gcc-testsuite-tweaks-for-mips-OE.patch \
            file://0001-mapper-localhost-might-not-be-known.patch \
+	   file://0029-CVE-2026-102010.patch \
 "
 
 UNPACKDIR = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/sources"

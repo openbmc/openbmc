@@ -52,7 +52,7 @@ SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://libc++.patch \
            "
 
-SRC_URI[sha256sum] = "0e68eb27923621c4bc127cfce40422d28cf7e473fedf6229ae6c32ba5c5b7c6d"
+SRC_URI[sha256sum] = "473ebcf26cae02860ee23e7cbf4ec875586017bd06f32613ba21b6586420e2ed"
 
 inherit autotools ptest pkgconfig useradd python3-dir manpages systemd upstream-stable-release-point
 

@@ -6,5 +6,5 @@ Linux kernel driver API for making driver porting easier, \
 and a subset of the POSIX C library for writing more command-line utilities."
 
 require barebox-common.inc
-inherit barebox
+inherit barebox upstream-stable-release-point
 

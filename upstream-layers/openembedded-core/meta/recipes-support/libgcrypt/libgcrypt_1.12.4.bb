@@ -12,7 +12,7 @@ LICENSE:${PN}-dev = "GPL-2.0-or-later & LGPL-2.1-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=570a9b3749dd0463a1778803b12a6dce \
                     file://COPYING.LIB;md5=4bf661c1e3793e55c8d1051bc5e0ae21 \
-                    file://LICENSES;md5=034b4e369944ad4b52a68368f1cf98b8 \
+                    file://LICENSES;md5=47e346a71a2593d19f741408407fe91f \
                     "
 
 DEPENDS = "libgpg-error"
@@ -25,10 +25,8 @@ SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.bz2 \
            file://no-native-gpg-error.patch \
            file://no-bench-slope.patch \
            file://run-ptest \
-           file://CVE-2026-41989.patch \
-           file://CVE-2026-41990.patch \
            "
-SRC_URI[sha256sum] = "7df5c08d952ba33f9b6bdabdb06a61a78b2cf62d2122c2d1d03a91a79832aa3c"
+SRC_URI[sha256sum] = "d77f68f48879510e79a2f65977ccc68981781ea0923e5bdffac2a193ea3d660e"
 
 BINCONFIG = "${bindir}/libgcrypt-config"
 

@@ -19,6 +19,7 @@ SRC_URI += "file://0001-pyproject.toml-remove-benchmark-disable-option.patch \
             file://CVE-2026-69249.patch \
             file://check-memfree.py \
             file://run-ptest \
+            file://CVE-2026-69247.patch \
            "
 
 require ${BPN}-crates.inc

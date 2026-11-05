@@ -453,9 +453,9 @@ class ItsNodeRootKernel(ItsNode):
 
         if self._bootscr:
             conf_desc.append("u-boot script")
-            opt_props["bootscr"] = self._bootscr.name
+            opt_props["script"] = self._bootscr.name
             if self._sign_enable:
-                sign_entries.append("bootscr")
+                sign_entries.append("script")
 
         if self._setup:
             conf_desc.append("setup")

@@ -31,6 +31,7 @@ EXTRA_OECONF += "--enable-largefile --without-iconv"
 
 SRC_URI = "https://libarchive.org/downloads/libarchive-${PV}.tar.gz \
            file://run-ptest \
+           file://CVE-2026-15028.patch \
           "
 UPSTREAM_CHECK_URI = "https://www.libarchive.org/"
 

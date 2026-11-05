@@ -35,7 +35,7 @@ SRC_URI = "https://lttng.org/files/lttng-ust/lttng-ust-${PV}.tar.bz2 \
            file://0001-lttng-ust-common-link-with-liburcu-explicitly.patch \
            "
 
-SRC_URI[sha256sum] = "82cdfd304bbb2b2b7d17cc951a6756b37a9f73868ec0ba7db448a0d5ca51b763"
+SRC_URI[sha256sum] = "3c232b514f33c4248ce23155f64ad272fdaae3323255f69d5e7a5c3d6812b7ea"
 
 CVE_PRODUCT = "ust"
 

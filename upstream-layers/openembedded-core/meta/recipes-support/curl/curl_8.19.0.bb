@@ -9,37 +9,37 @@ SECTION = "console/network"
 LICENSE = "curl"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0515352b285b9c3f66464b135c9c0fdc"
 
-SRC_URI = " \
-    https://curl.se/download/${BP}.tar.xz \
-    file://run-ptest \
-    file://disable-tests \
-    file://no-test-timeout.patch \
-    file://CVE-2026-6276.patch \
-    file://CVE-2026-5773.patch \
-    file://mbedtls.patch \
-    file://CVE-2026-5545.patch \
-    file://CVE-2026-6253.patch \
-    file://CVE-2026-6429-dependent.patch \
-    file://CVE-2026-6429.patch \
-    file://CVE-2026-7168.patch \
-    file://CVE-2026-4873.patch \
-    file://CVE-2026-8286.patch \
-    file://CVE-2026-8927.patch \
-    file://CVE-2026-8932-dependent.patch \
-    file://CVE-2026-8932.patch \
-    file://CVE-2026-11352.patch \
-    file://CVE-2026-11586.patch \
-    file://CVE-2026-7009.patch \
-    file://CVE-2026-8925.patch \
-    file://CVE-2026-9080.patch \
-    file://CVE-2026-9545-01.patch \
-    file://CVE-2026-9545-02.patch \
-    file://CVE-2026-9079.patch \
-    file://CVE-2026-13608.patch \
-    file://CVE-2026-80229.patch \
-    file://CVE-2026-9546-01.patch \
-    file://CVE-2026-9546-02.patch \
-"
+SRC_URI = "https://curl.se/download/${BP}.tar.xz \
+           file://run-ptest \
+           file://disable-tests \
+           file://no-test-timeout.patch \
+           file://CVE-2026-6276.patch \
+           file://CVE-2026-5773.patch \
+           file://mbedtls.patch \
+           file://CVE-2026-5545.patch \
+           file://CVE-2026-6253.patch \
+           file://CVE-2026-6429-dependent.patch \
+           file://CVE-2026-6429.patch \
+           file://CVE-2026-7168.patch \
+           file://CVE-2026-4873.patch \
+           file://CVE-2026-8286.patch \
+           file://CVE-2026-8927.patch \
+           file://CVE-2026-8932-dependent.patch \
+           file://CVE-2026-8932.patch \
+           file://CVE-2026-11352.patch \
+           file://CVE-2026-11586.patch \
+           file://CVE-2026-7009.patch \
+           file://CVE-2026-8925.patch \
+           file://CVE-2026-9080.patch \
+           file://CVE-2026-9545-01.patch \
+           file://CVE-2026-9545-02.patch \
+           file://CVE-2026-9079.patch \
+           file://CVE-2026-13608.patch \
+           file://CVE-2026-80229.patch \
+           file://CVE-2026-9546-01.patch \
+           file://CVE-2026-9546-02.patch \
+           file://CVE-2026-80230.patch \
+           "
 
 SRC_URI:append:class-nativesdk = " \
     file://environment.d-curl.sh \
