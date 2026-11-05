@@ -20,6 +20,7 @@ source /usr/share/gbmc-net-lib.sh || exit
 
 # shellcheck disable=SC2034
 declare -A gbmc_br_dhcrelay_linkaddrs
+gbmc_br_dhcrelay_dirty="${gbmc_br_dhcrelay_dirty-}"
 declare -A gbmc_ncsi_usb_ifindex=()
 
 gbmc_ncsi_dynamic_hook() {
@@ -65,7 +66,12 @@ EOF
 
     gbmc_ncsi_usb_network "$intf"
 
-    rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
+    if [ -e /run/gbmc-br-dhcrelay/uppers/"$intf" ]; then
+      rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
+      # shellcheck disable=SC2034
+      gbmc_br_dhcrelay_dirty=1
+      gbmc_ip_monitor_defer
+    fi
     # shellcheck disable=SC2034
     linkaddrs=''
     systemctl restart --no-block gbmc-ncsi-ra@"$intf"
@@ -76,7 +82,12 @@ EOF
       /run/nftables/50-gbmc-ncsi-"$intf".rules \
       /run/systemd/network/-bmc-"$intf".network || true
     systemctl stop --no-block gbmc-ncsi-ra@"$intf" || true
-    rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
+    if [ -e /run/gbmc-br-dhcrelay/uppers/"$intf" ]; then
+      rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
+      # shellcheck disable=SC2034
+      gbmc_br_dhcrelay_dirty=1
+      gbmc_ip_monitor_defer
+    fi
     unset 'gbmc_ncsi_usb_ifindex[$intf]'
     unset linkaddrs
   fi

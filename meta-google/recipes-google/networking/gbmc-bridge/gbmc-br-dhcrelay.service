@@ -1,8 +1,7 @@
 [Unit]
 Description=gBMC DHCP Relay Agent Daemon
 After=network.target
-StartLimitIntervalSec=10
-StartLimitBurst=3
+StartLimitIntervalSec=0
 
 [Service]
 Restart=always

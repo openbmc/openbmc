@@ -47,15 +47,18 @@ sed -e "s#/usr/share/gbmc-net-lib.sh#$GBMC_NET_LIB#g" \
 reload_usb_sh() {
   unset gbmc_ncsi_dynamic_lib
   gbmc_br_dhcrelay_linkaddrs=()
+  gbmc_br_dhcrelay_dirty=
   gbmc_ncsi_usb_ifindex=()
   rm -rf "$SYSFS_DIR" "$RUN_DIR"
   mkdir -p "$SYSFS_DIR" "$RUN_DIR"
   systemctl_calls=()
   networkd_reloads=0
   nft_reloads=0
+  defer_calls=0
   systemctl() { systemctl_calls+=("$*"); }
   gbmc_net_networkd_reload() { (( ++networkd_reloads )); }
   gbmc_net_nftables_reload() { (( ++nft_reloads )); }
+  gbmc_ip_monitor_defer() { (( ++defer_calls )); }
   # shellcheck source=/dev/null
   source "$TEST_DIR/gbmc-ncsi-usb.sh"
 }
@@ -119,14 +122,21 @@ testUsbNcsiSkipsSameIfindexUpdates() {
   [ -n "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]+1}" ] || fail
   expect_streq "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]}" ""
   [ ! -e "$RUN_DIR/gbmc-br-dhcrelay/uppers/enu1u1u2u1u1" ] || fail
+  expect_streq "$gbmc_br_dhcrelay_dirty" "1"
+  expect_numeq "$defer_calls" 1
 
   # Link deletion cleans up configs, stops RA, and allows re-add with same ifindex
+  gbmc_br_dhcrelay_dirty=
+  touch "$RUN_DIR/gbmc-br-dhcrelay/uppers/enu1u1u2u1u1"
   systemctl_calls=()
   link_event del enu1u1u2u1u1
   expect_numeq "${#systemctl_calls[@]}" 1
   expect_streq "${systemctl_calls[0]}" "stop --no-block gbmc-ncsi-ra@enu1u1u2u1u1"
   [ ! -e "$RUN_DIR/nftables/50-gbmc-ncsi-enu1u1u2u1u1.rules" ] || fail
   [ ! -e "$RUN_DIR/systemd/network/-bmc-enu1u1u2u1u1.network" ] || fail
+  [ ! -e "$RUN_DIR/gbmc-br-dhcrelay/uppers/enu1u1u2u1u1" ] || fail
+  expect_streq "$gbmc_br_dhcrelay_dirty" "1"
+  expect_numeq "$defer_calls" 2
   [ -z "${gbmc_br_dhcrelay_linkaddrs[enu1u1u2u1u1]+1}" ] || fail
 
   systemctl_calls=()
