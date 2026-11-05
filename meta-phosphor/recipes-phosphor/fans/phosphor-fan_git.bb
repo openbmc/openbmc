@@ -12,6 +12,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
+DEPENDS += "libgpiod"
 PACKAGECONFIG ?= "presence control monitor sensor-monitor"
 # multi-chassis fan apps options
 PACKAGECONFIG[multi-chassis] = "-Dmulti-chassis=enabled,-Dmulti-chassis=disabled"
