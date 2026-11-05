@@ -67,6 +67,14 @@ LDFLAGS:append:mipsel = " -latomic"
 LDFLAGS:append:powerpc = " -latomic"
 LDFLAGS:append:riscv32 = " -latomic"
 
+# configure links -latomic whenever the toolchain merely has it
+# (AC_CHECK_LIB([atomic],[main])) rather than when it is needed. buildtools ships
+# libatomic, so clippy gets a DT_NEEDED that the loader cannot resolve later:
+# BUILD_LDFLAGS has no --as-needed, there is no libatomic-native, and uninative
+# only rewrites the interpreter. Hosts without a system libatomic then fail with
+# "clippy: error while loading shared libraries: libatomic.so.1".
+LDFLAGS:append:class-native = " -Wl,--as-needed"
+
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "frr.service"
 SYSTEMD_AUTO_ENABLE = "disable"

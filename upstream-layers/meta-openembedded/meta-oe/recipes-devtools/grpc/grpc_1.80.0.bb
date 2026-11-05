@@ -27,6 +27,8 @@ SRCREV = "f5e2d6e856176c2f6b7691032adfefe21e5f64c1"
 BRANCH = "v1.80.x"
 SRC_URI = "gitsm://github.com/grpc/grpc.git;protocol=https;branch=${BRANCH};tag=v${PV} \
            file://0001-cmake-Link-with-libatomic-on-rv32-rv64.patch \
+           file://0001-Security-Update-repo-roots-to-chromium-roots-42094.patch \
+           file://0001-security-Update-gRPC-repo-roots.-43699.patch \
            "
 
 inherit cmake pkgconfig

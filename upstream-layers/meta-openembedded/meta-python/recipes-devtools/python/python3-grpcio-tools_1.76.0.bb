@@ -26,3 +26,6 @@ do_compile:prepend() {
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_PRODUCT += "grpc:grpc"
+CVE_STATUS[CVE-2023-33953] = "fixed-version: Fixed since 1.56.2"
+CVE_STATUS[CVE-2024-37168] = "cpe-incorrect: affects @grpc/grpc-js, not gRPC core"
+CVE_STATUS[CVE-2026-33186] = "cpe-incorrect: affects gRPC-Go, not Python grpcio-tools"

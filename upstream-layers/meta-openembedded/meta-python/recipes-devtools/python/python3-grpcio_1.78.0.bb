@@ -12,6 +12,8 @@ DEPENDS += "c-ares openssl python3-protobuf re2 zlib"
 
 SRC_URI += "file://0001-python-enable-unbundled-cross-compilation.patch \
            file://abseil-ppc-fixes.patch \
+           file://0001-Update-repo-roots-to-chromium-roots-42094.patch \
+           file://0001-Update-gRPC-repo-roots.-43699.patch \
            "
 SRC_URI[sha256sum] = "7382b95189546f375c174f53a5fa873cef91c4b8005faa05cc5b3beea9c4f1c5"
 
@@ -28,6 +30,10 @@ export GRPC_PYTHON_BUILD_SYSTEM_CARES = "1"
 export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL = "1"
 export GRPC_PYTHON_BUILD_SYSTEM_RE2 = "1"
 export GRPC_PYTHON_BUILD_SYSTEM_ZLIB = "1"
+
+do_configure:prepend() {
+    cp ${S}/etc/roots.pem ${S}/src/python/grpcio/grpc/_cython/_credentials/roots.pem
+}
 
 do_configure:append() {
     # Relax strict cython version pin so that the available cython satisfies the requirement.

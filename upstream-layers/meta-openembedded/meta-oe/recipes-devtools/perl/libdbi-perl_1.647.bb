@@ -15,6 +15,11 @@ SRC_URI = "${CPAN_MIRROR}/authors/id/H/HM/HMBRAND/DBI-${PV}.tgz \
            file://CVE-2026-14380.patch \
            file://CVE-2026-14739.patch \
            file://CVE-2026-14740.patch \
+           file://CVE-2026-73194_p1.patch \
+           file://CVE-2026-73194_p2.patch \
+           file://CVE-2026-73194_p3.patch \
+           file://CVE-2026-73193_p1.patch \
+           file://CVE-2026-73193_p2.patch \
            "
 SRC_URI[sha256sum] = "0df16af8e5b3225a68b7b592ab531004ddb35a9682b50300ce50174ad867d9aa"
 

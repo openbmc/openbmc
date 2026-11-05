@@ -18,8 +18,13 @@ DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 RDEPENDS:${PN} = "acl"
 
 SRC_URI = " \
-	git://github.com/storaged-project/udisks.git;branch=2.10.x-branch;protocol=https \
-	file://0001-Makefile.am-Dont-include-buildpath.patch \
+    git://github.com/storaged-project/udisks.git;branch=2.10.x-branch;protocol=https \
+    file://0001-Makefile.am-Dont-include-buildpath.patch \
+    file://CVE-2026-7867-1.patch \
+    file://CVE-2026-7867-2.patch \
+    file://CVE-2026-7867-3.patch \
+    file://CVE-2026-7867-4.patch \
+    file://CVE-2026-7867-5.patch \
 "
 SRCREV = "bc623acf9e7488dc105e4b00069d57e303e2616b"
 

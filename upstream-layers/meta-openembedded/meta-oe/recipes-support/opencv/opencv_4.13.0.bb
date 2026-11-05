@@ -213,10 +213,8 @@ do_install:append() {
         rm -rf ${D}${bindir}/setup_vars_opencv4.sh
     fi
 
-    for fn in arithm.vsx3.cpp convert.vsx3.cpp; do
-        if [ -f ${B}/modules/core/$fn ]; then
-            sed -i -e 's,${S},/usr/src/debug/${PN}/${PV},g' ${B}/modules/core/$fn
-        fi
+    find ${B}/modules -name "*.cpp" | xargs -r grep -l "${S}" | while read -r fn; do
+        sed -i -e 's,${S},/usr/src/debug/${PN}/${PV},g' "$fn"
     done
 
     if [ -d ${D}/${bindir}/shape ]; then

@@ -5,6 +5,7 @@ LICENSE = "MIT"
 
 SRC_URI = "git://github.com/alanxz/rabbitmq-c.git;branch=master;protocol=https \
            file://CVE-2026-44236.patch \
+           file://CVE-2026-44235.patch \
 "
 SRCREV = "84b81cd97a1b5515d3d4b304796680da24c666d8"
 

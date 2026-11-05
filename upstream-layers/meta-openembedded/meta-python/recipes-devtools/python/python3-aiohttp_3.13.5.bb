@@ -17,6 +17,11 @@ SRC_URI += " \
     file://CVE-2026-54278.patch \
     file://CVE-2026-54279.patch \
     file://CVE-2026-54280.patch \
+    file://CVE-2026-54273_p1.patch \
+    file://CVE-2026-54273_p2.patch \
+    file://CVE-2026-59881.patch \
+    file://CVE-2026-69243.patch \
+    file://CVE-2026-69244.patch \
 "
 
 CVE_PRODUCT = "aiohttp:aiohttp"
@@ -28,7 +33,14 @@ CVE-2026-34520 CVE-2026-34525"
 
 inherit python_setuptools_build_meta pypi 
 
-DEPENDS = "python3-pkgconfig-native"
+DEPENDS = "python3-pkgconfig-native python3-cython-native"
+
+do_configure:prepend() {
+    cython3 -3 -Werror \
+        -I ${S}/aiohttp \
+        -o ${S}/aiohttp/_http_parser.c \
+        ${S}/aiohttp/_http_parser.pyx
+}
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[extras] = ",,,python3-aiodns python3-brotli"
