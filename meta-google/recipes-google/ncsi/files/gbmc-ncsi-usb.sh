@@ -20,18 +20,22 @@ source /usr/share/gbmc-net-lib.sh || exit
 
 # shellcheck disable=SC2034
 declare -A gbmc_br_dhcrelay_linkaddrs
+declare -A gbmc_ncsi_usb_ifindex=()
 
 gbmc_ncsi_dynamic_hook() {
   # shellcheck disable=SC2154
   local -n numaddrs=gbmc_br_dhcrelay_linkaddrs["$intf"]
   # shellcheck disable=SC2154
   if [[ "$change" = 'link' && "$action" = 'add' ]]; then
-    # Builtins only: this runs for every link added, and short lived ones
+    # Builtins only: this runs for every link event, and short lived ones
     # (e.g. USB devices udev renames right away) may already be gone
-    local alias=
+    local alias='' idx=''
     read -r alias 2>/dev/null <"/sys/class/net/$intf/ifalias"
-    [[ $alias == ncsi-usb-side ]] || return
-    echo "NCSI USB Link Add $intf" >&2
+    [[ $alias == ncsi-usb-side ]] || return 0
+    read -r idx 2>/dev/null <"/sys/class/net/$intf/ifindex"
+    [[ -n $idx && $idx != "${gbmc_ncsi_usb_ifindex["$intf"]-}" ]] || return 0
+    gbmc_ncsi_usb_ifindex["$intf"]="$idx"
+    echo "NCSI USB Link Add $intf (ifindex $idx)" >&2
 
     local contents
 read -r -d '' contents <<EOF
@@ -61,16 +65,19 @@ EOF
 
     gbmc_ncsi_usb_network "$intf"
 
+    rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
+    # shellcheck disable=SC2034
+    numaddrs=0
     systemctl restart --no-block gbmc-ncsi-ra@"$intf"
-    numaddrs=${numaddrs-0}
   elif [[ "$change" = 'link' && "$action" = 'del' ]]; then
-    [[ -n "${numaddrs-}" ]] || return 0
+    [[ -n "${gbmc_ncsi_usb_ifindex["$intf"]-}" ]] || return 0
     echo "NCSI USB Link Del $intf" >&2
     gbmc_net_rm_if_exists \
       /run/nftables/50-gbmc-ncsi-"$intf".rules \
       /run/systemd/network/-bmc-"$intf".network || true
     systemctl stop --no-block gbmc-ncsi-ra@"$intf" || true
     rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
+    unset 'gbmc_ncsi_usb_ifindex[$intf]'
     unset numaddrs
   fi
 }
@@ -98,7 +105,7 @@ gbmc_ncsi_usb_network() {
   local contents
   contents="$(sed -e '/^#/d' -e "s/^Property=.*/Name=$intf/" \
     /usr/lib/systemd/network/"$shared")" || return
-  # Link events repeat on every carrier change, only reload when it changed
+  # Re-enumeration keeps the same config, only reload when it changed
   gbmc_net_write_if_changed "$contents" /run/systemd/network/"$name" || true
 }
 

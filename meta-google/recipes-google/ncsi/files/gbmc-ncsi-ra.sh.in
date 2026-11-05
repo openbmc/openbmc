@@ -78,8 +78,7 @@ EOF
   fi
 
   # We need to know which NCSI path has which route
-  mkdir -p /run/ncsi-ips
-  echo "$pfx" >/run/ncsi-ips/"$RA_IF"
+  gbmc_net_write_if_changed "$pfx" /run/ncsi-ips/"$RA_IF" || true
 
   gbmc_br_set_runtime_ip "$RA_IF-ra" "$pfx"
 }

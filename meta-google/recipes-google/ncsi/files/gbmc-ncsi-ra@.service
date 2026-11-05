@@ -4,8 +4,7 @@ Description=RA Gateway Updater
 # NICs are cleared by gbmc-ncsi-clear-gw@, which we start without waiting.
 After=systemd-networkd.service
 After=ncsid@%i.service
-StartLimitIntervalSec=1min
-StartLimitBurst=5
+StartLimitIntervalSec=0
 
 [Service]
 Restart=always
