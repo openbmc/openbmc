@@ -11,7 +11,7 @@ DEPENDS += " \
         gpioplus \
         cli11 \
         "
-SRCREV = "100f95a32b65881d500c7303107bf2bdb2bdccdc"
+SRCREV = "8b1bcac934bf7e0d121b8a4d2087847f82231103"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[use-dev-path] = "-Dalways-use-devpath=enabled, -Dalways-use-devpath=disabled"
 PACKAGECONFIG[use-bus-device] = "-Duse-bus-device=enabled, -Duse-bus-device=disabled"
