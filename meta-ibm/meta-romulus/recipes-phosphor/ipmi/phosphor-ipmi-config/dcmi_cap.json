@@ -10,7 +10,7 @@
     "TempMonitoringSamplingFreq":0,
     "PowerMgmtDeviceSlaveAddress": 0,
     "BMCChannelNumber": 0,
-    "DeviceRivision": 0,
+    "DeviceRevision": 0,
     "MandatoryPrimaryLanOOBSupport": 1,
     "OptionalSecondaryLanOOBSupport": 255,
     "OptionalSerialOOBMTMODECapability": 255
