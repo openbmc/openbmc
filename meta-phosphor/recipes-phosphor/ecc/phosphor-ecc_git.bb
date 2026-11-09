@@ -6,7 +6,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
-SRCREV = "8eda0ab23b2fca70c06e8f1de711d560c9261ae5"
+SRCREV = "a9e40eb9c333a8845e9d41ba1b6cf17177e2412e"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
