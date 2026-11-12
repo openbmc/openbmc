@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRCREV = "6a5ad96ce7643c433ea2f6bd597bc52dcc744120"
 SRC_URI = "git://github.com/FedeDP/${BPN};protocol=https;branch=master;tag=${PV} \
+           file://0001-log-Include-fcntl.h-for-open-and-O_-flags.patch \
 "
 
 inherit cmake pkgconfig features_check

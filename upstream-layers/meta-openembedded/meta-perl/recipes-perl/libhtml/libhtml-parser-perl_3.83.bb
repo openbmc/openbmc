@@ -7,7 +7,9 @@ LIC_FILES_CHKSUM = "file://README;beginline=996;endline=1000;md5=cab05784294bb47
 
 DEPENDS += "perl"
 
-SRC_URI = "${CPAN_MIRROR}/authors/id/O/OA/OALDERS/HTML-Parser-${PV}.tar.gz"
+SRC_URI = "${CPAN_MIRROR}/authors/id/O/OA/OALDERS/HTML-Parser-${PV}.tar.gz \
+           file://CVE-2026-8829.patch \
+           "
 
 SRC_URI[sha256sum] = "7278ce9791256132b26a71a5719451844704bb9674b58302c3486df43584f8c0"
 

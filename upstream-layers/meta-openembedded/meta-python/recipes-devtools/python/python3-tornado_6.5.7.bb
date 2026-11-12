@@ -11,6 +11,17 @@ SRC_URI[sha256sum] = "66c513a76cda70d53907bc27cf1447557699c2e95aa48ba27a442ff61c
 SRC_URI += "file://CVE-2026-91990.patch \
             file://CVE-2026-82397.patch \
             file://CVE-2026-91991.patch \
+            file://CVE-2026-103261.patch \
+            file://CVE-2026-103262.patch \
+            file://CVE-2026-103263.patch \
+            file://CVE-2026-103263-dependent.patch \
+            file://CVE-2026-115927.patch \
+            file://CVE-2026-116577_p1.patch \
+            file://CVE-2026-116577_p2.patch \
+            file://CVE-2026-116577_p3.patch \
+            file://CVE-2026-116578_p1.patch \
+            file://CVE-2026-116578_p2.patch \
+            file://CVE-2026-116578_p3.patch \
 "
 
 inherit pypi python_setuptools_build_meta

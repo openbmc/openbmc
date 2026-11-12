@@ -23,7 +23,10 @@ LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=570a9b3749dd0463a1778803b12a6dce"
 LICENSE_FLAGS = "commercial"
 
 SRCREV = "41f6a645068483470267271e1d09966ca3b9f413"
-SRC_URI = "git://github.com/mpv-player/mpv;name=mpv;branch=release/${@oe.utils.trim_version('${PV}', 2)};protocol=https;tag=v${PV}"
+SRC_URI = " \
+    git://github.com/mpv-player/mpv;name=mpv;branch=release/${@oe.utils.trim_version('${PV}', 2)};protocol=https;tag=v${PV} \
+    file://0001-opengl-context-require-swap_buffers-param-for-FenceS.patch \
+"
 
 inherit meson pkgconfig mime-xdg
 

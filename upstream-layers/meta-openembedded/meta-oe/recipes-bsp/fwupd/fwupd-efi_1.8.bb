@@ -12,6 +12,16 @@ COMPATIBLE_HOST = "(x86_64.*|i.86.*|aarch64.*|arm.*)-linux"
 
 inherit meson pkgconfig python3native
 
+# without this meson finds the build host linker in HOSTTOOLS.
+do_write_config:append() {
+    cat >${WORKDIR}/meson-${PN}.cross <<EOF
+[binaries]
+ld.bfd = '${HOST_PREFIX}ld.bfd'
+EOF
+}
+
+MESON_CROSS_FILE:append = " --cross-file ${WORKDIR}/meson-${PN}.cross"
+
 # These should be configured as needed
 SBAT_DISTRO_ID ?= "${DISTRO}"
 SBAT_DISTRO_SUMMARY ?= "${DISTRO_NAME}"

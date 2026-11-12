@@ -9,9 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 SRC_URI = "git://github.com/tuxera/ntfs-3g;protocol=https;branch=edge;tag=${PV} \
            file://0001-libntfs-3g-Makefile.am-fix-install-failed-while-host.patch \
            file://0001-unistr.c-Fix-use-after-free-in-ntfs_uppercase_mbs.patch \
-           file://CVE-2026-46572_CVE-2026-42617_p1.patch \
-           file://CVE-2026-46572_CVE-2026-42617_p2.patch \
-           file://CVE-2026-46572_CVE-2026-42617_p3.patch \
+           file://CVE-2026-46572_CVE-2026-42617_CVE-2026-56136_p1.patch \
+           file://CVE-2026-46572_CVE-2026-42617_CVE-2026-56136_p2.patch \
+           file://CVE-2026-46572_CVE-2026-42617_CVE-2026-56136_p3.patch \
            file://CVE-2026-46571.patch \
            file://CVE-2026-46570.patch \
            file://CVE-2026-46569.patch \
@@ -21,6 +21,10 @@ SRC_URI = "git://github.com/tuxera/ntfs-3g;protocol=https;branch=edge;tag=${PV} 
            file://CVE-2026-42616_p2.patch \
            file://CVE-2026-40706_p1.patch \
            file://CVE-2026-40706_p2.patch \
+           file://CVE-2026-56135_p1.patch \
+           file://CVE-2026-56135_p2.patch \
+           file://CVE-2026-56135_p3.patch \
+           file://CVE-2026-56135_p4.patch \
 "
 SRCREV = "78414d93613532fd82f3a82aba5d4a1c32898781"
 

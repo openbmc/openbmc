@@ -12,6 +12,7 @@ SRC_URI = " \
     file://CVE-2026-10650.patch \
     file://CVE-2026-19773.patch \
     file://CVE-2026-78161.patch \
+    file://CVE-2026-114550.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://github.com/warmcat/${BPN}/releases"

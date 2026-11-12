@@ -7,6 +7,7 @@ SRC_URI = " \
     http://www.fftw.org/fftw-${PV}.tar.gz \
     file://0001-NEON-autodetection-segfaults-assume-neon-present.patch \
     file://install-bench.patch \
+    file://0001-cycle.h-Do-not-use-CLOCK_SGI_CYCLE-on-Linux.patch \
     file://run-ptest \
 "
 SRC_URI[sha256sum] = "5630c24cdeb33b131612f7eb4b1a9934234754f9f388ff8617458d0be6f239a1"

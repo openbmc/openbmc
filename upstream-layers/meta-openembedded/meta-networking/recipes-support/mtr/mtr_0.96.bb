@@ -9,7 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://ui/mtr.c;beginline=5;endline=16;md5=00a894a39d53726a27386534d1c4e468"
 
 SRCREV = "f392168771570b0fdc104c38dea6bbc2ce585710"
-SRC_URI = "git://github.com/traviscross/mtr;branch=master;protocol=https;tag=v${PV}"
+SRC_URI = "git://github.com/traviscross/mtr;branch=master;protocol=https;tag=v${PV} \
+           file://CVE-2026-14461.patch \
+"
 
 
 inherit autotools pkgconfig
