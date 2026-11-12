@@ -22,5 +22,6 @@ this.
    report-defect
    recipe-style-guide
    submit-changes
+   ai-assisted-contribution-policy
 
 .. include:: /boilerplate.rst

@@ -130,25 +130,50 @@ section#welcome-to-the-yocto-project-documentation p.caption {
         color: inherit;
     }
 
-    /* Admonition should be gray, not blue or green */
+    /* Normal admonitions should be gray, not blue or green */
+    .rst-content .hint .admonition-title,
     .rst-content .note .admonition-title,
     .rst-content .tip .admonition-title,
-    .rst-content .warning .admonition-title,
-    .rst-content .caution .admonition-title,
-    .rst-content .admonition-tying-it-together .admonition-title,
-    .rst-content .important .admonition-title {
+    .rst-content .admonition-tying-it-together .admonition-title {
         background: #f0f0f2;
         color: #00557D;
-
+        padding: 12px 12px;
     }
 
+    .rst-content .hint,
     .rst-content .note,
     .rst-content .tip,
-    .rst-content .important,
-    .rst-content .warning,
-    .rst-content .admonition-tying-it-together,
-    .rst-content .caution  {
+    .rst-content .admonition-tying-it-together {
         background: #f0f0f2;
+    }
+
+    /* For other admonitions, make the title background color the same as the
+     * admonitions' content, to be consistent with our note and tip admonitions. */
+    .rst-content .attention .admonition-title,
+    .rst-content .caution .admonition-title,
+    .rst-content .important .admonition-title,
+    .rst-content .warning .admonition-title {
+        background: #fff6e5;
+        color: #b37400;
+        padding: 12px 12px;
+    }
+
+    .rst-content .attention,
+    .rst-content .caution,
+    .rst-content .important,
+    .rst-content .warning {
+        background: #fff6e5;
+    }
+
+    .rst-content .danger .admonition-title,
+    .rst-content .error .admonition-title {
+        background: #fdf3f2;
+        color: #8d2f26;
+        padding: 12px 12px;
+    }
+    .rst-content .danger,
+    .rst-content .error {
+        background: #fdf3f2;
     }
 
     /* Remove the icon in front of note/tip element, and before the logo */
