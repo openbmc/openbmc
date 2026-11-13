@@ -1,4 +1,4 @@
-From c5c46664a914d3a7f048c51c3b9c2ab13e21ed1b Mon Sep 17 00:00:00 2001
+From a2acfc8ab636148cc9a2ba81ee03698703154ff0 Mon Sep 17 00:00:00 2001
 From: Tim Orling <tim.orling@konsulko.com>
 Date: Thu, 29 Jan 2026 09:59:55 -0800
 Subject: [PATCH] Guard avx512 module with x86 target cfg
@@ -32,6 +32,3 @@ index e4c7697..46450ac 100644
  #[target_feature(enable = "avx512f,avx512bw,avx512vl,bmi2")]
  pub(crate) unsafe fn create_str_impl_avx512vl(buf: &str) -> *mut crate::ffi::PyObject {
      unsafe {
--- 
-2.39.5
-

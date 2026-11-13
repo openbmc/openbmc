@@ -10,6 +10,8 @@ SRC_URI[sha256sum] = "3cdbbf3fac90dc6f118bfd64384f309edeadd902d7c8fb17f02ffa1fc3
 
 inherit ptest-python-pytest pypi python_setuptools_build_meta
 
+PYPI_PACKAGE_SDIST = "py-cpuinfo"
+
 DEPENDS += "python3-wheel-native"
 
 SRC_URI += " \

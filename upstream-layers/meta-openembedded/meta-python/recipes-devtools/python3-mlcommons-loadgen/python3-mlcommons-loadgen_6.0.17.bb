@@ -18,8 +18,6 @@ SRC_URI += " \
     file://source-date-epoch.patch \
 "
 
-PYPI_PACKAGE = "mlcommons_loadgen"
-
 SRC_URI[sha256sum] = "a2e85d09e3cc0c606f89bfe1fbf97537c8b5b238ae0afbd923ad9c710fcf2ca8"
 
 # Because the pyproject.toml contains invalid requirements.

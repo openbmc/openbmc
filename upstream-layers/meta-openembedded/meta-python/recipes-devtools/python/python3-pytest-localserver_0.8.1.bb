@@ -7,6 +7,8 @@ DEPENDS += "python3-setuptools-scm-native"
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
+PYPI_PACKAGE_SDIST = "pytest-localserver"
+
 SRC_URI[sha256sum] = "66569c34fef31a5750b16effd1cd1288a7a90b59155d005e7f916accd3dee4f1"
 
 RDEPENDS:${PN}-ptest += " \

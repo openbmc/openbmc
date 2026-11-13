@@ -1,4 +1,4 @@
-From c8a74ad998879e52badd09e9e52477c8e87d0e5d Mon Sep 17 00:00:00 2001
+From 6f1bd0a468f5c7b49dd63125aacd8af2dd8fd8da Mon Sep 17 00:00:00 2001
 From: Khem Raj <khem.raj@oss.qualcomm.com>
 Date: Fri, 31 Jul 2026 02:25:45 -0700
 Subject: [PATCH] cmake: Pass _GNU_SOURCE via CMAKE_REQUIRED_DEFINITIONS too
@@ -36,7 +36,7 @@ Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 93a99bc..e37858d 100644
+index f7c1528..4381326 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -122,6 +122,11 @@ set(SDL_CHECK_REQUIRED_LINK_OPTIONS "" CACHE STRING "Extra link options (for CMA

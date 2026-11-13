@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "02e3c2e564c7403b92db3fef8ecae3d21123b15787daecd5b643a57369
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "eth-keyfile"
+
 RDEPENDS:${PN} += " \
     python3-eth-keys \
     python3-pycryptodome \

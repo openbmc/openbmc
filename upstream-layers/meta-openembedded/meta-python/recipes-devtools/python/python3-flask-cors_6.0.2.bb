@@ -7,8 +7,6 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=6;endline=6;md5=134f1026f0de92fd30e71976590a2868"
 
-PYPI_PACKAGE = "flask_cors"
-
 CVE_PRODUCT = "flask-cors"
 
 inherit pypi python_setuptools_build_meta

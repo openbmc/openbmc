@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=97de97cd9d6e23c88129d884588ce71a"
 
 SRC_URI[sha256sum] = "601abcc0343dfbae0c56273d98362d5cdc266ac84d20b3f65a212e4a2c83b302"
 
-PYPI_PACKAGE = "Flask-User"
+PYPI_PACKAGE_SDIST = "Flask-User"
 
 CVE_PRODUCT = "flask-user_project:flask-user"
 

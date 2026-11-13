@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 18 Oct 2026 17:40:00 -0700
+Subject: [PATCH] application: Define W_EXITCODE() if libc lacks it
+
+W_EXITCODE() is a glibc extension in <sys/wait.h> that musl does not
+provide, so the build fails with clang:
+
+  src/ptyxis-application.c:1926:34: error: call to undeclared function 'W_EXITCODE'
+
+Fall back to the same definition glibc uses.
+
+Upstream-Status: Pending
+AI-Generated: Uses Claude Code
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/ptyxis-application.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+--- a/src/ptyxis-application.c
++++ b/src/ptyxis-application.c
+@@ -26,6 +26,11 @@
+ #include <sys/utsname.h>
+ #include <sys/wait.h>
+ 
++/* musl does not provide W_EXITCODE(), use the glibc definition */
++#ifndef W_EXITCODE
++# define W_EXITCODE(ret, sig) ((ret) << 8 | (sig))
++#endif
++
+ #include "ptyxis-action-group.h"
+ #include "ptyxis-application.h"
+ #include "ptyxis-build-ident.h"

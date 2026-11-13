@@ -22,6 +22,7 @@ DEPENDS += "ethtool \
 RDEPENDS:${PN} += "bash ethtool libgcc"
 
 SRC_URI = "gitsm://github.com/Ettercap/ettercap;branch=master;protocol=https;tag=v${PV} \
+           file://0001-ec.h-do-not-strip-a-pre-existing-_GNU_SOURCE-define.patch \
            "
 
 SRCREV = "0dc8409779f3a09cbfff4434b9a4d7b33480d88d"

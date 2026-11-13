@@ -6,12 +6,10 @@ Subject: [PATCH] mkversion: remove user host pwd from version
 Upstream-Status: Pending
 
 Update this patch to version 2.4.47
+Refresh for 2.7.2
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- build/mkversion | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
 --- a/build/mkversion
 +++ b/build/mkversion
 @@ -53,8 +53,12 @@ APPLICATION=$1
@@ -28,10 +26,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  fi
  
  cat << __EOF__
-@@ -77,7 +81,7 @@ static const char copyright[] =
+@@ -79,7 +83,7 @@ static const char copyright[] LDAP_GCCATTR((unused)) =
  "COPYING RESTRICTIONS APPLY\n";
  
- $static $const char $SYMBOL[] =
+ $static $const char $SYMBOL[] LDAP_GCCATTR((unused)) =
 -"@(#) \$$PACKAGE: $APPLICATION $VERSION (" __DATE__ " " __TIME__ ") \$\n"
 +"@(#) \$$PACKAGE: $APPLICATION $VERSION ($DATE $TIME) \$\n"
  "\t$WHOWHERE\n";

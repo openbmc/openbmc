@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 9 Nov 2026 07:45:00 -0800
+Subject: [PATCH] Use packaging instead of pkg_resources for version parsing
+
+pkg_resources has been removed from setuptools, so SConstruct fails to
+load with:
+
+  ModuleNotFoundError: No module named 'pkg_resources'
+
+Use parse() from the packaging module instead.
+
+Upstream-Status: Inappropriate [v4.4 branch is EOL]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/SConstruct b/SConstruct
+--- a/SConstruct
++++ b/SConstruct
+@@ -16,7 +16,7 @@
+ import uuid
+ from glob import glob
+ 
+-from pkg_resources import parse_version
++from packaging.version import parse as parse_version
+ 
+ import SCons
+ 
+diff --git a/site_scons/site_tools/ccache.py b/site_scons/site_tools/ccache.py
+--- a/site_scons/site_tools/ccache.py
++++ b/site_scons/site_tools/ccache.py
+@@ -26,7 +26,7 @@
+ import subprocess
+ 
+ import SCons
+-from pkg_resources import parse_version
++from packaging.version import parse as parse_version
+ 
+ # This is the oldest version of ccache that offers support for -gsplit-dwarf
+ _ccache_version_min = parse_version("3.2.3")
+diff --git a/site_scons/site_tools/icecream.py b/site_scons/site_tools/icecream.py
+--- a/site_scons/site_tools/icecream.py
++++ b/site_scons/site_tools/icecream.py
+@@ -25,7 +25,7 @@
+ import subprocess
+ import urllib
+ 
+-from pkg_resources import parse_version
++from packaging.version import parse as parse_version
+ 
+ import SCons
+ 

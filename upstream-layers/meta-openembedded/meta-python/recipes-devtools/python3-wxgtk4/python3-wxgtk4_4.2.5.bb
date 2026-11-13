@@ -4,7 +4,7 @@ HOMEPAGE = "https://www.wxpython.org"
 LICENSE = "BSD-2-Clause AND LGPL-2.0-only AND LGPL-2.0-or-later WITH WxWindows-exception-3.1"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=102f37a0d23aa258e59e4cc8b5380b35"
 
-DEPENDS = "python3-attrdict3-native python3-six-native wxwidgets-native \
+DEPENDS = "wxwidgets-native \
            python3-requests-native wxwidgets \
            "
 
@@ -17,15 +17,11 @@ SRC_URI += "file://add-back-option-build-base.patch \
            "
 SRC_URI[sha256sum] = "44e836d1bccd99c38790bb034b6ecf70d9060f6734320560f7c4b0d006144793"
 
-inherit pypi setuptools3 cython pkgconfig features_check
+inherit pypi python_setuptools_build_meta cython pkgconfig features_check
 
-# wxPython declares setuptools.build_meta in pyproject.toml, but it cannot be
-# built through pyproject-build: the sdist ships a build.py in its top level
-# directory, which shadows the "build" module pyproject-build itself imports:
-#   from build.__main__ import entrypoint
-#   ModuleNotFoundError: No module named 'build.__main__'; 'build' is not a package
-# Keep driving setup.py directly until upstream stops colliding with that name.
-INSANE_SKIP += "pep517-backend"
+# pyproject.toml pins sip == 6.12.0, which is only needed to regenerate the
+# wrapper sources; the sdist already ships them.
+PEP517_BUILD_OPTS = "--skip-dependency-check"
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -42,7 +38,6 @@ RDEPENDS:${PN} = "\
     python3-pip \
     python3-pprint \
     python3-pycairo \
-    python3-six \
     python3-xml \
     python3-cairocffi \
 "

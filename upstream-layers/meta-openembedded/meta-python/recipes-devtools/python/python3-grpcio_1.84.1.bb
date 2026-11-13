@@ -1,0 +1,58 @@
+DESCRIPTION = "Google gRPC"
+HOMEPAGE = "https://www.grpc.io/"
+SECTION = "devel/python"
+LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND MIT AND MPL-2.0"
+LIC_FILES_CHKSUM = " \
+    file://LICENSE;md5=fe8c552b7748e45c00ac55ac0257f6c9 \
+    file://third_party/utf8_range/utf8_validity.h;beginline=1;endline=5;md5=db08ddb5817e660489678e7c3653805a \
+    file://third_party/xxhash/xxhash.h;beginline=1;endline=34;md5=d41d564db2353fc80a713956d85b1690 \
+"
+
+DEPENDS += "c-ares openssl python3-protobuf re2 zlib"
+
+SRC_URI += "file://0001-python-enable-unbundled-cross-compilation.patch \
+           file://0001-Fix-OpenSSL-4.0-compatibility.patch \
+           file://abseil-ppc-fixes.patch \
+           "
+SRC_URI[sha256sum] = "446e7876b9b991fa124c1d414899fa7cf95f89a3e71237ea0161863dc0b2c09f"
+
+RDEPENDS:${PN} = "python3-protobuf python3-typing-extensions"
+
+inherit python_setuptools_build_meta cython
+inherit pypi
+
+DEPENDS += "python3-wheel-native"
+
+CFLAGS:append:libc-musl = " -D_LARGEFILE64_SOURCE"
+
+# unbundling abseil-cpp needs work on dynamic linker issue
+#export GRPC_PYTHON_BUILD_SYSTEM_ABSL = "1"
+export GRPC_PYTHON_BUILD_SYSTEM_CARES = "1"
+export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL = "1"
+export GRPC_PYTHON_BUILD_SYSTEM_RE2 = "1"
+export GRPC_PYTHON_BUILD_SYSTEM_ZLIB = "1"
+
+do_configure:append() {
+    # Relax strict cython version pin so that the available cython satisfies the requirement.
+    # The C files are pre-generated so cython is not actually used during compilation.
+    sed -i 's/\"cython==/\"cython>=/' ${S}/pyproject.toml
+}
+
+do_compile:prepend() {
+    export GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS="${@oe.utils.parallel_make(d, False)}"
+}
+
+GRPC_CFLAGS ?= ""
+GRPC_CFLAGS:append:toolchain-clang = " -fvisibility=hidden -fno-wrapv -fno-exceptions"
+export GRPC_PYTHON_CFLAGS = "${GRPC_CFLAGS}"
+
+CLEANBROKEN = "1"
+
+BBCLASSEXTEND = "native nativesdk"
+
+CCACHE_DISABLE = "1"
+
+CVE_PRODUCT += "grpc:grpc"
+CVE_STATUS[CVE-2026-33186] = "cpe-incorrect: the vulnerabilty affects only the go implementation"
+CVE_STATUS[CVE-2023-33953] = "fixed-version: Fixed since 1.56.2"
+CVE_STATUS[CVE-2024-37168] = "cpe-incorrect: This CVE is for grps-js"

@@ -14,6 +14,10 @@ B = "${S}"
 
 inherit pkgconfig
 
+do_configure() {
+    sed -i "s/^version *= .*/version  = '${PV}'/" ${S}/lukefile
+}
+
 do_compile() {
     ${S}/build-aux/luke LUA_INCDIR=${STAGING_INCDIR}
 }

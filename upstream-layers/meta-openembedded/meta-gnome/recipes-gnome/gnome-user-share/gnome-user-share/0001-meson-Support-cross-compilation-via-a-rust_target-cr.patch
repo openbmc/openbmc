@@ -1,0 +1,49 @@
+From 76a5bb97ce8590836f4c4892400f65318f326b40 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 20 Oct 2026 21:40:51 +0200
+Subject: [PATCH] meson: Support cross-compilation via a rust_target cross
+ property
+
+cargo is always invoked without --target and the binary is copied from
+the native artifact layout (src/<profile>/), so gnome-user-share cannot
+be cross-compiled. Read the rust target triple from the cross file's
+[properties] (rust_target); when set, pass it as --target and read the
+binary from the per-target subdirectory cargo writes to. When it is
+unset the build is unchanged.
+
+AI-Generated: Uses Claude Code (Claude Opus 5.5)
+Upstream-Status: Pending
+---
+ src/meson.build | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 55e55c3..fe62135 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -17,6 +17,14 @@ run_command(
+ cargo_options = [ '--manifest-path', meson.project_source_root() / 'Cargo.toml' ]
+ cargo_options += [ '--target-dir', meson.project_build_root() / 'src' ]
+ 
++cargo_build_target = meson.get_external_property('rust_target', '')
++if cargo_build_target != ''
++  cargo_options += [ '--target', cargo_build_target ]
++  cargo_artifact_dir = 'src' / cargo_build_target
++else
++  cargo_artifact_dir = 'src'
++endif
++
+ if get_option('buildtype') == 'release'
+   cargo_options += [ '--release' ]
+   rust_target = 'release'
+@@ -47,6 +55,6 @@ custom_target(
+     cargo, 'build',
+     cargo_options,
+     '&&',
+-    'cp', 'src' / rust_target / meson.project_name(), '@OUTPUT@',
++    'cp', cargo_artifact_dir / rust_target / meson.project_name(), '@OUTPUT@',
+   ]
+ )
+-- 
+2.56.0
+

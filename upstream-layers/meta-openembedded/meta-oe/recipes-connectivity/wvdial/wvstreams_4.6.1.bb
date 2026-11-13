@@ -23,6 +23,7 @@ SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.
            file://openssl-buildfix.patch \
            file://0001-Forward-port-to-OpenSSL-1.1.x.patch \
            file://0001-Fix-narrowing-conversion-error.patch \
+           file://0001-crypto-build-against-OpenSSL-4.patch \
            "
 
 SRC_URI[sha256sum] = "8403f5fbf83aa9ac0c6ce15d97fd85607488152aa84e007b7d0621b8ebc07633"

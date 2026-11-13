@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 22 Sep 2026 09:15:10 +0200
+Subject: [PATCH] vala-unit: look up g-ir-compiler with find_program
+
+The path taken from the g_ir_compiler pkg-config variable is the
+target path and is not usable when cross-compiling. find_program
+honours the cross file, which is where the wrapper is set.
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+Upstream-Status: Pending
+---
+ subprojects/vala-unit/meson.build | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/subprojects/vala-unit/meson.build b/subprojects/vala-unit/meson.build
+index a1822aa8..d04cc307 100644
+--- a/subprojects/vala-unit/meson.build
++++ b/subprojects/vala-unit/meson.build
+@@ -31,13 +31,7 @@ gee = dependency('gee-0.8')
+ gio = dependency('gio-2.0')
+ glib = dependency('glib-2.0', version: '>=' + target_glib)
+ gobject = dependency('gobject-2.0')
+-gobject_introspection = dependency('gobject-introspection-1.0', required: false)
+-
+-if gobject_introspection.found()
+-  g_ir_compiler = gobject_introspection.get_variable('g_ir_compiler')
+-else
+-  g_ir_compiler = find_program('g-ir-compiler')
+-endif
++g_ir_compiler = find_program('g-ir-compiler')
+ if enable_valadoc
+   valadoc = find_program('valadoc')
+ endif

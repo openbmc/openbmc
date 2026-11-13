@@ -18,3 +18,5 @@ RDEPENDS:${PN} += " \
 	python3-email \
 	python3-logging \
 "
+
+BBCLASSEXTEND = "native nativesdk"

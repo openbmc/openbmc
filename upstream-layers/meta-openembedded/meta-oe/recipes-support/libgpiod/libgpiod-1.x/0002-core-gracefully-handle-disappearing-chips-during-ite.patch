@@ -1,0 +1,83 @@
+From 40f18f16f573e6bf091d83cb1677e7386d0b8495 Mon Sep 17 00:00:00 2001
+From: Potin Lai <potin.lai.pt@gmail.com>
+Date: Tue, 8 Sep 2026 21:05:07 +0800
+Subject: core: gracefully handle disappearing chips during iteration
+
+When hotpluggable GPIO controllers (like USB devices) are dynamically
+added or removed, a race condition can occur. A chip's device node might
+be present when iterating through /dev, but the chip could disappear by
+the time we try to open it or query its lines.
+
+Previously, this caused tools like 'gpiofind' to incorrectly abort with
+a 'No such device' (ENODEV) error if any chip on the system vanished
+during the search.
+
+Fix this by ignoring ENODEV errors when searching for a line
+(in gpiod_line_find()) and by silently skipping chips that fail to open
+during iteration (in gpiod_chip_iter_new()).
+
+Signed-off-by: Potin Lai <potin.lai.pt@gmail.com>
+Link: https://patch.msgid.link/20260908-gpiofind-error-enodev-v1-1-c7756aab9568@gmail.com
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/commit/?id=40f18f16f573e6bf091d83cb1677e7386d0b8495]
+---
+ lib/helpers.c |  2 +-
+ lib/iter.c    | 16 ++++------------
+ 2 files changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/lib/helpers.c b/lib/helpers.c
+index 479f370..6d1836a 100644
+--- a/lib/helpers.c
++++ b/lib/helpers.c
+@@ -423,7 +423,7 @@ struct gpiod_line *gpiod_line_find(const char *name)
+ 			return line;
+ 		}
+ 
+-		if (errno != ENOENT)
++		if (errno != ENOENT && errno != ENODEV)
+ 			goto out;
+ 	}
+ 
+diff --git a/lib/iter.c b/lib/iter.c
+index bfd2852..7f5ad9a 100644
+--- a/lib/iter.c
++++ b/lib/iter.c
+@@ -51,7 +51,7 @@ struct gpiod_chip_iter *gpiod_chip_iter_new(void)
+ 	if (!iter)
+ 		goto err_free_dirs;
+ 
+-	iter->num_chips = num_chips;
++	iter->num_chips = 0;
+ 	iter->offset = 0;
+ 
+ 	if (num_chips == 0) {
+@@ -64,23 +64,15 @@ struct gpiod_chip_iter *gpiod_chip_iter_new(void)
+ 		goto err_free_iter;
+ 
+ 	for (i = 0; i < num_chips; i++) {
+-		iter->chips[i] = gpiod_chip_open_by_name(dirs[i]->d_name);
+-		if (!iter->chips[i])
+-			goto err_close_chips;
++		iter->chips[iter->num_chips] = gpiod_chip_open_by_name(dirs[i]->d_name);
++		if (iter->chips[iter->num_chips])
++			iter->num_chips++;
+ 	}
+ 
+ 	free_dirs(dirs, num_chips);
+ 
+ 	return iter;
+ 
+-err_close_chips:
+-	for (i = 0; i < num_chips; i++) {
+-		if (iter->chips[i])
+-			gpiod_chip_close(iter->chips[i]);
+-	}
+-
+-	free(iter->chips);
+-
+ err_free_iter:
+ 	free(iter);
+ 
+-- 
+cgit 1.3.1-korg
+

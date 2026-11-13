@@ -4,16 +4,16 @@ LIC_FILES_CHKSUM = "file://LICENSE-Community.txt;md5=3a865f27f11f43ecbe542d9ea38
                     file://APACHE-2.0.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 DEPENDS = "openssl libpcap zlib boost curl python3 \
-           python3-setuptools-native \
+           python3-packaging-native python3-setuptools-native \
            python3-pyyaml-native python3-cheetah-native \
            python3-psutil-native python3-regex-native \
            "
 
 inherit scons dos2unix siteinfo python3native systemd useradd
 
-PV = "4.4.24"
-#v4.4.24
-SRCREV = "0b86b9b7b42ad9970c5f818c527dd86c0634243a"
+PV = "4.4.30"
+#v4.4.30
+SRCREV = "1ae4c9990dbc5711f3500748f0c3f8b5d375d8c0"
 SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4;protocol=https \
            file://0001-Tell-scons-to-use-build-settings-from-environment-va.patch \
            file://0001-Use-long-long-instead-of-int64_t.patch \
@@ -32,10 +32,14 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4;protocol=https \
            file://0001-add-explict-static_cast-size_t-to-maxMemoryUsageByte.patch \
            file://0001-server-Adjust-the-cache-alignment-assumptions.patch \
            file://0001-The-std-lib-unary-binary_function-base-classes-are-d.patch \
-           file://0001-free_mon-Include-missing-cstdint.patch \
            file://0001-apply-msvc-workaround-for-clang-16.patch \
            file://0001-Fix-type-mismatch-on-32bit-arches.patch \
            file://0001-Fix-build-on-32bit.patch \
+           file://0001-moduleconfig.py-python-3.12-compatibility.patch \
+           file://0001-Use-packaging-instead-of-pkg_resources-for-version-p.patch \
+           file://0002-SConstruct-Pass-call-to-CheckLibWithHeader-as-a-keyw.patch \
+           file://0003-boost-Fix-build-with-clang-23.patch \
+           file://0004-ssl-Fix-build-with-OpenSSL-4.patch \
            "
 SRC_URI:append:libc-musl = "\
            file://0001-Mark-one-of-strerror_r-implementation-glibc-specific.patch \
@@ -51,6 +55,7 @@ SRC_URI:append:toolchain-clang = "\
 
 CVE_STATUS[CVE-2014-8180] = "not-applicable-config: Not affecting our configuration so it can be safely ignored."
 CVE_STATUS[CVE-2017-2665] = "not-applicable-config: Not affecting our configuration so it can be safely ignored."
+CVE_STATUS[CVE-2025-14911] = "cpe-incorrect: The vulnerability is about mongo-c-driver application, not mongodb"
 
 COMPATIBLE_HOST ?= '(x86_64|i.86|powerpc64|arm|aarch64).*-linux'
 
@@ -140,5 +145,3 @@ SYSTEMD_SERVICE:${PN} = "mongod.service"
 FILES:${PN} += "${nonarch_libdir}/tmpfiles.d"
 
 RDEPENDS:${PN} += "tzdata-core"
-
-SKIP_RECIPE[mongodb] ?= "Needs porting to python 3.12"

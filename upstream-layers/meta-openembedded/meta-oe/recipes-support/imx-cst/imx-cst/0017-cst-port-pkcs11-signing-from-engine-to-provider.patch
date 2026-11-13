@@ -1,0 +1,236 @@
+From: Johannes Schneider <johannes.schneider@leica-geosystems.com>
+Subject: cst: port pkcs11 signing from the OpenSSL ENGINE to a provider
+
+OpenSSL 4.0 removed the ENGINE API, so CST's pkcs11-backed signing stops
+working: ENGINE_by_id("pkcs11") returns NULL and engine_ctx_init() fails.
+
+Reimplement the pkcs11 certificate and key loading on OSSL_STORE and the
+pkcs11 provider. engine_ctx_init() loads the default and pkcs11 providers --
+default explicitly, because activating any provider stops OpenSSL
+auto-loading default, which would drop the EVP digest and signature algorithms
+the signer needs. ENGINE_load_certificate()/ENGINE_load_key() open the pkcs11
+URI through OSSL_STORE and return the X509 / EVP_PKEY, feeding the existing CMS
+and EVP signing unchanged. The public entry points keep their names and
+signatures; the ENGINE * argument is now vestigial. The PIN travels in the URI
+(pin-value=).
+
+Upstream-Status: Pending
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Johannes Schneider <johannes.schneider@leica-geosystems.com>
+---
+Builds on the engine-stub change already in this recipe's series
+(0015-fix-openssl-4-engine-api-removal), which only makes the file compile and
+noted that pkcs11-backed signing was still unavailable on OpenSSL 4; this
+restores it.
+--- a/src/lib/back_end/engine.c
++++ b/src/lib/back_end/engine.c
+@@ -7,8 +7,9 @@
+ /*
+  * OpenSSL 4.0 removed the ENGINE API.  <openssl/engine.h> still declares
+  * it for source compatibility, and defining OPENSSL_ENGINE_STUBS turns the
+- * declarations into inline no-ops so this file keeps linking.  The pkcs11
+- * engine simply does not exist there, which engine_ctx_init() reports.
++ * declarations into inline no-ops so this file keeps linking.  Signing no
++ * longer uses an engine (see engine_ctx_init); the vestigial ENGINE * only
++ * keeps the public entry points' signatures unchanged.
+  */
+ #define OPENSSL_ENGINE_STUBS
+ 
+@@ -19,6 +20,8 @@
+ #include <openssl/err.h>
+ #include <openssl/x509.h>
+ #include <openssl/evp.h>
++#include <openssl/provider.h>
++#include <openssl/store.h>
+ #include <stdint.h>
+ 
+ #if CST_WITH_PKCS11
+@@ -31,6 +34,76 @@
+ }
+ #endif
+ 
++/* Load default and pkcs11 once; "default" explicitly, or activating pkcs11 stops OpenSSL auto-loading it and the signer loses its EVP algorithms. */
++static int load_providers(void)
++{
++	static int loaded;
++
++	if (loaded)
++		return 1;
++
++	if (!OSSL_PROVIDER_load(NULL, "default")) {
++		fprintf(stderr, "ERROR: cannot load the default OpenSSL provider\n");
++		return 0;
++	}
++	if (!OSSL_PROVIDER_load(NULL, "pkcs11")) {
++		fprintf(stderr, "ERROR: cannot load the pkcs11 OpenSSL provider; "
++			"is pkcs11-provider installed and OPENSSL_MODULES set?\n");
++		return 0;
++	}
++
++	loaded = 1;
++	return 1;
++}
++
++/* Load a certificate and/or key from a PKCS#11 (or any OSSL_STORE) URI; returns 1 only if every requested object was found. */
++static int store_load(const char *uri, X509 **cert_out, EVP_PKEY **key_out)
++{
++	OSSL_STORE_CTX *store = NULL;
++	int ok = 0;
++
++	if (!uri)
++		return 0;
++
++	store = OSSL_STORE_open(uri, NULL, NULL, NULL, NULL);
++	if (!store) {
++		fprintf(stderr, "ERROR: cannot open PKCS#11 store for %s\n", uri);
++		return 0;
++	}
++
++	while (!OSSL_STORE_eof(store)) {
++		OSSL_STORE_INFO *info = OSSL_STORE_load(store);
++
++		if (!info) {
++			/* NULL means EOF or a non-fatal error; break on the error flag, or a bad object spins forever (eof stays 0). */
++			if (OSSL_STORE_error(store))
++				break;
++			continue;
++		}
++
++		switch (OSSL_STORE_INFO_get_type(info)) {
++		case OSSL_STORE_INFO_CERT:
++			if (cert_out && !*cert_out)
++				*cert_out = OSSL_STORE_INFO_get1_CERT(info);
++			break;
++		case OSSL_STORE_INFO_PKEY:
++			if (key_out && !*key_out)
++				*key_out = OSSL_STORE_INFO_get1_PKEY(info);
++			break;
++		default:
++			break;
++		}
++		OSSL_STORE_INFO_free(info);
++
++		if ((!cert_out || *cert_out) && (!key_out || *key_out))
++			break;
++	}
++
++	OSSL_STORE_close(store);
++	ok = (!cert_out || *cert_out) && (!key_out || *key_out);
++	return ok;
++}
++
+ struct engine_ctx *engine_ctx_new(void)
+ {
+     struct engine_ctx *ctx = NULL;
+@@ -41,16 +114,13 @@
+ 
+ int32_t engine_ctx_destroy(struct engine_ctx *ctx)
+ {
+-	if (ctx) {
+-		ENGINE_free(ctx->engine);
++	if (ctx)
+ 		OPENSSL_free(ctx);
+-	}
+ 	return 1;
+ }
+ 
+ int32_t engine_ctx_init(struct engine_ctx *ctx)
+ {
+-    dynamic_fns fns;
+     /* OpenSSL Initialization */
+ #if OPENSSL_VERSION_NUMBER >= 0x10100000
+ 	OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS |
+@@ -66,60 +136,46 @@
+ 
+ 	ERR_clear_error();
+ 
+-	ENGINE_load_builtin_engines();
+-
+-	ctx->engine = ENGINE_by_id("pkcs11");
+-
+-	if (!ctx->engine) {
+-		fprintf(stderr, "ERROR: cannot load the pkcs11 OpenSSL engine\n");
+-#if OPENSSL_VERSION_MAJOR >= 4
+-		fprintf(stderr,
+-			"ERROR: OpenSSL 4.0 removed ENGINE support, so PKCS#11 "
+-			"backed signing is unavailable\n");
+-#endif
++	if (!load_providers())
+ 		return 0;
+-	}
+ 
+-#ifdef DEBUG
+-	ENGINE_ctrl_cmd_string(ctx->engine, "VERBOSE", NULL, 0);
+-#endif
+-
+-	if (!ENGINE_init(ctx->engine)) {
+-		ENGINE_free(ctx->engine);
+-		return 0;
+-	}
++	ctx->engine = NULL;
+ 
+ 	return 1;
+ }
+ 
+ int32_t engine_ctx_finish(struct engine_ctx *ctx)
+ {
+-	if (ctx)
+-		ENGINE_finish(ctx->engine);
++	(void)ctx;
+ 	return 1;
+ }
+ 
+ X509 *ENGINE_load_certificate(ENGINE *e, const char *cert_ref)
+ {
+-	struct {
+-		const char *s_slot_cert_id;
+-		X509 *cert;
+-	} params = {0};
++	X509 *cert = NULL;
+ 
+-	params.s_slot_cert_id = cert_ref;
+-	params.cert = NULL;
++	(void)e;
+ 
+-	if (!ENGINE_ctrl_cmd(e, "LOAD_CERT_CTRL", 0, &params, NULL, 1)) {
++	if (!store_load(cert_ref, &cert, NULL)) {
+ 		ERR_print_errors_fp(stderr);
+ 		return NULL;
+ 	}
+ 
+-	return params.cert;
++	return cert;
+ }
+ 
+ EVP_PKEY *ENGINE_load_key(ENGINE *e, const char *key_ref)
+ {
+-	return ENGINE_load_private_key(e, key_ref, 0, 0);
++	EVP_PKEY *key = NULL;
++
++	(void)e;
++
++	if (!store_load(key_ref, NULL, &key)) {
++		ERR_print_errors_fp(stderr);
++		return NULL;
++	}
++
++	return key;
+ }
+ 
+ X509 *engine_read_certificate(const char *cert_ref)
+@@ -161,14 +217,8 @@
+ #endif
+ 
+ out:
+-	if (ctx) {
+-	/*
+-	 * Destroy the context: ctx_finish is not called here since
+-	 * ENGINE_finish cleanups the engine instance. Calling ctx_destroy
+-	 * next will lead to null pointer dereference.
+-	 */
++	if (ctx)
+ 		engine_ctx_destroy(ctx);
+-	}
+ 
+ 	if (error)
+ 		ERR_print_errors_fp(stderr);

@@ -1,0 +1,37 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 27 Sep 2026 14:15:00 -0700
+Subject: [PATCH] test: don't let reinitcheck race the console-down test
+
+test1.cf sets "reinitcheck 1s", added to exercise the seconds unit.
+A reinit check brings back every console that is down, including one
+taken down on purpose, so test #4 ("cd") and test #5, which expects the
+console to still be down, race it: if the second console client does
+not attach and query the state within a second, conserver has already
+reinitialized the console and test #5 fails with
+
+  -[`shell' -- console is down]
+   [Enter `^Ec?' for help]
+
+This shows up readily on loaded or emulated targets. Use 60s instead:
+the seconds unit is still parsed and the check can no longer fire
+during the test run.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ test/test1.cf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test1.cf b/test/test1.cf
+index 781267e..b02a9ba 100644
+--- a/test/test1.cf
++++ b/test/test1.cf
+@@ -8,7 +8,7 @@ default * {
+ 	include full;
+ }
+ config * {
+-	reinitcheck 1s;
++	reinitcheck 60s;
+ }
+ break 5 {
+ 	string "\rtest\r";

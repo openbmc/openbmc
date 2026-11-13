@@ -1,7 +1,7 @@
-From c645c83628b2290855cbd225e13c038ab75a7f74 Mon Sep 17 00:00:00 2001
+From 7054727a3544730c0abd11658f7175ad38e41fb8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 26 Aug 2016 02:02:49 -0400
-Subject: [PATCH 05/11] fix incorrect timeout while system time changed
+Subject: [PATCH] fix incorrect timeout while system time changed
 
 While system time changed by NTP, invoking timeout_command
 breaks with incorrect timeout.
@@ -22,10 +22,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index 58117ae..5bc5804 100644
+index 623f732..5b51427 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -176,14 +176,14 @@ def timeout_command(argv, timeout, *args, **kwargs):
+@@ -184,14 +184,14 @@ def timeout_command(argv, timeout, *args, **kwargs):
      """call shell-command and either return its output or kill it
      if it doesn't normally exit within timeout seconds and return None"""
      import subprocess, datetime, os, time, signal

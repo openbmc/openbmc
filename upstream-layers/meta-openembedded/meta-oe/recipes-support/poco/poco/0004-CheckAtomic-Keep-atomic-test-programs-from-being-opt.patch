@@ -1,0 +1,62 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 20 Oct 2026 23:30:00 -0700
+Subject: [PATCH] CheckAtomic: Keep atomic test programs from being optimized
+ away
+
+The libatomic checks load from a local std::atomic that never escapes.
+When CMAKE_CXX_FLAGS contain -O2, as distro builds usually do, clang
+folds the load to a constant, so the test program links without
+libatomic even on targets that need it for 64-bit atomics, such as
+riscv32. Poco_ATOMIC_LIBRARIES then stays empty and the build fails
+later when linking against PocoFoundation:
+
+  ld.lld: error: undefined reference: __atomic_fetch_add_8
+  ld.lld: error: undefined symbol: __atomic_load_8
+
+Make the atomic variables global and modify them with a
+read-modify-write operation that depends on argc, so the compiler has
+to emit the atomic operations at any optimization level.
+
+Upstream-Status: Submitted [https://github.com/pocoproject/poco/pull/5585]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ cmake/CheckAtomic.cmake | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+--- a/cmake/CheckAtomic.cmake
++++ b/cmake/CheckAtomic.cmake
+@@ -8,12 +8,17 @@
+ 
+ # MSVC and Apple don't ship/need a separate libatomic.
+ if(NOT MSVC AND NOT APPLE)
++    # The atomic variables in the test programs are global and modified with
++    # a read-modify-write operation, otherwise the compiler can fold them away
++    # when optimizing and the check passes even though libatomic is needed.
++
+     # 1) 32-bit atomics
+     check_cxx_source_compiles("
+ 	#include <atomic>
+-	int main() {
+-	    std::atomic<int> x(0);
+-	    return x.load(std::memory_order_relaxed);
++	std::atomic<int> x(0);
++	int main(int argc, char **) {
++	    x.fetch_add(argc);
++	    return x.load();
+ 	}
+     " POCO_HAVE_CXX_ATOMICS32)
+ 
+@@ -28,9 +33,10 @@
+     check_cxx_source_compiles("
+ 	#include <atomic>
+ 	#include <cstdint>
+-	int main() {
+-	    std::atomic<uint64_t> x(0);
+-	    return (int)x.load(std::memory_order_relaxed);
++	std::atomic<uint64_t> x(0);
++	int main(int argc, char **) {
++	    x.fetch_add(static_cast<uint64_t>(argc));
++	    return static_cast<int>(x.load());
+ 	}
+     " POCO_HAVE_CXX_ATOMICS64)
+ 

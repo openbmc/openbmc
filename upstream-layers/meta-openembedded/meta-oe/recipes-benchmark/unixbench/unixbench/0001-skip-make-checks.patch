@@ -7,8 +7,8 @@ The UnixBench Run script expects a source tree and invokes
 during do_compile() and only runtime artifacts are installed.
 Skip the build verification step.
 
-Upstream-Status: Inappropriate [cross-compilation]
-
+Upstream-Status: Inappropriate [OE-specific runtime packaging]
+Signed-off-by: Vaibhav Jindal <vaibjind@qti.qualcomm.com>
 diff --git a/UnixBench/Run b/UnixBench/Run
 index 898eb5c..fb24263 100755
 --- a/UnixBench/Run

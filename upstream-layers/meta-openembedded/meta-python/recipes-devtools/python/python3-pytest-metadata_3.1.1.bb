@@ -8,8 +8,6 @@ SRC_URI[sha256sum] = "d2a29b0355fbc03f168aa96d41ff88b1a3b44a3b02acbe491801c98a04
 
 inherit pypi python_hatchling
 
-PYPI_PACKAGE = "pytest_metadata"
-
 DEPENDS += "python3-hatch-vcs-native"
 
 RDEPENDS:${PN} = " \

@@ -16,5 +16,3 @@ PACKAGECONFIG[pysha3python-version-bigger--equals-3-dot-9] = ",,,python3-safe-py
 PACKAGECONFIG[test] = ",,,python3-pytest python3-pytest-xdist"
 
 RDEPENDS:${PN} += "python3-core python3-logging python3-pycryptodome"
-
-PYPI_PACKAGE = "eth_hash"

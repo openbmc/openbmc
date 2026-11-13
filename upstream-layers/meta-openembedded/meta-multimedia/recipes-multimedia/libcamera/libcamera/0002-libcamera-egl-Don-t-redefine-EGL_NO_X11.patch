@@ -1,0 +1,46 @@
+From 998b5c7ee5cabd51292ac216ccb390c35f989a78 Mon Sep 17 00:00:00 2001
+From: Joel Winarske <joel.winarske@linux.com>
+Date: Mon, 12 Oct 2026 18:20:01 -0700
+Subject: [PATCH] libcamera: egl: Don't redefine EGL_NO_X11
+
+Mesa built without the X11 platform exports -DEGL_NO_X11 via egl.pc
+Cflags, from mesa!2226 (19.3) until mesa!18848 (22.3) moved Xlib
+inclusion behind USE_X11. This affects non-glvnd builds, where egl.pc
+comes from Mesa rather than libglvnd, e.g. the PowerVR mesa-pvr (22.1)
+used on StarFive JH7110.
+
+The -D defines the macro as 1, so the unconditional empty define in
+egl.h is a redefinition, which is an error with -Werror:
+
+  include/libcamera/internal/egl.h:23:9: error: 'EGL_NO_X11' redefined [-Werror]
+
+The define is still needed for EGL headers predating
+KhronosGroup/EGL-Registry#130, which otherwise pull in Xlib.h, so only
+define it when it isn't already set.
+
+Upstream-Status: Submitted [https://patchwork.libcamera.org/patch/28452/]
+
+Signed-off-by: Joel Winarske <joel.winarske@linux.com>
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Reviewed-by: Barnabás Pőcze <barnabas.pocze@ideasonboard.com>
+---
+ include/libcamera/internal/egl.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/libcamera/internal/egl.h b/include/libcamera/internal/egl.h
+index 1e31d490b..aeb4da80d 100644
+--- a/include/libcamera/internal/egl.h
++++ b/include/libcamera/internal/egl.h
+@@ -20,7 +20,9 @@
+  * Workaround for build issues on Mesa <= 22.2, see
+  * https://github.com/KhronosGroup/EGL-Registry/pull/130
+  */
++#ifndef EGL_NO_X11
+ #define EGL_NO_X11
++#endif
+ 
+ #define EGL_EGLEXT_PROTOTYPES
+ #include <EGL/egl.h>
+-- 
+2.56.0
+

@@ -18,3 +18,5 @@ RDEPENDS:${PN} += " \
 	python3-pickle \
 	python3-typing-extensions \
 "
+
+BBCLASSEXTEND = "native nativesdk"

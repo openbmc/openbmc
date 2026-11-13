@@ -1,0 +1,81 @@
+From 42fb66d5ed4a713ce82356cbd00f1f0a40676e1c Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:23:21 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim and slip does not need it on
+Python 3: six.with_metaclass is the metaclass keyword argument in the
+class statement.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ slip/dbus/introspection.py | 3 +--
+ slip/dbus/service.py       | 3 +--
+ slip/util/hookable.py      | 3 +--
+ 3 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/slip/dbus/introspection.py b/slip/dbus/introspection.py
+index 07eb8a7..83dc7e0 100644
+--- a/slip/dbus/introspection.py
++++ b/slip/dbus/introspection.py
+@@ -26,7 +26,6 @@ from __future__ import absolute_import
+ 
+ from xml.etree.ElementTree import ElementTree
+ from io import StringIO
+-from six import with_metaclass
+ 
+ 
+ class IElemMeta(type):
+@@ -73,7 +72,7 @@ class IElemMeta(type):
+         return kls
+ 
+ 
+-class IElem(with_metaclass(IElemMeta, object)):
++class IElem(object, metaclass=IElemMeta):
+     """Base class for introspection elements."""
+ 
+     def __new__(cls, elem, parent=None):
+diff --git a/slip/dbus/service.py b/slip/dbus/service.py
+index 5d276f8..6a795d6 100644
+--- a/slip/dbus/service.py
++++ b/slip/dbus/service.py
+@@ -27,7 +27,6 @@ from __future__ import absolute_import
+ 
+ import dbus
+ import dbus.service
+-from six import with_metaclass
+ 
+ from .._wrappers import _glib as GLib
+ 
+@@ -182,7 +181,7 @@ class InterfaceType(dbus.service.InterfaceType):
+         return super(InterfaceType, cls).__new__(cls, name, bases, dct)
+ 
+ 
+-class Object(with_metaclass(InterfaceType, dbus.service.Object)):
++class Object(dbus.service.Object, metaclass=InterfaceType):
+ 
+     # timeout & persistence
+ 
+diff --git a/slip/util/hookable.py b/slip/util/hookable.py
+index 89c7392..41d1688 100644
+--- a/slip/util/hookable.py
++++ b/slip/util/hookable.py
+@@ -24,7 +24,6 @@
+ hooks on changes."""
+ 
+ import collections.abc
+-from six import with_metaclass
+ 
+ __all__ = ["Hookable", "HookableSet"]
+ 
+@@ -121,7 +120,7 @@ class _HookEntry(object):
+             self.__hook(*self.__args, **self.__kwargs)
+ 
+ 
+-class Hookable(with_metaclass(HookableType, object)):
++class Hookable(object, metaclass=HookableType):
+ 
+     """An object which calls registered hooks on changes."""
+ 

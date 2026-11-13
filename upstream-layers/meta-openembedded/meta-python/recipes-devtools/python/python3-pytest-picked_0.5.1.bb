@@ -15,5 +15,3 @@ RDEPENDS:${PN} += "\
     git \
     python3-pytest (>=3.7.0) \
 "
-
-PYPI_PACKAGE = "pytest_picked"

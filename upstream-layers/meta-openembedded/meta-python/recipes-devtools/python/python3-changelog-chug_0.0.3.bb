@@ -7,8 +7,6 @@ SRC_URI[sha256sum] = "98ee1e8be75b6e9d512c35292c3c293a124541a4ec2014a6ec3cf33a3d
 
 inherit pypi python_setuptools_build_meta
 
-PYPI_PACKAGE = "changelog_chug"
-
 DEPENDS += " \
     python3-semver-native \
     python3-docutils-native \

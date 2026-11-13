@@ -15,8 +15,6 @@ PACKAGECONFIG ?= ""
 PACKAGECONFIG:append = "${@bb.utils.contains('PTEST_ENABLED', '1', ' cli', '', d)}"
 PACKAGECONFIG[cli] = ",,,python3-click"
 
-PYPI_PACKAGE = "python_dotenv"
-
 RDEPENDS:${PN}-ptest += "\
     coreutils \
     python3-sh \

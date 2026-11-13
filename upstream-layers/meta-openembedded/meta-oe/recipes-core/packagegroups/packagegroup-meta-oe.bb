@@ -147,7 +147,6 @@ RDEPENDS:packagegroup-meta-oe-connectivity = "\
     libuv \
     libwebsockets \
     linuxptp \
-    loudmouth \
     modemmanager \
     mosh \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "obex-data-server", "", d)} \
@@ -369,7 +368,6 @@ RDEPENDS:packagegroup-meta-oe-extended = "\
     liblognorm \
     libmodbus \
     libplist \
-    libpwquality \
     libqb \
     librelp \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "libreport", "", d)} \
@@ -382,7 +380,6 @@ RDEPENDS:packagegroup-meta-oe-extended = "\
     libusbmuxd \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libwmf", "", d)} \
     libyang \
-    libzip \
     linuxconsole \
     lockfile-progs \
     logwatch \

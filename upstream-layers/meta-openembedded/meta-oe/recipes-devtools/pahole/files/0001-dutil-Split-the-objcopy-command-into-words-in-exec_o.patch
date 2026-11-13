@@ -1,0 +1,181 @@
+From 726ca024c9bfdeee542361ceb2e611e884955050 Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti <ricardo.salveti@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 20:05:39 +0000
+Subject: [PATCH] dutil: Split the objcopy command into words in exec_objcopy()
+
+pahole 1.31 ran objcopy through system(), so LLVM_OBJCOPY was a command
+line that could carry options, like the $(OBJCOPY) make variable the
+kernel build sets it from. Since the switch to exec_objcopy() the whole
+value of LLVM_OBJCOPY or OBJCOPY is passed to posix_spawnp() as the
+program name, so a value such as "objcopy --some-option", or one with a
+trailing blank, fails with ENOENT.
+
+Kernel builds up to v6.19, including the LTS branches, run
+LLVM_OBJCOPY="${OBJCOPY}" pahole -J from link-vmlinux.sh and use
+${OBJCOPY} unquoted for their own objcopy calls in the same script, so
+an OBJCOPY that works for the rest of the build now stops the link with:
+
+  btf_encoder__write_elf: failed to add .BTF section to '.tmp_vmlinux1'
+
+This breaks OpenEmbedded kernel builds, where OBJCOPY carries the
+machine's objcopy options and ends with a blank when there are none.
+
+Split the command on blanks, like the shell's word splitting did with
+system(), for OBJCOPY as well. Quotes are not interpreted, so a path
+containing blanks can no longer be used, either quoted as with system()
+or as is as with v1.32. Name the file as both input and output, so that
+a stray word in the command makes objcopy fail instead of being taken
+as its input file and replacing the target.
+
+Extend btf_write_elf.sh to check that options in LLVM_OBJCOPY reach
+objcopy.
+
+Fixes: 6789ef8a16d5 ("btf_encoder: Fall back to objcopy when llvm-objcopy is not available")
+Assisted-by: Claude Code:claude-opus-5-5
+Upstream-Status: Submitted [https://lore.kernel.org/dwarves/20261022035604.3183589-1-ricardo.salveti@oss.qualcomm.com/]
+Signed-off-by: Ricardo Salveti <ricardo.salveti@oss.qualcomm.com>
+---
+ dutil.c                | 55 +++++++++++++++++++++++++++++++++---------
+ tests/btf_write_elf.sh | 34 ++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+), 11 deletions(-)
+
+diff --git a/dutil.c b/dutil.c
+index 38101f1..d333d41 100644
+--- a/dutil.c
++++ b/dutil.c
+@@ -248,15 +248,43 @@ int exec_objcopy(const char *objcopy, const char *add_section,
+ 	struct sigaction ign, old_int, old_quit;
+ 	posix_spawnattr_t attr;
+ 	sigset_t child_default;
++	char *cmd, *word, *saveptr, **argv;
++	int argc = 0;
+ 	pid_t pid;
+ 	int rc;
+ 
+-	char *argv[] = {
+-		(char *)objcopy,
+-		"--add-section", (char *)add_section,
+-		"--", (char *)filename,
+-		NULL
+-	};
++	/*
++	 * objcopy may come from $LLVM_OBJCOPY or $OBJCOPY, which the kernel
++	 * build sets from its $(OBJCOPY) make variable, a command line that
++	 * can carry options, so split it into words on blanks, as the shell
++	 * did with system(), but without interpreting quotes or escapes.
++	 * A string of n characters has at most (n + 1) / 2 words.
++	 */
++	cmd = strdup(objcopy);
++	argv = calloc((strlen(objcopy) + 1) / 2 + 6, sizeof(*argv));
++	if (cmd == NULL || argv == NULL) {
++		rc = -1;
++		goto out_free;
++	}
++
++	for (word = strtok_r(cmd, " \t\n", &saveptr); word != NULL;
++	     word = strtok_r(NULL, " \t\n", &saveptr))
++		argv[argc++] = word;
++
++	if (argc == 0) {
++		rc = -ENOENT;
++		goto out_free;
++	}
++
++	argv[argc++] = "--add-section";
++	argv[argc++] = (char *)add_section;
++	/*
++	 * Name the output file too, so that a stray word in the command
++	 * makes objcopy fail instead of becoming its input file.
++	 */
++	argv[argc++] = "--";
++	argv[argc++] = (char *)filename;
++	argv[argc++] = (char *)filename;
+ 
+ 	/* Ignore SIGINT/SIGQUIT in parent while waiting, per POSIX system() */
+ 	ign.sa_handler = SIG_IGN;
+@@ -278,14 +306,15 @@ int exec_objcopy(const char *objcopy, const char *add_section,
+ 	posix_spawnattr_setflags(&attr,
+ 				 POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_SETSIGMASK);
+ 
+-	rc = posix_spawnp(&pid, objcopy, NULL, &attr, argv, environ);
++	rc = posix_spawnp(&pid, argv[0], NULL, &attr, argv, environ);
+ 	posix_spawnattr_destroy(&attr);
+ 
+ 	if (rc != 0) {
+ 		sigaction(SIGINT, &old_int, NULL);
+ 		sigaction(SIGQUIT, &old_quit, NULL);
+ 		pthread_sigmask(SIG_SETMASK, &orig, NULL);
+-		return rc == ENOENT ? -ENOENT : -1;
++		rc = rc == ENOENT ? -ENOENT : -1;
++		goto out_free;
+ 	}
+ 
+ 	int status;
+@@ -302,7 +331,11 @@ int exec_objcopy(const char *objcopy, const char *add_section,
+ 	pthread_sigmask(SIG_SETMASK, &orig, NULL);
+ 
+ 	if (status == -1 || !WIFEXITED(status))
+-		return -1;
+-
+-	return WEXITSTATUS(status) == 0 ? 0 : -1;
++		rc = -1;
++	else
++		rc = WEXITSTATUS(status) == 0 ? 0 : -1;
++out_free:
++	free(argv);
++	free(cmd);
++	return rc;
+ }
+diff --git a/tests/btf_write_elf.sh b/tests/btf_write_elf.sh
+index 64ce128..dc512e0 100755
+--- a/tests/btf_write_elf.sh
++++ b/tests/btf_write_elf.sh
+@@ -14,6 +14,9 @@
+ #   exists from the first encode.  pahole opens the ELF with ELF_C_RDWR,
+ #   overwrites the Elf_Data buffer in place, and calls elf_update() --
+ #   no objcopy needed.  This is the "Existing .BTF section found" path.
++#
++# Path 1 is run again with options in LLVM_OBJCOPY, as kernel builds up to
++# v6.19 pass their $(OBJCOPY) command line there.
+ 
+ . "$(dirname "$0")/test_lib.sh"
+ outdir=$(make_tmpdir)
+@@ -115,4 +118,35 @@ if [ "$has_bpftool" -eq 1 ]; then
+ 	info_log "BTF content valid after overwrite (elf_test found): ok"
+ fi
+ 
++# --- Path 1 with options in LLVM_OBJCOPY ---
++# Kernel builds up to v6.19 run LLVM_OBJCOPY="${OBJCOPY}" pahole -J, and
++# $(OBJCOPY) is a command line that may carry options or trailing whitespace.
++# --preserve-dates keeps the old timestamp only if the option reaches objcopy.
++
++objcopy=${LLVM_OBJCOPY:-$OBJCOPY}
++if [ -z "$objcopy" ]; then
++	objcopy=objcopy
++	command -v llvm-objcopy > /dev/null 2>&1 && objcopy=llvm-objcopy
++fi
++args_obj="$outdir/write_elf_args_test.o"
++args_ref="$outdir/write_elf_args_test.ref"
++cp "$obj" "$args_obj"
++touch -t 200001010000 "$args_obj" "$args_ref"
++
++if ! LLVM_OBJCOPY="$objcopy --preserve-dates " pahole -J "$args_obj" 2>/dev/null; then
++	error_log "FAIL: pahole -J with options in LLVM_OBJCOPY failed (exit code != 0)"
++	test_fail
++fi
++
++if ! readelf -S "$args_obj" 2>/dev/null | grep -q '\.BTF[[:space:]]'; then
++	error_log "FAIL: .BTF section not found with options in LLVM_OBJCOPY"
++	test_fail
++fi
++
++if [ -n "$(find "$args_obj" -newer "$args_ref")" ]; then
++	error_log "FAIL: options in LLVM_OBJCOPY did not reach objcopy"
++	test_fail
++fi
++info_log "pahole -J with options in LLVM_OBJCOPY: ok"
++
+ test_pass
+-- 
+2.43.0
+

@@ -35,3 +35,9 @@ do_install () {
     install -c -m 755 ${UNPACKDIR}/debian-zeroconf ${D}${sysconfdir}/network/if-up.d/zeroconf
     install -c ${UNPACKDIR}/zeroconf-default ${D}${sysconfdir}/default/zeroconf
 }
+
+CVE_STATUS[CVE-2026-47180] = "cpe-incorrect: this vulnerability is for Python Zeroconf library"
+CVE_STATUS[CVE-2026-47183] = "cpe-incorrect: this vulnerability is for Python Zeroconf library"
+CVE_STATUS[CVE-2026-47184] = "cpe-incorrect: this vulnerability is for Python Zeroconf library"
+CVE_STATUS[CVE-2026-48045] = "cpe-incorrect: this vulnerability is for Python Zeroconf library"
+CVE_STATUS[CVE-2026-48487] = "cpe-incorrect: this vulnerability is for Python Zeroconf library"

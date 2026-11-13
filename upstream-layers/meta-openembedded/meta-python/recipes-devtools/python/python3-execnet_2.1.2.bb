@@ -11,6 +11,8 @@ DEPENDS += "\
     python3-hatch-vcs-native \
 "
 
+SRC_URI += "file://0001-testing-Drop-cached-remote-module-in-test_remote_exe.patch"
+
 SRC_URI[sha256sum] = "63d83bfdd9a23e35b9c6a3261412324f964c2ec8dcd8d3c6916ee9373e0befcd"
 
 inherit ptest-python-pytest pypi python_hatchling

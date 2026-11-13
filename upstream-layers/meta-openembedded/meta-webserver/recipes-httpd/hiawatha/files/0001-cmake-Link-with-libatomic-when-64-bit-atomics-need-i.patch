@@ -1,0 +1,70 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 14:00:00 -0700
+Subject: [PATCH] cmake: Link with libatomic when 64-bit atomics need it
+
+hiawatha uses __atomic_store_n()/__atomic_load_n() on time_t values,
+host->access_time in workers.c and, with ENABLE_HTTP2, drain_deadline in
+http2.c. On 32-bit targets with a 64-bit time_t but no 64-bit atomic
+instructions, such as riscv32, the compiler lowers these to
+__atomic_*_8 libcalls, and linking hiawatha fails:
+
+  ld.lld: error: undefined symbol: __atomic_store_8
+  >>> referenced by workers.c (src/workers.c)
+
+Check whether atomic operations on a time_t link on their own, and if
+not, whether they link with libatomic, and link hiawatha with it only in
+that case. The test variable is global so the compiler cannot optimize
+the atomic operations away.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ CMakeLists.txt | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,6 +25,7 @@
+ include(CheckFunctionExists)
+ include(CheckLibraryExists)
+ include(CheckSymbolExists)
++include(CheckCSourceCompiles)
+ include(GNUInstallDirs)
+ if(ENABLE_XSLT)
+ 	include(FindLibXml2)
+@@ -85,6 +86,26 @@
+ check_symbol_exists("kqueue" "sys/types.h;sys/event.h;sys/time.h" HAVE_KQUEUE)
+ check_symbol_exists("kqueue1" "sys/types.h;sys/event.h;sys/time.h" HAVE_KQUEUE1)
+ 
++# Atomic operations on time_t need libatomic on 32-bit targets with a 64-bit
++# time_t but without 64-bit atomic instructions, e.g. riscv32. The variable is
++# global so the compiler cannot optimize the atomic operations away.
++set(ATOMIC64_TEST_SOURCE "
++#include <time.h>
++time_t t;
++int main(void) {
++	__atomic_store_n(&t, time(NULL), __ATOMIC_RELEASE);
++	return __atomic_load_n(&t, __ATOMIC_SEQ_CST) == 0;
++}")
++check_c_source_compiles("${ATOMIC64_TEST_SOURCE}" HAVE_ATOMIC64)
++if(NOT HAVE_ATOMIC64)
++	set(CMAKE_REQUIRED_LIBRARIES atomic)
++	check_c_source_compiles("${ATOMIC64_TEST_SOURCE}" HAVE_ATOMIC64_WITH_LIBATOMIC)
++	unset(CMAKE_REQUIRED_LIBRARIES)
++	if(HAVE_ATOMIC64_WITH_LIBATOMIC)
++		set(ATOMIC_LIBRARY "atomic")
++	endif()
++endif()
++
+ if(HAVE_CRYPT_LIBRARY)
+ 	set(CRYPT_LIBRARY "crypt")
+ endif()
+@@ -168,7 +189,7 @@
+ add_executable(ssi-cgi ${ssi_cgi_src})
+ add_executable(wigwam ${wigwam_src})
+ target_link_libraries(cgi-wrapper ${Z_LIBRARY})
+-target_link_libraries(hiawatha ${CRYPT_LIBRARY} pthread ${Z_LIBRARY} ${MBEDTLS_LIBRARIES})
++target_link_libraries(hiawatha ${CRYPT_LIBRARY} pthread ${Z_LIBRARY} ${MBEDTLS_LIBRARIES} ${ATOMIC_LIBRARY})
+ target_link_libraries(ssi-cgi ${Z_LIBRARY})
+ target_link_libraries(wigwam ${CRYPT_LIBRARY} ${Z_LIBRARY} ${MBEDTLS_LIBRARIES})
+ if(ENABLE_HTTP2)

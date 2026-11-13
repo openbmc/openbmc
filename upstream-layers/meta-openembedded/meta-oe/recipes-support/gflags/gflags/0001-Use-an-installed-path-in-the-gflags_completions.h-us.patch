@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Oct 2026 07:04:28 -0700
+Subject: [PATCH] Use an installed path in the gflags_completions.h usage
+ example
+
+The example .bashrc line in gflags_completions.h points at
+/home/build/eng/bash/bash_completions.sh, a path from the original build
+environment that names a script gflags does not ship. Refer to the
+installed gflags_completions.sh instead, matching the example in
+gflags_completions.sh itself.
+
+The old path also trips reproducibility checks that look for build-host
+home directories in installed files, e.g. Yocto's buildpaths QA check:
+
+  File /usr/include/gflags/gflags_completions.h in package gflags-dev
+  contains a reference to the build host HOME directory. [buildpaths]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/gflags_completions.h.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gflags_completions.h.in b/src/gflags_completions.h.in
+index 177b8d2..35d76dc 100644
+--- a/src/gflags_completions.h.in
++++ b/src/gflags_completions.h.in
+@@ -89,7 +89,7 @@
+ 
+ /*
+ $ complete -o bashdefault -o default -o nospace -C                            \
+- '/home/build/eng/bash/bash_completions.sh --tab_completion_columns $COLUMNS' \
++ '/usr/local/bin/gflags_completions.sh --tab_completion_columns $COLUMNS'     \
+   time  env  binary_name  another_binary  [...]
+ */
+ 

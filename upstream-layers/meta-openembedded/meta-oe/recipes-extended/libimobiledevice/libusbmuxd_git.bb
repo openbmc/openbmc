@@ -4,9 +4,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6ab17b41640564434dda85c06b7124f7"
 
 DEPENDS = "udev libusb1 libplist libimobiledevice-glue"
 
-inherit autotools pkgconfig gitpkgv
+inherit autotools pkgconfig
 
-PKGV = "${GITPKGVTAG}"
 PV = "2.0.2+git"
 
 SRCREV = "36ffb7ab6e2a7e33bd1b56398a88895b7b8c615a"

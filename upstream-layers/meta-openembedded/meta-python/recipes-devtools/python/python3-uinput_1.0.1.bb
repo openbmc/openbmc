@@ -7,6 +7,7 @@ SRC_URI += "file://0001-Deal-with-64bit-time_t-default-on-32bit-architecture.pat
 SRC_URI[sha256sum] = "853697344b64df5537d4ae32ba6fbcf0515d51a9010910f5d5019959038b6eba"
 
 PYPI_PACKAGE = "python-uinput"
+PYPI_PACKAGE_SDIST = "python-uinput"
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 

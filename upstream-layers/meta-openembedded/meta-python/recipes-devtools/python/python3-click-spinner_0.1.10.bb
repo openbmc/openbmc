@@ -8,4 +8,6 @@ SRC_URI[sha256sum] = "87eacf9d7298973a25d7615ef57d4782aebf913a532bba4b28a37e366e
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "click-spinner"
+
 RDEPENDS:${PN} += "python3-json"

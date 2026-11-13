@@ -1,0 +1,43 @@
+From c243545c7ee2561ed0b5475c1b43f626d1284111 Mon Sep 17 00:00:00 2001
+From: Yusuf Efe <120668197+yuefdev@users.noreply.github.com>
+Date: Wed, 28 Oct 2026 08:45:21 +0300
+Subject: [PATCH] =?UTF-8?q?=E2=9C=85=20test(unix):=20use=20host=20strerror?=
+ =?UTF-8?q?=20in=20warning=20tests=20(#630)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-authored-by: Bernát Gábor <gaborjbernat@gmail.com>
+
+Upstream-Status: Backport [https://github.com/tox-dev/platformdirs/commit/c243545c7ee2561ed0b5475c1b43f626d1284111]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/test_unix.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_unix.py b/tests/test_unix.py
+index e68f2b8..1afb622 100644
+--- a/tests/test_unix.py
++++ b/tests/test_unix.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ import contextlib
++import errno
+ import importlib
+ import inspect
+ import os
+@@ -401,8 +402,8 @@ _PROBLEMS: typing.Final = {
+     "mode-500": "has mode 0500, not 0700",
+ }
+ _UNREACHABLE: typing.Final = {
+-    "file": "Not a directory",
+-    "symlink-loop": "Too many levels of symbolic links",
++    "file": os.strerror(errno.ENOTDIR),
++    "symlink-loop": os.strerror(errno.ELOOP),
+ }
+ _DEFAULT_PREFIXES: typing.Final = {
+     "linux": "run/user",
+-- 
+2.43.0
+

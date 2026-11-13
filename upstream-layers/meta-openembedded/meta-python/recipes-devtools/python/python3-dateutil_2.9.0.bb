@@ -4,9 +4,12 @@ HOMEPAGE = "https://dateutil.readthedocs.org"
 LICENSE = "Apache-2.0 AND BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3155c7bdc71f66e02678411d2abf996"
 
+SRC_URI += "file://0001-drop-the-six-dependency.patch"
 SRC_URI[sha256sum] = "78e73e19c63f5b20ffa567001531680d939dc042bf7850431877645523c66709"
 
 PYPI_PACKAGE = "python-dateutil"
+PYPI_PACKAGE_SDIST = "python-dateutil"
+
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += "python3-wheel-native"
@@ -19,7 +22,6 @@ DEPENDS += "python3-setuptools-scm-native"
 RDEPENDS:${PN} = "\
     python3-datetime \
     python3-numbers \
-    python3-six \
     python3-stringold \
 "
 

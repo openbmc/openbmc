@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "\
 SRC_URI = " \
         git://git.libcamera.org/libcamera/libcamera.git;protocol=https;branch=master;tag=v${PV} \
         file://0001-ipa_data_serializer-Mark-vector-readPOD-overload-as-m.patch \
+        file://0002-libcamera-egl-Don-t-redefine-EGL_NO_X11.patch \
 "
 
 SRCREV = "191e202178f02430b5942397c70d215cdd2056fa"
@@ -33,7 +34,7 @@ PACKAGECONFIG[compliance] = "-Dlc-compliance=enabled,-Dlc-compliance=disabled,gt
 PACKAGECONFIG[gst] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0 gstreamer1.0-plugins-base"
 PACKAGECONFIG[jpeg] = "-Dcam-jpeg=enabled,-Dcam-jpeg=disabled,libjpeg-turbo"
 PACKAGECONFIG[kms] = "-Dcam-output-kms=enabled,-Dcam-output-kms=disabled,libdrm"
-PACKAGECONFIG[opengl] = "-Dsoftisp-gpu=enabled,-Dsoftisp-gpu=disabled,virtual/libgl virtual/egl"
+PACKAGECONFIG[opengl] = "-Dsoftisp-gpu=enabled,-Dsoftisp-gpu=disabled,virtual/egl virtual/libgles2"
 PACKAGECONFIG[python] = "-Dpycamera=enabled,-Dpycamera=disabled,python3-pybind11"
 PACKAGECONFIG[raspberrypi] = ",,libpisp"
 PACKAGECONFIG[sdl] = "-Dcam-output-sdl2=enabled,-Dcam-output-sdl2=disabled,virtual/libsdl2"
@@ -94,10 +95,8 @@ FILES:${PN}-compliance = "${bindir}/lc-compliance"
 FILES:${PN}-gst = "${libdir}/gstreamer-1.0"
 FILES:${PN}-pycamera = "${PYTHON_SITEPACKAGES_DIR}/libcamera"
 
-# libcamera-v4l2 explicitly sets _FILE_OFFSET_BITS=32 to get access to
-# both 32 and 64 bit file APIs.
-GLIBC_64BIT_TIME_FLAGS = ""
-
+# v4l2-compat.so is built with 32-bit file and time APIs on purpose, so it
+# can wrap both the 32 and 64-bit calls. The rest of libcamera uses 64-bit time.
 INSANE_SKIP += "32bit-time"
 
 CXXFLAGS += "-Wno-error=array-bounds"

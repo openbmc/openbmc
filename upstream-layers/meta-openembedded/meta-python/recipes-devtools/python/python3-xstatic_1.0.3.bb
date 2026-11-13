@@ -4,7 +4,7 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://README.txt;md5=1418684272f85f400cebf1b1a255c5cd"
 
-PYPI_PACKAGE = "XStatic"
+PYPI_PACKAGE_SDIST = "XStatic"
 
 SRC_URI += "file://0001-remove-pkg_resources-import.patch"
 SRC_URI[sha256sum] = "402544cc9e179489441054f09c807804e115ea246907de87c0355fb4f5a31268"

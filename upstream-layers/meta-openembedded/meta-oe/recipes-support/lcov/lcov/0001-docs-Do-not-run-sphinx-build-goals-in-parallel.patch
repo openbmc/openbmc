@@ -1,0 +1,36 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 1 Nov 2026 20:00:00 -0700
+Subject: [PATCH] docs: Do not run sphinx-build goals in parallel
+
+The top-level "doc" target runs "make -C docs man html". With -j both
+goals match the catch-all rule at once and start two sphinx-build
+processes sharing _build/doctrees. One process can read a doctree the
+other is rewriting, so "make -j install" fails at random with unpickling
+errors such as:
+
+  AttributeError: 'dict' object has no attribute 'append'
+  EOFError: Ran out of input
+
+Mark the docs Makefile .NOTPARALLEL so the goals run one after the other.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ docs/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/docs/Makefile b/docs/Makefile
+index f99b1df..c088ba8 100644
+--- a/docs/Makefile
++++ b/docs/Makefile
+@@ -14,6 +14,10 @@ BUILDDIR      = _build
+ help:
+ 	@LCOV_BUILD_DATE=$(BUILD_DATE) LCOV_RELEASE=$(RELEASE) TOOL_NAME=$(TOOL_NAME) $(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+ 
++# Each goal runs its own sphinx-build and they all share the doctrees in
++# $(BUILDDIR), which sphinx does not write atomically.
++.NOTPARALLEL:
++
+ .PHONY: clean help Makefile
+ 
+ # Catch-all target: route all unknown targets to Sphinx using the new

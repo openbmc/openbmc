@@ -25,4 +25,5 @@ RDEPENDS:${PN}-ptest += " \
 RDEPENDS:${PN} += " \
     python3-dateutil \
     python3-tzdata \
+    python3-zoneinfo \
 "

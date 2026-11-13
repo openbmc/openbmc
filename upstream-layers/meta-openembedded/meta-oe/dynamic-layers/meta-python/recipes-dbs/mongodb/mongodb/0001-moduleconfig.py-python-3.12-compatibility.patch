@@ -1,0 +1,57 @@
+From 37580777bc5294d606584f3731d9f5f5425bb587 Mon Sep 17 00:00:00 2001
+From: Awais B <awais.b@rufilla.com>
+Date: Tue, 4 Mar 2025 11:27:10 +0000
+Subject: [PATCH] moduleconfig.py: python 3.12 compatibility
+
+The imp module was deprecated in python 3.4 and is dropped
+with python 3.12. We now need to use importlib for the
+purpose of manipulating/loading modules.
+
+Upstream-Status: Pending
+Signed-off-by: Awais B <awais.b@rufilla.com>
+---
+ buildscripts/moduleconfig.py | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/buildscripts/moduleconfig.py b/buildscripts/moduleconfig.py
+index b4d0bba0490..69dd91ab30d 100644
+--- a/buildscripts/moduleconfig.py
++++ b/buildscripts/moduleconfig.py
+@@ -27,7 +27,8 @@ MongoDB SConscript files do.
+ __all__ = ('discover_modules', 'discover_module_directories', 'configure_modules',
+            'register_module_test')  # pylint: disable=undefined-all-variable
+ 
+-import imp
++import importlib
++import sys
+ import inspect
+ import os
+ 
+@@ -71,12 +72,18 @@ def discover_modules(module_root, allowed_modules):
+             print("adding module: %s" % (name))
+             fp = open(build_py, "r")
+             try:
+-                module = imp.load_module("module_" + name, fp, build_py,
+-                                         (".py", "r", imp.PY_SOURCE))
+-                if getattr(module, "name", None) is None:
+-                    module.name = name
+-                found_modules.append(module)
+-                found_module_names.append(name)
++                module_name = "module_" + name
++                module_spec = importlib.util.spec_from_file_location(module_name, build_py)
++
++                if module_spec is not None:
++                    module = importlib.util.module_from_spec(module_spec)
++                    sys.modules[module_name] = module
++                    module_spec.loader.exec_module(module)
++
++                    if not hasattr(module, "name"):
++                        module.name = name
++                    found_modules.append(module)
++                    found_module_names.append(name)
+             finally:
+                 fp.close()
+         except (FileNotFoundError, IOError):
+-- 
+2.34.1
+

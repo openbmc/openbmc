@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "a3a7ff5264e5bca52e8ae547bbfd0761b72495230d438d05b6c0915be6
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "aiohttp-jinja2"
+
 RDEPENDS:${PN} += " \
     python3-jinja2 \
     python3-aiohttp \

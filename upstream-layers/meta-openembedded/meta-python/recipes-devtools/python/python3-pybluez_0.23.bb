@@ -11,7 +11,7 @@ SRC_URI += "file://0001-Use-Py_ssize_t-when-parsing-buffer-length-fix-426-42.pat
             file://py-3.11.patch "
 SRC_URI[sha256sum] = "c8f04d2e78951eaa9de486b4d49381704e8943d0a6e6e58f55fcd7b8582e90de"
 
-PYPI_PACKAGE = "PyBluez"
+PYPI_PACKAGE_SDIST = "PyBluez"
 
 inherit pypi setuptools3
 

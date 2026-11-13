@@ -7,6 +7,4 @@ SRC_URI[sha256sum] = "c7e58ce09192557605d8bbd92836d7e1d520ac9580096042c0bfd197ef
 
 inherit pypi python_pdm
 
-PYPI_PACKAGE = "annotated_doc"
-
 RDEPENDS:${PN} += "python3-compression"

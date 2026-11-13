@@ -27,7 +27,7 @@ GIR_MESON_OPTION = ""
 GTKIC_VERSION = "4"
 inherit  meson pkgconfig gtk-icon-cache gobject-introspection gettext features_check
 
-REQUIRED_DISTRO_FEATURES = "pam polkit gobject-introspection"
+REQUIRED_DISTRO_FEATURES = "pam polkit gobject-introspection systemd"
 
 EXTRA_OEMESON = "-Dui=enabled"
 

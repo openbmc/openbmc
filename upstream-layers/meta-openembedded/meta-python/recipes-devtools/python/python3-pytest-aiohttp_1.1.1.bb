@@ -12,8 +12,6 @@ DEPENDS = "\
 
 SRC_URI[sha256sum] = "3aa9c9fe26e543eaccc7eb0add381c685ba3ed3e2fed0af74540f63bcd31458d"
 
-PYPI_PACKAGE = "pytest_aiohttp"
-
 inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} += "python3-aiohttp"

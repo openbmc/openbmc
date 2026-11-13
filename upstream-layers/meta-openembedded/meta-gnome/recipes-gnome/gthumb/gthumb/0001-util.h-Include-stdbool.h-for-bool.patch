@@ -1,0 +1,29 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 19:00:00 -0700
+Subject: [PATCH] util.h: Include stdbool.h for bool
+
+util.h declares _g_parse_exif_date() returning bool, but relies on
+another header to include stdbool.h. Before C23, bool is not a keyword,
+so where none of them does, e.g. with clang and musl on riscv32, the
+build fails:
+
+  src/lib/util.h:68:1: error: unknown type name 'bool'
+
+Include stdbool.h directly.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gthumb/-/merge_requests/64]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/lib/util.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/lib/util.h
++++ b/src/lib/util.h
+@@ -2,6 +2,7 @@
+ #define LIB_UTIL_H
+ 
+ #include <math.h>
++#include <stdbool.h>
+ #include <glib.h>
+ #include <glib/gi18n-lib.h>
+ #include <gio/gio.h>

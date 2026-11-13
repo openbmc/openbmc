@@ -1,7 +1,7 @@
-From 052818e91314b797d96d87672c60f6784160f935 Mon Sep 17 00:00:00 2001
+From 7762fbc23f6e0f06f055072e74759070311d6ace Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 25 Mar 2024 10:50:59 -0700
-Subject: [PATCH 2/2] Add missing STATX_ATTR_* defines from musl sys/stat.h
+Subject: [PATCH] Add missing STATX_ATTR_* defines from musl sys/stat.h
 
 These defines are not provided by sys/stat.h on musl but are
 in glibc's sys/stat.h, therefore to compile the tests on musl
@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/src/statx.h b/src/statx.h
-index 3f239d79..12599f5b 100644
+index 0a27bf03..4cf2a964 100644
 --- a/src/statx.h
 +++ b/src/statx.h
-@@ -12,6 +12,18 @@
+@@ -20,6 +20,18 @@
  #define AT_STATX_DONT_SYNC      0x4000  /* - Don't sync attributes with the server */
  #endif
  
@@ -37,6 +37,3 @@ index 3f239d79..12599f5b 100644
  #ifndef AT_NO_AUTOMOUNT
  #define AT_NO_AUTOMOUNT		0x800	/* Suppress terminal automount traversal */
  #endif
--- 
-2.44.0
-

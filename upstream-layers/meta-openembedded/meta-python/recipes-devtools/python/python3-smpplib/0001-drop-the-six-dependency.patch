@@ -1,0 +1,124 @@
+From ebb5d702a7bff096a75280b1709f5e061857b7d4 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:24:42 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim and smpplib does not need it on
+Python 3: six.iteritems is dict.items, six.int2byte is bytes of a single
+value and six.b encodes as latin-1.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ setup.py                 | 1 -
+ smpplib/command.py       | 8 +++-----
+ smpplib/command_codes.py | 4 +---
+ smpplib/gsm.py           | 8 +++-----
+ 4 files changed, 7 insertions(+), 14 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index b12fc31..b3ef37e 100644
+--- a/setup.py
++++ b/setup.py
+@@ -16,7 +16,6 @@ setup(
+     url='https://github.com/python-smpplib/python-smpplib',
+     description='SMPP library for python',
+     packages=find_packages(),
+-    install_requires=['six'],
+     extras_require=dict(
+         tests=('typing; python_version < "3.5"', 'pytest', 'mock'),
+     ),
+diff --git a/smpplib/command.py b/smpplib/command.py
+index bde5840..40fcac7 100644
+--- a/smpplib/command.py
++++ b/smpplib/command.py
+@@ -22,8 +22,6 @@
+ import logging
+ import struct
+ 
+-import six
+-
+ from smpplib import consts, exceptions, pdu
+ from smpplib.ptypes import flag, ostr
+ 
+@@ -64,7 +62,7 @@ def get_optional_name(code):
+     """Return optional_params name by given code. If code is unknown, raise
+     UnkownCommandError exception"""
+ 
+-    for key, value in six.iteritems(consts.OPTIONAL_PARAMS):
++    for key, value in consts.OPTIONAL_PARAMS.items():
+         if value == code:
+             return key
+ 
+@@ -106,7 +104,7 @@ class Command(pdu.PDU):
+ 
+     def _set_vars(self, **kwargs):
+         """set attributes accordingly to kwargs"""
+-        for key, value in six.iteritems(kwargs):
++        for key, value in kwargs.items():
+             if not hasattr(self, key) or getattr(self, key) is None:
+                 setattr(self, key, value)
+ 
+@@ -179,7 +177,7 @@ class Command(pdu.PDU):
+                 value = chr(0)
+ 
+         setattr(self, field, field_value)
+-        return six.b(value)
++        return value.encode('latin-1')
+ 
+     def _generate_ostring(self, field):
+         """Generate octet string value (no null terminator)"""
+diff --git a/smpplib/command_codes.py b/smpplib/command_codes.py
+index eab6868..a0fc53e 100644
+--- a/smpplib/command_codes.py
++++ b/smpplib/command_codes.py
+@@ -1,5 +1,3 @@
+-import six
+-
+ from smpplib import exceptions
+ 
+ #
+@@ -42,7 +40,7 @@ def get_command_name(code):
+     If code is unknown, raise UnknownCommandError exception.
+     """
+ 
+-    for key, value in six.iteritems(commands):
++    for key, value in commands.items():
+         if value == code:
+             return key
+ 
+diff --git a/smpplib/gsm.py b/smpplib/gsm.py
+index 9d70f98..77c6d0e 100644
+--- a/smpplib/gsm.py
++++ b/smpplib/gsm.py
+@@ -1,8 +1,6 @@
+ # -*- coding: utf8 -*-
+ import random
+ 
+-import six
+-
+ from smpplib import consts, exceptions
+ 
+ 
+@@ -55,7 +53,7 @@ def gsm_encode(plaintext):
+     """Performs default GSM 7-bit encoding. Beware it's vendor-specific and not recommended for use."""
+     try:
+         return b''.join(
+-            six.int2byte(index) if index < 0x80 else b'\x1B' + six.int2byte(index - 0x80)
++            bytes((index,)) if index < 0x80 else b'\x1B' + bytes((index - 0x80,))
+             for index in map(GSM_CHARACTER_TABLE.index, plaintext)
+         )
+     except ValueError:
+@@ -78,9 +76,9 @@ def make_parts_encoded(encoded_text, part_size):
+         raise exceptions.MessageTooLong()
+ 
+     uid = random.randint(0, 255)
+-    header = b''.join((b'\x05\x00\x03', six.int2byte(uid), six.int2byte(len(chunks))))
++    header = b''.join((b'\x05\x00\x03', bytes((uid,)), bytes((len(chunks),))))
+ 
+-    return [b''.join((header, six.int2byte(i), chunk)) for i, chunk in enumerate(chunks, start=1)]
++    return [b''.join((header, bytes((i,)), chunk)) for i, chunk in enumerate(chunks, start=1)]
+ 
+ 
+ def split_sequence(sequence, part_size):

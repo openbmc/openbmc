@@ -1,0 +1,46 @@
+From a2d268590cd2e8460b40438b4eff894ae472a0f2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 16 Oct 2026 16:26:28 +0000
+Subject: [PATCH] build_support: do not pass empty linker option to the
+ compiler
+
+does_build_succeed() builds an argv list and inserts linker_options
+verbatim. When no extra linker option is wanted it is "", so the
+compiler is invoked with a literal empty argument:
+
+  cc -Wall -o foo foo.c '' -lpthread
+
+GNU ld treats the empty argument as an input file and fails with
+"cannot find : No such file or directory", while lld silently ignores
+it. With GNU ld every probe that runs without -lrt therefore fails,
+which makes sniff_realtime_lib() wrongly conclude that librt is needed
+(or raise DiscoveryError on C libraries that have no usable librt),
+independent of what the C library actually provides. With lld the
+probes happen to give the right answer, so the outcome depends on the
+linker rather than on the target system.
+
+This regressed when the command was converted from a shell string
+(where an empty %s vanished) to an argv list.
+
+Split linker_options with shlex like CC already is, so an empty value
+contributes no argument and multi-word values still work.
+
+Upstream-Status: Submitted [https://github.com/osvenskan/posix_ipc/pull/114]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ build_support/discover_system_info.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build_support/discover_system_info.py b/build_support/discover_system_info.py
+index 1c3741f..669c234 100644
+--- a/build_support/discover_system_info.py
++++ b/build_support/discover_system_info.py
+@@ -57,7 +57,7 @@ def does_build_succeed(filename, linker_options=""):
+            '-o',
+            f'./build_support/src/{filename[:-2]}',
+            f'./build_support/src/{filename}',
+-           linker_options,
++           *shlex.split(linker_options),
+            '-lpthread'
+            ]
+     p = subprocess.Popen(cmd, stdout=STDOUT, stderr=STDERR)

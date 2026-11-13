@@ -1,4 +1,4 @@
-From 7612367e4bd2a366365bf527c6672be55a133ee6 Mon Sep 17 00:00:00 2001
+From c1f52a2283c93151fe6455bfa61a0c74ac9418fe Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 20 Nov 2025 12:55:48 -0800
 Subject: [PATCH] python3-google-auth-oauthlib: Skip failing 3PI credentials
@@ -21,7 +21,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/tests/unit/test_helpers.py b/tests/unit/test_helpers.py
-index 9df49de..6ec19f5 100644
+index fb49421..f1f5682 100644
 --- a/tests/unit/test_helpers.py
 +++ b/tests/unit/test_helpers.py
 @@ -123,6 +123,7 @@ def test_credentials_from_session_granted_scopes(session):

@@ -1,0 +1,37 @@
+From 7939a8c180c8a3e1a0df8c66fc2ef8a0b0d4d4d6 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Thu, 24 Sep 2026 11:52:25 +1000
+Subject: [PATCH] CMakeLists: Convert gdbus-codegen to use a relative path
+
+Passing an absolute path to gdbus-codegen results in an absolute path
+being hardcoded in the build directory.
+
+This leaks the build host TMPDIR/HOME into the shipped debug sources and
+trips OpenEmbedded's buildpaths QA check.
+
+Instead let's run gdbus-codegen from the ${CMAKE_SOURCE_DIR} directory with
+relative  paths.
+
+Upstream-Status: Submitted [https://github.com/open-iscsi/tcmu-runner/pull/713]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index eccfda1..a657d8b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -144,7 +144,8 @@ install(TARGETS RUNTIME DESTINATION bin)
+ 
+ add_custom_command(
+   OUTPUT ${CMAKE_SOURCE_DIR}/tcmuhandler-generated.c ${CMAKE_SOURCE_DIR}/tcmuhandler-generated.h
+-  COMMAND gdbus-codegen ${CMAKE_SOURCE_DIR}/tcmu-handler.xml --generate-c-code ${CMAKE_SOURCE_DIR}/tcmuhandler-generated --c-generate-object-manager --interface-prefix org.kernel
++  COMMAND gdbus-codegen tcmu-handler.xml --generate-c-code tcmuhandler-generated --c-generate-object-manager --interface-prefix org.kernel
++  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+   MAIN_DEPENDENCY tcmu-handler.xml
+   )
+ 
+-- 
+2.55.0
+

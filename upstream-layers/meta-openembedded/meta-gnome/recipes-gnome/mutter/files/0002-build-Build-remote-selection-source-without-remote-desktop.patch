@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 18 Oct 2026 17:50:00 -0700
+Subject: [PATCH] build: Build remote selection source without remote desktop
+
+meta-clipboard-session.c is built unconditionally, as input capture
+uses it, but it calls into meta-selection-source-remote.c, which is only
+built with remote desktop support. Linking libmutter with
+-Dremote_desktop=false fails:
+
+  ld.lld: error: undefined symbol: meta_selection_source_remote_new
+
+The remote selection source has no remote desktop dependencies, so
+build it unconditionally as well.
+
+Upstream-Status: Pending
+AI-Generated: Uses Claude Code
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -345,6 +345,8 @@
+   'core/meta-selection.c',
+   'core/meta-selection-source.c',
+   'core/meta-selection-source-memory.c',
++  'core/meta-selection-source-remote.c',
++  'core/meta-selection-source-remote.h',
+   'core/meta-session-manager.c',
+   'core/meta-session-state.c',
+   'core/meta-sound-player.c',
+@@ -470,8 +472,6 @@
+     'backends/meta-stream-window.h',
+     'backends/meta-stream.c',
+     'backends/meta-stream.h',
+-    'core/meta-selection-source-remote.c',
+-    'core/meta-selection-source-remote.h',
+   ]
+ endif
+ 

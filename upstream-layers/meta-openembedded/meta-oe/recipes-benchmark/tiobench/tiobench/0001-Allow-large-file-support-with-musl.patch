@@ -1,0 +1,90 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 18 Oct 2026 19:00:00 -0700
+Subject: [PATCH] Allow large file support with musl
+
+USE_LARGEFILES requires the libc to define _LFS64_LARGEFILE and errors
+out otherwise. musl does not define it: its off_t is always 64-bit and
+lseek64(), mmap64() and friends are aliases of the plain interfaces.
+So the build fails on musl:
+
+  ./constants.h:36:2: error: no large file support available, remove -DLARGEFILES from makefile
+
+When _LFS64_LARGEFILE is missing, only require a 64-bit off_t.
+
+Also replace the %L length modifier on integer conversions with the
+standard %ll. %L is only defined for long double, and musl's printf
+rejects it with integer conversions.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ constants.h       | 9 +++++++--
+ test_largefiles.c | 6 +++---
+ tiotest.c         | 2 +-
+ 3 files changed, 11 insertions(+), 6 deletions(-)
+
+--- a/constants.h
++++ b/constants.h
+@@ -33,7 +33,12 @@
+ 
+ #ifdef USE_LARGEFILES
+ #ifndef _LFS64_LARGEFILE
+-#error no large file support available, remove -DLARGEFILES from makefile
++/*
++ * musl does not define _LFS64_LARGEFILE: its off_t is always 64-bit and
++ * the *64 interfaces are plain aliases, so only require a 64-bit off_t.
++ */
++_Static_assert(sizeof(off_t) >= 8,
++	"no large file support available, remove -DLARGEFILES from makefile");
+ #endif
+ #endif
+ 
+@@ -83,7 +88,7 @@
+ #define TIO_ftruncate  ftruncate64
+ #define TIO_pread      pread64
+ #define TIO_pwrite     pwrite64
+-#define OFFSET_FORMAT  "0x%Lx"
++#define OFFSET_FORMAT  "0x%llx"
+ #else
+ typedef off_t          TIO_off_t;
+ #define TIO_lseek      lseek
+--- a/tiotest.c
++++ b/tiotest.c
+@@ -1411,7 +1411,7 @@
+ 
+ 			if(crc != d->bufferCrc)
+ 			{
+-				fprintf(stderr, "Thread(%lu) consistency check failed at offset %Lu\n", d->myNumber, (long long unsigned int)offset);
++				fprintf(stderr, "Thread(%lu) consistency check failed at offset %llu\n", d->myNumber, (long long unsigned int)offset);
+ 				return -1;
+ 			}
+ 		}
+--- a/test_largefiles.c
++++ b/test_largefiles.c
+@@ -57,7 +57,7 @@
+         exit(1);
+     }
+ 
+-    printf( xstr(TIO_ftruncate) "()'ing large test file to size %Lx\n", LARGEFILE_SIZE);
++    printf( xstr(TIO_ftruncate) "()'ing large test file to size %llx\n", LARGEFILE_SIZE);
+     rc = TIO_ftruncate(fd, LARGEFILE_SIZE); /* pre-allocate space */
+     if(rc != 0) 
+     {
+@@ -67,7 +67,7 @@
+ 
+     for(offset = (TIO_off_t)0; offset + CHUNK_SIZE <= LARGEFILE_SIZE; offset += CHUNK_SIZE) {
+ 
+-        printf(xstr(TIO_lseek) "()ing to offset %Lx\n", offset);
++        printf(xstr(TIO_lseek) "()ing to offset %llx\n", offset);
+         offset_ret = TIO_lseek(fd, offset, SEEK_SET);
+         if (offset_ret != offset) {
+             perror("Error " xstr(TIO_lseek) "()ing");
+@@ -105,7 +105,7 @@
+         }
+         data = 0;
+ 
+-        printf(xstr(TIO_mmap) "()ing chunk of size %Lx at offset %Lx\n", CHUNK_SIZE, offset);
++        printf(xstr(TIO_mmap) "()ing chunk of size %llx at offset %llx\n", CHUNK_SIZE, offset);
+         file_loc = TIO_mmap((caddr_t )0, CHUNK_SIZE,
+                  PROT_READ | PROT_WRITE, MAP_SHARED, fd, (TIO_off_t)offset);
+         if (file_loc == MAP_FAILED) {

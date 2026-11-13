@@ -1,4 +1,4 @@
-From a6638a007a42917fea4b03e5c30d9b7208c634c4 Mon Sep 17 00:00:00 2001
+From fb86570aaac63c4ababa7bd572ecc265fe994dd6 Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Thu, 7 Nov 2024 22:04:40 +0100
 Subject: [PATCH] libltdl: remove reference to nonexisting directory
@@ -25,11 +25,11 @@ Upstream-Status: Inappropriate [upstream ticket https://lists.squid-cache.org/pi
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/libltdl/Makefile.am b/libltdl/Makefile.am
-index aad98e2..8a9539b 100644
+index 9153be5..f2f3612 100644
 --- a/libltdl/Makefile.am
 +++ b/libltdl/Makefile.am
-@@ -29,7 +29,7 @@
- ## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+@@ -26,7 +26,7 @@
+ ## License along with GNU Libltdl.  If not, see <https://www.gnu.org/licenses/>.
  #####
  
 -ACLOCAL_AMFLAGS = -I m4
@@ -38,10 +38,10 @@ index aad98e2..8a9539b 100644
  AM_CPPFLAGS =
  AM_LDFLAGS =
 diff --git a/libltdl/Makefile.in b/libltdl/Makefile.in
-index 9929557..c77df2e 100644
+index 5923f0e..14d1eb3 100644
 --- a/libltdl/Makefile.in
 +++ b/libltdl/Makefile.in
-@@ -448,7 +448,7 @@ target_alias = @target_alias@
+@@ -454,7 +454,7 @@ target_alias = @target_alias@
  top_build_prefix = @top_build_prefix@
  top_builddir = @top_builddir@
  top_srcdir = @top_srcdir@
@@ -50,6 +50,3 @@ index 9929557..c77df2e 100644
  AUTOMAKE_OPTIONS = foreign
  
  # -I$(srcdir) is needed for user that built libltdl with a sub-Automake
--- 
-2.30.2
-

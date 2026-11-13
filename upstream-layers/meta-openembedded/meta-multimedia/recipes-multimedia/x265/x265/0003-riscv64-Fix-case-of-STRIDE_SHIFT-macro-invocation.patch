@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 19 Oct 2026 19:50:54 -0700
+Subject: [PATCH] riscv64: Fix case of STRIDE_SHIFT macro invocation
+
+The ADDPTR macro invokes "stride_shift", but the macro is defined as
+STRIDE_SHIFT. GNU as matches macro names case-insensitively, so this
+works with GCC, but the LLVM integrated assembler is case-sensitive
+and fails to build the high bit depth SAD functions with clang:
+
+  <instantiation>:1:1: error: unrecognized instruction mnemonic
+  stride_shift a6, a7, t5, t5, 1, 1
+  ^
+  common/riscv64/sad-a.S:666:1: note: while in macro instantiation
+  SAD_FUNC_COMMON 24, 32, 1 , 2
+
+Use the name the macro is defined with.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ source/common/riscv64/asm.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/common/riscv64/asm.S b/source/common/riscv64/asm.S
+index 39953af..09eab48 100644
+--- a/source/common/riscv64/asm.S
++++ b/source/common/riscv64/asm.S
+@@ -332,7 +332,7 @@ ELF     .size   \name, . - \name
+ .endm
+ 
+ .macro ADDPTR t0, t1, s0, s1, stride0, stride1, shift0, shift1
+-    stride_shift \t0, \t1, \stride0, \stride1, \shift0, \shift1
++    STRIDE_SHIFT \t0, \t1, \stride0, \stride1, \shift0, \shift1
+     add      \s0, \s0, \t0
+     add      \s1, \s1, \t1
+ .endm

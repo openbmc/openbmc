@@ -15,7 +15,7 @@ SECTION = "console/network"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b28513e7b696027d3d2b8dbf117f9fe5"
 
-DEPENDS = "libxcrypt"
+DEPENDS = "virtual/crypt"
 
 inherit autotools ptest systemd useradd
 
@@ -23,6 +23,7 @@ SRC_URI = "\
     git://github.com/bstansell/conserver;protocol=https;branch=master;tag=v${PV} \
     file://conserver.service \
     file://run-ptest \
+    file://0001-test-don-t-let-reinitcheck-race-the-console-down-tes.patch \
 "
 SRCREV = "fe9aac337554f95721dc9f3da721092a81092089"
 

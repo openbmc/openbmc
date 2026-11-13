@@ -1,0 +1,176 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 9 Nov 2026 09:00:00 -0800
+Subject: [PATCH] boost: Fix build with clang 23
+
+Backport fixes from newer Boost to the bundled Boost 1.70:
+
+- numeric_conversion and log: use boost::integral_constant instead of
+  mpl::integral_c for enum constants. mpl::integral_c computes the
+  next/prior values, which are outside the range of the enum, and clang
+  now rejects that:
+
+    error: in-class initializer for static data member is not a constant expression
+    note: integer value -1 is outside the valid range of values [0, 3] for the enumeration type 'lock_access_mode'
+
+- thread: fix a typo in run_it's move assignment operator, which clang
+  now diagnoses in uninstantiated templates:
+
+    error: no member named 'that' in 'boost::detail::run_it<FutureExecutorContinuationSharedState>'
+
+Upstream-Status: Backport [https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a https://github.com/boostorg/log/commit/77f1e20bd69c2e7a9e25e6a9818ae6105f7d070c https://github.com/boostorg/thread/commit/49ccf9c30a0ca556873dbf64b12b0d741d1b3e66]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/src/third_party/boost-1.70.0/boost/log/utility/strictest_lock.hpp b/src/third_party/boost-1.70.0/boost/log/utility/strictest_lock.hpp
+index 5dd48b4f..05c7a037 100644
+--- a/src/third_party/boost-1.70.0/boost/log/utility/strictest_lock.hpp
++++ b/src/third_party/boost-1.70.0/boost/log/utility/strictest_lock.hpp
+@@ -17,6 +17,7 @@
+ #define BOOST_LOG_UTILITY_STRICTEST_LOCK_HPP_INCLUDED_
+ 
+ #include <boost/mpl/integral_c.hpp>
++#include <boost/type_traits/integral_constant.hpp>
+ #include <boost/log/detail/config.hpp>
+ #include <boost/log/detail/locks.hpp>
+ #if defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
+@@ -67,44 +68,44 @@ template< typename LockT >
+ struct thread_access_mode_of;
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< no_lock< MutexT > > : mpl::integral_c< lock_access_mode, unlocked_access >
++struct thread_access_mode_of< no_lock< MutexT > > : boost::integral_constant< lock_access_mode, unlocked_access >
+ {
+ };
+ 
+ #if !defined(BOOST_LOG_NO_THREADS)
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< lock_guard< MutexT > > : mpl::integral_c< lock_access_mode, exclusive_access >
++struct thread_access_mode_of< lock_guard< MutexT > > : boost::integral_constant< lock_access_mode, exclusive_access >
+ {
+ };
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< shared_lock_guard< MutexT > > : mpl::integral_c< lock_access_mode, shared_access >
++struct thread_access_mode_of< shared_lock_guard< MutexT > > : boost::integral_constant< lock_access_mode, shared_access >
+ {
+ };
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< unique_lock< MutexT > > : mpl::integral_c< lock_access_mode, exclusive_access >
++struct thread_access_mode_of< unique_lock< MutexT > > : boost::integral_constant< lock_access_mode, exclusive_access >
+ {
+ };
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< shared_lock< MutexT > > : mpl::integral_c< lock_access_mode, shared_access >
++struct thread_access_mode_of< shared_lock< MutexT > > : boost::integral_constant< lock_access_mode, shared_access >
+ {
+ };
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< upgrade_lock< MutexT > > : mpl::integral_c< lock_access_mode, shared_access >
++struct thread_access_mode_of< upgrade_lock< MutexT > > : boost::integral_constant< lock_access_mode, shared_access >
+ {
+ };
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< boost::log::aux::exclusive_lock_guard< MutexT > > : mpl::integral_c< lock_access_mode, exclusive_access >
++struct thread_access_mode_of< boost::log::aux::exclusive_lock_guard< MutexT > > : boost::integral_constant< lock_access_mode, exclusive_access >
+ {
+ };
+ 
+ template< typename MutexT >
+-struct thread_access_mode_of< boost::log::aux::shared_lock_guard< MutexT > > : mpl::integral_c< lock_access_mode, shared_access >
++struct thread_access_mode_of< boost::log::aux::shared_lock_guard< MutexT > > : boost::integral_constant< lock_access_mode, shared_access >
+ {
+ };
+ 
+diff --git a/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/int_float_mixture.hpp b/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/int_float_mixture.hpp
+index 464e5275..7690d07a 100644
+--- a/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/int_float_mixture.hpp
++++ b/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/int_float_mixture.hpp
+@@ -16,15 +16,15 @@
+ #include "boost/numeric/conversion/int_float_mixture_enum.hpp"
+ #include "boost/numeric/conversion/detail/meta.hpp"
+ 
+-#include "boost/mpl/integral_c.hpp"
++#include "boost/type_traits/integral_constant.hpp"
+ 
+ namespace boost { namespace numeric { namespace convdetail
+ {
+   // Integral Constants for 'IntFloatMixture'
+-  typedef mpl::integral_c<int_float_mixture_enum, integral_to_integral> int2int_c ;
+-  typedef mpl::integral_c<int_float_mixture_enum, integral_to_float>    int2float_c ;
+-  typedef mpl::integral_c<int_float_mixture_enum, float_to_integral>    float2int_c ;
+-  typedef mpl::integral_c<int_float_mixture_enum, float_to_float>       float2float_c ;
++  typedef boost::integral_constant<int_float_mixture_enum, integral_to_integral> int2int_c ;
++  typedef boost::integral_constant<int_float_mixture_enum, integral_to_float>    int2float_c ;
++  typedef boost::integral_constant<int_float_mixture_enum, float_to_integral>    float2int_c ;
++  typedef boost::integral_constant<int_float_mixture_enum, float_to_float>       float2float_c ;
+ 
+   // Metafunction:
+   //
+diff --git a/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/sign_mixture.hpp b/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/sign_mixture.hpp
+index c7f9e42a..fde15840 100644
+--- a/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/sign_mixture.hpp
++++ b/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/sign_mixture.hpp
+@@ -16,15 +16,15 @@
+ #include "boost/numeric/conversion/sign_mixture_enum.hpp"
+ #include "boost/numeric/conversion/detail/meta.hpp"
+ 
+-#include "boost/mpl/integral_c.hpp"
++#include "boost/type_traits/integral_constant.hpp"
+ 
+ namespace boost { namespace numeric { namespace convdetail
+ {
+   // Integral Constants for 'SignMixture'
+-  typedef mpl::integral_c<sign_mixture_enum, unsigned_to_unsigned> unsig2unsig_c ;
+-  typedef mpl::integral_c<sign_mixture_enum, signed_to_signed>     sig2sig_c ;
+-  typedef mpl::integral_c<sign_mixture_enum, signed_to_unsigned>   sig2unsig_c ;
+-  typedef mpl::integral_c<sign_mixture_enum, unsigned_to_signed>   unsig2sig_c ;
++  typedef boost::integral_constant<sign_mixture_enum, unsigned_to_unsigned> unsig2unsig_c ;
++  typedef boost::integral_constant<sign_mixture_enum, signed_to_signed>     sig2sig_c ;
++  typedef boost::integral_constant<sign_mixture_enum, signed_to_unsigned>   sig2unsig_c ;
++  typedef boost::integral_constant<sign_mixture_enum, unsigned_to_signed>   unsig2sig_c ;
+ 
+   // Metafunction:
+   //
+diff --git a/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/udt_builtin_mixture.hpp b/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/udt_builtin_mixture.hpp
+index 36dbc491..a39d29fd 100644
+--- a/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/udt_builtin_mixture.hpp
++++ b/src/third_party/boost-1.70.0/boost/numeric/conversion/detail/udt_builtin_mixture.hpp
+@@ -15,15 +15,15 @@
+ #include "boost/numeric/conversion/udt_builtin_mixture_enum.hpp"
+ #include "boost/numeric/conversion/detail/meta.hpp"
+ 
+-#include "boost/mpl/integral_c.hpp"
++#include "boost/type_traits/integral_constant.hpp"
+ 
+ namespace boost { namespace numeric { namespace convdetail
+ {
+   // Integral Constants for 'UdtMixture'
+-  typedef mpl::integral_c<udt_builtin_mixture_enum, builtin_to_builtin> builtin2builtin_c ;
+-  typedef mpl::integral_c<udt_builtin_mixture_enum, builtin_to_udt>     builtin2udt_c ;
+-  typedef mpl::integral_c<udt_builtin_mixture_enum, udt_to_builtin>     udt2builtin_c ;
+-  typedef mpl::integral_c<udt_builtin_mixture_enum, udt_to_udt>         udt2udt_c ;
++  typedef boost::integral_constant<udt_builtin_mixture_enum, builtin_to_builtin> builtin2builtin_c ;
++  typedef boost::integral_constant<udt_builtin_mixture_enum, builtin_to_udt>     builtin2udt_c ;
++  typedef boost::integral_constant<udt_builtin_mixture_enum, udt_to_builtin>     udt2builtin_c ;
++  typedef boost::integral_constant<udt_builtin_mixture_enum, udt_to_udt>         udt2udt_c ;
+ 
+   // Metafunction:
+   //
+diff --git a/src/third_party/boost-1.70.0/boost/thread/future.hpp b/src/third_party/boost-1.70.0/boost/thread/future.hpp
+index 3d1b29d4..2862fc0a 100644
+--- a/src/third_party/boost-1.70.0/boost/thread/future.hpp
++++ b/src/third_party/boost-1.70.0/boost/thread/future.hpp
+@@ -4669,7 +4669,7 @@ namespace detail
+       }
+       run_it& operator=(BOOST_THREAD_RV_REF(run_it) x) BOOST_NOEXCEPT {
+         if (this != &x) {
+-          that_=x.that;
++          that_=x.that_;
+           x.that_.reset();
+         }
+         return *this;

@@ -1,7 +1,7 @@
 SUMMARY = "Tvheadend: TV streaming server and recorder"
 HOMEPAGE = "https://tvheadend.org/"
 
-inherit autotools-brokensep gettext gitpkgv pkgconfig
+inherit autotools-brokensep gettext pkgconfig
 
 DEPENDS = "avahi cmake-native dvb-apps libdvbcsa libpcre2 openssl uriparser zlib"
 
@@ -14,7 +14,10 @@ SRC_URI = "git://github.com/tvheadend/tvheadend.git;branch=master;protocol=https
 
 SRCREV = "cc602833684953fc3e6f1c89d4f08f6dfef179e3"
 PV = "4.3+git"
-PKGV = "4.3+git${GITPKGV}"
+# PKGV used to be 4.3+git<commit count>+<hash> from gitpkgv; the PR
+# server AUTOINC that replaces the count starts lower, so bump PE to keep
+# the upgrade path.
+PE = "1"
 
 
 EXTRA_OECONF += "--arch=${TARGET_ARCH} \

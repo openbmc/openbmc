@@ -1,4 +1,4 @@
-From c677aa7a80fd551abb391a8f6abd28dc9f5c43a2 Mon Sep 17 00:00:00 2001
+From 77c79aa0e048e4bea40eb794a623c36ff1ec3fbc Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
 Date: Mon, 20 Jul 2026 15:52:32 +0300
 Subject: [PATCH] Skip -march guessing for external cross toolchains
@@ -16,7 +16,7 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  1 file changed, 33 insertions(+), 3 deletions(-)
 
 diff --git a/src/autobahn/nvx/_compile_args.py b/src/autobahn/nvx/_compile_args.py
-index 2a35ab31..173e5fd4 100644
+index 2a35ab3..173e5fd 100644
 --- a/src/autobahn/nvx/_compile_args.py
 +++ b/src/autobahn/nvx/_compile_args.py
 @@ -81,6 +81,10 @@ CIBUILDWHEEL : str, optional
@@ -83,6 +83,3 @@ index 2a35ab31..173e5fd4 100644
  def _get_target_machine():
      """
      Return the *target* machine architecture for the build.
--- 
-2.43.0
-

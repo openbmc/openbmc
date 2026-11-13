@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 12 Sep 2026 00:00:00 -0700
+Subject: [PATCH] selftests/filesystems: idmapped_tmpfile: chown the layer
+ directory into the idmapped range
+
+mapped_caller_creates_and_links fails with EACCES:
+
+  idmapped_tmpfile.c:145:mapped_caller_creates_and_links:Expected fd (-1) >= 0 (0)
+
+The fixture creates /tmp/d as root, i.e. owned by on-disk id 0. The
+idmapped mount maps caller ids [0, 10000) onto on-disk ids
+[10000, 20000), so the directory owner has no mapping through the mount
+and inode_permission() refuses MAY_WRITE with -EACCES because of
+HAS_UNMAPPED_ID(), before the world-writable mode is even looked at.
+
+Chown the directory to MAP_HOST so it is representable through the
+idmapped mount. The unmapped caller test still reaches the
+fsuidgid_has_mapping() check in vfs_tmpfile() and gets -EOVERFLOW.
+
+Fixes: d943e68edc5c ("selftests/filesystems: test O_TMPFILE creation on idmapped mounts")
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tools/testing/selftests/filesystems/idmapped_tmpfile.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/testing/selftests/filesystems/idmapped_tmpfile.c b/tools/testing/selftests/filesystems/idmapped_tmpfile.c
+--- a/tools/testing/selftests/filesystems/idmapped_tmpfile.c
++++ b/tools/testing/selftests/filesystems/idmapped_tmpfile.c
+@@ -91,6 +91,8 @@
+ 	ASSERT_EQ(mkdir(self->dir, 0777), 0);
+ 	/* World-writable so an unmapped caller still passes permission(). */
+ 	ASSERT_EQ(chmod(self->dir, 0777), 0);
++	/* Owned by an id the idmapped mount can represent, else MAY_WRITE is refused. */
++	ASSERT_EQ(chown(self->dir, MAP_HOST, MAP_HOST), 0);
+ }
+ 
+ FIXTURE_TEARDOWN(idmapped_tmpfile)

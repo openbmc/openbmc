@@ -9,7 +9,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f2d38c9e0d63058b051065fb7b1102a8"
 
 DEPENDS = "zlib"
 
-SRC_URI = "git://github.com/assimp/assimp.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/assimp/assimp.git;protocol=https;branch=master \
+           file://CVE-2026-117608.patch \
+"
 
 SRCREV = "fe1965b3e73f7c241265e8e5b3015764936a6ce5"
 

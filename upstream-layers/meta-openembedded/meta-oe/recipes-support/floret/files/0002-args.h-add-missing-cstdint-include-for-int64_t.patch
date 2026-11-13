@@ -1,0 +1,32 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:54:51 +0000
+Subject: [PATCH] args.h: add missing <cstdint> include for int64_t
+
+args.h declares getAutotuneModelSize() returning int64_t but never
+includes <cstdint> itself. On glibc/libstdc++ this compiles because
+some other transitively-included standard header happens to declare
+int64_t first, but that is not guaranteed. musl's libc++/libstdc++
+headers do not provide this transitive declaration, so args.h fails
+to parse with "unknown type name 'int64_t'". The existing
+0001-PATCH-floret patch adds <cstdint> to args.cc, but only after
+it includes "args.h", so it does not help args.h parse itself.
+Include <cstdint> directly in args.h so the header is self-contained.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/args.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/args.h b/src/args.h
+index 1111111..2222222 100644
+--- a/src/args.h
++++ b/src/args.h
+@@ -8,6 +8,7 @@
+
+ #pragma once
+
++#include <cstdint>
+ #include <istream>
+ #include <ostream>
+ #include <string>

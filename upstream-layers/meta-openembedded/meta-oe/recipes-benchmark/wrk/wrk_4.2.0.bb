@@ -23,6 +23,10 @@ EXTRA_OEMAKE = "\
     CFLAGS='${CFLAGS} -I${RECIPE_SYSROOT}/usr/include/luajit-2.1' \
 "
 
+# wrk's Makefile is in-tree only (relative obj/, src/) and its obj/bytecode.c
+# rule doesn't depend on obj/, so create it before make runs in ${S}.
+do_compile[dirs] = "${S}/obj ${S}"
+
 do_compile() {
     export LUA_PATH="${RECIPE_SYSROOT_NATIVE}/usr/share/luajit-2.1/?.lua;;"
     oe_runmake
@@ -32,3 +36,5 @@ do_install() {
     install -d ${D}${bindir}
     install -m 0755 wrk ${D}${bindir}/wrk
 }
+
+COMPATIBLE_HOST:riscv32 = "null"

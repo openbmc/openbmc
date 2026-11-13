@@ -1,0 +1,24 @@
+From: Markus Volk <f_l_k@t-online.de>
+Subject: [PATCH] hwdec_drmprime_overlay: make the framebuffer the whole frame
+
+The framebuffer for the DRM plane was made the size of the source rect,
+while SRC_X and SRC_Y place that rect inside the frame. As soon as the
+rect does not start at the top left, with panscan or a video crop, it
+reaches past the framebuffer and the atomic commit fails with ENOSPC; the
+plane stays dark. Make the framebuffer the size of the frame and let the
+SRC_* properties pick the part that is shown.
+
+Upstream-Status: Pending
+---
+--- a/video/out/hwdec/hwdec_drmprime_overlay.c
++++ b/video/out/hwdec/hwdec_drmprime_overlay.c
+@@ -187,7 +187,8 @@
+             int dstw = MP_ALIGN_UP(p->dst.x1 - p->dst.x0, 2);
+             int dsth = MP_ALIGN_UP(p->dst.y1 - p->dst.y0, 2);
+ 
+-            if (drm_prime_create_framebuffer(p->log, p->ctx->fd, desc, srcw, srch, &next_frame.fb, &p->handle_refs)) {
++            // The framebuffer is the whole frame, SRC_* pick the part shown
++            if (drm_prime_create_framebuffer(p->log, p->ctx->fd, desc, hw_image->w, hw_image->h, &next_frame.fb, &p->handle_refs)) {
+                 ret = -1;
+                 goto fail;
+             }

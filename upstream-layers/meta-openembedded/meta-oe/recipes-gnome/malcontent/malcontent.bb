@@ -19,7 +19,7 @@ GIR_MESON_OPTION = ""
 
 inherit  meson pkgconfig gobject-introspection gettext features_check useradd
 
-REQUIRED_DISTRO_FEATURES = "pam polkit gobject-introspection"
+REQUIRED_DISTRO_FEATURES = "pam polkit gobject-introspection systemd"
 
 PACKAGECONFIG ?= "ui"
 PACKAGECONFIG[ui] = ",,,malcontent-ui"
@@ -37,5 +37,9 @@ FILES:${PN} += " \
 "
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --shell /bin/false --home-dir ${localstatedir}  malcontent-timer-ext-agent;malcontent-timerd;malcontent-webd"
+USERADD_PARAM:${PN} = " \
+    --system --no-create-home --user-group --shell /bin/false --home-dir ${localstatedir} malcontent-timer-ext-agent; \
+    --system --no-create-home --user-group --shell /bin/false --home-dir ${localstatedir}/lib/malcontent-timerd malcontent-timerd; \
+    --system --no-create-home --user-group --shell /bin/false --home-dir ${localstatedir}/lib/malcontent-webd malcontent-webd \
+"
 

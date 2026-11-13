@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "e06b88efe223885d2725df51cf7c9b7b463d1c6f04ea49d4690874318d
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "dbus-deviation"
+
 SRC_URI += "file://0001-Prevent-trying-to-donwload-requierment-which-will-ca.patch"
 
 DEPENDS += "python3-sphinx-native"

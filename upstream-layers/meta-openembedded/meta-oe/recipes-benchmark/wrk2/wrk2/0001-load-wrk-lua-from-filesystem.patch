@@ -8,7 +8,7 @@ cross-compilation issues where bytecode cannot be compiled for the
 target architecture.
 
 Upstream-Status: Inappropriate [cross-compilation]
-
+Signed-off-by: Vaibhav Jindal <vaibjind@qti.qualcomm.com>
 diff --git a/src/script.c b/src/script.c
 index 30ef4fd..38f97d6 100644
 --- a/src/script.c

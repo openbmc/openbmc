@@ -15,8 +15,6 @@ RDEPENDS:${PN} += "\
 
 inherit pypi python_hatchling
 
-PYPI_PACKAGE = "pytest_examples"
-
 SRC_URI[sha256sum] = "9a464f007f805b113677a15e2f8942ebb92d7d3eb5312e9a405d018478ec9801"
 
 BBCLASSEXTEND = "native nativesdk"

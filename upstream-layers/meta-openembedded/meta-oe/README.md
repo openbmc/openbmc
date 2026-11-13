@@ -19,7 +19,7 @@ sudo apt-get install gcc-multilib linux-libc-dev:i386
 Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-oe]' in the subject'
 
 When sending single patches, please use something like:
-'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix="meta-oe][PATCH"'
+'git send-email -M30% -C --find-copies-harder -1 --to openembedded-devel@lists.openembedded.org --subject-prefix="meta-oe][PATCH"'
 
 You are encouraged to fork the mirror on GitHub https://github.com/openembedded/meta-openembedded
 to share your patches, this is preferred for patch sets consisting of more than one patch.

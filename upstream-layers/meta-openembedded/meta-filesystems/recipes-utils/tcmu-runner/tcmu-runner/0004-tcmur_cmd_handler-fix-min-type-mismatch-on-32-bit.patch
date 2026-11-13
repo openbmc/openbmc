@@ -1,0 +1,34 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 17 Oct 2026 00:00:00 -0700
+Subject: [PATCH] tcmur_cmd_handler: Fix min() type mismatch on 32-bit targets
+
+tcmu_lba_to_byte() returns uint64_t while length is size_t, which is
+32-bit on ILP32 targets. The type-checking min() macro then compares
+pointers to distinct types and clang errors out with
+
+  error: comparison of distinct pointer types ('typeof (length) *'
+  (aka 'unsigned int *') and 'typeof (tcmu_lba_to_byte(dev, lba_cnt)) *'
+  (aka 'unsigned long long *')) [-Werror,-Wcompare-distinct-pointer-types]
+
+Do the comparison in 64 bits; the result never exceeds length, so it
+still fits in size_t.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tcmur_cmd_handler.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tcmur_cmd_handler.c b/tcmur_cmd_handler.c
+index 01d6a10..c676e84 100644
+--- a/tcmur_cmd_handler.c
++++ b/tcmur_cmd_handler.c
+@@ -768,7 +768,7 @@ static int handle_writesame(struct tcmu_device *dev, struct tcmulib_cmd *cmd)
+ 
+ 	max_xfer_length = tcmu_dev_get_max_xfer_len(dev) * block_size;
+ 	length = round_up(length, max_xfer_length);
+-	length = min(length, tcmu_lba_to_byte(dev, lba_cnt));
++	length = min((uint64_t)length, tcmu_lba_to_byte(dev, lba_cnt));
+ 
+ 	if (tcmur_cmd_state_init(tcmur_cmd, sizeof(*write_same), length)) {
+ 		tcmu_dev_err(dev, "Failed to calloc write_same data!\n");

@@ -1,0 +1,58 @@
+From a12efc7d5ede4fb2404ea1e4edeba03c9225ab4e Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:22:53 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim and jsonpath-rw does not need it on
+Python 3: six.integer_types and six.string_types are int and str, and
+six.moves.xrange is range.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ jsonpath_rw/jsonpath.py | 6 ++----
+ setup.py                | 2 +-
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/jsonpath_rw/jsonpath.py b/jsonpath_rw/jsonpath.py
+index 3c491d0..4703fae 100644
+--- a/jsonpath_rw/jsonpath.py
++++ b/jsonpath_rw/jsonpath.py
+@@ -1,7 +1,5 @@
+ from __future__ import unicode_literals, print_function, absolute_import, division, generators, nested_scopes
+ import logging
+-import six
+-from six.moves import xrange
+ from itertools import *
+ 
+ logger = logging.getLogger(__name__)
+@@ -485,13 +483,13 @@ class Slice(JSONPath):
+         
+         # Here's the hack. If it is a dictionary or some kind of constant,
+         # put it in a single-element list
+-        if (isinstance(datum.value, dict) or isinstance(datum.value, six.integer_types) or isinstance(datum.value, six.string_types)):
++        if (isinstance(datum.value, dict) or isinstance(datum.value, int) or isinstance(datum.value, str)):
+             return self.find(DatumInContext([datum.value], path=datum.path, context=datum.context))
+ 
+         # Some iterators do not support slicing but we can still
+         # at least work for '*'
+         if self.start == None and self.end == None and self.step == None:
+-            return [DatumInContext(datum.value[i], path=Index(i), context=datum) for i in xrange(0, len(datum.value))]
++            return [DatumInContext(datum.value[i], path=Index(i), context=datum) for i in range(0, len(datum.value))]
+         else:
+             return [DatumInContext(datum.value[i], path=Index(i), context=datum) for i in range(0, len(datum.value))[self.start:self.end:self.step]]
+ 
+diff --git a/setup.py b/setup.py
+index 8108124..4b2dfb9 100644
+--- a/setup.py
++++ b/setup.py
+@@ -18,7 +18,7 @@ setuptools.setup(
+         'console_scripts':  ['jsonpath.py = jsonpath_rw.bin.jsonpath:entry_point'],
+     },
+     test_suite = 'tests',
+-    install_requires = [ 'ply', 'decorator', 'six' ],
++    install_requires = [ 'ply', 'decorator' ],
+     classifiers = [
+         'Development Status :: 5 - Production/Stable',
+         'Intended Audience :: Developers',

@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 25 Oct 2026 15:56:41 -0700
+Subject: [PATCH] test: skip live whois tests in ptest
+
+"Whois request" and "AS resolver - IPv6" only query public whois
+servers, and upstream already notes that they often fail. In OE
+testimage runs "AS resolver - IPv6" fails intermittently and turns the
+whole ptest result into a failure, while it passes on a rerun.
+
+Tag them with "skipped_ptest" so run-ptest filters them out with
+-K skipped_ptest. "AS resolvers" is kept since it also carries the
+offline riswhois and cymru parser checks.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/regression.uts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/regression.uts b/test/regression.uts
+index b6bb9d6..c818e4c 100644
+--- a/test/regression.uts
++++ b/test/regression.uts
+@@ -1781,7 +1781,7 @@ def _test():
+ retry_test(_test)
+ 
+ = Whois request
+-~ netaccess IP as_resolvers
++~ netaccess IP as_resolvers skipped_ptest
+ * This test retries on failure because it often fails
+ def _test():
+     IP(src="8.8.8.8").whois()
+@@ -1825,7 +1825,7 @@ assert len(tmp) == 3
+ assert [l[1] for l in tmp] == ['AS24776', 'AS36459', 'AS26496']
+ 
+ = AS resolver - IPv6
+-~ netaccess IP as_resolvers
++~ netaccess IP as_resolvers skipped_ptest
+ * This test retries on failure because it often fails
+ 
+ def _test():

@@ -1,0 +1,37 @@
+From d3ba98005ddf52d739d2e9056b53ec2f7884ef8b Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 1 Oct 2026 07:00:36 +0000
+Subject: [PATCH] tests: match parse 1.22.2 float pattern in test_numbered
+
+tests/parse_tests/ is a copy of the test suite of the external parse
+module, run against whichever parse is installed. parse 1.22.2 (issue249)
+made {:f} also accept nan/inf, so the generated regex for "{0:f} {1:f}"
+changed and the copied test_numbered expectation no longer matches.
+
+Update the expectation to the one parse 1.22.2's own tests/test_pattern.py
+uses.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/parse_tests/test_pattern.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/parse_tests/test_pattern.py b/tests/parse_tests/test_pattern.py
+index abc19d6..039ebde 100644
+--- a/tests/parse_tests/test_pattern.py
++++ b/tests/parse_tests/test_pattern.py
+@@ -33,7 +33,10 @@ def test_named_typed():
+ def test_numbered():
+     _test_expression("{0}", r"(.+?)")
+     _test_expression("{0} {1}", r"(.+?) (.+?)")
+-    _test_expression("{0:f} {1:f}", r"([-+ ]?\d*\.\d+) ([-+ ]?\d*\.\d+)")
++    _test_expression(
++        "{0:f} {1:f}",
++        r"([-+ ]?(?:\d*\.\d+|nan|NAN|inf|INF)) ([-+ ]?(?:\d*\.\d+|nan|NAN|inf|INF))",
++    )
+ 
+ 
+ def test_bird():

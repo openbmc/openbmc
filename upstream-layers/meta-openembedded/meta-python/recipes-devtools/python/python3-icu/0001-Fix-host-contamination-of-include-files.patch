@@ -1,4 +1,4 @@
-From 5648531ec5f77f5270ddf5c7e49ade5c160669bc Mon Sep 17 00:00:00 2001
+From 2fe99147f24049694c02f857c9bcc900575d8de1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 16 Apr 2021 10:48:36 -0700
 Subject: [PATCH] Fix host contamination of include files
@@ -16,7 +16,7 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 8a975e5..e85fdd3 100644
+index b87ae66..4c81aa0 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -68,7 +68,7 @@ elif platform.startswith('freebsd'):

@@ -1,0 +1,31 @@
+From 77ad19ae9bc3d0fa0f2208be99e562fb96a6e392 Mon Sep 17 00:00:00 2001
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Date: Wed, 14 Oct 2026 09:21:42 +0200
+Subject: [PATCH] test/meson.build: better detect if libc has argp
+
+On some cases, the build system is not properly detecting if
+argp is there or not, because on non-Linux systems, they may
+require the location of the libraries containing it.
+
+As we have our own simplified version of argp here, and currently
+we use it only on tests, if the library is not there, simply fall
+back to non_argp.c.
+
+Upstream-Status: Backport [https://github.com/mchehab/zbar/commit/77ad19ae9bc3d0fa0f2208be99e562fb96a6e392]
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ test/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/meson.build b/test/meson.build
+index 656c8aa2..42905b80 100644
+--- a/test/meson.build
++++ b/test/meson.build
+@@ -1,5 +1,5 @@
+ argp_compat = []
+-if not cc.has_header('argp.h')
++if not cc.has_header('argp.h') or not cc.has_function('argp_parse')
+   argp_compat = files('non_argp.c')
+ endif
+ 

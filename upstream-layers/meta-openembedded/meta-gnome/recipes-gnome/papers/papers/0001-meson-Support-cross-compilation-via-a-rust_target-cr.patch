@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 22 Sep 2026 07:00:00 +0200
+Subject: [PATCH] meson: Support cross-compilation via a rust_target cross
+ property
+
+cargo is always invoked without --target and the binaries are copied
+from the native artifact layout (<profile>/), so papers cannot be
+cross-compiled. Read the rust target triple from the cross file's
+[properties] (rust_target); when set, pass it as --target and read the
+binaries from the per-target subdirectory cargo writes to. When it is
+unset the build is unchanged.
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+Upstream-Status: Pending
+---
+ rust/meson.build        | 9 +++++++++
+ shell/src/meson.build   | 2 +-
+ thumbnailer/meson.build | 2 +-
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/rust/meson.build b/rust/meson.build
+--- a/rust/meson.build
++++ b/rust/meson.build
+@@ -57,3 +57,12 @@ if get_option('optimization') == '0'
+ else
+   rust_target = 'release'
+ endif
++
++cargo_build_target = meson.get_external_property('rust_target', '')
++if cargo_build_target != ''
++  cargo_target_options = ['--target', cargo_build_target]
++  cargo_artifact_dir = cargo_build_target / rust_target
++else
++  cargo_target_options = []
++  cargo_artifact_dir = rust_target
++endif
+diff --git a/shell/src/meson.build b/shell/src/meson.build
+--- a/shell/src/meson.build
++++ b/shell/src/meson.build
+@@ -2,7 +2,7 @@ cargo = find_program('cargo', required: true)
+ 
+ cargo_options = [ '--manifest-path', shell_rs_root / 'Cargo.toml' ]
+ cargo_options += [ '--target-dir', meson.current_build_dir() ]
+-
++cargo_options += cargo_target_options
+ if rust_target == 'release'
+   cargo_options += [ '--release' ]
+ endif
+@@ -48,7 +48,7 @@ custom_target(
+   output: meson.project_name(),
+   command: [
+     'cp',
+-    meson.current_build_dir() / rust_target / meson.project_name(),
++    meson.current_build_dir() / cargo_artifact_dir / meson.project_name(),
+     '@OUTPUT@',
+   ],
+ )
+diff --git a/thumbnailer/meson.build b/thumbnailer/meson.build
+--- a/thumbnailer/meson.build
++++ b/thumbnailer/meson.build
+@@ -14,6 +14,7 @@ cargo = find_program('cargo', required: true)
+ thumbnailer_root = meson.current_source_dir()
+ cargo_options = ['--manifest-path', thumbnailer_root / 'Cargo.toml']
+ cargo_options += ['--target-dir', meson.current_build_dir()]
++cargo_options += cargo_target_options
+ 
+ if rust_target == 'release'
+   cargo_options += [ '--release' ]
+@@ -44,7 +45,7 @@ copy = custom_target(
+   output: meson.project_name() + '-thumbnailer',
+   command: [
+     'cp',
+-    meson.current_build_dir() / rust_target / meson.project_name()
++    meson.current_build_dir() / cargo_artifact_dir / meson.project_name()
+     + '-thumbnailer',
+     '@OUTPUT@',
+   ],

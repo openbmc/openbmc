@@ -1,0 +1,171 @@
+From 3db4e7361ecdafec16b5ea23a2a21e62bc5d87bd Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 18:00:00 -0700
+Subject: [PATCH] ruff: Use portable-atomic for AtomicU64 on targets without
+ 64-bit atomics
+
+std only provides AtomicU64 on targets with 64-bit atomics, so ruff
+fails to build for e.g. riscv32:
+
+  error[E0432]: unresolved import `std::sync::atomic::AtomicU64`
+   --> crates/ruff/src/cache.rs:7:25
+    |
+  7 | use std::sync::atomic::{AtomicU64, Ordering};
+    |                         ^^^^^^^^^ no `AtomicU64` in `sync::atomic`
+
+FileCache::last_seen holds milliseconds since the Unix epoch, so it has
+to stay 64-bit. On targets without 64-bit atomics, use the AtomicU64
+from portable-atomic, which is already in the dependency tree, instead.
+rkyv's AtomicLoad wrapper only supports the std atomics, so add an
+equivalent wrapper that archives it as an ArchivedU64, which keeps the
+on-disk cache format the same on all targets. Targets with 64-bit
+atomics keep using std's AtomicU64 unchanged.
+
+Upstream-Status: Submitted [https://github.com/astral-sh/ruff/pull/29627]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Cargo.lock               |  1 +
+ Cargo.toml               |  1 +
+ crates/ruff/Cargo.toml   |  3 +++
+ crates/ruff/src/cache.rs | 57 +++++++++++++++++++++++++++++++++++++---
+ 4 files changed, 58 insertions(+), 4 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 84eda7b..4444142 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -3123,6 +3123,7 @@ dependencies = [
+  "mimalloc",
+  "notify",
+  "path-absolutize",
++ "portable-atomic",
+  "rayon",
+  "regex",
+  "rkyv",
+diff --git a/Cargo.toml b/Cargo.toml
+index f5f3f6c..288535a 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -172,6 +172,7 @@ pathdiff = { version = "0.2.1", default-features = false }
+ phf = { version = "0.14.0", default-features = false }
+ phf_codegen = { version = "0.14.0", default-features = false }
+ pep440_rs = { version = "0.7.1", default-features = false }
++portable-atomic = { version = "1.13.1", default-features = false, features = ["fallback"] }
+ pretty_assertions = { version = "1.3.0", default-features = false, features = ["std"] }
+ proc-macro2 = { version = "1.0.79", default-features = false, features = ["proc-macro"] }
+ pyproject-toml = { version = "0.13.4", default-features = false }
+diff --git a/crates/ruff/Cargo.toml b/crates/ruff/Cargo.toml
+index d88c322..a0de836 100644
+--- a/crates/ruff/Cargo.toml
++++ b/crates/ruff/Cargo.toml
+@@ -77,6 +77,9 @@ tikv-jemallocator = { workspace = true }
+ [target.'cfg(target_os = "windows")'.dependencies]
+ mimalloc = { workspace = true }
+ 
++[target.'cfg(not(target_has_atomic = "64"))'.dependencies]
++portable-atomic = { workspace = true }
++
+ [dev-dependencies]
+ # Enable test rules during development
+ ruff_linter = { workspace = true, features = ["clap", "test-rules"] }
+diff --git a/crates/ruff/src/cache.rs b/crates/ruff/src/cache.rs
+index 94ca467..3fca85e 100644
+--- a/crates/ruff/src/cache.rs
++++ b/crates/ruff/src/cache.rs
+@@ -4,7 +4,9 @@ use std::hash::Hasher;
+ use std::io::{self, Write};
+ use std::path::{Path, PathBuf};
+ use std::sync::Mutex;
+-use std::sync::atomic::{AtomicU64, Ordering};
++#[cfg(target_has_atomic = "64")]
++use std::sync::atomic::AtomicU64;
++use std::sync::atomic::Ordering;
+ use std::time::{Duration, SystemTime};
+ 
+ use anyhow::{Context, Result};
+@@ -23,6 +25,10 @@ use ruff_macros::CacheKey;
+ use ruff_workspace::Settings;
+ use ruff_workspace::resolver::Resolver;
+ 
++// `std` only provides `AtomicU64` on targets with 64-bit atomics.
++#[cfg(not(target_has_atomic = "64"))]
++use portable_atomic::AtomicU64;
++
+ /// [`Path`] that is relative to the package root in [`PackageCache`].
+ pub(crate) type RelativePath = Path;
+ /// [`PathBuf`] that is relative to the package root in [`PackageCache`].
+@@ -341,12 +347,56 @@ pub(crate) struct FileCache {
+     ///
+     /// Represented as the number of milliseconds since Unix epoch. This will
+     /// break in 1970 + ~584 years (~2554).
+-    #[rkyv(with = rkyv::with::AtomicLoad<rkyv::with::Relaxed>)]
++    #[cfg_attr(
++        target_has_atomic = "64",
++        rkyv(with = rkyv::with::AtomicLoad<rkyv::with::Relaxed>)
++    )]
++    #[cfg_attr(not(target_has_atomic = "64"), rkyv(with = AtomicU64LoadRelaxed))]
+     last_seen: AtomicU64,
+ 
+     data: FileCacheData,
+ }
+ 
++/// Archives a [`portable_atomic::AtomicU64`] as its value, like
++/// [`rkyv::with::AtomicLoad`] with [`rkyv::with::Relaxed`] does for the `std`
++/// one, so the on-disk format is the same on all targets.
++#[cfg(not(target_has_atomic = "64"))]
++struct AtomicU64LoadRelaxed;
++
++#[cfg(not(target_has_atomic = "64"))]
++impl rkyv::with::ArchiveWith<AtomicU64> for AtomicU64LoadRelaxed {
++    type Archived = rkyv::primitive::ArchivedU64;
++    type Resolver = ();
++
++    fn resolve_with(field: &AtomicU64, (): Self::Resolver, out: rkyv::Place<Self::Archived>) {
++        out.write(rkyv::primitive::ArchivedU64::from_native(
++            field.load(Ordering::Relaxed),
++        ));
++    }
++}
++
++#[cfg(not(target_has_atomic = "64"))]
++impl<S: rkyv::rancor::Fallible + ?Sized> rkyv::with::SerializeWith<AtomicU64, S>
++    for AtomicU64LoadRelaxed
++{
++    fn serialize_with(_: &AtomicU64, _: &mut S) -> std::result::Result<Self::Resolver, S::Error> {
++        Ok(())
++    }
++}
++
++#[cfg(not(target_has_atomic = "64"))]
++impl<D: rkyv::rancor::Fallible + ?Sized>
++    rkyv::with::DeserializeWith<rkyv::primitive::ArchivedU64, AtomicU64, D>
++    for AtomicU64LoadRelaxed
++{
++    fn deserialize_with(
++        field: &rkyv::primitive::ArchivedU64,
++        _: &mut D,
++    ) -> std::result::Result<AtomicU64, D::Error> {
++        Ok(AtomicU64::new(field.to_native()))
++    }
++}
++
+ impl FileCache {
+     /// Return whether or not the file in the cache was linted and found to have no diagnostics.
+     pub(crate) fn linted(&self) -> bool {
+@@ -503,7 +553,6 @@ mod tests {
+     use std::io;
+     use std::io::Write;
+     use std::path::{Path, PathBuf};
+-    use std::sync::atomic::AtomicU64;
+     use std::time::SystemTime;
+ 
+     use anyhow::Result;
+@@ -522,7 +571,7 @@ mod tests {
+     use ruff_workspace::Settings;
+ 
+     use crate::cache::{self, ChangeData, FileCache, FileCacheData, FileCacheKey};
+-    use crate::cache::{Cache, RelativePathBuf};
++    use crate::cache::{AtomicU64, Cache, RelativePathBuf};
+     use crate::commands::format::{FormatCommandError, FormatMode, FormatResult, format_path};
+     use crate::diagnostics::{Diagnostics, lint_path};
+ 

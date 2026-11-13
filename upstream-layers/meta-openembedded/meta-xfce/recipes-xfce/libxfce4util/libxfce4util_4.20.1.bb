@@ -7,4 +7,9 @@ DEPENDS = "intltool-native xfce4-dev-tools-native glib-2.0"
 
 inherit xfce gtk-doc gobject-introspection vala
 
+do_configure:prepend() {
+    # Remove vapigen.m4 bundled with sources so that the one shipped by vala is used instead.
+    rm -f ${S}/m4/vapigen.m4
+}
+
 SRC_URI[sha256sum] = "84bfc4daab9e466193540c3665eee42b2cf4d24e3f38fc3e8d1e0a2bebe3b8f1"

@@ -11,6 +11,7 @@ do_populate_lic[depends] += "virtual/kernel:do_shared_workdir"
 EXTRA_OEMAKE = "-C ${S}/tools/spi O=${B} CROSS=${TARGET_PREFIX} CC="${CC}" LD="${LD}" AR=${AR} ARCH=${ARCH}"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
+do_configure[cleandirs] = "${B}"
 
 do_compile() {
     oe_runmake

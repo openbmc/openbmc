@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://README.rst;beginline=337;endline=358;md5=f68bda54505b
 SRC_URI[sha256sum] = "9737e0c24cabb8bc9d48bf8c57c3df2a70f8cdd96b70c50290803286f9e46bf7"
 
 PYPI_PACKAGE = "python-pkcs11"
+PYPI_PACKAGE_SDIST = "python-pkcs11"
 
 inherit pypi setuptools3 cython
 

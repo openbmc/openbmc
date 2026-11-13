@@ -31,7 +31,7 @@ Send pull requests to openembedded-devel@lists.openembedded.org with
 '[meta-python]' in the subject.
 
 When sending single patches, please use something like:
-git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix='meta-python][PATCH'
+git send-email -M30% -C --find-copies-harder -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix='meta-python][PATCH'
 
 Maintenance
 -------------------------

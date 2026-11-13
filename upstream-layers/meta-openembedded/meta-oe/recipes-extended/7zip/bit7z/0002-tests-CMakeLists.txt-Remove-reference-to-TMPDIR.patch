@@ -1,0 +1,60 @@
+From 0ea00afd5217683074f263027df6c28c03b25e1e Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Wed, 9 Sep 2026 16:00:00 +0300
+Subject: [PATCH] tests/CMakeLists.txt: Remove reference to TMPDIR
+
+Adjust the path where the tests data directory will actually be
+located when running the tests on the target device.
+
+Fixes:
+
+ERROR: bit7z-4.1.0-r0 do_package_qa: QA Issue: File
+/usr/lib/bit7z/ptest/bit7z-tests-public-cpp20 in package
+bit7z-ptest contains reference to TMPDIR [buildpaths]
+ERROR: bit7z-4.1.0-r0 do_package_qa: QA Issue: File
+/usr/lib/bit7z/ptest/bit7z-tests in package bit7z-ptest contains
+reference to TMPDIR [buildpaths]
+ERROR: bit7z-4.1.0-r0 do_package_qa: QA Issue: File
+/usr/lib/bit7z/ptest/bit7z-tests-public in package bit7z-ptest
+contains reference to TMPDIR [buildpaths]
+ERROR: bit7z-4.1.0-r0 do_package_qa: Fatal QA errors were found,
+failing task.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ tests/CMakeLists.txt | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 2af67faa..64573893 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -94,8 +94,15 @@ if( BIT7Z_TESTS_FILESYSTEM )
+         message( STATUS "Custom test data dir: ${BIT7Z_TESTS_DATA_DIR}" )
+     endif()
+ 
++    # Adjust the path where the tests data directory will actually be
++    # located when running the tests on the target device.
++    set( BIT7Z_TESTS_DATA_DIR_TARGET "" CACHE STRING "The path of the tests data directory at run time" )
++    if( BIT7Z_TESTS_DATA_DIR_TARGET STREQUAL "" )
++        set( BIT7Z_TESTS_DATA_DIR_TARGET ${BIT7Z_TESTS_DATA_DIR} )
++    endif()
++
+     target_compile_definitions(
+-        ${TESTS_BASE_TARGET} INTERFACE BIT7Z_TESTS_FILESYSTEM BIT7Z_TESTS_DATA_DIR="${BIT7Z_TESTS_DATA_DIR}"
++        ${TESTS_BASE_TARGET} INTERFACE BIT7Z_TESTS_FILESYSTEM BIT7Z_TESTS_DATA_DIR="${BIT7Z_TESTS_DATA_DIR_TARGET}"
+     )
+ 
+     if( NOT EXISTS ${BIT7Z_TESTS_DATA_DIR}/test_filesystem/empty )
+@@ -224,4 +231,4 @@ if( "cxx_std_20" IN_LIST CMAKE_CXX_COMPILE_FEATURES )
+     set_property( TARGET ${TESTS_TARGET_PUBLIC_CPP20} PROPERTY CXX_STANDARD_REQUIRED ON )
+ endif()
+ 
+-catch_discover_tests( ${TESTS_TARGET} )
+\ No newline at end of file
++catch_discover_tests( ${TESTS_TARGET} )
+-- 
+2.43.0
+

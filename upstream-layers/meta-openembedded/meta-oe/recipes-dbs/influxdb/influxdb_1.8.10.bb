@@ -37,8 +37,7 @@ do_install:prepend() {
     test -e ${B}/src/${GO_IMPORT}/build.py && rm ${B}/src/${GO_IMPORT}/build.py
     test -e ${B}/src/${GO_IMPORT}/build.sh && rm ${B}/src/${GO_IMPORT}/build.sh
     rm -rf ${B}/src/${GO_IMPORT}/Dockerfile*
-
-    sed -i -e "s#usr/bin/sh#bin/sh#g" ${B}/src/${GO_IMPORT}/scripts/ci/run_perftest.sh
+    rm -rf ${B}/src/${GO_IMPORT}/.circleci ${B}/src/${GO_IMPORT}/scripts/ci
 }
 
 do_install:append() {

@@ -8,4 +8,6 @@ SRC_URI[sha256sum] = "2675282e99d9129ecc446f917e174bc205c65e36c602aa18603b494856
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "asyncio-throttle"
+
 RDEPENDS:${PN} += "python3-asyncio"

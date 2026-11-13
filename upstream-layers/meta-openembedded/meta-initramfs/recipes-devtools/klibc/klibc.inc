@@ -78,3 +78,5 @@ KLIBC_ARCH:powerpc = "ppc"
 KLIBC_ARCH:powerpc64 = "ppc64"
 KLIBC_ARCH:powerpc64le = "ppc64"
 THIS_LIBKLIBC = "libklibc (= ${PV}-${PR})"
+
+COMPATIBLE_HOST:riscv32 = "null"

@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 22 Sep 2026 09:15:56 +0200
+Subject: [PATCH] meson: do not check for the iso xml files and the C.utf8
+ locale during build
+
+The iso xml files are needed at runtime and live in the staging area
+when cross-compiling, and the locale check runs the host's locale
+command against the host's locales. Neither says anything about the
+target, so drop both build-time checks.
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+Upstream-Status: Pending
+---
+ meson.build | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index dfd919a7..51ab9015 100644
+--- a/meson.build
++++ b/meson.build
+@@ -195,17 +195,6 @@ if iso_3166_xml == ''
+   iso_3166_xml = iso_codes_dir / 'iso_3166.xml'
+ endif
+ 
+-files(iso_639_xml, iso_3166_xml) # Check to make sure these exist
+-
+-# Make sure the locale C.UTF-8 is installed on the system
+-
+-c_utf8_check = run_command('locale', '-a', check: true).stdout()
+-have_c_utf8 = 'C.utf8' in c_utf8_check.split('\n')
+-
+-if not have_c_utf8
+-  warning('C.utf8 locale not available on this system.')
+-endif
+-
+ # Post-install script
+ gnome.post_install(
+   gtk_update_icon_cache: true,

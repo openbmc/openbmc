@@ -1,0 +1,172 @@
+From a383dde2c5c37efb7c55e0a0a9a1a8c7fe56d543 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:24:12 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim and rouge-score does not need it on
+Python 3: map, range and zip are builtins, zip_longest comes from
+itertools, six.iteritems and six.iterkeys are the dict methods, and the
+six.ensure_str call sites are all passed str already.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ rouge_score/io.py           | 6 ++----
+ rouge_score/rouge_scorer.py | 9 +++------
+ rouge_score/scoring.py      | 6 ++----
+ rouge_score/scoring_test.py | 2 --
+ rouge_score/tokenize.py     | 5 ++---
+ setup.py                    | 1 -
+ 6 files changed, 9 insertions(+), 20 deletions(-)
+
+diff --git a/rouge_score/io.py b/rouge_score/io.py
+index ffd96ef..334b8bb 100644
+--- a/rouge_score/io.py
++++ b/rouge_score/io.py
+@@ -19,11 +19,9 @@ from __future__ import division
+ from __future__ import print_function
+ 
+ import glob
++from itertools import zip_longest
+ 
+ from absl import logging
+-import six
+-from six.moves import zip
+-from six.moves import zip_longest
+ 
+ 
+ 
+@@ -76,7 +74,7 @@ def _open(filepattern, mode="r"):
+ def _record_gen(filename, delimiter):
+   """Opens file and yields records separated by delimiter."""
+   with _open(filename) as f:
+-    records = f.read().split(six.ensure_str(delimiter))
++    records = f.read().split(delimiter)
+   if records[-1]:
+     # Need a final delimiter at end of file to be able to detect an empty last
+     # record.
+diff --git a/rouge_score/rouge_scorer.py b/rouge_score/rouge_scorer.py
+index 4c076bf..64bf73a 100644
+--- a/rouge_score/rouge_scorer.py
++++ b/rouge_score/rouge_scorer.py
+@@ -39,9 +39,6 @@ import re
+ from absl import logging
+ import nltk
+ import numpy as np
+-import six
+-from six.moves import map
+-from six.moves import range
+ from rouge_score import scoring
+ from rouge_score import tokenizers
+ 
+@@ -140,7 +137,7 @@ class RougeScorer(scoring.BaseScorer):
+             sents = nltk.sent_tokenize(text)
+           else:
+             # Assume sentences are separated by newline.
+-            sents = six.ensure_str(text).split("\n")
++            sents = text.split("\n")
+           sents = [x for x in sents if len(x)]
+           return sents
+ 
+@@ -151,7 +148,7 @@ class RougeScorer(scoring.BaseScorer):
+ 
+         scores = _summary_level_lcs(target_tokens_list,
+                                     prediction_tokens_list)
+-      elif re.match(r"rouge[0-9]$", six.ensure_str(rouge_type)):
++      elif re.match(r"rouge[0-9]$", rouge_type):
+         # Rouge from n-grams.
+         n = int(rouge_type[5:])
+         if n <= 0:
+@@ -321,7 +318,7 @@ def _score_ngrams(target_ngrams, prediction_ngrams):
+   """
+ 
+   intersection_ngrams_count = 0
+-  for ngram in six.iterkeys(target_ngrams):
++  for ngram in target_ngrams:
+     intersection_ngrams_count += min(target_ngrams[ngram],
+                                      prediction_ngrams[ngram])
+   target_ngrams_count = sum(target_ngrams.values())
+diff --git a/rouge_score/scoring.py b/rouge_score/scoring.py
+index d7d018c..d6f3e5b 100644
+--- a/rouge_score/scoring.py
++++ b/rouge_score/scoring.py
+@@ -27,8 +27,6 @@ import collections
+ from typing import Dict
+ 
+ import numpy as np
+-import six
+-from six.moves import range
+ 
+ 
+ class Score(
+@@ -106,7 +104,7 @@ class BootstrapAggregator(object):
+         representing a score.
+     """
+ 
+-    for score_type, score in six.iteritems(scores):
++    for score_type, score in scores.items():
+       self._scores[score_type].append(score)
+ 
+   def aggregate(self):
+@@ -117,7 +115,7 @@ class BootstrapAggregator(object):
+     """
+ 
+     result = {}
+-    for score_type, scores in six.iteritems(self._scores):
++    for score_type, scores in self._scores.items():
+       # Stack scores into a 2-d matrix of (sample, measure).
+       score_matrix = np.vstack(tuple(scores))
+       # Percentiles are returned as (interval, measure).
+diff --git a/rouge_score/scoring_test.py b/rouge_score/scoring_test.py
+index 4cb8083..4e6cb9e 100644
+--- a/rouge_score/scoring_test.py
++++ b/rouge_score/scoring_test.py
+@@ -26,8 +26,6 @@ import os
+ 
+ from absl.testing import absltest
+ import numpy as np
+-from six.moves import range
+-from six.moves import zip
+ from rouge_score import rouge_scorer
+ from rouge_score import scoring
+ from rouge_score import test_util
+diff --git a/rouge_score/tokenize.py b/rouge_score/tokenize.py
+index d22abae..61ca0d3 100644
+--- a/rouge_score/tokenize.py
++++ b/rouge_score/tokenize.py
+@@ -19,7 +19,6 @@ from __future__ import division
+ from __future__ import print_function
+ 
+ import re
+-import six
+ 
+ 
+ # Pre-compile regexes that are use often
+@@ -48,12 +47,12 @@ def tokenize(text, stemmer):
+   # Convert everything to lowercase.
+   text = text.lower()
+   # Replace any non-alpha-numeric characters with spaces.
+-  text = NON_ALPHANUM_RE.sub(" ", six.ensure_str(text))
++  text = NON_ALPHANUM_RE.sub(" ", text)
+ 
+   tokens = SPACES_RE.split(text)
+   if stemmer:
+     # Only stem words more than 3 characters long.
+-    tokens = [six.ensure_str(stemmer.stem(x)) if len(x) > 3 else x
++    tokens = [stemmer.stem(x) if len(x) > 3 else x
+               for x in tokens]
+ 
+   # One final check to drop any empty or invalid tokens.
+diff --git a/setup.py b/setup.py
+index c630204..914c4fe 100644
+--- a/setup.py
++++ b/setup.py
+@@ -50,7 +50,6 @@ setuptools.setup(
+         "absl-py",
+         "nltk",
+         "numpy",
+-        "six>=1.14.0",
+     ],
+     python_requires=">=3.7",
+ )

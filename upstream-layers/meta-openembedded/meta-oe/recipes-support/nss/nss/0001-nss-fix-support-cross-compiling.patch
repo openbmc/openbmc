@@ -1,4 +1,4 @@
-From c15470d6b52986a8e41f9be4579c88ed80413b44 Mon Sep 17 00:00:00 2001
+From 456896494f7299b479a56fa630cc1cc204af4465 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 22 Feb 2017 11:36:11 +0200
 Subject: [PATCH] nss: fix support cross compiling
@@ -15,7 +15,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/nss/coreconf/arch.mk b/nss/coreconf/arch.mk
-index 711d19d..a163d24 100644
+index fbc15ef..2449821 100644
 --- a/nss/coreconf/arch.mk
 +++ b/nss/coreconf/arch.mk
 @@ -26,11 +26,11 @@ OS_ARCH := $(subst /,_,$(shell uname -s))
@@ -33,7 +33,7 @@ index 711d19d..a163d24 100644
  
  
 diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
-index e744314..0ebfc92 100644
+index 057b458..22977e1 100644
 --- a/nss/lib/freebl/Makefile
 +++ b/nss/lib/freebl/Makefile
 @@ -36,6 +36,12 @@ ifdef USE_64
@@ -49,6 +49,3 @@ index e744314..0ebfc92 100644
  ifdef USE_ABI32_FPU
  	DEFINES += -DNSS_USE_ABI32_FPU
  endif
--- 
-2.25.1
-

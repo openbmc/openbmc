@@ -2,7 +2,7 @@ SUMMARY = "A Python interface for the Firmata protocol"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=84ddcef430b7c44caa22b2ff4b37a3df"
 
-PYPI_PACKAGE = "pyFirmata"
+PYPI_PACKAGE_SDIST = "pyFirmata"
 
 RDEPENDS:${PN} = "\
     python3-pyserial \

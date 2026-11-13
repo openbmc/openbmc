@@ -14,7 +14,7 @@ DEPENDS = "autoconf-archive-native flex-native"
 SRC_URI = "https://pcsclite.apdu.fr/files/${BP}.tar.xz"
 SRC_URI[sha256sum] = "bfcfe38a20afc49849c6bf55325e38f449fc4b26d3923fdc32b969ae41a8741b"
 
-inherit meson systemd pkgconfig perlnative
+inherit meson systemd pkgconfig perlnative useradd
 
 EXTRA_OEMESON = " \
     -Dlibusb=false \
@@ -37,11 +37,14 @@ RRECOMMENDS:${PN} = "ccid"
 RRECOMMENDS:${PN}:class-native = ""
 RPROVIDES:${PN}:append:class-native = " pcsc-lite-lib-native"
 
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --shell /sbin/nologin --user-group pcscd"
+
 FILES:${PN} = "${sbindir}/pcscd \
                ${datadir}/polkit-1 \
                ${systemd_system_unitdir}/pcscd.service \
                ${systemd_system_unitdir}/pcscd.socket \
-               ${libdir}/sysusers.d \
+               ${nonarch_libdir}/sysusers.d \
                ${exec_prefix}/sysusers.d \
                ${sysconfdir}/default/pcscd"
 FILES:${PN}-lib = "${libdir}/libpcsclite*${SOLIBS}"

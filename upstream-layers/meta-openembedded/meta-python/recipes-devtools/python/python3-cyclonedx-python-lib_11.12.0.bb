@@ -7,8 +7,6 @@ SRC_URI[sha256sum] = "16767c4039de90c04e9f03348f8f0ed4b8ff842eaa7eefcad3a95685f9
 
 inherit pypi python_poetry_core
 
-PYPI_PACKAGE = "cyclonedx_python_lib"
-
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} = "\

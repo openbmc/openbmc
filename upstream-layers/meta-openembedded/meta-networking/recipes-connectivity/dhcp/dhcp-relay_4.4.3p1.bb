@@ -24,6 +24,9 @@ SRC_URI[sha256sum] = "0ac416bb55997ca8632174fd10737fd61cdb8dba2752160a335775bc21
 UPSTREAM_CHECK_URI = "http://ftp.isc.org/isc/dhcp/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>(\d+(\.\d+)+)(-P\d+)?)"
 
+# As per https://www.isc.org/download/#DHCP, software has reached EOL
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 S = "${UNPACKDIR}/dhcp-4.4.3-P1"
 
 inherit autotools-brokensep systemd pkgconfig

@@ -8,8 +8,6 @@ SRC_URI[sha256sum] = "ca0aa2c60d418dd2558767db59953ab5954fb5b87dc0b50cecd60566b0
 
 inherit pypi python_flit_core ptest-python-pytest
 
-PYPI_PACKAGE = "python_xmp_toolkit"
-
 DEPENDS += "\
     python3-pytz-native \
 "

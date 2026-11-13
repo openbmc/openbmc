@@ -1,0 +1,44 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:56:40 +0000
+Subject: [PATCH] lib/cap, cli/main: include switchtec/endian.h for musl
+
+lib/cap.c and cli/main.c call htole32()/le32toh()/le64toh() etc.
+without including inc/switchtec/endian.h, the project's own portable
+endian-conversion shim (already used by lib/diag.c, lib/switchtec.c,
+lib/pmon.c, lib/fw.c, lib/fabric.c, cli/mfg.c and cli/diag.c). On
+glibc this went unnoticed because some other transitively-included
+header happens to pull in <endian.h> as a side effect, but musl's
+headers don't have that side effect, so building with musl libc fails
+with "call to undeclared function 'htole32'" and friends. Add the
+missing include to both files so they pick up the same <endian.h>
+declarations (switchtec/endian.h just wraps <endian.h> on Linux,
+which musl provides unconditionally, unlike glibc which historically
+gated it behind feature-test macros).
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/cli/main.c b/cli/main.c
+index 6dc4524..b0bdcc3 100644
+--- a/cli/main.c
++++ b/cli/main.c
+@@ -33,6 +33,7 @@
+ #include <switchtec/errors.h>
+ #include <switchtec/utils.h>
+ #include <switchtec/pci.h>
++#include <switchtec/endian.h>
+ 
+ #include <locale.h>
+ #include <time.h>
+diff --git a/lib/cap.c b/lib/cap.c
+index b10685f..52ee3f5 100644
+--- a/lib/cap.c
++++ b/lib/cap.c
+@@ -32,6 +32,7 @@
+ #include "switchtec/cap.h"
+ #include "switchtec/switchtec.h"
+ #include "switchtec/mrpc.h"
++#include "switchtec/endian.h"
+ #include "switchtec_priv.h"
+ 
+ #include <stddef.h>

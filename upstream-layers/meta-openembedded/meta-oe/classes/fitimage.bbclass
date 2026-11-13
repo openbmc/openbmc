@@ -58,11 +58,13 @@
 #    do_fitimage:prepend() {
 #        signing_prepare
 #        signing_use_role "${FITIMAGE_SIGNING_KEY_ROLE}"
+#        mkdir -p "${FITIMAGE_SIGN_KEYDIR}"
+#        signing_create_uri_pem "${FITIMAGE_SIGNING_KEY_ROLE}" "${FITIMAGE_SIGN_KEYDIR}/${FITIMAGE_SIGN_KEYNAME}.key"
 #    }
 #
 #    FITIMAGE_SIGN = "1"
-#    FITIMAGE_MKIMAGE_EXTRA_ARGS = "--engine pkcs11"
-#    FITIMAGE_SIGN_KEYDIR = "${PKCS11_URI#pkcs11:}"
+#    FITIMAGE_SIGN_KEYDIR = "${B}/keys"
+#    FITIMAGE_SIGN_KEYNAME = "fit"
 
 
 LICENSE ?= "MIT"
@@ -81,7 +83,7 @@ DEPENDS = "u-boot-mkimage-native dtc-native"
 FITIMAGE_SIGN ?= "0"
 FITIMAGE_SIGN[doc] = "Enable FIT image signing"
 FITIMAGE_SIGN_KEYDIR ?= ""
-FITIMAGE_SIGN_KEYDIR[doc] = "Key directory or pkcs#11 URI to use for signing configuration"
+FITIMAGE_SIGN_KEYDIR[doc] = "Key directory to use for signing configuration"
 FITIMAGE_MKIMAGE_EXTRA_ARGS[doc] = "Extra arguemnts to pass to uboot-mkimage call"
 FITIMAGE_HASH_ALGO ?= "sha256"
 FITIMAGE_HASH_ALGO[doc] = "Hash algorithm to use"
@@ -517,6 +519,11 @@ do_configure[postfuncs] += "write_manifest"
 
 do_fitimage () {
     if [ "${FITIMAGE_SIGN}" = "1" ]; then
+        case " ${FITIMAGE_MKIMAGE_EXTRA_ARGS} " in
+        *" --engine "*|*" --engine="*|*" -N "*)
+            bbfatal "FITIMAGE_MKIMAGE_EXTRA_ARGS: OpenSSL engines are no longer supported, see updated usage in fitimage.bbclass."
+            ;;
+        esac
         uboot-mkimage ${FITIMAGE_MKIMAGE_EXTRA_ARGS} \
             -k "${FITIMAGE_SIGN_KEYDIR}" -r \
             -f "${B}/manifest.its" \

@@ -19,5 +19,3 @@ RDEPENDS:${PN} += " \
 "
 
 inherit setuptools3 pypi
-
-PYPI_PACKAGE = "et_xmlfile"

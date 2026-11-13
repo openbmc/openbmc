@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# test_async_cat_file_ranges fetches a file from a public S3 bucket, so it
+# needs working DNS and internet access from the target.
+pytest --automake \
+    --deselect implementations/tests/test_reference.py::test_async_cat_file_ranges

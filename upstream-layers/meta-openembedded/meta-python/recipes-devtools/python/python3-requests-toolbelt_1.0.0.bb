@@ -13,6 +13,8 @@ SRC_URI[sha256sum] = "7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c8
 
 inherit pypi setuptools3 ptest-python-pytest
 
+PYPI_PACKAGE_SDIST = "requests-toolbelt"
+
 RDEPENDS:${PN} += " \
     python3-requests (>=2.0.1) \
 "

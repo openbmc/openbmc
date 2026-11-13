@@ -8,8 +8,6 @@ PYPI_SRC_URI = "git://github.com/adamchainz/time-machine;protocol=https;branch=m
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
-PYPI_PACKAGE = "time_machine"
-
 RDEPENDS:${PN} += "\
     python3-tzdata \
     python3-unittest \

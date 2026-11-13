@@ -1,0 +1,59 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:57:13 +0000
+Subject: [PATCH] internal: replace glibc LFS64 names with portable POSIX
+ equivalents
+
+musl does not provide the glibc LFS64 off64_t/stat64/lstat64/lseek64/
+ftruncate64 names at all; off_t/struct stat are already 64-bit on
+musl, so there is no separate 64-suffixed API. This broke the build
+on musl targets:
+
+| src/internal/fsutil.hpp:33:24: error: use of undeclared identifier 'lstat64'; did you mean 'lstat'?
+| src/internal/fsutil.hpp:34:23: error: 'stat64' does not refer to a value
+| src/internal/fsutil.hpp:185:6: error: incomplete result type 'FileMetadata' (aka 'struct stat64') in function definition
+
+Extend the existing BSD/Apple compatibility branches in fsutil.hpp
+(FileMetadata/os_stat/os_lstat) and filehandle.cpp (NO_LSEEK64) to
+also apply when building against a non-glibc libc (detected via
+!defined(__GLIBC__)), so musl uses the same plain POSIX stat/lstat/
+lseek/ftruncate/off_t names that the BSDs already use.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/internal/filehandle.cpp | 5 ++++-
+ src/internal/fsutil.hpp     | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/internal/filehandle.cpp b/src/internal/filehandle.cpp
+index 4cff411..22aeeef 100644
+--- a/src/internal/filehandle.cpp
++++ b/src/internal/filehandle.cpp
+@@ -24,7 +24,10 @@
+ #include <unistd.h>
+
+ #if defined( __APPLE__ ) || defined( BSD ) || \
+-    defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __DragonFly__ )
++    defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __DragonFly__ ) || \
++    !defined( __GLIBC__ )
++/* musl (and the BSDs) do not provide the glibc LFS64 lseek64/ftruncate64/off64_t names;
++ * off_t is already 64-bit there, so lseek/ftruncate with off_t suffice. */
+ #define NO_LSEEK64
+ #endif
+ #endif
+diff --git a/src/internal/fsutil.hpp b/src/internal/fsutil.hpp
+index eaf9ae9..2b173c1 100644
+--- a/src/internal/fsutil.hpp
++++ b/src/internal/fsutil.hpp
+@@ -24,7 +24,10 @@
+ #include <sys/stat.h>
+
+ #   if defined( __APPLE__ ) || defined( BSD ) || \
+-        defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __DragonFly__ )
++        defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __DragonFly__ ) || \
++        !defined( __GLIBC__ )
++/* musl (and the BSDs) do not provide the glibc LFS64 stat64/lstat64 names;
++ * their off_t/struct stat are already 64-bit, so the plain POSIX names suffice. */
+ using FileMetadata = struct stat;
+ const auto os_lstat = &lstat;
+ const auto os_stat = &stat;

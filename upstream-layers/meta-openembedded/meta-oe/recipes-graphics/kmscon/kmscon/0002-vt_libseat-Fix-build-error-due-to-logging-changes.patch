@@ -1,0 +1,32 @@
+From 153db63d679df719a99dd36505f9c2f55d9c59f6 Mon Sep 17 00:00:00 2001
+From: Jocelyn Falempe <jfalempe@redhat.com>
+Date: Mon, 28 Sep 2026 11:46:21 +0200
+Subject: [PATCH] vt_libseat: Fix build error due to logging changes
+
+Commit "efda2b5 log: Simplify logging, remove timestamp, and level for notice and info."
+changed the log_submit() arguments, and this was not updated in
+vt_libseat.c
+
+Upstream-Status: Backport [https://github.com/kmscon/kmscon/commit/153db63d679df719a99dd36505f9c2f55d9c59f6]
+
+Signed-off-by: Jocelyn Falempe <jfalempe@redhat.com>
+---
+ src/uterm/vt_libseat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/uterm/vt_libseat.c b/src/uterm/vt_libseat.c
+index 4f65c84..2097628 100644
+--- a/src/uterm/vt_libseat.c
++++ b/src/uterm/vt_libseat.c
+@@ -260,7 +260,7 @@ static enum log_severity log_level(enum libseat_log_level level)
+ 
+ static void log_libseat(enum libseat_log_level level, const char *fmt, va_list args)
+ {
+-	log_submit(LOG_DEFAULT, log_level(level), fmt, args);
++	log_submit(log_level(level), "libseat", fmt, args);
+ }
+ 
+ static void vt_libseat_input(struct input *input, struct input_key_event *ev, void *data)
+-- 
+2.55.0
+

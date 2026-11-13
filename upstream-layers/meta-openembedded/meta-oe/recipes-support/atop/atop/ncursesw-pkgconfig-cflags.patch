@@ -1,0 +1,29 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:56:24 +0000
+Subject: [PATCH] Makefile: pull in ncursesw cflags via pkg-config
+
+atop links against libncursesw and calls wide-character curses
+functions such as waddwstr(), which ncurses only declares in
+curses.h when NCURSES_WIDECHAR is defined (normally via the
+`-DNCURSES_WIDECHAR` cflag reported by `pkg-config --cflags
+ncursesw`). The Makefile only queried pkg-config for glib-2.0 cflags
+and never queried it for ncursesw, so on distros shipping a unified
+curses.h (as this OE ncurses recipe does) waddwstr() is left
+undeclared and the build fails under -Werror=implicit-function-declaration.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/Makefile b/Makefile
+index 3a73bd2..7d1a3c4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -22,7 +22,7 @@
+
+ PKG_CONFIG ?= pkg-config
+
+-override CFLAGS  := -O2 -I. -Wall $(shell $(PKG_CONFIG) --cflags glib-2.0) -Wmissing-prototypes -Wmissing-declarations -Wformat-security $(CFLAGS) # -DNOPERFEVENT   # -DHTTPSTATS
++override CFLAGS  := -O2 -I. -Wall $(shell $(PKG_CONFIG) --cflags glib-2.0) $(shell $(PKG_CONFIG) --cflags ncursesw) -Wmissing-prototypes -Wmissing-declarations -Wformat-security $(CFLAGS) # -DNOPERFEVENT   # -DHTTPSTATS
+
+ CC_CHECK := $(shell echo | $(CC) -dM -E - | grep -q __clang__ && echo clang || echo gcc)
+ ifeq ($(CC_CHECK),gcc)

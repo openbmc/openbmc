@@ -6,7 +6,8 @@ Allow toolchain components (CC, AS, AR, and LD) to be overridden by the build
 environment. This enables cross-compilation support while preserving the existing
 default behavior for native builds.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [cross-compilation]
+Signed-off-by: Vaibhav Jindal <vaibjind@qti.qualcomm.com>
 diff --git a/util/make/gcc64.mak b/util/make/gcc64.mak
 index d8d5e51..5ee9b52 100644
 --- a/util/make/gcc64.mak

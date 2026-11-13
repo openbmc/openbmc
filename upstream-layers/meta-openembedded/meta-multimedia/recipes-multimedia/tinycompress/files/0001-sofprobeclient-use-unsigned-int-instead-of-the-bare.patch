@@ -1,0 +1,40 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:54:51 +0000
+Subject: [PATCH] sofprobeclient: use unsigned int instead of the bare uint
+ typedef
+
+uint is a legacy BSD/glibc typedef from <sys/types.h> that is only
+exposed under glibc's _DEFAULT_SOURCE feature-test macro. musl does
+not expose it by default, so probes_demux.c fails to build with
+"use of undeclared identifier 'uint'". Rather than relying on a
+feature-test macro that differs between libc implementations, use
+the portable "unsigned int" spelling directly.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/utils/sofprobeclient/probes_demux.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/utils/sofprobeclient/probes_demux.c b/src/utils/sofprobeclient/probes_demux.c
+index 1111111..2222222 100644
+--- a/src/utils/sofprobeclient/probes_demux.c
++++ b/src/utils/sofprobeclient/probes_demux.c
+@@ -318,7 +318,7 @@
+
+ int parser_parse_data(struct dma_frame_parser *p, size_t d_len)
+ {
+-	uint i = 0;
++	unsigned int i = 0;
+
+ 	p->len = p->start + d_len;
+ 	/* processing all loaded bytes */
+@@ -383,7 +383,7 @@
+ 		}
+ 		/* data copying section */
+ 		if (p->total_data_to_copy > 0) {
+-			uint data_to_copy;
++			unsigned int data_to_copy;
+
+ 			/* check if there is enough bytes loaded */
+ 			/* or copy partially if not */

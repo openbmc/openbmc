@@ -1,10 +1,18 @@
-Upstream-Status: Pending
+From 4e8c159d08421060827f9f6c034456632c21b292 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Sep 2017 19:15:50 -0700
+Subject: [PATCH] xfsprogs: Upgrade to 4.12.0
 
-Index: xfsprogs-6.18.0/include/builddefs.in
-===================================================================
---- xfsprogs-6.18.0.orig/include/builddefs.in
-+++ xfsprogs-6.18.0/include/builddefs.in
-@@ -180,7 +180,7 @@ SANITIZER_CXXFLAGS = $(SANITIZER_CFLAGS)
+Upstream-Status: Pending
+---
+ include/builddefs.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/builddefs.in b/include/builddefs.in
+index acdbc5c..d968474 100644
+--- a/include/builddefs.in
++++ b/include/builddefs.in
+@@ -197,7 +197,7 @@ SANITIZER_CXXFLAGS = $(SANITIZER_CFLAGS)
  GCXXFLAGS = $(GCFLAGS)
  PCXXFLAGS = $(PCFLAGS)
  

@@ -1,0 +1,58 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 29 Sep 2026 01:59:00 +0000
+Subject: [PATCH] buildtools: don't let the musl getprogname() macro clobber
+ its own fallback definition
+
+On musl, the recipe passes -Dgetprogname()=program_invocation_name via
+TUNE_CCARGS so callers of getprogname() resolve to musl's
+program_invocation_name. But android-logging's logger_write.cpp and
+android-libbase's logging.cpp each already provide their own
+"static const char* getprogname()" fallback for any non-Apple,
+non-Bionic target (which includes musl-linux). The function-like macro
+textually matches this definition's "getprogname()" declarator too,
+rewriting it into "program_invocation_name" and turning what should be
+a function definition into an ill-typed brace-initialized variable
+definition of type "const char*", which then conflicts with musl's own
+"extern char *program_invocation_name" declaration:
+
+  error: redefinition of 'program_invocation_name' with a different
+  type: 'const char *' vs 'char *'
+
+Guard each fallback definition with "&& !defined(getprogname)" so it
+is skipped when the build already supplies getprogname() as a macro,
+leaving the existing __APPLE__/__BIONIC__ exclusions untouched for
+platforms that don't define the macro.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/buildtools/android-logging/liblog/logger_write.cpp	2026-09-29 01:58:46.064186639 +0000
++++ b/buildtools/android-logging/liblog/logger_write.cpp	2026-09-29 01:58:46.065218637 +0000
+@@ -109,7 +109,11 @@
+ }
+ 
+ // BSD-based systems like Android/macOS have getprogname(). Others need us to provide one.
+-#if !defined(__APPLE__) && !defined(__BIONIC__)
++// Skip this on platforms where the build already provides getprogname() as a macro
++// (e.g. musl builds define -Dgetprogname()=program_invocation_name), since the macro
++// would otherwise rewrite this very definition's "getprogname()" declarator into
++// "program_invocation_name", clashing with musl's own char* extern declaration.
++#if !defined(__APPLE__) && !defined(__BIONIC__) && !defined(getprogname)
+ static const char* getprogname() {
+ #ifdef _WIN32
+   static bool first = true;
+--- a/buildtools/android-libbase/logging.cpp	2026-09-29 01:58:46.066054793 +0000
++++ b/buildtools/android-libbase/logging.cpp	2026-09-29 01:58:46.067074541 +0000
+@@ -62,7 +62,11 @@
+ namespace base {
+ 
+ // BSD-based systems like Android/macOS have getprogname(). Others need us to provide one.
+-#if !defined(__APPLE__) && !defined(__BIONIC__)
++// Skip this on platforms where the build already provides getprogname() as a macro
++// (e.g. musl builds define -Dgetprogname()=program_invocation_name), since the macro
++// would otherwise rewrite this very definition's "getprogname()" declarator into
++// "program_invocation_name", clashing with musl's own char* extern declaration.
++#if !defined(__APPLE__) && !defined(__BIONIC__) && !defined(getprogname)
+ static const char* getprogname() {
+ #ifdef _WIN32
+   static bool first = true;

@@ -1,0 +1,35 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] modbus-rtu: pull in TCGETS2/TCSETS2 from asm/ioctls.h on musl
+
+When HAVE_STRUCT_TERMIOS2 is set, this file issues the TCGETS2/TCSETS2
+ioctl requests together with struct termios2. On musl, <sys/ioctl.h>
+only declares the plain (non-termios2) TCGETS/TCSETS request codes;
+TCGETS2/TCSETS2 are only available from the kernel uapi ioctls header,
+so the build fails with "use of undeclared identifier 'TCGETS2'".
+
+Include <asm/ioctls.h> in this case. It is safe to add unconditionally
+here: it redefines TCGETS/TCSETS with the same values musl's
+<sys/ioctl.h> already uses, and glibc ships (and already indirectly
+includes) the very same header, so this is a no-op there.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/src/modbus-rtu.c b/src/modbus-rtu.c
+index 87e0887..1e98e74 100644
+--- a/src/modbus-rtu.c
++++ b/src/modbus-rtu.c
+@@ -14,6 +14,12 @@
+ #endif
+ #if defined(HAVE_STRUCT_TERMIOS2)
+ #include <sys/ioctl.h>
++/* On musl, <sys/ioctl.h> only provides the plain (non-termios2) TCGETS/
++ * TCSETS request codes; TCGETS2/TCSETS2 (used below with struct termios2)
++ * come from the kernel uapi ioctls header. <asm/ioctls.h> is safe to add
++ * unconditionally here: it redefines TCGETS/TCSETS with the same values
++ * musl already uses, and glibc ships the same header too. */
++#include <asm/ioctls.h>
+ #endif
+ #include "modbus-private.h"
+ #include <assert.h>

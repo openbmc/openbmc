@@ -7,4 +7,6 @@ SRC_URI[sha256sum] = "1a464209fb4bf0a3f5d5a428310cb2a70487a01a6bc3a960d1dda90af8
 
 inherit pypi setuptools3 ptest-python-pytest
 
+PYPI_PACKAGE_SDIST = "precise-runner"
+
 PTEST_PYTEST_DIR = "test"

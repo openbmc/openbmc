@@ -24,6 +24,10 @@ CONFIGUREOPTS = " --prefix=${prefix} \
 # avoids build breaks when using no-static-libs.inc
 DISABLE_STATIC = ""
 
+# wafsamba version scripts name symbols that may not exist (_end, __bss_start,
+# _edata, and symbols from older ABI versions); lld rejects those by default
+LDFLAGS += "-Wl,--undefined-version"
+
 def get_waf_parallel_make(d):
     pm = d.getVar('PARALLEL_MAKE')
     if pm:
@@ -65,10 +69,15 @@ def get_waf_parallel_make(d):
 # to help generate the cross answer when adding new board support.
 CROSS_METHOD ?= "answer"
 
+WAF_CROSS_ANSWERS_PATH ?= "${THISDIR}/../../files/waf-cross-answers"
+
+# The cross-answers file is read from the layer rather than through
+# SRC_URI, so add it to the checksums to reconfigure when it changes.
+do_configure[file-checksums] += "${WAF_CROSS_ANSWERS_PATH}/cross-answers-${TARGET_ARCH}.txt:True"
+
 do_configure() {
 
     # Prepare the cross-answers file
-    WAF_CROSS_ANSWERS_PATH="${THISDIR}/../../files/waf-cross-answers"
     CROSS_ANSWERS="${B}/cross-answers-${TARGET_ARCH}.txt"
     if [ -e ${CROSS_ANSWERS} ]; then
         rm -f ${CROSS_ANSWERS}

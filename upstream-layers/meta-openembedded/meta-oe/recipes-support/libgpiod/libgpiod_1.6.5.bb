@@ -3,7 +3,10 @@ require libgpiod.inc
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2caced0b25dfefd4c601d92bd15116de"
 
-SRC_URI += "file://0001-bindings-cxx-disable-tests.patch"
+SRC_URI += " \
+    file://0001-bindings-cxx-disable-tests.patch \
+    file://0002-core-gracefully-handle-disappearing-chips-during-ite.patch \
+"
 
 SRC_URI[sha256sum] = "ae280f697bf035a1fb780c9972e5c81d0d2712b7ab6124fb3fba24619daa72bc"
 

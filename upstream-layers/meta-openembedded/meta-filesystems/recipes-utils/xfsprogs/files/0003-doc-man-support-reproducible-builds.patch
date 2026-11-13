@@ -1,4 +1,4 @@
-From a2d78f6716157d6e1e94d9864e351887d74d0b30 Mon Sep 17 00:00:00 2001
+From 94997f2d7bf759664c8dec517798b0aed06aadf1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@eng.windriver.com>
 Date: Tue, 18 Nov 2025 01:04:27 -0800
 Subject: [PATCH] doc/man: support reproducible builds

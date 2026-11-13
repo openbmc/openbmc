@@ -5,4 +5,6 @@ SRC_URI[sha256sum] = "b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd8720
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "requests-oauthlib"
+
 RDEPENDS:${PN} += "python3-requests python3-oauthlib"

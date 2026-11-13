@@ -1,0 +1,36 @@
+From 1bd587299f7578f4e08242eb45282933b8c10b36 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 1 Oct 2026 10:31:31 -0700
+Subject: [PATCH] tests: skip tls-ossl-connect-failure-vg.sh without libtool
+
+The test runs the sender through ${srcdir}/../libtool, which only exists
+in a build tree. When the test suite is installed and run elsewhere, as
+with ptest, the sender cannot be started and the test fails with:
+
+  tls-ossl-connect-failure-vg.sh: line 22: .../tests/../libtool: No such file or directory
+  unexpected sender exit status 127 (expected authentication failure)
+
+The other valgrind tests already skip in this case through
+startup_receiver_valgrind(). Skip this one as well.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/tls-ossl-connect-failure-vg.sh | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/tls-ossl-connect-failure-vg.sh b/tests/tls-ossl-connect-failure-vg.sh
+index d67378d..08bf018 100755
+--- a/tests/tls-ossl-connect-failure-vg.sh
++++ b/tests/tls-ossl-connect-failure-vg.sh
+@@ -9,6 +9,10 @@ if ! ./have_tlslib "openssl"; then
+ 	echo "OpenSSL support is not available"
+ 	exit 77
+ fi
++if [ ! -x "${srcdir}/../libtool" ]; then
++	echo "libtool not available, cannot run under valgrind"
++	exit 77
++fi
+ 
+ export errorlog="error.$LIBRELP_DYN.log"
+ export TLSLIB="-l openssl"

@@ -17,6 +17,7 @@ SRCNAME = "python-slip"
 SRC_URI = "https://github.com/nphilipp/${SRCNAME}/releases/download/${SRCNAME}-${PV}/${SRCNAME}-${PV}.tar.bz2 \
            file://9b939c0b534c1b7958fa0a3c7aedf30bca910431.patch \
            file://0001-setup.py-Use-setuptools-instead-of-distutils.patch \
+           file://0002-drop-the-six-dependency.patch \
           "
 SRC_URI[sha256sum] = "c726c086f0dd93a0ac7a0176f383a12af91b6657b78a301e3f5b25d9f8d4d10b"
 
@@ -26,9 +27,6 @@ do_compile:prepend() {
     sed -e 's/@VERSION@/${PV}/g' ${S}/setup.py.in > ${S}/setup.py
 }
 
-RDEPENDS:${PN} += "\
-    python3-six \
-"
 # http://errors.yoctoproject.org/Errors/Details/184713/
 # python-native/python: can't open file 'setup.py': [Errno 2] No such file or directory
 CLEANBROKEN = "1"

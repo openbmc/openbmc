@@ -1,0 +1,265 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Sep 2026 01:30:00 +0000
+Subject: [PATCH] crypto: build against OpenSSL 4
+
+OpenSSL 4.0 brings two changes that wvstreams' X.509 code trips over:
+
+ - struct asn1_string_st is opaque, so ASN1_INTEGER / ASN1_OCTET_STRING /
+   ASN1_BIT_STRING / ASN1_TIME can no longer be dereferenced;
+ - several getters gained const: X509_get_ext(), X509_EXTENSION_get_data(),
+   X509_get0_pubkey_bitstr(), X509_get_subject_name(),
+   X509_get_issuer_name() and X509_REQ_get_subject_name().
+
+Use the ASN1_STRING_get0_data() / ASN1_STRING_length() / ASN1_STRING_type()
+accessors, which have existed since OpenSSL 1.1.0, and propagate const to
+the locals that only ever read through those pointers.
+
+Three call sites did rely on getting a mutable X509_NAME back: they fetched
+the certificate's (or request's) existing name, edited it in place through
+set_name_entry() and then installed it again.  There is no mutable
+counterpart to those getters, so duplicate the name with X509_NAME_dup(),
+edit the copy, and free it after the setter has taken its own copy.  That
+keeps the previous behaviour of merging into the existing DN rather than
+starting from an empty one.
+
+WvX509::set_subject(X509_NAME *) becomes set_subject(const X509_NAME *) so
+that wvx509mgr.cc can keep passing X509_REQ_get_subject_name() straight in;
+the implementation only forwards to X509_set_subject_name(), which takes a
+const pointer.
+
+set_aki() and WvCRL's constructor used one X509_EXTENSION * for both the
+borrowed extension returned by X509_get_ext() and the freshly built one they
+own and free, which no longer type checks now that the former is const. Give
+the owned extension its own variable.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/include/wvx509.h
++++ b/include/wvx509.h
+@@ -161,7 +161,7 @@
+      */
+     WvString get_subject() const;
+     void set_subject(WvStringParm name);
+-    void set_subject(X509_NAME *name);
++    void set_subject(const X509_NAME *name);
+ 
+     /**
+      * get and set the serialNumber field of the certificate
+--- a/crypto/wvcrl.cc
++++ b/crypto/wvcrl.cc
+@@ -56,7 +56,7 @@
+ 
+     // most of this copied from wvx509.cc, sigh
+     ASN1_OCTET_STRING *ikeyid = NULL;
+-    X509_EXTENSION *ext;
++    const X509_EXTENSION *ext;
+     int i = X509_get_ext_by_NID(ca.cert, NID_subject_key_identifier, -1);
+     if ((i >= 0) && (ext = X509_get_ext(ca.cert, i)))
+         ikeyid = static_cast<ASN1_OCTET_STRING *>(X509V3_EXT_d2i(ext));
+@@ -67,9 +67,10 @@
+         akeyid->issuer = NULL;
+         akeyid->serial = NULL;
+         akeyid->keyid = ikeyid;
+-        ext = X509V3_EXT_i2d(NID_authority_key_identifier, 0, akeyid);
+-        X509_CRL_add_ext(crl, ext, -1);
+-        X509_EXTENSION_free(ext); 
++        X509_EXTENSION *akiext =
++            X509V3_EXT_i2d(NID_authority_key_identifier, 0, akeyid);
++        X509_CRL_add_ext(crl, akiext, -1);
++        X509_EXTENSION_free(akiext);
+         AUTHORITY_KEYID_free(akeyid);
+     }
+ 
+@@ -169,7 +170,8 @@
+                              &i, NULL));
+     if (aki)
+     {
+-        char *tmp = hex_to_string(aki->keyid->data, aki->keyid->length); 
++        char *tmp = hex_to_string(ASN1_STRING_get0_data(aki->keyid),
++                                  ASN1_STRING_length(aki->keyid));
+         WvString str(tmp);
+         
+         OPENSSL_free(tmp);
+--- a/crypto/wvx509.cc
++++ b/crypto/wvx509.cc
+@@ -306,11 +306,12 @@
+ 
+     X509_REQ_set_pubkey(certreq, pk);
+ 
+-    name = X509_REQ_get_subject_name(certreq);
++    name = X509_NAME_dup(X509_REQ_get_subject_name(certreq));
+ 
+     debug("Creating Certificate request for %s\n", subject);
+     set_name_entry(name, subject);
+     X509_REQ_set_subject_name(certreq, name);
++    X509_NAME_free(name);
+     char *sub_name = X509_NAME_oneline(X509_REQ_get_subject_name(certreq), 
+ 				       0, 0);
+     debug("SubjectDN: %s\n", sub_name);
+@@ -606,9 +607,10 @@
+ {
+     CHECK_CERT_EXISTS_SET("issuer");
+ 
+-    X509_NAME *name = X509_get_issuer_name(cert);
++    X509_NAME *name = X509_NAME_dup(X509_get_issuer_name(cert));
+     set_name_entry(name, issuer);
+     X509_set_issuer_name(cert, name);
++    X509_NAME_free(name);
+ }
+ 
+ 
+@@ -616,7 +618,7 @@
+ {
+     CHECK_CERT_EXISTS_SET("issuer");
+ 
+-    X509_NAME *casubj = X509_get_subject_name(cacert.cert);
++    const X509_NAME *casubj = X509_get_subject_name(cacert.cert);
+     X509_set_issuer_name(cert, casubj);
+ }
+ 
+@@ -636,13 +638,14 @@
+ {    
+     CHECK_CERT_EXISTS_SET("subject");
+ 
+-    X509_NAME *name = X509_get_subject_name(cert);
++    X509_NAME *name = X509_NAME_dup(X509_get_subject_name(cert));
+     set_name_entry(name, subject);
+     X509_set_subject_name(cert, name);
++    X509_NAME_free(name);
+ }
+ 
+ 
+-void WvX509::set_subject(X509_NAME *name)
++void WvX509::set_subject(const X509_NAME *name)
+ {
+     CHECK_CERT_EXISTS_SET("subject");
+ 
+@@ -799,7 +802,8 @@
+         ca = constraints->ca;
+         if (constraints->pathlen)
+         {
+-            if ((constraints->pathlen->type == V_ASN1_NEG_INTEGER) || !ca)
++            if ((ASN1_STRING_type(constraints->pathlen) ==
++                 V_ASN1_NEG_INTEGER) || !ca)
+             {
+                 debug("Path length type not valid when getting basic "
+                       "constraints.\n");
+@@ -1153,7 +1157,7 @@
+     int index = X509_get_ext_by_NID(cert, nid, -1);
+     if (index >= 0)
+     {
+-        X509_EXTENSION *ext = X509_get_ext(cert, index);
++        const X509_EXTENSION *ext = X509_get_ext(cert, index);
+         
+         if (ext)
+         {
+@@ -1162,11 +1166,13 @@
+ #else
+             X509V3_EXT_METHOD *method = X509V3_EXT_get(ext);
+ #endif
+-            ASN1_OCTET_STRING *ext_data_str = X509_EXTENSION_get_data(ext);
++            const ASN1_OCTET_STRING *ext_data_str =
++                X509_EXTENSION_get_data(ext);
+             if (!method)
+             {
+                 WvDynBuf buf;
+-                buf.put(ext_data_str->data, ext_data_str->length);
++                buf.put(ASN1_STRING_get0_data(ext_data_str),
++                        ASN1_STRING_length(ext_data_str));
+                 retval = buf.getstr();
+             }
+             else
+@@ -1177,21 +1183,22 @@
+                 // even though it's const (at least as of version 0.9.8e). 
+                 // gah.
+ #if OPENSSL_VERSION_NUMBER >= 0x0090800fL
+-                const unsigned char * ext_value_data = ext_data_str->data;
++                const unsigned char * ext_value_data =
++                    ASN1_STRING_get0_data(ext_data_str);
+ #else
+                 unsigned char *ext_value_data = ext->value->data;
+ #endif
+                 if (method->it)
+                 {
+                     ext_data = ASN1_item_d2i(NULL, &ext_value_data,
+-                                             ext_data_str->length, 
++                                             ASN1_STRING_length(ext_data_str),
+                                              ASN1_ITEM_ptr(method->it));
+                     TRACE("Applied generic conversion!\n");
+                 }
+                 else
+                 {
+                     ext_data = method->d2i(NULL, &ext_value_data,
+-                                           ext_data_str->length);
++                                           ASN1_STRING_length(ext_data_str));
+                     TRACE("Applied method specific conversion!\n");
+                 }
+                 
+@@ -1343,7 +1350,7 @@
+ }
+ 
+ 
+-static time_t ASN1_TIME_to_time_t(ASN1_TIME *t)
++static time_t ASN1_TIME_to_time_t(const ASN1_TIME *t)
+ {
+     struct tm newtime;
+     char *p = NULL;
+@@ -1351,7 +1358,7 @@
+     memset(&d,'\0',sizeof(d));    
+     memset(&newtime,'\0',sizeof newtime);
+     
+-    if (t->type == V_ASN1_GENERALIZEDTIME) 
++    if (ASN1_STRING_type(t) == V_ASN1_GENERALIZEDTIME) 
+     {
+          // For time values >= 2050, OpenSSL uses
+          // ASN1_GENERALIZEDTIME - which we'll worry about
+@@ -1359,7 +1366,7 @@
+ 	return 0;
+     }
+ 
+-    p = (char *)t->data;
++    p = (char *)ASN1_STRING_get0_data(t);
+     sscanf(p,"%2s%2s%2s%2s%2s%2sZ", d, &d[3], &d[6], &d[9], &d[12], &d[15]);
+     
+     int year = strtol(d, (char **)NULL, 10);
+@@ -1452,11 +1459,12 @@
+     CHECK_CERT_EXISTS_SET("ski");
+ 
+     ASN1_OCTET_STRING *oct = ASN1_OCTET_STRING_new();
+-    ASN1_BIT_STRING *pk = X509_get0_pubkey_bitstr(cert);
++    const ASN1_BIT_STRING *pk = X509_get0_pubkey_bitstr(cert);
+     unsigned char pkey_dig[EVP_MAX_MD_SIZE];
+     unsigned int diglen;
+ 
+-    EVP_Digest(pk->data, pk->length, pkey_dig, &diglen, EVP_sha1(), NULL);
++    EVP_Digest(ASN1_STRING_get0_data(pk), ASN1_STRING_length(pk), pkey_dig,
++               &diglen, EVP_sha1(), NULL);
+ 
+     ASN1_OCTET_STRING_set(oct, pkey_dig, diglen);
+     X509_EXTENSION *ext = X509V3_EXT_i2d(NID_subject_key_identifier, 0, 
+@@ -1474,7 +1482,7 @@
+     // can't set a meaningful AKI for subordinate certification without the 
+     // parent having an SKI
+     ASN1_OCTET_STRING *ikeyid = NULL;
+-    X509_EXTENSION *ext;
++    const X509_EXTENSION *ext;
+     int i = X509_get_ext_by_NID(cacert.cert, NID_subject_key_identifier, -1);
+     if ((i >= 0) && (ext = X509_get_ext(cacert.cert, i)))
+         ikeyid = static_cast<ASN1_OCTET_STRING *>(X509V3_EXT_d2i(ext));
+@@ -1486,9 +1494,10 @@
+     akeyid->issuer = NULL;
+     akeyid->serial = NULL;
+     akeyid->keyid = ikeyid;
+-    ext = X509V3_EXT_i2d(NID_authority_key_identifier, 0, akeyid);
+-    X509_add_ext(cert, ext, -1);
+-    X509_EXTENSION_free(ext); 
++    X509_EXTENSION *akiext =
++        X509V3_EXT_i2d(NID_authority_key_identifier, 0, akeyid);
++    X509_add_ext(cert, akiext, -1);
++    X509_EXTENSION_free(akiext);
+     AUTHORITY_KEYID_free(akeyid);
+ }
+ 

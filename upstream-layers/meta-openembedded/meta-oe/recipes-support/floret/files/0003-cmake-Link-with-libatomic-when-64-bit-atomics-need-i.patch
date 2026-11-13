@@ -1,0 +1,77 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 17:00:00 -0700
+Subject: [PATCH] cmake: Link with libatomic when 64-bit atomics need it
+
+FastText::tokenCount_ is a std::atomic<int64_t>. On 32-bit targets
+without 64-bit atomic instructions, such as riscv32, its operations
+become __atomic_*_8 libcalls, but floret is not linked with libatomic,
+so linking the floret CLI fails:
+
+  ld.lld: error: undefined symbol: __atomic_fetch_add_8
+  >>> referenced by fasttext.cc
+  >>>               fasttext.cc.o:(fasttext::FastText::trainThread(...)) in archive libfloret.a
+
+Check whether 64-bit atomics link on their own, and if not, whether
+they link with libatomic, and only in that case link the libraries with
+it, which also covers the CLI linking the static library, and add it to
+Libs.private in floret.pc. The test variable is global so the compiler
+cannot optimize the atomic operations away.
+
+Upstream-Status: Submitted [https://github.com/explosion/floret/pull/34]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ CMakeLists.txt | 27 +++++++++++++++++++++++++++
+ floret.pc.in   |  1 +
+ 2 files changed, 28 insertions(+)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,6 +52,29 @@
+     src/vector.cc)
+ 
+ 
++# std::atomic<int64_t> needs libatomic on 32-bit targets without 64-bit
++# atomic instructions, e.g. riscv32. The variable is global so the compiler
++# cannot optimize the atomic operations away.
++include(CheckCXXSourceCompiles)
++set(ATOMIC64_TEST "
++#include <atomic>
++#include <cstdint>
++std::atomic<int64_t> v;
++int main() {
++  v.fetch_add(1);
++  return static_cast<int>(v.load());
++}")
++check_cxx_source_compiles("${ATOMIC64_TEST}" HAVE_ATOMIC64)
++if (NOT HAVE_ATOMIC64)
++  set(CMAKE_REQUIRED_LIBRARIES atomic)
++  check_cxx_source_compiles("${ATOMIC64_TEST}" HAVE_ATOMIC64_WITH_LIBATOMIC)
++  unset(CMAKE_REQUIRED_LIBRARIES)
++  if (HAVE_ATOMIC64_WITH_LIBATOMIC)
++    set(ATOMIC_LIBRARY atomic)
++    set(PC_LIBS_PRIVATE "-latomic")
++  endif()
++endif()
++
+ if (NOT MSVC)
+   include(GNUInstallDirs)
+   configure_file("floret.pc.in" "floret.pc" @ONLY)
+@@ -66,6 +89,10 @@
+ set_target_properties(floret-static PROPERTIES OUTPUT_NAME floret)
+ set_target_properties(floret-static_pic PROPERTIES OUTPUT_NAME floret_pic
+   POSITION_INDEPENDENT_CODE True)
++target_link_libraries(floret-shared ${ATOMIC_LIBRARY})
++target_link_libraries(floret-static ${ATOMIC_LIBRARY})
++target_link_libraries(floret-static_pic ${ATOMIC_LIBRARY})
++
+ add_executable(floret-bin src/main.cc)
+ target_link_libraries(floret-bin pthread floret-static)
+ set_target_properties(floret-bin PROPERTIES PUBLIC_HEADER "${HEADER_FILES}" OUTPUT_NAME floret)
+--- a/floret.pc.in
++++ b/floret.pc.in
+@@ -7,4 +7,5 @@
+ Description: Efficient learning of word representations and sentence classification
+ Version: @PROJECT_VERSION@
+ Libs: -L${libdir} -lfloret
++Libs.private: @PC_LIBS_PRIVATE@
+ Cflags: -I${includedir}

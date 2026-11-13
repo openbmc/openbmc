@@ -1,0 +1,58 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:00:10 +0000
+Subject: [PATCH] ec.h: do not strip a pre-existing _GNU_SOURCE define
+
+ec.h temporarily defines __USE_GNU/_GNU_SOURCE around the <string.h>
+include (to pick up memmem()/strsignal() on musl) and then
+unconditionally #undefs them again afterwards. This recipe already
+passes -D_GNU_SOURCE on the command line (CFLAGS += "-D_GNU_SOURCE"),
+so the unconditional #undef strips it right back out for the rest of
+every translation unit that includes ec.h -- which is effectively all
+of them, since ec.h is the first header pulled in everywhere.
+
+On musl, many POSIX/BSD-ish declarations (struct ifreq and IFNAMSIZ in
+<net/if.h>, struct sigaction/sigfillset()/sigaction()/sigwait() in
+<signal.h>, pthread_kill()/pthread_sigmask() in <pthread.h>, isascii()
+in <ctype.h>, nanosleep() in <time.h>) are only exposed when
+_GNU_SOURCE (or an equivalent feature test macro) is defined at the
+point those headers are processed. Once ec.h undefines it, headers
+included later in the same file lose that exposure and fail to
+compile. glibc does not gate these declarations as strictly, so this
+was never observed there. Only undo the temporary define if ec.h
+itself introduced it, leaving an externally supplied -D_GNU_SOURCE
+intact for the remainder of the translation unit.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ include/ec.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+--- a/include/ec.h
++++ b/include/ec.h
+@@ -20,19 +20,23 @@
+ 
+ #if !defined (__USE_GNU)   /* for memmem(), strsignal(), etc etc... */
+    #define __USE_GNU
++   #define EC_UNDEF_USE_GNU
+ #endif
+ #if !defined (_GNU_SOURCE) /* for memmem(), strsignal(), etc etc... on musl */
+    #define _GNU_SOURCE
++   #define EC_UNDEF_GNU_SOURCE
+ #endif
+ #ifdef OS_SOLARIS
+    #define _REENTRANT      /* for strtok_r() */
+ #endif
+ #include <string.h>
+-#if defined (__USE_GNU)
++#if defined (EC_UNDEF_USE_GNU)
+    #undef __USE_GNU
++   #undef EC_UNDEF_USE_GNU
+ #endif
+-#if defined (_GNU_SOURCE)
++#if defined (EC_UNDEF_GNU_SOURCE)
+    #undef _GNU_SOURCE
++   #undef EC_UNDEF_GNU_SOURCE
+ #endif
+ #include <strings.h>
+ #include <unistd.h>

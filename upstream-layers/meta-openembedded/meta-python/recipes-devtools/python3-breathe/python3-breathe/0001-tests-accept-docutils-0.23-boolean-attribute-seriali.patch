@@ -1,0 +1,36 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Subject: [PATCH] tests: accept docutils 0.23 boolean attribute serialization
+
+docutils 0.23 serializes boolean node attributes as "1"/"0" in its
+pseudo-XML output instead of "True"/"False", which makes every
+test_examples comparison fail against the bundled compare.xml models.
+Normalize the generated value before comparing.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/tests/test_examples.py b/tests/test_examples.py
+index c256d83..20a9d3e 100644
+--- a/tests/test_examples.py
++++ b/tests/test_examples.py
+@@ -150,10 +150,18 @@ def str_to_set(x):
+     return frozenset(x.split())
+ 
+ 
++# docutils >= 0.23 serializes boolean attributes as "1"/"0" instead of
++# "True"/"False"
++BOOL_ATTR_VALUES = {"1": "True", "0": "False"}
++
++
+ def attr_compare(name, actual, expected):
+     if name == "classes":
+         return str_to_set(actual) >= str_to_set(expected)
+ 
++    if expected in ("True", "False"):
++        actual = BOOL_ATTR_VALUES.get(actual, actual)
++
+     return actual == expected
+ 
+ 

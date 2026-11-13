@@ -9,7 +9,9 @@ RDEPENDS:${PN} = "python3 python3-modules"
 
 inherit python3native python3targetconfig
 
-SRC_URI = "https://www.mercurial-scm.org/release/${BP}.tar.gz"
+SRC_URI = "https://www.mercurial-scm.org/release/${BP}.tar.gz \
+           file://0001-ssl-do-not-treat-ssl.HAS_TLSv1_2-as-authoritative-wi.patch \
+           "
 SRC_URI[sha256sum] = "85839e0f39e6cb893a88932aa36ef661759f3c5c5de4551ad26bd9df53cb71a2"
 
 # Constrain the version to digits-and-dots, otherwise the auto-derived regex

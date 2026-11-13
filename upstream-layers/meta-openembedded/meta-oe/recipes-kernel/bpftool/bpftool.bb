@@ -9,6 +9,8 @@ inherit bash-completion kernelsrc kernel-arch
 
 do_populate_lic[depends] += "virtual/kernel:do_shared_workdir"
 
+ARCH = "${@oe.kernel.map_kernel_arch(d)}"
+
 EXTRA_OEMAKE = "\
     V=1 \
     -C ${S}/tools/bpf/bpftool \

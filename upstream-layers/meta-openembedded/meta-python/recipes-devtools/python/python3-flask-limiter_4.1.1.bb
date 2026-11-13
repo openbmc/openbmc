@@ -6,8 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=2455d5e574bc0fc489411ca45766ac78"
 
 SRC_URI[sha256sum] = "ca11608fc7eec43dcea606964ca07c3bd4ec1ae89043a0f67f717899a4f48106"
 
-PYPI_PACKAGE = "flask_limiter"
-
 inherit pypi python_hatchling
 
 DEPENDS += "python3-hatch-vcs-native"

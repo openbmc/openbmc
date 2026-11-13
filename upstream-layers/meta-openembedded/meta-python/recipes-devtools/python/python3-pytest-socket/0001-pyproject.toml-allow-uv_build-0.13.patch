@@ -1,0 +1,25 @@
+From e3ed717f36fe4794adc50712873e7c33fd43a581 Mon Sep 17 00:00:00 2001
+From: Mike Fiedler <miketheman@gmail.com>
+Date: Mon, 12 Oct 2026 13:05:41 -0400
+Subject: [PATCH] pyproject.toml: allow uv_build 0.13
+
+Only the build-system part of the upstream commit "chore: add Python
+3.15 support", which raised the uv_build bound to < 0.14.0.
+
+Upstream-Status: Backport [https://github.com/miketheman/pytest-socket/commit/e3ed717f36fe4794adc50712873e7c33fd43a581]
+AI-Generated: Claude Code, Claude Opus 5.5
+Signed-off-by: Thomas Roos <thomas@roosesweb.de>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -92,5 +92,5 @@
+ ]
+ 
+ [build-system]
+-requires = ["uv_build>=0.7.20,<0.13.0"]
++requires = ["uv_build>=0.7.20,<0.14.0"]
+ build-backend = "uv_build"

@@ -24,8 +24,8 @@ SRC_URI = "git://github.com/crash-utility/${BPN}.git;branch=master;protocol=http
 # 0001-Use-CC-env-var-to-get-compiler-version.patch:
 # to get the right compiler info into ./crash --buildinfo
 
-SRCREV = "61fe107ff96a22e7df0029877529b7ce6da36850"
-#PV = "9.0.2"
+SRCREV = "a507c2f2036e43c62053a9f5ece0289dcb6f05fb"
+#PV = "9.0.3"
 SRC_URI[gdb.sha256sum] = "bdc1da4a033280ac752e7d34b0418efaa45bed093235cb88e62ea961752a37f8"
 
 

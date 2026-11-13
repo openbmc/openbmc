@@ -1,0 +1,57 @@
+From: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH] test: malloc_overload: Only use glibc malloc extensions where available
+
+mallopt(), mallinfo() and pvalloc() are GNU extensions that musl does not
+provide, so test_malloc_overload fails to build there:
+
+  test_malloc_overload.cpp:401:13: error: use of undeclared identifier 'mallopt'
+  test_malloc_overload.cpp:451:18: error: use of undeclared identifier 'pvalloc'; did you mean 'valloc'?
+  test_malloc_overload.cpp:466:21: error: variable has incomplete type 'struct mallinfo'
+
+Only test them on glibc (and Android for mallopt()/mallinfo()), matching
+the guard tbbmalloc_proxy already uses for its mallinfo() override.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/test/tbbmalloc/test_malloc_overload.cpp
++++ b/test/tbbmalloc/test_malloc_overload.cpp
+@@ -53,7 +53,9 @@
+ #endif
+ 
+ #define __TBB_POSIX_MEMALIGN_PRESENT (__unix__ && !__ANDROID__) || __APPLE__
+-#define __TBB_PVALLOC_PRESENT __unix__ && !__ANDROID__
++#define __TBB_PVALLOC_PRESENT __unix__ && !__ANDROID__ && __GLIBC__
++// mallopt() and mallinfo() are not provided by every C library, e.g. musl
++#define __TBB_MALLOPT_MALLINFO_PRESENT __unix__ && (__GLIBC__ || __ANDROID__)
+ #if __GLIBC__
+   // aligned_alloc available since GLIBC 2.16
+   #define __TBB_ALIGNED_ALLOC_PRESENT __GLIBC_PREREQ(2, 16)
+@@ -397,9 +399,9 @@
+ //! Testing tbbmalloc_proxy overload capabilities
+ //! \brief \ref error_guessing
+ TEST_CASE("Main set of tests") {
+-#if __unix__
++#if __TBB_MALLOPT_MALLINFO_PRESENT
+     REQUIRE(mallopt(0, 0)); // add dummy mallopt call for coverage
+-#endif // __unix__
++#endif // __TBB_MALLOPT_MALLINFO_PRESENT
+ 
+     void *ptr = nullptr;
+     utils::suppress_unused_warning(ptr); // for android
+@@ -456,6 +458,7 @@
+     CheckMemalignFuncOverload(aligned_alloc, free);
+ #endif
+ 
++#if __TBB_MALLOPT_MALLINFO_PRESENT
+ #if __INTEL_COMPILER
+    #pragma warning(push)
+    #pragma warning(disable: 1478)
+@@ -473,6 +476,7 @@
+     REQUIRE((!info.arena && !info.ordblks && !info.smblks && !info.hblks
+            && !info.hblkhd && !info.usmblks && !info.fsmblks
+            && !info.uordblks && !info.fordblks && !info.keepcost));
++#endif // __TBB_MALLOPT_MALLINFO_PRESENT
+ 
+  #if !__ANDROID__
+     // These non-standard functions are exported by GLIBC, and might be used

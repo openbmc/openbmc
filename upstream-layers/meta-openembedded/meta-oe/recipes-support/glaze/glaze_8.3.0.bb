@@ -9,13 +9,15 @@ SRCREV = "dce5e0f7ec572725ec369a0bc59a00eeb2270a9a"
 
 inherit cmake
 
+# For some odd reason, glaze_INSTALL_CMAKEDIR must be relative, or the installed
+# files will not work as intended when cross-compiling.
 EXTRA_OECMAKE = " \
     -Dglaze_BUILD_EXAMPLES=OFF \
     -DBUILD_TESTING=OFF \
     -Dglaze_ENABLE_FUZZING=OFF \
+    -Dglaze_DEVELOPER_MODE=OFF \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${prefix} \
-    -DDESTDIR=${D} \
+    -Dglaze_INSTALL_CMAKEDIR:PATH=${baselib}/cmake/${BPN} \
 "
 
 # Glaze is a header-only C++ library, so the main package will be empty.

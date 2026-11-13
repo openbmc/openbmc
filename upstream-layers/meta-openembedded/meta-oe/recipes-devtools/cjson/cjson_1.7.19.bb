@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=218947f77e8cb8e2fa02918dc41c50d0"
 SRC_URI = "git://github.com/DaveGamble/cJSON.git;branch=master;protocol=https \
            file://run-ptest \
            file://0001-allow-build-with-cmake-4.patch \
+           file://CVE-2026-87933.patch \
          "
 SRCREV = "c859b25da02955fef659d658b8f324b5cde87be3"
 

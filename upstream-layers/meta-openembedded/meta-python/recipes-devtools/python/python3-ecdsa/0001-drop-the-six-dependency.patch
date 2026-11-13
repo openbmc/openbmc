@@ -1,0 +1,393 @@
+From 53f1f05e81e03b023c08a28d0d2b6d28766cb5cd Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:05:32 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim. On Python 3 int2byte is a one line
+struct helper, and PY2, integer_types, text_type, binary_type,
+python_2_unicode_compatible and six.moves.reduce all have direct
+equivalents, so the module keeps its behaviour without the dependency.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ requirements.txt           | 1 -
+ setup.py                   | 1 -
+ src/ecdsa/__init__.py      | 5 -----
+ src/ecdsa/_compat.py       | 6 ++++--
+ src/ecdsa/curves.py        | 3 +--
+ src/ecdsa/der.py           | 5 ++---
+ src/ecdsa/ecdsa.py         | 3 +--
+ src/ecdsa/ellipticcurve.py | 2 --
+ src/ecdsa/keys.py          | 3 +--
+ src/ecdsa/numbertheory.py  | 11 ++++-------
+ src/ecdsa/test_pyecdsa.py  | 35 +++++++++++++++++------------------
+ src/ecdsa/util.py          | 8 ++------
+ 12 files changed, 32 insertions(+), 51 deletions(-)
+
+diff --git a/requirements.txt b/requirements.txt
+index ffe2fce..e69de29 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1 +0,0 @@
+-six
+diff --git a/setup.py b/setup.py
+index 618f5e6..8aceb5b 100755
+--- a/setup.py
++++ b/setup.py
+@@ -44,6 +44,5 @@ setup(
+         "Programming Language :: Python :: 3.12",
+         "Programming Language :: Python :: 3.13",
+     ],
+-    install_requires=["six>=1.9.0"],
+     extras_require={"gmpy2": "gmpy2", "gmpy": "gmpy"},
+ )
+diff --git a/src/ecdsa/__init__.py b/src/ecdsa/__init__.py
+index 342538e..64aaa55 100644
+--- a/src/ecdsa/__init__.py
++++ b/src/ecdsa/__init__.py
+@@ -1,6 +1,3 @@
+-# while we don't use six in this file, we did bundle it for a long time, so
+-# keep as part of module in a virtual way (through __all__)
+-import six
+ from .keys import (
+     SigningKey,
+     VerifyingKey,
+@@ -56,7 +53,6 @@ __all__ = [
+     "numbertheory",
+     "test_pyecdsa",
+     "util",
+-    "six",
+ ]
+ 
+ _hush_pyflakes = [
+@@ -90,7 +86,6 @@ _hush_pyflakes = [
+     SECP160r1,
+     Ed25519,
+     Ed448,
+-    six.b(""),
+     BRAINPOOLP160t1,
+     BRAINPOOLP192t1,
+     BRAINPOOLP224t1,
+diff --git a/src/ecdsa/_compat.py b/src/ecdsa/_compat.py
+index 4558e33..bd410f9 100644
+--- a/src/ecdsa/_compat.py
++++ b/src/ecdsa/_compat.py
+@@ -4,13 +4,15 @@ Common functions for providing cross-python version compatibility.
+ import sys
+ import re
+ import binascii
+-from six import integer_types
++import struct
++
++int2byte = struct.Struct(">B").pack
+ 
+ 
+ def str_idx_as_int(string, index):
+     """Take index'th byte from string, return as integer"""
+     val = string[index]
+-    if isinstance(val, integer_types):
++    if isinstance(val, int):
+         return val
+     return ord(val)
+ 
+diff --git a/src/ecdsa/curves.py b/src/ecdsa/curves.py
+index 38e3a75..7662185 100644
+--- a/src/ecdsa/curves.py
++++ b/src/ecdsa/curves.py
+@@ -1,6 +1,5 @@
+ from __future__ import division
+ 
+-from six import PY2
+ from . import der, ecdsa, ellipticcurve, eddsa
+ from .util import orderlen, number_to_string, string_to_number
+ from ._compat import normalise_bytes, bit_length
+@@ -269,7 +268,7 @@ class Curve:
+             and ``explicit``
+         :type valid_encodings: :term:`set-like object`
+         """
+-        if not PY2 and isinstance(string, str):  # pragma: no branch
++        if isinstance(string, str):  # pragma: no branch
+             string = string.encode()
+ 
+         ec_param_index = string.find(b"-----BEGIN EC PARAMETERS-----")
+diff --git a/src/ecdsa/der.py b/src/ecdsa/der.py
+index 5d35d69..42440cc 100644
+--- a/src/ecdsa/der.py
++++ b/src/ecdsa/der.py
+@@ -4,8 +4,7 @@ import binascii
+ import base64
+ import warnings
+ from itertools import chain
+-from six import int2byte, text_type
+-from ._compat import compat26_str, str_idx_as_int
++from ._compat import compat26_str, int2byte, str_idx_as_int
+ 
+ 
+ class UnexpectedDER(Exception):
+@@ -461,7 +460,7 @@ def remove_bitstring(string, expect_unused=_sentry):
+ 
+ 
+ def unpem(pem):
+-    if isinstance(pem, text_type):  # pragma: no branch
++    if isinstance(pem, str):  # pragma: no branch
+         pem = pem.encode()
+ 
+     d = b"".join(
+diff --git a/src/ecdsa/ecdsa.py b/src/ecdsa/ecdsa.py
+index f710965..6877a2f 100644
+--- a/src/ecdsa/ecdsa.py
++++ b/src/ecdsa/ecdsa.py
+@@ -65,11 +65,10 @@ modified as part of the python-ecdsa package.
+ """
+ 
+ import warnings
+-from six import int2byte
+ from . import ellipticcurve
+ from . import numbertheory
+ from .util import bit_length
+-from ._compat import remove_whitespace
++from ._compat import int2byte, remove_whitespace
+ 
+ 
+ class RSZeroError(RuntimeError):
+diff --git a/src/ecdsa/ellipticcurve.py b/src/ecdsa/ellipticcurve.py
+index a982c1e..0e9db2e 100644
+--- a/src/ecdsa/ellipticcurve.py
++++ b/src/ecdsa/ellipticcurve.py
+@@ -47,14 +47,12 @@ except ImportError:  # pragma: no branch
+         GMPY = False
+ 
+ 
+-from six import python_2_unicode_compatible
+ from . import numbertheory
+ from ._compat import normalise_bytes, int_to_bytes, bit_length, bytes_to_int
+ from .errors import MalformedPointError
+ from .util import orderlen, string_to_number, number_to_string
+ 
+ 
+-@python_2_unicode_compatible
+ class CurveFp(object):
+     """
+     :term:`Short Weierstrass Elliptic Curve <short Weierstrass curve>` over a
+diff --git a/src/ecdsa/keys.py b/src/ecdsa/keys.py
+index f74252c..75e059f 100644
+--- a/src/ecdsa/keys.py
++++ b/src/ecdsa/keys.py
+@@ -5,7 +5,6 @@ Primary classes for performing signing and verification operations.
+ import binascii
+ from hashlib import sha1
+ import os
+-from six import PY2
+ from . import ecdsa, eddsa
+ from . import der, ssh
+ from . import rfc6979
+@@ -963,7 +962,7 @@ class SigningKey(object):
+         :return: Initialised SigningKey object
+         :rtype: SigningKey
+         """
+-        if not PY2 and isinstance(string, str):  # pragma: no branch
++        if isinstance(string, str):  # pragma: no branch
+             string = string.encode()
+ 
+         # The privkey pem may have multiple sections, commonly it also has
+diff --git a/src/ecdsa/numbertheory.py b/src/ecdsa/numbertheory.py
+index fe974f8..9d55047 100644
+--- a/src/ecdsa/numbertheory.py
++++ b/src/ecdsa/numbertheory.py
+@@ -12,8 +12,9 @@
+ from __future__ import division
+ 
+ import sys
+-from six import integer_types, PY2
+-from six.moves import reduce
++from functools import reduce
++
++integer_types = (int,)
+ 
+ try:
+     xrange
+@@ -218,11 +219,7 @@ def square_root_mod_prime(a, p):
+         assert d == p - 1
+         return (2 * a * pow(4 * a, (p - 5) // 8, p)) % p
+ 
+-    if PY2:
+-        # xrange on python2 can take integers representable as C long only
+-        range_top = min(0x7FFFFFFF, p)
+-    else:
+-        range_top = p
++    range_top = p
+     for b in xrange(2, range_top):  # pragma: no branch
+         if jacobi(b * b - 4 * a, p) == -1:
+             f = (a, -b, 1)
+diff --git a/src/ecdsa/test_pyecdsa.py b/src/ecdsa/test_pyecdsa.py
+index 799e9b7..6d95672 100644
+--- a/src/ecdsa/test_pyecdsa.py
++++ b/src/ecdsa/test_pyecdsa.py
+@@ -16,7 +16,6 @@ from functools import partial
+ from hypothesis import given, settings
+ import hypothesis.strategies as st
+ 
+-from six import binary_type
+ from .keys import SigningKey, VerifyingKey
+ from .keys import BadSignatureError, MalformedPointError, BadDigestError
+ from . import util
+@@ -235,47 +234,47 @@ class ECDSA(unittest.TestCase):
+     def test_privkey_strings(self):
+         priv1 = SigningKey.generate()
+         s1 = priv1.to_string()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertEqual(len(s1), NIST192p.baselen)
+         priv2 = SigningKey.from_string(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+         s1 = priv1.to_pem()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertTrue(s1.startswith(b"-----BEGIN EC PRIVATE KEY-----"))
+         self.assertTrue(s1.strip().endswith(b"-----END EC PRIVATE KEY-----"))
+         priv2 = SigningKey.from_pem(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+         s1 = priv1.to_der()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         priv2 = SigningKey.from_der(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+         priv1 = SigningKey.generate(curve=NIST256p)
+         s1 = priv1.to_pem()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertTrue(s1.startswith(b"-----BEGIN EC PRIVATE KEY-----"))
+         self.assertTrue(s1.strip().endswith(b"-----END EC PRIVATE KEY-----"))
+         priv2 = SigningKey.from_pem(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+         s1 = priv1.to_der()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         priv2 = SigningKey.from_der(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+     def test_privkey_strings_brainpool(self):
+         priv1 = SigningKey.generate(curve=BRAINPOOLP512r1)
+         s1 = priv1.to_pem()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertTrue(s1.startswith(b"-----BEGIN EC PRIVATE KEY-----"))
+         self.assertTrue(s1.strip().endswith(b"-----END EC PRIVATE KEY-----"))
+         priv2 = SigningKey.from_pem(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+         s1 = priv1.to_der()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         priv2 = SigningKey.from_der(s1)
+         self.assertTruePrivkeysEqual(priv1, priv2)
+ 
+@@ -288,7 +287,7 @@ class ECDSA(unittest.TestCase):
+         priv1 = SigningKey.generate()
+         pub1 = priv1.get_verifying_key()
+         s1 = pub1.to_string()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertEqual(len(s1), NIST192p.verifying_key_length)
+         pub2 = VerifyingKey.from_string(s1)
+         self.assertTruePubkeysEqual(pub1, pub2)
+@@ -296,13 +295,13 @@ class ECDSA(unittest.TestCase):
+         priv1 = SigningKey.generate(curve=NIST256p)
+         pub1 = priv1.get_verifying_key()
+         s1 = pub1.to_string()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertEqual(len(s1), NIST256p.verifying_key_length)
+         pub2 = VerifyingKey.from_string(s1, curve=NIST256p)
+         self.assertTruePubkeysEqual(pub1, pub2)
+ 
+         pub1_der = pub1.to_der()
+-        self.assertEqual(type(pub1_der), binary_type)
++        self.assertEqual(type(pub1_der), bytes)
+         pub2 = VerifyingKey.from_der(pub1_der)
+         self.assertTruePubkeysEqual(pub1, pub2)
+ 
+@@ -330,7 +329,7 @@ class ECDSA(unittest.TestCase):
+         self.assertRaises(UnknownCurveError, VerifyingKey.from_der, badder)
+ 
+         pem = pub1.to_pem()
+-        self.assertEqual(type(pem), binary_type)
++        self.assertEqual(type(pem), bytes)
+         self.assertTrue(pem.startswith(b"-----BEGIN PUBLIC KEY-----"), pem)
+         self.assertTrue(pem.strip().endswith(b"-----END PUBLIC KEY-----"), pem)
+         pub2 = VerifyingKey.from_pem(pem)
+@@ -340,13 +339,13 @@ class ECDSA(unittest.TestCase):
+         priv1 = SigningKey.generate(curve=BRAINPOOLP512r1)
+         pub1 = priv1.get_verifying_key()
+         s1 = pub1.to_string()
+-        self.assertEqual(type(s1), binary_type)
++        self.assertEqual(type(s1), bytes)
+         self.assertEqual(len(s1), BRAINPOOLP512r1.verifying_key_length)
+         pub2 = VerifyingKey.from_string(s1, curve=BRAINPOOLP512r1)
+         self.assertTruePubkeysEqual(pub1, pub2)
+ 
+         pub1_der = pub1.to_der()
+-        self.assertEqual(type(pub1_der), binary_type)
++        self.assertEqual(type(pub1_der), bytes)
+         pub2 = VerifyingKey.from_der(pub1_der)
+         self.assertTruePubkeysEqual(pub1, pub2)
+ 
+@@ -431,21 +430,21 @@ class ECDSA(unittest.TestCase):
+         data = b"data"
+ 
+         sig = priv1.sign(data)
+-        self.assertEqual(type(sig), binary_type)
++        self.assertEqual(type(sig), bytes)
+         self.assertEqual(len(sig), NIST192p.signature_length)
+         self.assertTrue(pub1.verify(sig, data))
+ 
+         sig = priv1.sign(data, sigencode=sigencode_strings)
+         self.assertEqual(type(sig), tuple)
+         self.assertEqual(len(sig), 2)
+-        self.assertEqual(type(sig[0]), binary_type)
+-        self.assertEqual(type(sig[1]), binary_type)
++        self.assertEqual(type(sig[0]), bytes)
++        self.assertEqual(type(sig[1]), bytes)
+         self.assertEqual(len(sig[0]), NIST192p.baselen)
+         self.assertEqual(len(sig[1]), NIST192p.baselen)
+         self.assertTrue(pub1.verify(sig, data, sigdecode=sigdecode_strings))
+ 
+         sig_der = priv1.sign(data, sigencode=sigencode_der)
+-        self.assertEqual(type(sig_der), binary_type)
++        self.assertEqual(type(sig_der), bytes)
+         self.assertTrue(pub1.verify(sig_der, data, sigdecode=sigdecode_der))
+ 
+     def test_sigencode_string_canonize_no_change(self):
+diff --git a/src/ecdsa/util.py b/src/ecdsa/util.py
+index 1aff5bf..06b2fdb 100644
+--- a/src/ecdsa/util.py
++++ b/src/ecdsa/util.py
+@@ -18,9 +18,8 @@ import math
+ import binascii
+ import sys
+ from hashlib import sha256
+-from six import PY2, int2byte, next
+ from . import der
+-from ._compat import normalise_bytes
++from ._compat import int2byte, normalise_bytes
+ 
+ 
+ # RFC5480:
+@@ -111,10 +110,7 @@ class PRNG:
+     def __call__(self, numbytes):
+         a = [next(self.generator) for i in range(numbytes)]
+ 
+-        if PY2:  # pragma: no branch
+-            return "".join(a)
+-        else:
+-            return bytes(a)
++        return bytes(a)
+ 
+     def block_generator(self, seed):
+         counter = 0

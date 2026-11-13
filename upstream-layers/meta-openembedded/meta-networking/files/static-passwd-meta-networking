@@ -16,4 +16,4 @@ ntp:x:653:ntp::/:/bin/nologin
 nm-fortisslvpn:x:654:nogroup::/:/bin/nologin
 nm-openvpn:x:655:nogroup::/:/bin/nologin
 squid:x:656:nogroup::/:/bin/nologin
-mosquitto:x:657:nogroup::/:/bin/nologin
+mosquitto:x:657:mosquitto::/:/bin/nologin

@@ -1,0 +1,77 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 12:00:00 -0700
+Subject: [PATCH] nu-dap: Use portable-atomic for 64-bit atomics on targets
+ without them
+
+std only provides AtomicI64 and AtomicU64 on targets with 64-bit
+atomics, so nu-dap fails to build for e.g. riscv32:
+
+  error[E0425]: cannot find type `AtomicU64` in module `std::sync::atomic`
+     --> src/state.rs:428:37
+
+The protocol sequence number and the UI request ids are 64-bit, so use
+the atomics from portable-atomic on such targets instead, through
+crate-level imports, and keep std's on all other targets.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Cargo.toml          | 5 +++++
+ src/dap/protocol.rs | 4 +++-
+ src/lib.rs          | 6 ++++++
+ src/state.rs        | 2 +-
+ 4 files changed, 15 insertions(+), 2 deletions(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -101,6 +101,11 @@
+ [dev-dependencies.typetag]
+ version = "0.2"
+ 
++[target."cfg(not(target_has_atomic = \"64\"))".dependencies.portable-atomic]
++version = "1.13.1"
++features = ["fallback"]
++default-features = false
++
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.185"
+ 
+--- a/src/dap/protocol.rs
++++ b/src/dap/protocol.rs
+@@ -9,7 +9,9 @@
+ use serde_json::Value as Json;
+ use std::io::{BufRead, Write};
+ use std::sync::Arc;
+-use std::sync::atomic::{AtomicI64, Ordering};
++use std::sync::atomic::Ordering;
++
++use crate::AtomicI64;
+ 
+ #[derive(Debug, Deserialize)]
+ pub struct Request {
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -35,6 +35,12 @@
+ // Tests may `unwrap` (matches nushell); production code stays `unwrap`-free.
+ #![cfg_attr(test, allow(clippy::unwrap_used))]
+ 
++// std only provides 64-bit atomics on targets that support them.
++#[cfg(target_has_atomic = "64")]
++use std::sync::atomic::{AtomicI64, AtomicU64};
++#[cfg(not(target_has_atomic = "64"))]
++use portable_atomic::{AtomicI64, AtomicU64};
++
+ mod debugger;
+ mod engine;
+ mod eval_scratch;
+--- a/src/state.rs
++++ b/src/state.rs
+@@ -425,7 +425,7 @@
+ pub(crate) struct UiBridge {
+     pub replies: Mutex<HashMap<u64, UiReply>>,
+     pub cv: Condvar,
+-    pub next_id: std::sync::atomic::AtomicU64,
++    pub next_id: crate::AtomicU64,
+ }
+ 
+ /// How the client numbers lines and columns, from the `initialize` request.

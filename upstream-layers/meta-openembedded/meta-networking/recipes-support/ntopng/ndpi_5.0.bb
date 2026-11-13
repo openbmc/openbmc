@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b52f2d57d10c4f7ee67a7eb9615d5d24"
 SRCREV = "375f99ef9fb4999d778b57bbeece171b3fa9fba6"
 SRC_URI = "git://github.com/ntop/nDPI.git;branch=5.0-stable;protocol=https;tag=${PV} \
            file://0001-configure-Stop-embedding-pwd-at-configure-time.patch \
+           file://CVE-2026-116744.patch \
           "
 
 inherit autotools pkgconfig

@@ -21,7 +21,7 @@ diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport
 index ee2092acece..23340beda98 100644
 --- a/src/core/tsi/ssl_transport_security.cc
 +++ b/src/core/tsi/ssl_transport_security.cc
-@@ -891,8 +891,8 @@ static int looks_like_ip_address(absl::string_view name) {
+@@ -1021,8 +1021,8 @@ static int looks_like_ip_address(absl::string_view name) {
  static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
                                             size_t* utf8_size) {
    int common_name_index = -1;
@@ -32,7 +32,7 @@ index ee2092acece..23340beda98 100644
    auto* subject_name = X509_get_subject_name(cert);
    int utf8_returned_size = 0;
    if (subject_name == nullptr) {
-@@ -1342,13 +1342,12 @@ static tsi_result x509_store_load_certs(X509_STORE* cert_store,
+@@ -1472,13 +1472,12 @@ static tsi_result x509_store_load_certs(X509_STORE* cert_store,
        break;  // We're at the end of stream.
      }
      if (root_names != nullptr) {

@@ -1,0 +1,45 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] spdm_emu_mctp_kernel: provide AF_MCTP fallback for musl
+
+AF_MCTP (Linux commit 583be982d934, merged in v5.15) is a newer socket
+address family. <linux/mctp.h>, which this header's implementation
+files include, assumes AF_MCTP is already declared by the libc's own
+socket headers and does not define it itself. This musl version's
+<sys/socket.h> has not picked up AF_MCTP yet (its AF_* list stops at
+AF_XDP), so building the AF_MCTP-based kernel MCTP transport fails
+with "use of undeclared identifier 'AF_MCTP'".
+
+Provide the numeric fallback (45, matching the kernel's
+include/linux/socket.h) so kernel-mode MCTP socket support still
+builds against this libc. Drop this once the staged libc defines
+AF_MCTP itself.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/spdm_emu/spdm_emu_common/spdm_emu_mctp_kernel.h b/spdm_emu/spdm_emu_common/spdm_emu_mctp_kernel.h
+index 4c0eb2b..5feb99f 100644
+--- a/spdm_emu/spdm_emu_common/spdm_emu_mctp_kernel.h
++++ b/spdm_emu/spdm_emu_common/spdm_emu_mctp_kernel.h
+@@ -7,6 +7,20 @@
+ #ifndef __SPDM_EMU_MCTP_KERNEL_H__
+ #define __SPDM_EMU_MCTP_KERNEL_H__
+
++#include <sys/socket.h>
++
++/*
++ * AF_MCTP (Linux commit 583be982d934, v5.15) is a newer socket address
++ * family. <linux/mctp.h> assumes it is already declared by the libc's own
++ * socket headers and does not define it itself; this musl version's
++ * <sys/socket.h> has not picked it up yet (its AF_* list stops at AF_XDP).
++ * Provide the numeric fallback so kernel-mode MCTP socket support still
++ * builds; drop this once the staged libc defines AF_MCTP.
++ */
++#ifndef AF_MCTP
++#define AF_MCTP 45
++#endif
++
+ /**
+  * Register the Linux kernel AF_MCTP IO ops and reset the peer address state.
+  *

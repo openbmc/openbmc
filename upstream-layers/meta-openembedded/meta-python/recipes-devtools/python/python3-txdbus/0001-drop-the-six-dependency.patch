@@ -1,0 +1,301 @@
+From f3362adf93eb439e0b9c997b7b8d182da4ed6cf4 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:25:01 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim and txdbus does not need it on
+Python 3: the iteritems/iterkeys/itervalues helpers are the dict
+methods, integer_types and string_types are int and str, byte2int is
+indexing the bytes object, six.next is next and six.moves.cStringIO is
+io.StringIO.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ setup.py                 | 2 +-
+ txdbus/authentication.py | 3 +--
+ txdbus/client.py         | 5 ++---
+ txdbus/interface.py      | 7 +++----
+ txdbus/introspection.py  | 4 ++--
+ txdbus/marshal.py        | 14 ++++++--------
+ txdbus/objects.py        | 11 +++++------
+ txdbus/protocol.py       | 3 +--
+ txdbus/router.py         | 3 +--
+ 9 files changed, 22 insertions(+), 30 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 784cd0f..d4d2758 100755
+--- a/setup.py
++++ b/setup.py
+@@ -21,7 +21,7 @@ setup(
+     url='https://github.com/cocagne/txdbus',
+     author='Tom Cocagne',
+     author_email='tom.cocagne@gmail.com',
+-    install_requires=['twisted>=10.1', 'six'],
++    install_requires=['twisted>=10.1'],
+     provides=['txdbus'],
+     packages=['txdbus'],
+     keywords=['dbus', 'twisted'],
+diff --git a/txdbus/authentication.py b/txdbus/authentication.py
+index 656fecf..2b91e47 100644
+--- a/txdbus/authentication.py
++++ b/txdbus/authentication.py
+@@ -11,7 +11,6 @@ import os
+ import os.path
+ import time
+ 
+-import six
+ from twisted.internet import interfaces
+ from twisted.python import log
+ from zope.interface import implementer, Interface
+@@ -557,7 +556,7 @@ class BusAuthenticator (object):
+         self.state = None
+         self.current_mech = None
+ 
+-        for n, m in six.iteritems(self.authenticators):
++        for n, m in self.authenticators.items():
+             self.mechanisms[n] = m
+ 
+         mechNames = self.authenticators.keys()
+diff --git a/txdbus/client.py b/txdbus/client.py
+index 986da6c..53b4a25 100644
+--- a/txdbus/client.py
++++ b/txdbus/client.py
+@@ -7,7 +7,6 @@ methods over the DBus bus.
+ @author: Tom Cocagne
+ """
+ 
+-import six
+ from twisted.internet import defer, reactor
+ from twisted.internet.error import ConnectError
+ from twisted.internet.protocol import Factory
+@@ -472,7 +471,7 @@ class DBusClientConnection (txdbus.protocol.BasicDBusProtocol):
+             return None
+ 
+         # if not (
+-        #     isinstance(msg.body[0], six.string_types) and
++        #     isinstance(msg.body[0], str) and
+         #     msg.body[0].startswith('<!D')
+         # ):
+         #     print('RET SIG', msg.signature, 'BODY:', msg.body)
+@@ -630,7 +629,7 @@ class DBusClientConnection (txdbus.protocol.BasicDBusProtocol):
+             e.message = ''
+             e.values = []
+             if merr.body:
+-                if isinstance(merr.body[0], six.string_types):
++                if isinstance(merr.body[0], str):
+                     e.message = merr.body[0]
+                 e.values = merr.body
+             d.errback(e)
+diff --git a/txdbus/interface.py b/txdbus/interface.py
+index 87ad3c4..6b6b677 100644
+--- a/txdbus/interface.py
++++ b/txdbus/interface.py
+@@ -5,7 +5,6 @@ model's definition of Interfaces.
+ 
+ @author: Tom Cocagne
+ """
+-import six
+ import twisted
+ 
+ from txdbus import marshal
+@@ -212,7 +211,7 @@ class DBusInterface (object):
+             l = []
+             l.append('  <interface name="%s">' % (self.name,))
+ 
+-            k = sorted(six.iterkeys(self.methods))
++            k = sorted(self.methods)
+             for m in (self.methods[a] for a in k):
+                 l.append('    <method name="%s">' % (m.name,))
+                 for arg_sig in marshal.genCompleteTypes(m.sigIn):
+@@ -225,14 +224,14 @@ class DBusInterface (object):
+                         (arg_sig,))
+                 l.append('    </method>')
+ 
+-            k = sorted(six.iterkeys(self.signals))
++            k = sorted(self.signals)
+             for s in (self.signals[a] for a in k):
+                 l.append('    <signal name="%s">' % (s.name,))
+                 for arg_sig in marshal.genCompleteTypes(s.sig):
+                     l.append('      <arg type="%s"/>' % (arg_sig,))
+                 l.append('    </signal>')
+ 
+-            k = list(six.iterkeys(self.properties))
++            k = list(self.properties)
+             k.sort()
+             for p in (self.properties[a] for a in k):
+                 l.append(
+diff --git a/txdbus/introspection.py b/txdbus/introspection.py
+index 099a74b..b8a85cc 100644
+--- a/txdbus/introspection.py
++++ b/txdbus/introspection.py
+@@ -6,7 +6,7 @@ Provides support for DBus introspection
+ import xml.sax
+ import xml.sax.handler
+ 
+-from six.moves import cStringIO
++from io import StringIO
+ 
+ from txdbus import interface
+ 
+@@ -96,7 +96,7 @@ def getInterfacesFromXML(xmlStr, replaceKnownInterfaces=False):
+     p.setFeature(xml.sax.handler.feature_validation, False)
+     p.setFeature(xml.sax.handler.feature_external_ges, False)
+     p.setContentHandler(handler)
+-    p.parse(cStringIO(xmlStr))
++    p.parse(StringIO(xmlStr))
+ 
+     return handler.interfaces
+ 
+diff --git a/txdbus/marshal.py b/txdbus/marshal.py
+index 1867e0b..ac49f15 100644
+--- a/txdbus/marshal.py
++++ b/txdbus/marshal.py
+@@ -8,8 +8,6 @@ import codecs
+ import re
+ import struct
+ 
+-import six
+-
+ from txdbus.error import MarshallingError
+ 
+ 
+@@ -262,11 +260,11 @@ def sigFromPy(pobj):
+         return 'b'
+     elif isinstance(pobj, int):
+         return 'i'
+-    elif isinstance(pobj, six.integer_types):
++    elif isinstance(pobj, int):
+         return 'x'
+     elif isinstance(pobj, float):
+         return 'd'
+-    elif isinstance(pobj, six.string_types):
++    elif isinstance(pobj, str):
+         return 's'
+     elif isinstance(pobj, bytearray):
+         return 'ay'
+@@ -288,7 +286,7 @@ def sigFromPy(pobj):
+     elif isinstance(pobj, dict):
+         same = True
+         vtype = None
+-        for k, v in six.iteritems(pobj):
++        for k, v in pobj.items():
+             if vtype is None:
+                 vtype = type(v)
+             elif not isinstance(v, vtype):
+@@ -376,7 +374,7 @@ def genCompleteTypes(compoundSig):
+ 
+         elif c == 'a':
+             g = genCompleteTypes(compoundSig[i + 1:])
+-            ct = six.next(g)
++            ct = next(g)
+             i += len(ct)
+             yield 'a' + ct
+ 
+@@ -468,7 +466,7 @@ def marshal_unix_fd(ct, var, start_byte, lendian, oobFDs):
+ #       3 - terminating nul byte
+ #
+ def marshal_string(ct, var, start_byte, lendian, oobFDs):
+-    if not isinstance(var, six.string_types):
++    if not isinstance(var, str):
+         raise MarshallingError('Required string. Received: ' + repr(var))
+     if var.find('\0') != -1:
+         raise MarshallingError(
+@@ -525,7 +523,7 @@ def marshal_array(ct, var, start_byte, lendian, oobFDs):
+     if isinstance(var, (list, tuple, bytearray)):
+         arr_list = var
+     elif isinstance(var, dict):
+-        arr_list = [tpl for tpl in six.iteritems(var)]
++        arr_list = [tpl for tpl in var.items()]
+     else:
+         raise MarshallingError(
+             'List, Tuple, Bytearray, or Dictionary required for DBus array. '
+diff --git a/txdbus/objects.py b/txdbus/objects.py
+index 69d3a3e..e2e7523 100644
+--- a/txdbus/objects.py
++++ b/txdbus/objects.py
+@@ -7,7 +7,6 @@ DBus objects
+ import inspect
+ import weakref
+ 
+-import six
+ from twisted.internet import defer
+ from zope.interface import implementer, Interface
+ 
+@@ -400,7 +399,7 @@ class DBusObject (object):
+ 
+                 cache = {}
+ 
+-                for name, obj in six.iteritems(base.__dict__):
++                for name, obj in base.__dict__.items():
+                     self._cacheInterfaces(base, cache, name, obj)
+ 
+                 base._dbusIfaceCache = cache
+@@ -449,7 +448,7 @@ class DBusObject (object):
+                     if key in d:
+                         return d[key]
+             else:
+-                for ic in six.itervalues(cache):
++                for ic in cache.values():
+                     d = getattr(ic, cacheAttr)
+                     if key in d:
+                         return d[key]
+@@ -588,14 +587,14 @@ class DBusObject (object):
+                 ifc = cache.get(interfaceName, None)
+ 
+                 if ifc:
+-                    for p in six.itervalues(ifc.properties):
++                    for p in ifc.properties.values():
+                         addp(p)
+                     break
+ 
+         else:
+             for cache in self._iterIFaceCaches():
+-                for ifc in six.itervalues(cache):
+-                    for p in six.itervalues(ifc.properties):
++                for ifc in cache.values():
++                    for p in ifc.properties.values():
+                         addp(p)
+ 
+         return r
+diff --git a/txdbus/protocol.py b/txdbus/protocol.py
+index 7e6ed8a..1c05f11 100644
+--- a/txdbus/protocol.py
++++ b/txdbus/protocol.py
+@@ -6,7 +6,6 @@ This module implements the wire-level DBus protocol.
+ import os.path
+ import struct
+ 
+-import six
+ from twisted.internet import interfaces, protocol
+ from twisted.python import log
+ from zope.interface import implementer, Interface
+@@ -144,7 +143,7 @@ class BasicDBusProtocol(protocol.Protocol):
+                     self.dataReceived(b'')
+         else:
+             if not self._client and self._firstByte:
+-                if six.byte2int(data) != 0:
++                if data[0] != 0:
+                     self.transport.loseConnection()
+                     return
+                 self._firstByte = False
+diff --git a/txdbus/router.py b/txdbus/router.py
+index a5f8e44..2a7e732 100644
+--- a/txdbus/router.py
++++ b/txdbus/router.py
+@@ -4,7 +4,6 @@ to interested connections.
+ 
+ @author: Tom Cocagne
+ """
+-import six
+ from twisted.python import log
+ 
+ # XXX Replace this simple, inefficient implementation with something a bit
+@@ -124,5 +123,5 @@ class MessageRouter (object):
+ 
+     def routeMessage(self, m):
+         # print 'ROUTING MSG', m.interface, m.member
+-        for r in six.itervalues(self._rules):
++        for r in self._rules.values():
+             r.match(m)

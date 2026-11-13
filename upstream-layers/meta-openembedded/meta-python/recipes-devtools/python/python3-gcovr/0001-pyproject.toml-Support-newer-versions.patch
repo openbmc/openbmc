@@ -1,4 +1,4 @@
-From 99d7788bab614ff5a451f09204139b4cae40be3e Mon Sep 17 00:00:00 2001
+From a4a0cbc4659e4979b770a089f5e197dd2d175e9b Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
 Date: Tue, 4 Mar 2025 13:30:48 +0000
 Subject: [PATCH] pyproject.toml: Support newer versions
@@ -13,7 +13,7 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index f8e54eb03..e6242f042 100644
+index c2c046603..c393d2137 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -1,9 +1,9 @@

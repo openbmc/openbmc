@@ -7,11 +7,8 @@ SRC_URI[sha256sum] = "9ec8a0ad96d5c56148b3f914aa79c1564c3fde5d2e6b876e7bc327e353
 
 inherit pypi python_setuptools_build_meta
 
-PYPI_PACKAGE = "prompt_toolkit"
-
 RDEPENDS:${PN} += " \
     python3-core \
-    python3-six \
     python3-terminal \
     python3-threading \
     python3-wcwidth \

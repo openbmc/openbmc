@@ -1,4 +1,4 @@
-From 5facddc332c5ff8330f93c0a7e1b7f6d7bbd24a3 Mon Sep 17 00:00:00 2001
+From eb72d9e6b07d8ec4fa934fbccd52fe5774100651 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 5 Nov 2023 08:31:21 -0800
 Subject: [PATCH] add missing FTW_ macros when not available in libc
@@ -16,10 +16,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/src/global.h b/src/global.h
-index 49570ef1..1c247488 100644
+index e07b3703..3036b504 100644
 --- a/src/global.h
 +++ b/src/global.h
-@@ -190,4 +190,16 @@ roundup_64(unsigned long long x, unsigned int y)
+@@ -210,4 +210,16 @@ roundup_64(unsigned long long x, unsigned int y)
  	return rounddown_64(x + y - 1, y);
  }
  
@@ -36,6 +36,3 @@ index 49570ef1..1c247488 100644
 +#endif
 +
  #endif /* GLOBAL_H */
--- 
-2.42.1
-

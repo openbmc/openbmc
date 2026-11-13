@@ -1,0 +1,60 @@
+Subject: [PATCH] adbd: make fs_config opt-in on non-Android builds
+
+should_use_fs_config() exists to restrict Android's fs_config-based
+ownership/mode table to the partitions it actually describes
+(/system, /vendor, /oem), with a compatibility carve-out that also
+excludes /data on older on-device Android API levels. That carve-out
+is guarded by `#if defined(__ANDROID__)`, so on a non-Android (Linux
+host) build of adbd it never applies, and the function unconditionally
+returns true instead.
+
+As a result, every `adb push` destination -- including arbitrary
+paths under /data -- gets routed through fs_config's android_dirs/
+android_files tables. Those tables define a catch-all directory entry
+for "data" (mode 0771, uid/gid AID_SYSTEM) but no equivalent catch-all
+file entry, so a freshly pushed directory and the file inside it end
+up with different, Android-partition-image-derived owners instead of
+both simply being owned by whoever ran the push. Mode 0771 also means
+a process that isn't root or system can traverse such a directory but
+not list its contents, which breaks any non-privileged service trying
+to iterate a pushed directory tree.
+
+fs_config's table has nothing meaningful to say about a generic Linux
+rootfs, so on non-Android builds disable it by default, which makes adbd
+honour the mode sent by the host and leave ownership untouched. Builds
+that do rely on fs_config can define ADBD_USE_FS_CONFIG, in which case
+it is applied only to /system, /vendor and /oem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ packages/modules/adb/daemon/file_sync_service.cpp | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/packages/modules/adb/daemon/file_sync_service.cpp b/packages/modules/adb/daemon/file_sync_service.cpp
+--- a/packages/modules/adb/daemon/file_sync_service.cpp
++++ b/packages/modules/adb/daemon/file_sync_service.cpp
+@@ -81,8 +81,19 @@ static bool should_use_fs_config([[maybe_unused]] const std::string& path) {
+     if (android_get_device_api_level() < __ANDROID_API_V__) {
+         return !android::base::StartsWith(path, "/data/");
+     }
+-#endif
+     return true;
++#elif defined(ADBD_USE_FS_CONFIG)
++    // Non-Android (Linux host) build with fs_config enabled: its tables only
++    // describe the system partitions, so keep it scoped to those rather than
++    // letting it apply to arbitrary pushed paths such as /data.
++    return android::base::StartsWith(path, "/system/") ||
++           android::base::StartsWith(path, "/vendor/") ||
++           android::base::StartsWith(path, "/oem/");
++#else
++    // Non-Android build, fs_config disabled: use the mode sent by the host and
++    // don't change ownership.
++    return false;
++#endif
+ }
+ 
+ static bool update_capabilities(const char* path, uint64_t capabilities) {
+--
+2.43.0

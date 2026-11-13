@@ -1,0 +1,39 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:05:57 +0000
+Subject: [PATCH] dvd_filesystem.h: fix off64_t definition for musl
+
+dvd_filesystem.h defines off64_t itself for _MSC_VER, __GLIBC__, and a
+fixed list of BSD-like libcs (Apple, FreeBSD, OpenBSD, NetBSD,
+DragonFly) whose off_t is already 64-bit. musl falls into none of
+these branches, so off64_t stays undeclared, which breaks any
+consumer of this public installed header (e.g. libdvdnav):
+
+| dvd_filesystem.h:87:5: error: type name requires a specifier or qualifier
+| dvd_filesystem.h:87:39: error: unknown type name 'off64_t'; did you mean 'off_t'?
+
+musl's off_t is also already 64-bit (there is no separate LFS64 API),
+same as the BSDs/Apple, so replace the closed list of libcs with a
+catch-all "else", covering musl (and any other libc in the same
+situation) alongside the ones already listed.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/dvdread/dvd_filesystem.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/dvdread/dvd_filesystem.h b/src/dvdread/dvd_filesystem.h
+index 1111111..2222222 100644
+--- a/src/dvdread/dvd_filesystem.h
++++ b/src/dvdread/dvd_filesystem.h
+@@ -37,8 +37,9 @@
+ #elif defined(__GLIBC__)
+ /* sys/types.h may have been included before _LARGEFILE64_SOURCE was defined. */
+ typedef __off64_t off64_t;
+-#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
+-/* off_t is already 64 bit here so off64_t is not provided. */
++#else
++/* musl (and the BSDs, and Apple's libc) do not provide the glibc LFS64
++ * off64_t name; their off_t is already 64 bit, so it can be used as-is. */
+ typedef off_t off64_t;
+ #endif

@@ -1,0 +1,43 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 18 Oct 2026 18:00:00 -0700
+Subject: [PATCH] lib/libxdp: Embed BPF objects with .incbin instead of ld --format=binary
+
+The embedded BPF objects are made with a relocatable link of a raw binary
+input (cc -r -Wl,--format=binary). When the only input is a raw binary,
+the linker has no real object to take target attributes from. With lld on
+riscv64 the result has e_flags 0 (soft-float ABI) and a
+.note.gnu.property where every CFI feature bit is set. Linking it into
+libxdp users then fails:
+
+  ld.lld: error: libxdp.a(xdp-dispatcher.embed.o): file has conflicting
+    properties: GNU_PROPERTY_RISCV_FEATURE_1_CFI_LP_UNLABELED and
+    GNU_PROPERTY_RISCV_FEATURE_1_CFI_LP_FUNC_SIG
+  ld.lld: error: libxdp.a(xdp-dispatcher.embed.o): cannot link object
+    files with different floating-point ABI from Scrt1.o
+
+Instead, assemble a small stub that pulls in the BPF object with .incbin.
+The compiler driver then emits a normal object for the target ABI. The
+_binary_<name>_start/_end symbol names that libxdp.c uses stay the same.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/libxdp/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/lib/libxdp/Makefile b/lib/libxdp/Makefile
+--- a/lib/libxdp/Makefile
++++ b/lib/libxdp/Makefile
+@@ -134,8 +134,10 @@
+ 	$(QUIET_M4)$(M4) $(DEFINES) $< > $@ || ( ret=$$?; rm -f $@; exit $$ret )
+ 
+ $(EMBEDDED_XDP_OBJS): %.embed.o: %.o
+-	$(QUIET_CC)$(CC) -r -nostdlib -Wl,-z,noexecstack,--format=binary $(LDFLAGS) -o $@ $<
+-	$(Q)$(OBJCOPY)  --rename-section .data=.rodata,alloc,load,readonly,data,contents $@
++	$(QUIET_CC)SYM=_binary_$$(echo '$<' | sed 's/[^A-Za-z0-9_]/_/g'); \
++	printf '\t.section .rodata,"a"\n\t.balign 8\n\t.globl %s_start\n%s_start:\n\t.incbin "%s"\n\t.globl %s_end\n%s_end:\n' \
++		$$SYM $$SYM '$<' $$SYM $$SYM | \
++	$(CC) -c -x assembler -Wa,--noexecstack -o $@ -
+ 
+ $(XDP_OBJS): %.o: %.c $(BPF_HEADERS) $(LIBMK)
+ 	$(QUIET_CLANG)$(CLANG) -target $(BPF_TARGET) $(BPF_CFLAGS) -O2 -c -g -o $@ $<

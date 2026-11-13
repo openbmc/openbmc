@@ -1,0 +1,52 @@
+From 6ee4ddc1b53f792d4e2a7826d65cebeeb9d9eb79 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 27 Sep 2026 15:54:57 -0700
+Subject: [PATCH 3/4] libpcap: load libpcap even when find_library() cannot
+ locate it
+
+ctypes.util.find_library() finds libraries through "ldconfig -p", gcc
+or ld. A target system may have none of them; on musl-based systems
+there is no ldconfig cache at all, so find_library("pcap") returns None
+even with libpcap installed, and scapy reports
+
+  OSError: Cannot find libpcap.so library
+
+which disables conf.use_pcap and BPF filter compilation (sniff() with a
+filter, tcpdump(), tdecode(), ...). Fall back to loading libpcap.so.1 or
+libpcap.so by name and let the dynamic loader search its default paths.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ scapy/libs/winpcapy.py | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/scapy/libs/winpcapy.py b/scapy/libs/winpcapy.py
+index 42bfa850..c537b22b 100644
+--- a/scapy/libs/winpcapy.py
++++ b/scapy/libs/winpcapy.py
+@@ -36,9 +36,21 @@ else:
+     # Try to load libpcap
+     SOCKET = c_int
+     _lib_name = find_library("pcap")
+-    if not _lib_name:
+-        raise OSError("Cannot find libpcap.so library")
+-    _lib = CDLL(_lib_name)
++    if _lib_name:
++        _lib = CDLL(_lib_name)
++    else:
++        # ctypes.util.find_library() relies on ldconfig, gcc or ld to
++        # locate libraries, none of which may exist on the target (e.g.
++        # musl-based systems have no "ldconfig -p"). Fall back to letting
++        # the dynamic loader search its default paths.
++        for _lib_name in ("libpcap.so.1", "libpcap.so"):
++            try:
++                _lib = CDLL(_lib_name)
++                break
++            except OSError:
++                pass
++        else:
++            raise OSError("Cannot find libpcap.so library")
+ 
+ 
+ ##

@@ -1,0 +1,90 @@
+SUMMARY = "Polkit Authorization Framework"
+DESCRIPTION = "The polkit package is an application-level toolkit for defining and handling the policy that allows unprivileged processes to speak to privileged processes."
+HOMEPAGE = "http://www.freedesktop.org/wiki/Software/polkit"
+LICENSE = "LGPL-2.0-or-later"
+LIC_FILES_CHKSUM = "file://COPYING;md5=155db86cdbafa7532b41f390409283eb"
+BUGTRACKER = "https://github.com/polkit-org/polkit/issues"
+
+SRC_URI = "\
+    git://github.com/polkit-org/polkit.git;protocol=https;branch=main;tag=${PV} \
+"
+
+SRCREV = "e6373dc19975d8583568c6cd7025d03e682ca956"
+
+DEPENDS = "expat glib-2.0 duktape"
+
+inherit meson pkgconfig useradd systemd gettext gobject-introspection features_check
+
+REQUIRED_DISTRO_FEATURES = "polkit"
+
+# Prevent meson.build to try to autodetect host OS (which could lead to
+# non-reproducibility)
+EXTRA_OEMESON = "-Dos_type=openembedded"
+
+PACKAGECONFIG = " \
+	${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', 'consolekit', d)} \
+	dbus \
+"
+PACKAGECONFIG[dbus] = ",,dbus"
+PACKAGECONFIG[gtk-doc] = "-Dgtk_doc=true,-Dgtk_doc=false,gtk-doc-native"
+PACKAGECONFIG[pam] = "-Dauthfw=pam,-Dauthfw=shadow,libpam,libpam"
+PACKAGECONFIG[systemd] = "-Dsession_tracking=logind,,systemd,,,consolekit elogind"
+PACKAGECONFIG[consolekit] = "-Dsession_tracking=ConsoleKit,,,consolekit,,systemd elogind"
+PACKAGECONFIG[elogind] = "-Dsession_tracking=libelogin,,elogind,,,systemd consolekit"
+PACKAGECONFIG[libs-only] = "-Dlibs-only=true,-Dlibs-only=false"
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 --shell /bin/nologin polkitd"
+
+# Package the systemd service into a separate package to be able
+# to exclude the polkit service in favor of alternative implementations
+SYSTEMD_PACKAGES += "${PN}-service"
+SYSTEMD_SERVICE:${PN}-service = "${BPN}.service"
+
+PACKAGES =+ "${PN}-service"
+RDEPENDS:${PN}-service += "polkit"
+FILES:${PN}-service += " \
+    ${systemd_system_unitdir}/polkit.service \
+    ${sysconfdir}/systemd/system/polkit-virtual-provider.service \
+"
+
+# Package also the dbus configuration into a separate package
+PACKAGES =+ "${PN}-dbus"
+RDEPENDS:${PN}-dbus += "polkit"
+FILES:${PN}-dbus += "\
+    ${datadir}/dbus-1 \
+"
+
+do_install:append() {
+	# Match the ownership and mode set by polkit's own tmpfiles.d entry
+	if ${@bb.utils.contains('PACKAGECONFIG', 'libs-only', 'false', 'true', d)}; then
+		chmod 750 ${D}/${sysconfdir}/polkit-1/rules.d
+		chown root:polkitd ${D}/${sysconfdir}/polkit-1/rules.d
+	fi
+
+	# Polkit unconditionally installs a systemd service, remove it on SysVinit
+	# systems to avoid "installed but not packaged file" error.
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+		rm -rf ${D}${nonarch_libdir}/systemd ${D}${libdir}/systemd
+	fi
+}
+
+FILES:${PN} += " \
+	${libdir}/pam.d/polkit-1 \
+	${libdir}/sysusers.d \
+	${libdir}/tmpfiles.d \
+	${libdir}/polkit-1 \
+	${nonarch_libdir}/pam.d/polkit-1 \
+	${nonarch_libdir}/sysusers.d \
+	${nonarch_libdir}/tmpfiles.d \
+	${nonarch_libdir}/polkit-1 \
+	${datadir} \
+	${systemd_unitdir}/system/polkit-agent-helper.socket \
+	${systemd_unitdir}/system/polkit-agent-helper@.service \
+"
+
+# Enable the polkit agent helper socket used by the systemd ask-password functionality
+SYSTEMD_SERVICE:${PN} += "polkit-agent-helper.socket"
+
+CVE_STATUS[CVE-2016-2568] = "unpatched: the fix is a kernel compiled without CONFIG_LEGACY_TIOCSTI"

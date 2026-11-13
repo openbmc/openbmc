@@ -9,7 +9,6 @@ inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} += "\
     python3-core \
-    python3-six \
 "
 
 BBCLASSEXTEND = "native nativesdk"

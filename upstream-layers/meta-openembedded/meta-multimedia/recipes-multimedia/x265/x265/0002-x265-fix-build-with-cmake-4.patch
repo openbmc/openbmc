@@ -1,0 +1,43 @@
+From 5e759128b016cb03866ada875166560155b9d21e Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Thu, 10 Jul 2025 09:04:27 +0200
+Subject: [PATCH] x265: fix build with cmake 4
+
+drop policies that have been removed in cmake 4 and allow to build
+with 4.0
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Submitted [https://github.com/Multicorewareinc/x265/pull/996]
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ source/CMakeLists.txt              | 2 +-
+ source/dynamicHDR10/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index 3177af99a..f1364b886 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -11,7 +11,7 @@ if(POLICY CMP0042)
+     cmake_policy(SET CMP0042 NEW) # MACOSX_RPATH
+ endif()
+ 
+-cmake_minimum_required (VERSION 2.8.8...3.10) # OBJECT libraries require 2.8.8
++cmake_minimum_required (VERSION 2.8.8...4.0) # OBJECT libraries require 2.8.8
+ 
+ if (POLICY CMP0075)
+     cmake_policy(SET CMP0075 NEW) # CMAKE_REQUIRED_LIBRARIES warning
+diff --git a/source/dynamicHDR10/CMakeLists.txt b/source/dynamicHDR10/CMakeLists.txt
+index 4243338c6..2c3af4f00 100644
+--- a/source/dynamicHDR10/CMakeLists.txt
++++ b/source/dynamicHDR10/CMakeLists.txt
+@@ -10,7 +10,7 @@ add_library(dynamicHDR10 OBJECT
+     hdr10plus.h
+     api.cpp )
+ 
+-cmake_minimum_required (VERSION 2.8.11...3.26)
++cmake_minimum_required (VERSION 2.8.11...4.0)
+ project(dynamicHDR10)
+ include(CheckIncludeFiles)
+ include(CheckFunctionExists)

@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "792038247e0021beb966a7ea6e3a70ff5fcfba77eb72c6ec8fd6287af8
 
 inherit pypi python_setuptools_build_meta
 
+PYPI_PACKAGE_SDIST = "pytest-helpers-namespace"
+
 DEPENDS += "python3-setuptools-scm-native python3-setuptools-declarative-requirements-native"
 
 RDEPENDS:${PN} += " \

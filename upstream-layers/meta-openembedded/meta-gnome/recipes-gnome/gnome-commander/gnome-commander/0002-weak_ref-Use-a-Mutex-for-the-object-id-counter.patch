@@ -1,0 +1,59 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 20:00:00 -0700
+Subject: [PATCH] weak_ref: Use a Mutex for the object id counter
+
+std only provides AtomicU64 on targets with 64-bit atomics, so
+gnome-commander fails to build for e.g. riscv32:
+
+  error[E0432]: unresolved import `std::sync::atomic::AtomicU64`
+   --> src/weak_ref.rs:8:14
+
+The counter hands out the ids IdentityWeakRef uses for equality and
+hashing, so it has to stay 64-bit and must not wrap. Keep it in a
+Mutex<u64>, which works on every target. Ids are only allocated when an
+object gets its first weak reference, so the lock is uncontended in
+practice.
+
+Upstream-Status: Inappropriate [the code was removed upstream after 2.0.3]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/weak_ref.rs | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+--- a/src/weak_ref.rs
++++ b/src/weak_ref.rs
+@@ -3,10 +3,7 @@
+ // SPDX-License-Identifier: GPL-3.0-or-later
+ 
+ use gtk::{glib, glib::prelude::*};
+-use std::sync::{
+-    LazyLock,
+-    atomic::{AtomicU64, Ordering},
+-};
++use std::sync::{LazyLock, Mutex};
+ 
+ #[derive(Clone, Debug)]
+ pub struct IdentityWeakRef<T: ObjectType> {
+@@ -24,13 +21,20 @@
+ }
+ 
+ fn set_object_id<T: ObjectType>(obj: &T) -> u64 {
+-    static SEQ: AtomicU64 = AtomicU64::new(1);
++    // A Mutex rather than an AtomicU64, which std only provides on targets
++    // with 64-bit atomics. The id has to stay 64-bit so it does not wrap.
++    static SEQ: Mutex<u64> = Mutex::new(1);
+ 
+     unsafe {
+         match obj.qdata::<u64>(*ID_QUARK) {
+             Some(existing_id) => *(existing_id.as_ref()),
+             None => {
+-                let new_id = SEQ.fetch_add(1, Ordering::SeqCst);
++                let new_id = {
++                    let mut seq = SEQ.lock().unwrap();
++                    let id = *seq;
++                    *seq += 1;
++                    id
++                };
+                 obj.set_qdata(*ID_QUARK, new_id);
+                 new_id
+             }

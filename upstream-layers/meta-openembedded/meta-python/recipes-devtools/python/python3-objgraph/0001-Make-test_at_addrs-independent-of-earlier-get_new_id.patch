@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 28 Oct 2026 08:08:23 -0700
+Subject: [PATCH] Make test_at_addrs independent of earlier get_new_ids() calls
+
+get_new_ids() keeps the ids it has seen in its _state and reports only
+ids that are not in there. Ids of objects that were freed after an
+earlier call stay in that set, so if the list created by test_at_addrs
+reuses the address of one of them it is not reported as new and the
+test fails:
+
+    self.assertIn(a, new_lists)
+  AssertionError: [0, 1, 2] not found in [...]
+
+Whether that happens depends on the allocator and on what ran before;
+it was seen intermittently with musl, and a slight change in what the
+test allocates makes it fail every time.
+
+Call get_new_ids() once more right before creating the list, as the
+example in its docstring does, so the baseline only holds live objects.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests.py b/tests.py
+index 0c7aa1f..1dab8c1 100755
+--- a/tests.py
++++ b/tests.py
+@@ -361,6 +361,10 @@ class ByTypeTest(GarbageCollectedMixin, unittest.TestCase):
+ class AtAddrsTest(unittest.TestCase):
+ 
+     def test_at_addrs(self):
++        # get_new_ids() remembers the ids seen by earlier calls, including
++        # ones of objects that have been freed since; refresh that state so
++        # that a list reusing such an address still counts as new.
++        objgraph.get_new_ids(limit=0)
+         a = [0, 1, 2]
+         new_ids = objgraph.get_new_ids(limit=0)
+         new_lists = objgraph.at_addrs(new_ids['list'])

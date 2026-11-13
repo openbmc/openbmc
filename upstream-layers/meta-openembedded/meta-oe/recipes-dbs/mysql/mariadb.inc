@@ -25,9 +25,9 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://riscv32.patch \
            file://0001-support-reproducible-builds.patch \
            file://0001-storage-mroonga-CMakeLists.txt-fix-reproducible-buil.patch \
-           file://c21bb11be28ae9b2432b2a661bf38a197cf9514d.patch \
+           file://0001-MDEV-40287-AES_ENCRYPT-and-KDF-return-NULL-with-Open.patch \
           "
-SRC_URI[sha256sum] = "5ab7883db519bfcebfdd2aac09bc5544a12ce328f39edd46d0bf01690615ef6c"
+SRC_URI[sha256sum] = "1bb254b106d0a7ca871cfa18fa6e18d4b80a7430f9ec9d1571ec4271a13def96"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/tags"
 
@@ -79,6 +79,7 @@ LDFLAGS:riscv32:toolchain-clang = "-latomic"
 EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DWITH_JEMALLOC=no \
                  -DWITHOUT_TOKUDB=TRUE \
+                 -DPLUGIN_DUCKDB=NO \
                  -DCMAKE_DISABLE_FIND_PACKAGE_Boost=TRUE \
                  -DGROFF=FALSE \
                  -DNROFF=FALSE \
@@ -110,6 +111,14 @@ ARM_INSTRUCTION_SET:armv5 = "arm"
 do_compile:prepend:class-target () {
     # remove the buildpath
     sed -i -e "s:CMAKE_SYSROOT:CMAKE_SYSROOT_PLACE_HOLDER:g" ${S}/libmariadb/mariadb_config/mariadb_config.c.in
+}
+
+do_configure:prepend() {
+    # The parser is regenerated in ${B} with bison-native, but sql/*.cc
+    # would still #include the stale headers next to them in ${S}, whose
+    # #line directives carry /home/buildbot/... paths into the debug info.
+    rm -f ${S}/sql/yy_mariadb.cc ${S}/sql/yy_mariadb.hh \
+          ${S}/sql/yy_oracle.cc ${S}/sql/yy_oracle.hh
 }
 
 do_configure:append() {

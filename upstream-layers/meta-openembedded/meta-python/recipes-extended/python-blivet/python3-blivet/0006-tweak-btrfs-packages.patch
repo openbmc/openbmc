@@ -1,4 +1,4 @@
-From b55b1023f8f1ad3121928eb9d0ee9902f5474752 Mon Sep 17 00:00:00 2001
+From 5dabe62759e1de84142367aedc7c3a790bf1259b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 8 May 2017 16:33:15 +0800
 Subject: [PATCH] tweak btrfs packages
@@ -15,7 +15,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/blivet/devices/btrfs.py b/blivet/devices/btrfs.py
-index c446e7e..37c183e 100644
+index 283da4e..87163cd 100644
 --- a/blivet/devices/btrfs.py
 +++ b/blivet/devices/btrfs.py
 @@ -58,7 +58,7 @@ class BTRFSDevice(StorageDevice):
@@ -28,10 +28,10 @@ index c446e7e..37c183e 100644
  
      def __init__(self, *args, **kwargs):
 diff --git a/blivet/formats/fs.py b/blivet/formats/fs.py
-index 1e102b6..f16941e 100644
+index 631aeb2..3512675 100644
 --- a/blivet/formats/fs.py
 +++ b/blivet/formats/fs.py
-@@ -1050,7 +1050,7 @@ class BTRFS(FS):
+@@ -1067,7 +1067,7 @@ class BTRFS(FS):
      _formattable = True
      _linux_native = True
      _supported = True

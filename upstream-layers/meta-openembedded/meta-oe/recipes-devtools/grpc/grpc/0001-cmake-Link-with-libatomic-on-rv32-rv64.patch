@@ -18,7 +18,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 06e6453b5c..476d7f1576 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -306,6 +306,9 @@ if(UNIX AND NOT HAIKU)
+@@ -353,6 +353,9 @@ if(UNIX AND NOT HAIKU)
        set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES} rt)
      endif()
    endif()

@@ -14,6 +14,7 @@ LICENSE = "Artistic-1.0"
 LIC_FILES_CHKSUM = "file://lib/Data/HexDump.pm;beginline=277;endline=279;md5=bf1cd9373f8d1f85fe091ee069a480e9"
 
 DEPENDS = "perl"
+RDEPENDS:${PN} += "perl-module-parent"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/N/NE/NEILB/Data-HexDump-${PV}.tar.gz \
            file://run-ptest \
@@ -22,7 +23,7 @@ SRC_URI[sha256sum] = "bc36f404438ac36ad2b9295539227d36f99cd1623f1e347af77c594c40
 
 S = "${UNPACKDIR}/Data-HexDump-${PV}"
 
-inherit cpan ptest update-alternatives
+inherit cpan ptest
 
 do_install_ptest () {
     install -d ${D}${PTEST_PATH}/t
@@ -32,8 +33,3 @@ do_install_ptest () {
 RDEPENDS:${PN}-ptest += "perl-module-exporter perl-module-carp perl-module-filehandle"
 
 BBCLASSEXTEND = "native"
-
-ALTERNATIVES_PRIORITY = "100"
-ALTERNATIVE:${PN} = "hexdump"
-ALTERNATIVE_LINK_NAME[hexdump] = "${bindir}/hexdump"
-

@@ -1,0 +1,46 @@
+From 9eba4aec2de63b6e2e82826f0a2ebd12f1c28e5c Mon Sep 17 00:00:00 2001
+From: Kanksha Paturi <Kanksha.Paturi@windriver.com>
+Date: Tue, 27 Oct 2026 15:15:39 +0000
+Subject: [PATCH] CMakeLists.txt: use GNUInstallDirs for install destinations
+
+The install destinations were hardcoded to lib, bin and include. On
+multilib systems the library directory can be lib64 (or similar), so
+installing to a hardcoded lib puts the libraries in the wrong place.
+
+Use the GNUInstallDirs variables (CMAKE_INSTALL_BINDIR,
+CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_INCLUDEDIR) so the files are
+installed to the correct, platform-appropriate directories.
+
+Upstream-Status: Pending
+Signed-off-by: Kanksha Paturi <Kanksha.Paturi@windriver.com>
+---
+ CMakeLists.txt | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 77e0527f..9bec3ced 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -4,6 +4,7 @@
+ 
+ cmake_minimum_required( VERSION 3.16 )
+ project ( YUV C CXX )	# "C" is required even for C++ projects
++include ( GNUInstallDirs )
+ option( UNIT_TEST "Built unit tests" OFF )
+ 
+ include(CheckCSourceCompiles)
+@@ -242,10 +243,10 @@ endif()
+ 
+ 
+ # install the conversion tool, .so, .a, and all the header files
+-install ( TARGETS yuvconvert DESTINATION bin )
+-install ( TARGETS ${ly_lib_static}						DESTINATION lib )
+-install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION lib RUNTIME DESTINATION bin ARCHIVE DESTINATION lib )
+-install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
++install ( TARGETS yuvconvert DESTINATION ${CMAKE_INSTALL_BINDIR} )
++install ( TARGETS ${ly_lib_static} DESTINATION ${CMAKE_INSTALL_LIBDIR} )
++install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
++install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
+ 
+ # create the .deb and .rpm packages using cpack
+ include ( CM_linux_packages.cmake )

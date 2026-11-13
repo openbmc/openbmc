@@ -1,0 +1,43 @@
+From 9ddee0a5f46a1d7fea81228e6905ebc485e678a7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Sep 2026 20:24:55 -0700
+Subject: [PATCH] dlt_user: Honor dlt_user_housekeeper_exit_requested in
+ housekeeper loop
+
+dlt_user_atexit_handler() sets dlt_user_housekeeper_exit_requested to
+signal the housekeeper thread to exit, but nothing ever reads the flag,
+so the housekeeper thread keeps running until dlt_stop_threads() cancels
+it with pthread_cancel().
+
+clang 23 added -Wunused-but-set-global (enabled by -Wall) which spots
+this dead store, and since the build uses -Werror -Wfatal-errors it is
+now a hard build failure:
+
+  src/lib/dlt_user.c:132:20: fatal error: variable
+    'dlt_user_housekeeper_exit_requested' set but not used
+    [-Wunused-but-set-global]
+    132 | static atomic_bool dlt_user_housekeeper_exit_requested = false;
+
+Check the flag in the housekeeper loop condition, which is what the
+"Signal housekeeper thread to exit" comment intends. Leaving the loop
+this way is equivalent to being cancelled: pthread_cleanup_pop(1) at the
+end of the function runs dlt_user_cleanup_handler() either way.
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/dlt_user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/dlt_user.c b/src/lib/dlt_user.c
+index daf5e8b..9fa2906 100644
+--- a/src/lib/dlt_user.c
++++ b/src/lib/dlt_user.c
+@@ -4850,7 +4850,7 @@ void *dlt_user_housekeeperthread_function(void *ptr)
+ 
+     pthread_mutex_unlock(&dlt_housekeeper_running_mutex);
+ 
+-    while (in_loop) {
++    while (in_loop && !dlt_user_housekeeper_exit_requested) {
+         /* Check for new messages from DLT daemon */
+         if (!dlt_user.disable_injection_msg)
+             if (dlt_user_log_check_user_message() < DLT_RETURN_OK)

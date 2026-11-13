@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# These examples compare against XML models generated with doxygen 1.9.x;
+# doxygen 1.18 renders group titles, markdown headings, function pointer
+# members and member ordering differently
+pytest --automake \
+    --deselect "tests/test_examples.py::test_example[class]" \
+    --deselect "tests/test_examples.py::test_example[cpp_function]" \
+    --deselect "tests/test_examples.py::test_example[group]" \
+    --deselect "tests/test_examples.py::test_example[headings]"

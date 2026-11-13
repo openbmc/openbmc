@@ -77,16 +77,18 @@ REPART_DDI_TYPE ?= "sysext"
 
 REPART_DDI_EXTENSION ?= "ddi"
 
-# systemd-repart creates temporary directoryies under /var/tmp/.#repartXXXXXXX/,
-# to estimate partition size etc. Since files are copied there from the image/rootfs
-# folder - which are owned by pseudo-root - this temporary location has to be
-# added to the directories handled by pseudo; otherwise calls to e.g.
-# fchown(0,0) inside systemd git/src/shared/copy.c end up failing.
-PSEUDO_INCLUDE_PATHS .= ",/var/tmp/"
+# systemd-repart stages copies of the rootfs here; pseudo has to cover it
+REPART_WORKDIR = "${WORKDIR}/repart-tmp"
+PSEUDO_INCLUDE_PATHS .= ",${REPART_WORKDIR}"
 
 oe_image_systemd_repart_make_ddi() {
 
     local additional_args=""
+
+    # $TMP, not $TMPDIR: pseudo derives its own runtime paths from $TMPDIR
+    rm -rf "${REPART_WORKDIR}"
+    mkdir -p "${REPART_WORKDIR}"
+    export TMP="${REPART_WORKDIR}"
 
     if [ -n "${REPART_PRIVATE_KEY}" ]
     then
@@ -134,4 +136,3 @@ oe_image_systemd_repart_make_ddi() {
 }
 
 IMAGE_CMD:ddi = "oe_image_systemd_repart_make_ddi"
-do_image_ddi[deptask] += "do_unpack"

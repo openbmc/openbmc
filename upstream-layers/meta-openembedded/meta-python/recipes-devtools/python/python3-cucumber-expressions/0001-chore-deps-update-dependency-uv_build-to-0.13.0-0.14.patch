@@ -1,0 +1,23 @@
+From f643f89f9150dcea8c97c8eda989baeef8a2b24d Mon Sep 17 00:00:00 2001
+From: "renovate[bot]" <29139614+renovate[bot]@users.noreply.github.com>
+Date: Sat, 10 Oct 2026 12:26:36 +0000
+Subject: [PATCH] chore(deps): update dependency uv_build to >=0.13.0,<0.14.0
+
+Upstream-Status: Backport [https://github.com/cucumber/cucumber-expressions/commit/b6e45a7ee46490996bf4a150832b0a4f0b75bad1]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2fb5f57..e8fc3a5 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [build-system]
+ build-backend = "uv_build"
+-requires = ["uv_build>=0.12.0,<0.13.0"]
++requires = ["uv_build>=0.13.0,<0.14.0"]
+ 
+ [project]
+ name = "cucumber-expressions"

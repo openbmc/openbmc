@@ -8,12 +8,11 @@ SECTION = "net"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-inherit pkgconfig cmake gitpkgv ptest
+inherit pkgconfig cmake ptest
 
 RDEPENDS:${PN}-ptest += "coreutils pcsc-lite-lib"
 
 PE = "1"
-PKGV = "${GITPKGVTAG}"
 
 SRCREV = "9b678b6d5a40ce01607d8c3b1b1416437c8416c4"
 SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=stable-2.0;protocol=https \

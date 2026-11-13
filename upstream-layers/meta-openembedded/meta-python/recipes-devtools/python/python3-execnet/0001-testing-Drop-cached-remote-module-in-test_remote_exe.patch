@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 4 Nov 2026 16:22:44 -0800
+Subject: [PATCH] testing: Drop cached remote module in
+ test_remote_exec_module_is_removed
+
+test_remote_exec_module_is_removed is parametrized over the gateway
+fixtures. The first run imports "remote" from its tmp_path and then
+removes that directory, but the module stays in sys.modules. Later
+runs then get the stale module back from "import remote", whose source
+file is gone, and remote_exec() fails with:
+
+  OSError: could not get source code
+
+Remove "remote" from sys.modules before importing it, so each run
+imports the module it just wrote.
+
+Upstream-Status: Submitted [https://github.com/pytest-dev/execnet/pull/442]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testing/test_gateway.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/testing/test_gateway.py b/testing/test_gateway.py
+index 634f237..c571bbd 100644
+--- a/testing/test_gateway.py
++++ b/testing/test_gateway.py
+@@ -130,6 +130,9 @@ class TestBasicGateway:
+         )
+ 
+         monkeypatch.syspath_prepend(tmp_path)
++        # The test is parametrized; drop the module cached by a previous run,
++        # whose source file has since been removed.
++        monkeypatch.delitem(sys.modules, "remote", raising=False)
+         import remote  # type: ignore[import-not-found]
+ 
+         ch = gw.remote_exec(remote)

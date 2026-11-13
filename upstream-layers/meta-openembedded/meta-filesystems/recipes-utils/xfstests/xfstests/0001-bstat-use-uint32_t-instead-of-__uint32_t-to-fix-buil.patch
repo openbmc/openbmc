@@ -1,4 +1,4 @@
-From c3cc5c68a297a98adb9a7046c7563d0678245243 Mon Sep 17 00:00:00 2001
+From be39c148a62cc89719604a17ed8cbccdf224dd65 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <martin.jansa@gmail.com>
 Date: Sun, 27 Apr 2025 20:29:09 +0200
 Subject: [PATCH] bstat: use uint32_t instead of __uint32_t to fix build with

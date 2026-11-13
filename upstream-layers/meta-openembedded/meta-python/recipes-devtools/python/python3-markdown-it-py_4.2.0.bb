@@ -9,7 +9,6 @@ inherit pypi python_flit_core
 
 RDEPENDS:${PN} += "python3-mdurl"
 
-PYPI_PACKAGE = "markdown_it_py"
 CVE_PRODUCT = "markdown-it-py"
 
 BBCLASSEXTEND = "native nativesdk"

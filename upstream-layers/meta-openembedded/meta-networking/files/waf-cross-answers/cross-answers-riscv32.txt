@@ -28,9 +28,9 @@ Checking whether POSIX capabilities are available: OK
 Checking if can we convert from CP850 to UCS-2LE: OK
 Checking if can we convert from UTF-8 to UCS-2LE: OK
 vfs_fileid checking for statfs() and struct statfs.f_fsid: OK
-Checking whether we can use Linux thread-specific credentials with 32-bit system calls: OK
+Checking whether we can use Linux thread-specific credentials: OK
 Checking whether fcntl locking is available: OK
-Checking for the maximum value of the 'time_t' type: NO
+Checking for the maximum value of the 'time_t' type: OK
 Checking whether the realpath function allows a NULL argument: OK
 Checking for ftruncate extend: OK
 getcwd takes a NULL argument: OK

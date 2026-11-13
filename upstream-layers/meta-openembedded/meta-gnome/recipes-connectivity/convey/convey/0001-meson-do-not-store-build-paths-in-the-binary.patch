@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 22 Sep 2026 07:43:41 +0200
+Subject: [PATCH] meson: do not store build paths in the binary
+
+The build root and source root are only used when convey runs
+uninstalled, but storing them puts TMPDIR into the binary and breaks
+reproducibility. Point them to /usr/src and the schema directory to the
+installed location instead.
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+Upstream-Status: Inappropriate [oe-specific]
+---
+ src/meson.build | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 87690ada..ce722126 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -4,8 +4,8 @@ conf = configuration_data()
+ conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
+ conf.set_quoted('G_LOG_DOMAIN', meson.project_name())
+ conf.set_quoted('APP_ID', convey_id)
+-conf.set_quoted('BUILD_ROOT_DIR', meson.project_build_root())
+-conf.set_quoted('GSETTINGS_DIR', meson.project_build_root() / 'desktop')
++conf.set_quoted('BUILD_ROOT_DIR', '/usr/src')
++conf.set_quoted('GSETTINGS_DIR', data_dir / 'glib-2.0' / 'schemas')
+ conf.set_quoted('INSTALL_PREFIX', convey_prefix)
+ conf.set_quoted('ISO_CODE_3166_XML', iso_3166_xml)
+ conf.set_quoted('ISO_CODE_639_XML', iso_639_xml)
+@@ -14,7 +14,7 @@ conf.set_quoted('NAME_SUFFIX', name_suffix)
+ conf.set_quoted('PLUGINS_DIR', plugins_dir)
+ conf.set_quoted('PROFILE', profile)
+ conf.set_quoted('REVNO', revno)
+-conf.set_quoted('SOURCE_ROOT_DIR', meson.project_source_root())
++conf.set_quoted('SOURCE_ROOT_DIR', '/usr/src')
+ conf.set_quoted('VERSION', convey_version)
+ conf.set_quoted('WEB_EXTENSIONS_DIR', web_extensions_dir)
+ config_h = configure_file(output: 'config.h', configuration: conf)

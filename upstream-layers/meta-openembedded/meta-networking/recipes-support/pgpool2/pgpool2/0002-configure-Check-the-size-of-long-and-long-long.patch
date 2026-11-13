@@ -1,0 +1,39 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 01:00:00 -0700
+Subject: [PATCH] configure: Check the size of long and long long
+
+The replacement snprintf() in src/parser/snprintf.c handles the %z
+length modifier by comparing SIZEOF_SIZE_T with SIZEOF_LONG and
+SIZEOF_LONG_LONG, but configure only defines SIZEOF_UNSIGNED_LONG,
+SIZEOF_VOID_P and SIZEOF_SIZE_T. The undefined macros evaluate to 0 in
+the #if, so whenever the replacement snprintf() is built it fails with
+
+  snprintf.c:651:2: error: "cannot find integer type of the same size as size_t"
+
+This happens e.g. when cross compiling for a 32-bit target such as
+riscv32, where configure cannot run its long long snprintf format test
+and falls back to the replacement implementation.
+
+Check the size of long and long long so these are defined on every
+target.
+
+Upstream-Status: Submitted [https://www.postgresql.org/message-id/20261021153104.43840-1-khem.raj%40oss.qualcomm.com]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -211,6 +211,11 @@
+ AC_CHECK_SIZEOF([void *])
+ AC_CHECK_SIZEOF([size_t])
+ 
++# The replacement snprintf() compares SIZEOF_SIZE_T against these to handle
++# the %z length modifier
++AC_CHECK_SIZEOF([long])
++AC_CHECK_SIZEOF([long long])
++
+ # Decide whether float4 is passed by value: user-selectable, enabled by default
+ AC_MSG_CHECKING([whether to build with float4 passed by value])
+ PGAC_ARG_BOOL(enable, float4-byval, yes, [disable float4 passed by value],

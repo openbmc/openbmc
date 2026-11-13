@@ -7,8 +7,6 @@ SRC_URI[sha256sum] = "9d5db56154a867a9b897c0163b33a793c804c80cee984116d02d49e457
 
 inherit pypi python_poetry_core
 
-PYPI_PACKAGE = "py_serializable"
-
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} += "python3-defusedxml"

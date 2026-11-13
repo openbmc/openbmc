@@ -263,6 +263,7 @@ RDEPENDS:${PN}-daemon += "\
 RRECOMMENDS:${PN}-daemon += "\
     ${NETWORKMANAGER_FIREWALL_DEFAULT} \
     ${@bb.utils.filter('PACKAGECONFIG', 'dnsmasq', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'polkit', 'polkit-group-rule-network', '', d)} \
 "
 INITSCRIPT_NAME:${PN}-daemon = "network-manager"
 SYSTEMD_SERVICE:${PN}-daemon = "\

@@ -1,0 +1,56 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 00:10:00 -0700
+Subject: [PATCH] configure: Link with libatomic when 64-bit atomics need it
+
+fio uses 64-bit C11 atomics, e.g. atomic_load_acquire() and
+atomic_store_release() on the uint64_t inflight_issued and
+inflight_numberio fields. On 32-bit targets without native 64-bit
+atomic instructions, such as riscv32, the compiler lowers these to
+__atomic_load_8/__atomic_store_8 libcalls, and linking fio fails:
+
+  ld.lld: error: undefined symbol: __atomic_load_8
+  ld.lld: error: undefined symbol: __atomic_store_8
+
+Check whether a 64-bit atomic load/store links on its own, and if not,
+whether it links with -latomic, and add libatomic to LIBS only in that
+case. The test variable is global and the stored value depends on argc,
+so the compiler cannot optimize the atomic operations away.
+
+Upstream-Status: Submitted [https://github.com/axboe/fio/pull/2163]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ configure | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+--- a/configure
++++ b/configure
+@@ -667,6 +667,29 @@
+   fatal "C11 atomics support not found"
+ fi
+ 
++##########################################
++# check if 64-bit atomics need libatomic
++# The variable is global and the stored value depends on argc so that the
++# compiler cannot optimize the atomic operations away.
++cat > $TMPC <<EOF
++#include <stdatomic.h>
++#include <stdint.h>
++_Atomic uint64_t v;
++int main(int argc, char **argv)
++{
++  atomic_store_explicit(&v, (uint64_t)argc, memory_order_release);
++  return (int)atomic_load_explicit(&v, memory_order_acquire);
++}
++EOF
++libatomic="no"
++if ! compile_prog "" "" "64-bit atomics"; then
++  if compile_prog "" "-latomic" "64-bit atomics with libatomic"; then
++    libatomic="yes"
++    LIBS="-latomic $LIBS"
++  fi
++fi
++print_config "libatomic for 64-bit atomics" "$libatomic"
++
+ 
+ ##########################################
+ # check for wordsize

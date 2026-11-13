@@ -1,4 +1,4 @@
-From 5935755eef43ac7cb8f4567e7bed5892180f954c Mon Sep 17 00:00:00 2001
+From 452f42bb1c6dc4281b5879c6fb6f85e5c33c21f3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 7 Mar 2020 08:34:02 -0800
 Subject: [PATCH] nss: does not build on mips with clang because wrong types
@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/nss/lib/freebl/pqg.c b/nss/lib/freebl/pqg.c
-index 62d46b5..8c8665d 100644
+index 73ff540..64a5e22 100644
 --- a/nss/lib/freebl/pqg.c
 +++ b/nss/lib/freebl/pqg.c
 @@ -326,8 +326,8 @@ generate_h_candidate(SECItem *hit, mp_int *H)
@@ -30,6 +30,3 @@ index 62d46b5..8c8665d 100644
            SECItem *seedout)
  {
      mp_int s, sum, modulus, tmp;
--- 
-2.25.1
-

@@ -10,7 +10,7 @@ inherit gnomebase gobject-introspection vala gi-docgen
 SRC_URI += "file://disable-lgi-check.patch"
 SRC_URI[archive.sha256sum] = "589eca89b437006edf3755478df037c740a2a84cfa5d202dbad6095e828e2488"
 
-PACKAGECONFIG ?= "python3 gjs lua51 ${@bb.utils.contains('DISTRO_FEATURES', 'gobject-introspection', 'vala', '', d)}"
+PACKAGECONFIG ?= "python3 gjs lua51 ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vala', '', d)}"
 PACKAGECONFIG:remove:riscv32 = "lua51"
 PACKAGECONFIG:remove:riscv64 = "lua51"
 PACKAGECONFIG:remove:powerpc64 = "lua51"

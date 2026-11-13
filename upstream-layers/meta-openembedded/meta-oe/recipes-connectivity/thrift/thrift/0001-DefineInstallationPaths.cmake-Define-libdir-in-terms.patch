@@ -7,12 +7,30 @@ Subject: [PATCH] DefineInstallationPaths.cmake: Define libdir in terms of
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- build/cmake/DefineInstallationPaths.cmake | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ build/cmake/DefineCMakeDefaults.cmake     | 4 ++--
+ build/cmake/DefineInstallationPaths.cmake | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/build/cmake/DefineCMakeDefaults.cmake b/build/cmake/DefineCMakeDefaults.cmake
+index 2b0cdbb..6f5022f 100644
+--- a/build/cmake/DefineCMakeDefaults.cmake
++++ b/build/cmake/DefineCMakeDefaults.cmake
+@@ -44,8 +44,8 @@ include(BuildType)
+ # top of the build tree rather than in hard-to-find leaf
+ # directories. This simplifies manual testing and the use of the build
+ # tree rather than installed thrift libraries.
+-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
++set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX})
++set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX})
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ 
+ #
+diff --git a/build/cmake/DefineInstallationPaths.cmake b/build/cmake/DefineInstallationPaths.cmake
+index 0c3dd09..9e9b77c 100644
 --- a/build/cmake/DefineInstallationPaths.cmake
 +++ b/build/cmake/DefineInstallationPaths.cmake
-@@ -26,11 +26,11 @@ else()
+@@ -28,11 +28,11 @@ else()
      set(LIB_INSTALL_DIR "lib${LIB_SUFFIX}" CACHE PATH "The library install dir (default: lib${LIB_SUFFIX})")
  endif()
  set(INCLUDE_INSTALL_DIR "include" CACHE PATH "The library install dir (default: include)")
@@ -27,16 +45,3 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +set(libdir "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
  set(includedir "${CMAKE_INSTALL_PREFIX}/include")
  set(cmakedir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DIR}")
---- a/build/cmake/DefineCMakeDefaults.cmake
-+++ b/build/cmake/DefineCMakeDefaults.cmake
-@@ -44,8 +44,8 @@ include(BuildType)
- # top of the build tree rather than in hard-to-find leaf
- # directories. This simplifies manual testing and the use of the build
- # tree rather than installed thrift libraries.
--set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
--set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX})
-+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX})
- set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
- 
- #

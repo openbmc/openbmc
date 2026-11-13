@@ -1,0 +1,97 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 11:30:00 -0700
+Subject: [PATCH] Use portable-atomic for AtomicU64 on targets without 64-bit
+ atomics
+
+std only provides AtomicU64 on targets with 64-bit atomics, so rmcp
+fails to build for e.g. riscv32:
+
+  error[E0432]: unresolved import `std::sync::atomic::AtomicU64`
+     --> src/service.rs:455:17
+      |
+  455 |     sync::{Arc, atomic::AtomicU64},
+      |                 ^^^^^^^^---------
+      |                         |
+      |                         no `AtomicU64` in `sync::atomic`
+
+The request id and control generation counters are 64-bit, so use the
+AtomicU64 from portable-atomic on such targets instead, through a
+crate-level import, and keep std's on all other targets.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Cargo.toml              | 5 +++++
+ src/lib.rs              | 8 ++++++++
+ src/service.rs          | 4 +++-
+ src/transport/worker.rs | 3 ++-
+ 4 files changed, 18 insertions(+), 2 deletions(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -930,6 +930,11 @@
+ [dev-dependencies.url]
+ version = "2.4"
+ 
++[target.'cfg(not(target_has_atomic = "64"))'.dependencies.portable-atomic]
++version = "1.13.1"
++features = ["fallback"]
++default-features = false
++
+ [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.chrono]
+ version = "0.4.38"
+ features = [
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2,6 +2,14 @@
+ #![cfg_attr(docsrs, allow(unused_attributes))]
+ #![doc = include_str!("../README.md")]
+ 
++// std only provides AtomicU64 on targets with 64-bit atomics.
++#[cfg(target_has_atomic = "64")]
++#[allow(unused_imports)]
++pub(crate) use std::sync::atomic::AtomicU64;
++#[cfg(not(target_has_atomic = "64"))]
++#[allow(unused_imports)]
++pub(crate) use portable_atomic::AtomicU64;
++
+ mod error;
+ pub use error::{ErrorData, RmcpError};
+ 
+--- a/src/service.rs
++++ b/src/service.rs
+@@ -452,12 +452,14 @@
+ use std::{
+     collections::{HashMap, VecDeque},
+     ops::Deref,
+-    sync::{Arc, atomic::AtomicU64},
++    sync::Arc,
+     time::Duration,
+ };
+ 
+ use tokio::sync::mpsc;
+ 
++use crate::AtomicU64;
++
+ pub trait RequestIdProvider: Send + Sync + 'static {
+     fn next_request_id(&self) -> RequestId;
+ }
+--- a/src/transport/worker.rs
++++ b/src/transport/worker.rs
+@@ -3,7 +3,7 @@
+     collections::HashMap,
+     sync::{
+         Arc, Mutex, PoisonError, Weak,
+-        atomic::{AtomicU64, Ordering},
++        atomic::Ordering,
+     },
+     time::Duration,
+ };
+@@ -12,6 +12,7 @@
+ use tracing::{Instrument, Level};
+ 
+ use super::{IntoTransport, Transport};
++use crate::AtomicU64;
+ use crate::{
+     model::{CancelledNotification, JsonRpcMessage, RequestId},
+     service::{RxJsonRpcMessage, ServiceRole, TxJsonRpcMessage},

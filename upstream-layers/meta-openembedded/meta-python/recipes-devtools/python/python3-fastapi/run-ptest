@@ -2,4 +2,12 @@
 
 # ignore the test from the tutorial
 # those depends on python packages that are not part of OE
-pytest --automake --ignore tests/test_tutorial
+# the ignored telemetry tests need logfire, the opentelemetry otlp exporter
+# and the opentelemetry fastapi instrumentation, which are not part of OE
+pytest --automake --ignore tests/test_tutorial \
+       --ignore tests/test_telemetry/test_background.py \
+       --ignore tests/test_telemetry/test_data.py \
+       --ignore tests/test_telemetry/test_environment_integrations.py \
+       --ignore tests/test_telemetry/test_integrations.py \
+       --ignore tests/test_telemetry/test_native_integrations.py \
+       --ignore tests/test_telemetry/test_runtime.py

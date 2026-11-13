@@ -1,0 +1,49 @@
+From fb2fa4a7af169878f7e7cb2fbf3dba00639d73ed Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 27 Sep 2026 15:52:39 -0700
+Subject: [PATCH 3/3] connectx: only export the unversioned sctp_connectx alias
+ on glibc
+
+libsctp exports sctp_connectx four times: an unversioned alias of the
+original three-argument API plus the VERS_1, VERS_2 and default VERS_3
+versions. glibc honours the version recorded in the caller, but musl's
+dynamic linker does not implement symbol versioning: it skips the
+hidden VERS_1/VERS_2 entries yet accepts both the unversioned alias and
+sctp_connectx@@VERS_3, and whichever comes first in the hash chain wins.
+That is the unversioned alias, so on musl every sctp_connectx() call
+runs the old API, which ignores the association id argument. The caller
+then reads an uninitialised id, e.g. test_connectx:
+
+  test_connectx.c 3 BROK : Association id mismatch: connectx returned 3,
+  notification returned:240
+
+The alias only exists for binaries linked before libsctp was versioned,
+which is a glibc concern. Emit it only when building against glibc, so
+sctp_connectx@@VERS_3 is the only visible definition elsewhere.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/lib/connectx.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/lib/connectx.c b/src/lib/connectx.c
+index 2a21e3a..119f6c9 100644
+--- a/src/lib/connectx.c
++++ b/src/lib/connectx.c
+@@ -76,7 +76,15 @@ static int __connectx_addrsize(const struct sockaddr *addrs,
+ }
+ 			
+ 
++/* The unversioned alias lets glibc resolve references from binaries
++ * built before libsctp had symbol versions. Dynamic linkers without
++ * symbol versioning, such as musl's, pick the first matching name
++ * instead and would bind every sctp_connectx() call to this old API,
++ * which never reports the association id.
++ */
++#ifdef __GLIBC__
+ SYMVER(__sctp_connectx, sctp_connectx@)
++#endif
+ int __sctp_connectx(int fd, struct sockaddr *addrs, int addrcnt)
+ {
+ 	int addrs_size = __connectx_addrsize(addrs, addrcnt);

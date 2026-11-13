@@ -7,8 +7,6 @@ SRC_URI[sha256sum] = "ab69322dc6719dcc7f296479dbb70181b66df6ed315064f92dbc85c0e1
 
 inherit pypi python_flit_core
 
-PYPI_PACKAGE = "myst_parser"
-
 RDEPENDS:${PN} = "\
     python3-docutils \
     python3-jinja2 \

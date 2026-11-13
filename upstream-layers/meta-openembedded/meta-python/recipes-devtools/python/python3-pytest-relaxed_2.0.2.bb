@@ -9,6 +9,8 @@ SRC_URI[sha256sum] = "956ea028ec30dbbfb680dd8e7b4a7fb8f80a239595e88bace018bf2c0d
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "pytest-relaxed"
+
 RDEPENDS:${PN} += " \
     python3-core \
     python3-pytest \

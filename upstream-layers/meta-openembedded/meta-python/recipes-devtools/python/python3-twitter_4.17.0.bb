@@ -15,7 +15,6 @@ RDEPENDS:${PN} += "\
     python3-pysocks \
     python3-requests \
     python3-requests-oauthlib \
-    python3-six \
 "
 
 CVE_PRODUCT = "josh_roesslein:tweepy tweepy:tweepy"

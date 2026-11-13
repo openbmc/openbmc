@@ -7,3 +7,5 @@ DEPENDS = "python3-setuptools-scm-native"
 SRC_URI[sha256sum] = "e9e12e333b525156e82a3c852f22016b9158220d2f47454de9cae8a77d371401"
 
 inherit pypi python_setuptools_build_meta
+
+PYPI_PACKAGE_SDIST = "requests-mock"

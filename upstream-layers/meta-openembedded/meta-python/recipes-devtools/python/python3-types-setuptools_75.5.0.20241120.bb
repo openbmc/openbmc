@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=6;endline=6;md5=c2d9643b4523fdf462
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "types-setuptools"
+
 SRC_URI[sha256sum] = "d3c7e95b0598bf87fede29b3b57b19f5cdcd62a85b9298a7b30f8343f6f21c4f"
 
 BBCLASSEXTEND = "native"

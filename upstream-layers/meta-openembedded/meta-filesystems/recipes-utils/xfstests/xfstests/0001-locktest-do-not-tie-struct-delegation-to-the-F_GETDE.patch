@@ -1,4 +1,4 @@
-From 784139a16a03cd0c6486e4b587b995e9d5ab21dd Mon Sep 17 00:00:00 2001
+From d298792d021059f2941822484bb989185bd02d70 Mon Sep 17 00:00:00 2001
 From: Khem Raj <khem.raj@oss.qualcomm.com>
 Date: Wed, 29 Jul 2026 05:10:29 +0000
 Subject: [PATCH] locktest: do not tie struct delegation to the F_GETDELEG
@@ -27,7 +27,7 @@ Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/src/locktest.c b/src/locktest.c
-index 54ee1f0..e24a0fe 100644
+index 54ee1f07..e24a0fe1 100644
 --- a/src/locktest.c
 +++ b/src/locktest.c
 @@ -80,13 +80,18 @@ extern int h_errno;

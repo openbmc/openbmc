@@ -1,0 +1,49 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 12:00:00 -0700
+Subject: [PATCH] Cargo.lock: Add portable-atomic to patched crates
+
+fff-search, rmcp, nu-command and nu-dap are patched to depend on
+portable-atomic on targets without 64-bit atomics. The build uses
+--frozen, so record the dependencies in the lock file. portable-atomic
+1.13.1 is already locked.
+
+Upstream-Status: Inappropriate [OE-specific, follows the crate patches]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Cargo.lock | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1629,6 +1629,7 @@
+  "notify 9.0.0-rc.4",
+  "parking_lot",
+  "pathdiff",
++ "portable-atomic",
+  "rayon",
+  "regex",
+  "regex-syntax",
+@@ -3732,6 +3733,7 @@
+  "os_pipe",
+  "pathdiff",
+  "percent-encoding",
++ "portable-atomic",
+  "print-positions",
+  "procfs",
+  "pure-rust-locales",
+@@ -3812,6 +3814,7 @@
+  "nu-protocol",
+  "nu-utils",
+  "parking_lot",
++ "portable-atomic",
+  "serde",
+  "serde_json",
+  "windows-sys 0.61.2",
+@@ -5512,6 +5515,7 @@
+  "indexmap",
+  "pastey",
+  "pin-project-lite",
++ "portable-atomic",
+  "rand 0.10.2",
+  "rmcp-macros",
+  "schemars",

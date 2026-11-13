@@ -8,9 +8,11 @@ SECTION = "base/shell"
 LICENSE = "LicenseRef-zsh"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=1a4c4cda3e8096d2fd483ff2f4514fec"
 
-DEPENDS = "ncurses bison-native libcap libpcre2 gdbm groff-native"
+DEPENDS = "ncurses bison-native libcap groff-native"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.xz"
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.xz \
+           file://pcre2-config \
+"
 SRC_URI[sha256sum] = "36fa734374b44783582cec09bcd67822e2f992c779ec1624ab5596df078d2f81"
 
 # The SourceForge download mirror has no browsable listing; check the per-release
@@ -30,8 +32,6 @@ EXTRA_OECONF = " \
     --with-term-lib='ncursesw ncurses' \
     --enable-cap \
     --enable-multibyte \
-    --disable-gdbm \
-    --disable-dynamic \
     zsh_cv_shared_environ=yes \
 "
 
@@ -45,6 +45,10 @@ ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
 ALTERNATIVE_TARGET[sh] = "${base_bindir}/${BPN}"
 ALTERNATIVE_PRIORITY = "90"
 
+PACKAGECONFIG ??= "static"
+PACKAGECONFIG[static] = "--disable-dynamic,--enable-dynamic zsh_cv_sys_dynamic_rtld_global=yes zsh_cv_sys_dynamic_execsyms=yes"
+PACKAGECONFIG[gdbm] = "--enable-gdbm,--disable-gdbm,gdbm,,,static"
+PACKAGECONFIG[pcre] = "--enable-pcre PCRE_CONFIG=${UNPACKDIR}/pcre2-config,--disable-pcre,libpcre2 pkgconfig-native,,,static"
 # Needed for manpages.bbclass, but they're always installed
 PACKAGECONFIG[manpages] = ""
 

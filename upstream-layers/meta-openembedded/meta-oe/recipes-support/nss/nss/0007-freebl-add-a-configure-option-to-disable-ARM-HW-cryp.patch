@@ -1,4 +1,4 @@
-From 459ee39104228a958a0999e1a7d4c43e4e6fe4f0 Mon Sep 17 00:00:00 2001
+From c36282f11d9714502c82d290e968634c1e8b0db6 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 18 Dec 2019 12:29:50 +0100
 Subject: [PATCH] freebl: add a configure option to disable ARM HW crypto
@@ -14,19 +14,19 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
-index 0ebfc92..3ee7623 100644
+index 22977e1..febe407 100644
 --- a/nss/lib/freebl/Makefile
 +++ b/nss/lib/freebl/Makefile
-@@ -136,6 +136,8 @@ endif
+@@ -142,6 +142,8 @@ endif
          endif
      endif
  endif
 +ifdef NSS_USE_ARM_HW_CRYPTO
 +    DEFINES += -DNSS_USE_ARM_HW_CRYPTO
  ifeq ($(CPU_ARCH),aarch64)
-     ifdef CC_IS_CLANG
-         DEFINES += -DUSE_HW_AES -DUSE_HW_SHA1 -DUSE_HW_SHA2 -DHAVE_PLATFORM_GHASH
-@@ -178,6 +180,7 @@ endif
+     # CC_IS_GCC covers clang too; the Arm crypto extension intrinsics need one
+     # or the other.
+@@ -214,6 +216,7 @@ endif
          endif
      endif
  endif

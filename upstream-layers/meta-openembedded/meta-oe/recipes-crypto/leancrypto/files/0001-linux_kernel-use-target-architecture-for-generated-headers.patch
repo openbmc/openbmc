@@ -1,0 +1,164 @@
+From 47aedd8d985b94dc35836925c123cb705985796b Mon Sep 17 00:00:00 2001
+From: Ayoub Zaki <ayoub.zaki@embetrix.com>
+Date: Sun, 1 Nov 2026 16:55:00 +0100
+Subject: [PATCH] linux_kernel: use target architecture for generated headers
+
+Derive the architecture from the target kernel configuration and pass it
+to the AWK generators instead of querying uname -m.
+This prevents cross builds from using the build host's settings.
+
+Upstream-Status: Submitted [https://github.com/smuellerDD/leancrypto/pull/79]
+Signed-off-by: Ayoub Zaki <ayoub.zaki@embetrix.com>
+---
+ linux_kernel/Kbuild.autogen        | 28 ++++++++++++++++++++++------
+ linux_kernel/README.md             |  8 ++++++++
+ linux_kernel/lc_ascon_hash.awk     |  7 ++-----
+ linux_kernel/lc_hash.h.awk         |  9 +++------
+ linux_kernel/lc_memory_support.awk | 11 ++++-------
+ 5 files changed, 39 insertions(+), 24 deletions(-)
+
+diff --git a/linux_kernel/Kbuild.autogen b/linux_kernel/Kbuild.autogen
+index e5052406d..da6d5d05a 100644
+--- a/linux_kernel/Kbuild.autogen
++++ b/linux_kernel/Kbuild.autogen
+@@ -3,6 +3,17 @@
+ 
+ # Generic support files
+ 
++# Use the target kernel configuration not the build host architecture
++ifdef CONFIG_X86_64
++lc_target_arch := x86_64
++else ifdef CONFIG_ARM
++lc_target_arch := arm
++else ifdef CONFIG_ARM64
++lc_target_arch := aarch64
++else
++lc_target_arch := generic
++endif
++
+ clean-files := $(obj)/lc_memory_support.h $(obj)/lc_hash.h
+ 
+ $(obj)/posix_support.o: $(obj)/lc_memory_support.h
+@@ -10,16 +21,19 @@ $(obj)/posix_support.o: $(obj)/lc_memory_support.h
+ targets += lc_memory_support.h
+ 
+ quiet_cmd_build_lc_memory_support = GEN     $@
+-      cmd_build_lc_memory_support = awk -f $(src)/lc_memory_support.awk $< > $@
+-$(obj)/lc_memory_support.h: $(src)/../internal/api/lc_memory_support.h.in FORCE
++      cmd_build_lc_memory_support = awk -v target_arch=$(lc_target_arch) \
++	-f $(src)/lc_memory_support.awk $< > $@
++$(obj)/lc_memory_support.h: $(src)/../internal/api/lc_memory_support.h.in \
++			  $(src)/lc_memory_support.awk FORCE
+ 	$(call if_changed,build_lc_memory_support)
+ 
+ $(obj)/leancrypto_kernel.o: $(obj)/lc_hash.h
+ targets += lc_hash.h
+ 
+ quiet_cmd_build_lc_hash = GEN     $@
+-      cmd_build_lc_hash = awk -f $(src)/lc_hash.h.awk $< > $@
+-$(obj)/lc_hash.h: $(src)/../hash/api/lc_hash.h.in FORCE
++      cmd_build_lc_hash = awk -v target_arch=$(lc_target_arch) \
++	-f $(src)/lc_hash.h.awk $< > $@
++$(obj)/lc_hash.h: $(src)/../hash/api/lc_hash.h.in $(src)/lc_hash.h.awk FORCE
+ 	$(call if_changed,build_lc_hash)
+ 
+ 
+@@ -103,8 +117,10 @@ clean-files += $(obj)/lc_ascon_hash.h
+ 
+ 
+ quiet_cmd_build_lc_ascon_hash = GEN     $@
+-      cmd_build_lc_ascon_hash = awk -f $(src)/lc_ascon_hash.awk $< > $@
+-$(obj)/lc_ascon_hash.h: $(src)/../hash/api/lc_ascon_hash.h.in FORCE
++      cmd_build_lc_ascon_hash = awk -v target_arch=$(lc_target_arch) \
++	-f $(src)/lc_ascon_hash.awk $< > $@
++$(obj)/lc_ascon_hash.h: $(src)/../hash/api/lc_ascon_hash.h.in \
++		      $(src)/lc_ascon_hash.awk FORCE
+ 	$(call if_changed,build_lc_ascon_hash)
+ 
+ 
+diff --git a/linux_kernel/README.md b/linux_kernel/README.md
+index 45ae377cc..17ff76b16 100644
+--- a/linux_kernel/README.md
++++ b/linux_kernel/README.md
+@@ -21,6 +21,14 @@ directory `linux_kernel`:
+ 
+ 2. the leancrypto library is provided with `leancrypto.ko`
+ 
++For cross-compilation set `KDIR` to the configured and prepared target kernel
++build directory and pass the kernel architecture and compiler prefix:
++
++```sh
++make KDIR=/path/to/target/kernel/build ARCH=arm64 \
++	CROSS_COMPILE=aarch64-linux-gnu-
++```
++
+ ## Build in Tree
+ 
+ When the use of leancrypto as a kernel module is insufficient, e.g. when its
+diff --git a/linux_kernel/lc_ascon_hash.awk b/linux_kernel/lc_ascon_hash.awk
+index e1fed4cf6..e3c048511 100644
+--- a/linux_kernel/lc_ascon_hash.awk
++++ b/linux_kernel/lc_ascon_hash.awk
+@@ -1,9 +1,6 @@
+-# Set the Ascon memory size
+-BEGIN {
+-	"uname -m" | getline host
+-}
++# Set the Ascon memory size for target_arch
+ {
+-	if (host=="x86_64") {
++	if (target_arch=="x86_64") {
+ 		gsub("mesondefine LC_DEF_ASCON_AVX512", "define LC_DEF_ASCON_AVX512", $0) ;
+ 	} else {
+ 		gsub("mesondefine LC_DEF_ASCON_AVX512", "undef LC_DEF_ASCON_AVX512", $0) ;
+diff --git a/linux_kernel/lc_hash.h.awk b/linux_kernel/lc_hash.h.awk
+index d26e36304..0a83bade2 100644
+--- a/linux_kernel/lc_hash.h.awk
++++ b/linux_kernel/lc_hash.h.awk
+@@ -1,9 +1,6 @@
+-# Set the hash alignment value
+-BEGIN {
+-	"uname -m" | getline host
+-}
++# Set the hash alignment value for target_arch
+ {
+-	if (host=="x86_64") {
++	if (target_arch=="x86_64") {
+ 		# This value has to be limited to 32 as otherwise the hash
+ 		# algorithms fail to register since their state is larger than
+ 		# HASH_MAX_DESCSIZE - this is an arbitrary defined value in
+@@ -14,7 +11,7 @@ BEGIN {
+ 		# implementation as it requires an alignment of the buffer to
+ 		# 512 bits.
+ 		gsub("@hash_common_alignment@", "32", $0) ;
+-	} else if (host=="arm") {
++	} else if (target_arch=="arm") {
+ 		gsub("@hash_common_alignment@", "32", $0) ;
+ 	} else {
+ 		gsub("@hash_common_alignment@", "8", $0) ;
+diff --git a/linux_kernel/lc_memory_support.awk b/linux_kernel/lc_memory_support.awk
+index b3480a7e2..4b346a742 100644
+--- a/linux_kernel/lc_memory_support.awk
++++ b/linux_kernel/lc_memory_support.awk
+@@ -1,17 +1,14 @@
+-# Set the XOR alignment value
+-BEGIN {
+-	"uname -m" | getline host
+-}
++# Set the XOR alignment value for target_arch
+ {
+-	if (host=="x86_64") {
++	if (target_arch=="x86_64") {
+ 		gsub("mesondefine LC_DEF_HOST_X86_64", "define LC_DEF_HOST_X86_64", $0) ;
+ 		gsub("mesondefine LC_DEF_HOST_ARM32_NEON", "undef LC_DEF_HOST_ARM32_NEON", $0) ;
+ 		gsub("mesondefine LC_DEF_HOST_AARCH64", "undef LC_DEF_HOST_AARCH64", $0) ;
+-	} else if (host=="arm") {
++	} else if (target_arch=="arm") {
+ 		gsub("mesondefine LC_DEF_HOST_X86_64", "undef LC_DEF_HOST_X86_64", $0) ;
+ 		gsub("mesondefine LC_DEF_HOST_ARM32_NEON", "define LC_DEF_HOST_ARM32_NEON", $0) ;
+ 		gsub("mesondefine LC_DEF_HOST_AARCH64", "undef LC_DEF_HOST_AARCH64", $0) ;
+-	} else if (host=="aarch64") {
++	} else if (target_arch=="aarch64") {
+ 		gsub("mesondefine LC_DEF_HOST_X86_64", "undef LC_DEF_HOST_X86_64", $0) ;
+ 		gsub("mesondefine LC_DEF_HOST_ARM32_NEON", "undef LC_DEF_HOST_ARM32_NEON", $0) ;
+ 		gsub("mesondefine LC_DEF_HOST_AARCH64", "define LC_DEF_HOST_AARCH64", $0) ;

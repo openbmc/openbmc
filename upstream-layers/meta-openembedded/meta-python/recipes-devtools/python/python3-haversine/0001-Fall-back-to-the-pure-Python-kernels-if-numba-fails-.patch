@@ -1,0 +1,40 @@
+From 5f199ca92d651d653cb26b4fb6c48ba91137bec5 Mon Sep 17 00:00:00 2001
+From: Thomas Roos <thomas@roosesweb.de>
+Date: Sat, 7 Nov 2026 11:45:31 +0100
+Subject: [PATCH] Fall back to the pure Python kernels if numba fails to import
+
+numba is an optional accelerator, but importing it can fail with an
+ImportError other than ModuleNotFoundError, for instance when the
+installed NumPy is newer than numba supports:
+
+  ImportError: Numba needs NumPy 2.4 or less. Got NumPy 2.5.
+
+That error escaped and made "import haversine" fail. Catch ImportError,
+which also covers ModuleNotFoundError, so haversine keeps working
+without numba.
+
+Upstream-Status: Submitted [https://github.com/mapado/haversine/pull/91]
+AI-Generated: Claude Code, Claude Opus 5.5
+Signed-off-by: Thomas Roos <thomas@roosesweb.de>
+---
+ haversine/haversine.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/haversine/haversine.py b/haversine/haversine.py
+index a731188..687b602 100755
+--- a/haversine/haversine.py
++++ b/haversine/haversine.py
+@@ -176,7 +176,9 @@ try:
+         _inverse_haversine_kernel_vector = numba.njit(fastmath=True)(_inverse_haversine_kernel_vector)
+     _haversine_kernel = numba.njit(_haversine_kernel)
+     _inverse_haversine_kernel = numba.njit(_inverse_haversine_kernel)
+-except ModuleNotFoundError:
++except ImportError:
++    # numba is optional. Besides being absent, it can refuse to import, e.g.
++    # "Numba needs NumPy 2.4 or less", which must not break haversine.
+     pass
+ 
+ 
+-- 
+2.56.0
+

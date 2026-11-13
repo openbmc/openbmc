@@ -1,0 +1,68 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 Sep 2026 06:40:00 +0000
+Subject: [PATCH] disks: drop the unused gdk/gdkx.h include
+
+gdupasswordstrengthwidget.c, gduvolumegrid.c and gduestimator.c all
+pull in <gdk/gdkx.h>, GDK's X11 backend header, but none of them call
+any X11-specific GDK API (no gdk_x11_*, no GDK_WINDOW_XID, nothing).
+The include is dead weight left over from history.
+
+On a wayland-only build (no x11 in DISTRO_FEATURES) the GTK3 recipe is
+configured without its X11 backend, so gdk/gdkx.h isn't installed into
+the sysroot at all, and do_compile fails:
+
+  gdupasswordstrengthwidget.c:14:10: fatal error: 'gdk/gdkx.h' file not found
+  gduvolumegrid.c:14:10: fatal error: 'gdk/gdkx.h' file not found
+  gduestimator.c:14:10: fatal error: 'gdk/gdkx.h' file not found
+
+Drop the unused include from all three files so the GTK3 build works
+regardless of whether the X11 backend is enabled.
+
+Upstream-Status: Inappropriate [these files were dropped entirely in
+the upstream GTK4/libadwaita port (gduvolumegrid.c) or renamed with a
+GTK4-only gdkx.h path (gdupasswordstrengthwidget.c, gduestimator.c,
+see GNOME/gnome-disk-utility!179aab50); none carries a comparable fix
+for the GTK3 code line this recipe still builds]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/disks/gduestimator.c              | 1 -
+ src/disks/gdupasswordstrengthwidget.c | 1 -
+ src/disks/gduvolumegrid.c             | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/src/disks/gduestimator.c b/src/disks/gduestimator.c
+index 1111111..2222222 100644
+--- a/src/disks/gduestimator.c
++++ b/src/disks/gduestimator.c
+@@ -11,7 +11,6 @@
+
+ #include <math.h>
+ #include <gdk/gdkkeysyms.h>
+-#include <gdk/gdkx.h>
+ #include <stdlib.h>
+
+ #include "gduestimator.h"
+diff --git a/src/disks/gdupasswordstrengthwidget.c b/src/disks/gdupasswordstrengthwidget.c
+index 1111111..2222222 100644
+--- a/src/disks/gdupasswordstrengthwidget.c
++++ b/src/disks/gdupasswordstrengthwidget.c
+@@ -11,7 +11,6 @@
+
+ #include <math.h>
+ #include <gdk/gdkkeysyms.h>
+-#include <gdk/gdkx.h>
+ #include <stdlib.h>
+
+ #include <pwquality.h>
+diff --git a/src/disks/gduvolumegrid.c b/src/disks/gduvolumegrid.c
+index 1111111..2222222 100644
+--- a/src/disks/gduvolumegrid.c
++++ b/src/disks/gduvolumegrid.c
+@@ -11,7 +11,6 @@
+
+ #include <math.h>
+ #include <gdk/gdkkeysyms.h>
+-#include <gdk/gdkx.h>
+ #include <stdlib.h>
+
+ #include "gduvolumegrid.h"

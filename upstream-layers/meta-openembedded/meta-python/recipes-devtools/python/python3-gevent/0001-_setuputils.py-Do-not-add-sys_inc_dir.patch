@@ -1,4 +1,4 @@
-From 21b8f74c3d0006c80549452743d50e6f012aa7ef Mon Sep 17 00:00:00 2001
+From f3d1cf5b05decc4554676dcba5eb831cd404729b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 11 Oct 2022 17:37:01 -0700
 Subject: [PATCH] _setuputils.py: Do not add sys_inc_dir
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/_setuputils.py b/_setuputils.py
-index 4c25e00..23fdfe1 100644
+index 652ebc8..53980e5 100644
 --- a/_setuputils.py
 +++ b/_setuputils.py
 @@ -164,7 +164,6 @@ def get_include_dirs(*extra_paths):

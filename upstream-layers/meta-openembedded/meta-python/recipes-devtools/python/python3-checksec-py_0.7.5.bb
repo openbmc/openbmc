@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 PR = "r0"
 
 inherit pypi python_poetry_core
-PYPI_PACKAGE = "checksec_py"
 SRC_URI[sha256sum] = "892854f95d17a76d8f45a5c0cc597b9f1bebced3fffb9c7205d0baaf5eace886"
 
 SRC_URI += " \

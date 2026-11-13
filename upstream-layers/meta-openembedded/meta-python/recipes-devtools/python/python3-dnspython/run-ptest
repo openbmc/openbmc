@@ -1,3 +1,12 @@
 #!/bin/sh
 
+# The live resolver tests use the system resolver configuration. When the
+# network is set up by the kernel's ip= parameter and nothing in userspace
+# (e.g. systemd-resolved) writes /etc/resolv.conf from it, the nameserver is
+# only available in /proc/net/pnp, so the tests fail with "no nameservers"
+# even though the Internet is reachable. Seed resolv.conf from it in that case.
+if ! grep -qs '^nameserver' /etc/resolv.conf && grep -qs '^nameserver' /proc/net/pnp; then
+    grep '^nameserver' /proc/net/pnp >> /etc/resolv.conf
+fi
+
 pytest --automake

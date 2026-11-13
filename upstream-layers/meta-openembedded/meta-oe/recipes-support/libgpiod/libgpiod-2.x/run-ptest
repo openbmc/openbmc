@@ -20,6 +20,8 @@ run_one_test() {
 
 	./$testbin > ./$testbin.out 2>&1
 	if [ $? -ne 0 ]; then
+		# keep the details of intermittent failures in the ptest log
+		cat ./$testbin.out
 		echo "FAIL: $testbin"
 	else
 		echo "PASS: $testbin"

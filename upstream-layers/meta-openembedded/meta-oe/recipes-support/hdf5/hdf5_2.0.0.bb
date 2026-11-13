@@ -18,6 +18,17 @@ SRC_URI = "https://support.hdfgroup.org/releases/hdf5/v2_0/v2_0_0/downloads/${BP
            file://0001-cmake-remove-build-flags.patch \
            file://CVE-2026-26199.patch \
            file://CVE-2026-26197.patch \
+           file://CVE-2026-17572.patch \
+           file://CVE-2026-17573.patch \
+           file://CVE-2026-17574.patch \
+           file://CVE-2026-19025.patch \
+           file://CVE-2026-19026-CVE-2026-19027-CVE-2026-19028.patch \
+           file://CVE-2026-19023-CVE-2026-19024.patch \
+           file://CVE-2026-120689.patch \
+           file://CVE-2026-120754-CVE-2026-120755.patch \
+           file://CVE-2026-120756.patch \
+           file://CVE-2026-120757.patch \
+           file://CVE-2026-120758.patch \
            "
 SRC_URI[sha256sum] = "f4c2edc5668fb846627182708dbe1e16c60c467e63177a75b0b9f12c19d7efed"
 
@@ -31,6 +42,10 @@ EXTRA_OECMAKE = " \
     -DCMAKE_INSTALL_PREFIX='${prefix}' \
     -DHDF5_INSTALL_LIB_DIR='${baselib}' \
 "
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[cpp] = "-DHDF5_BUILD_CPP_LIB=ON,-DHDF5_BUILD_CPP_LIB=OFF"
+
 EXTRA_OECMAKE:prepend:class-target = "-DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/qemuwrapper "
 
 gen_emu() {
@@ -56,9 +71,14 @@ do_install:append() {
     # Used for generating config files on target
     oe_multilib_header H5pubconf.h
     sed -i -e 's|${RECIPE_SYSROOT_NATIVE}||g' ${D}${bindir}/h5cc
+    if ${@bb.utils.contains('PACKAGECONFIG', 'cpp', 'true', 'false', d)}; then
+        sed -i -e 's|${RECIPE_SYSROOT_NATIVE}||g' ${D}${bindir}/h5c++
+    fi
 }
 
-MULTILIB_SCRIPTS += "${PN}:${bindir}/h5cc"
+MULTILIB_SCRIPTS += "${PN}:${bindir}/h5cc \
+                     ${@bb.utils.contains('PACKAGECONFIG', 'cpp', '${PN}:${bindir}/h5c++', '', d)} \
+"
 
 BBCLASSEXTEND = "native"
 

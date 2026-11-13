@@ -1,4 +1,4 @@
-From dce2cc2886a9097971856e69737cc5c05c9239ea Mon Sep 17 00:00:00 2001
+From 5e149e9e9948ecf6dffdb7f48d56b01d262990fd Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Wed, 8 Apr 2026 10:54:25 +0200
 Subject: [PATCH] quill: use soft rdtsc fallback on 32-bit PowerPC
@@ -19,7 +19,7 @@ Signed-off-by: Peter Marko <peter.marko@siemens.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/dependencies/quill/include/quill/core/Rdtsc.h b/dependencies/quill/include/quill/core/Rdtsc.h
-index 3d0ae9f26..67f26cb89 100644
+index 10394c585..bbf1797ae 100644
 --- a/dependencies/quill/include/quill/core/Rdtsc.h
 +++ b/dependencies/quill/include/quill/core/Rdtsc.h
 @@ -95,7 +95,7 @@ QUILL_NODISCARD QUILL_ATTRIBUTE_HOT inline uint64_t rdtsc() noexcept
@@ -31,5 +31,3 @@ index 3d0ae9f26..67f26cb89 100644
  QUILL_NODISCARD QUILL_ATTRIBUTE_HOT inline uint64_t rdtsc() noexcept
  {
    // soft failover
--- 
-2.47.2

@@ -3,7 +3,9 @@ HOMEPAGE = "https://github.com/ystreet/librice"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE-MIT;md5=b377b220f43d747efdec40d69fcaa69d"
 
-SRC_URI += " git://github.com/ystreet/librice.git;protocol=https;branch=main;tag=v${PV}"
+SRC_URI += " git://github.com/ystreet/librice.git;protocol=https;branch=main;tag=v${PV} \
+            file://0001-rice-proto-Use-AtomicUsize-for-the-agent-counter.patch \
+"
 SRCREV = "afd70fdd7ca96a39824c55e6b373bac97311f2ba"
 
 DEPENDS += "openssl clang-native"
@@ -15,6 +17,11 @@ require ${PN}-crates.inc
 CARGO_BUILD_FLAGS += " --workspace"
 
 export LIBCLANG_PATH = "${STAGING_LIBDIR_NATIVE}/libclang.so"
+
+# rice-c/build.rs runs bindgen, point libclang at the target sysroot instead
+# of the build host headers in /usr/include
+BINDGEN_EXTRA_CLANG_ARGS = "${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} --target=${TARGET_SYS}"
+export BINDGEN_EXTRA_CLANG_ARGS
 
 # rice-c/build.rs builds the internal rice-proto C library in-tree (via
 # "cargo cinstall") and then locates it through system-deps + pkg-config.

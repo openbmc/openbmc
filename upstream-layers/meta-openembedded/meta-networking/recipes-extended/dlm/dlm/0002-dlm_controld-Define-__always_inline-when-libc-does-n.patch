@@ -1,0 +1,34 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 18 Oct 2026 18:30:00 -0700
+Subject: [PATCH] dlm_controld: Define __always_inline when libc does not
+
+rbtree.h and rbtree_augmented.h were copied from the kernel and use
+__always_inline. glibc defines it in <sys/cdefs.h>, but musl does not,
+so the build fails on musl:
+
+  ./rbtree.h:153:8: error: unknown type name '__always_inline'
+
+Add a fallback definition to linux_helpers.h, which rbtree.h already
+includes.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ dlm_controld/linux_helpers.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/dlm_controld/linux_helpers.h b/dlm_controld/linux_helpers.h
+--- a/dlm_controld/linux_helpers.h
++++ b/dlm_controld/linux_helpers.h
+@@ -3,6 +3,11 @@
+ #ifndef __DLM_LINUX_HELPERS__
+ #define __DLM_LINUX_HELPERS__
+ 
++/* glibc provides this in <sys/cdefs.h>, but musl does not */
++#ifndef __always_inline
++#define __always_inline inline __attribute__((__always_inline__))
++#endif
++
+ /*
+  * static_assert - check integer constant expression at build time
+  *

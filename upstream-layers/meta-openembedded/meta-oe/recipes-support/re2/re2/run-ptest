@@ -1,3 +1,20 @@
 #!/bin/sh
 
-ctest --force-new-ctest-process | sed -u 's/\*\*\*/   /g' | awk '/Test +#/{gsub(/Passed/,"PASS"); gsub(/Failed/,"FAIL"); gsub(/Skipped/,"SKIP"); print $6": "$4; fflush();}'
+# Running under QEMU (x86 and UEFI arm64 report it via DMI, arm/arm64/riscv
+# virt machines have a fw-cfg node, ppc64 pseries a qemu compatible)
+is_qemu() {
+    [ "$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)" = "QEMU" ] && return 0
+    for f in /proc/device-tree/fw-cfg@*; do
+        [ -e "$f" ] && return 0
+    done
+    grep -qs qemu /proc/device-tree/compatible
+}
+
+# Under QEMU, skip the tests upstream's Makefile lists as BIGTESTS (not run by
+# "make test", "size = large" in Bazel); emulated, each of them can run for
+# longer than the ptest-runner timeout without printing anything.
+if is_qemu; then
+    set -- -E '^(dfa|exhaustive[0-9]*|random)_test$'
+fi
+
+ctest --force-new-ctest-process "$@" | sed -u 's/\*\*\*/   /g' | awk '/Test +#/{gsub(/Passed/,"PASS"); gsub(/Failed/,"FAIL"); gsub(/Skipped/,"SKIP"); print $6": "$4; fflush();}'

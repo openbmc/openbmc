@@ -11,6 +11,7 @@ inherit pypi python_hatchling ptest
 
 SRC_URI += " \
 	file://run-ptest \
+	file://0001-tests-skip-DDR-tests-when-the-resolvers-do-not-answe.patch \
 "
 
 RDEPENDS:${PN}-ptest += " \

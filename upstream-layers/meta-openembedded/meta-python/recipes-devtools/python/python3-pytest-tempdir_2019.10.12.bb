@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "e7d91813a9aa991db87dacdef8cfd3f1657632d731d56d06238c5ffb63
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "pytest-tempdir"
+
 RDEPENDS:${PN} += " \
     python3-pytest \
 "

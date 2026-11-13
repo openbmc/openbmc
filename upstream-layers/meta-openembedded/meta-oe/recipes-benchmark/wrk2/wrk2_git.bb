@@ -46,3 +46,5 @@ do_install() {
     install -d ${D}${datadir}/wrk2
     install -m 0644 src/wrk.lua ${D}${datadir}/wrk2/wrk.lua
 }
+
+COMPATIBLE_HOST:riscv32 = "null"

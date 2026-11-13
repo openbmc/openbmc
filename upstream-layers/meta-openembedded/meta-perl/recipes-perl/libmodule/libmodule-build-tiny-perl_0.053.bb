@@ -46,6 +46,7 @@ RDEPENDS:${PN} += " \
     perl-module-metadata \
     perl-module-parse-cpan-meta \
     perl-module-perl-ostype \
+    perl-module-perlio-encoding \
     perl-module-pod-man \
     perl-module-tap-harness-env \
     perl-module-test-more \

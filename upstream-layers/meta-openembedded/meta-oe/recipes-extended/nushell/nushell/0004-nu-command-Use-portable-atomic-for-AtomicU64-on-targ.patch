@@ -1,0 +1,66 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 12:00:00 -0700
+Subject: [PATCH] nu-command: Use portable-atomic for AtomicU64 on targets
+ without 64-bit atomics
+
+std only provides AtomicU64 on targets with 64-bit atomics, so
+nu-command fails to build for e.g. riscv32:
+
+  error[E0432]: unresolved import `std::sync::atomic::AtomicU64`
+    --> src/filesystem/idx/state.rs:18:39
+
+The scan duration is kept in nanoseconds and needs 64 bits, so use the
+AtomicU64 from portable-atomic on such targets instead, through a
+crate-level import, and keep std's on all other targets.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Cargo.toml                   | 5 +++++
+ src/filesystem/idx/state.rs  | 3 ++-
+ src/lib.rs                   | 7 +++++++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -596,6 +596,11 @@
+     "mode",
+ ]
+ 
++[target."cfg(not(target_has_atomic = \"64\"))".dependencies.portable-atomic]
++version = "1.13.1"
++features = ["fallback"]
++default-features = false
++
+ [target."cfg(unix)".dependencies.nix]
+ version = "0.31.3"
+ features = [
+--- a/src/filesystem/idx/state.rs
++++ b/src/filesystem/idx/state.rs
+@@ -13,9 +13,10 @@
+ use nu_protocol::shell_error::generic::GenericError;
+ use nu_protocol::{ListStream, PipelineMetadata, Signals};
+ use nu_utils::time::Instant;
++use crate::AtomicU64;
+ use pathdiff::diff_paths;
+ use std::path::{Path, PathBuf};
+-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
++use std::sync::atomic::{AtomicBool, Ordering};
+ use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender, channel};
+ use std::sync::{Arc, Mutex, OnceLock};
+ use std::time::Duration;
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,5 +1,12 @@
+ #![cfg_attr(not(feature = "os"), allow(unused))]
+ #![doc = include_str!("../README.md")]
++
++// std only provides AtomicU64 on targets with 64-bit atomics.
++#[cfg(target_has_atomic = "64")]
++use std::sync::atomic::AtomicU64;
++#[cfg(not(target_has_atomic = "64"))]
++use portable_atomic::AtomicU64;
++
+ mod bytes;
+ mod charting;
+ mod conversions;

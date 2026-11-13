@@ -34,6 +34,7 @@ SRC_URI = "git://github.com/opencv/opencv.git;name=opencv;branch=4.x;protocol=ht
            file://download.patch \
            file://0001-Make-ts-module-external.patch \
            file://0008-Do-not-embed-build-directory-in-binaries.patch \
+           file://29533.patch \
            "
 SRC_URI:append:riscv64 = " file://0001-Use-Os-to-compile-tinyxml2.cpp.patch;patchdir=contrib"
 SRC_URI:append:aarch64 = " git://gitlab.arm.com/kleidi/kleidicv;branch=main;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/3rdparty/kleidicv;name=kleidicv;protocol=https"
@@ -213,10 +214,8 @@ do_install:append() {
         rm -rf ${D}${bindir}/setup_vars_opencv4.sh
     fi
 
-    for fn in arithm.vsx3.cpp convert.vsx3.cpp; do
-        if [ -f ${B}/modules/core/$fn ]; then
-            sed -i -e 's,${S},/usr/src/debug/${PN}/${PV},g' ${B}/modules/core/$fn
-        fi
+    find ${B}/modules -name "*.cpp" | xargs -r grep -l "${S}" | while read -r fn; do
+        sed -i -e 's,${S},/usr/src/debug/${PN}/${PV},g' "$fn"
     done
 
     if [ -d ${D}/${bindir}/shape ]; then

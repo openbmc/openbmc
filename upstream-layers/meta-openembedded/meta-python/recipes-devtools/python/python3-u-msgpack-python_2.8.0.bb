@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "b801a83d6ed75e6df41e44518b4f2a9c221dc2da4bcd5380e3a0feda52
 
 inherit pypi setuptools3 ptest-python-pytest
 
+PYPI_PACKAGE_SDIST = "u-msgpack-python"
+
 do_install_ptest:append() {
        cp -f ${S}/test_umsgpack.py ${D}${PTEST_PATH}/
 }

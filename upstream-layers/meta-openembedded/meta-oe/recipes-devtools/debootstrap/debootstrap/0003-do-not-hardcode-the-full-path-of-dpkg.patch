@@ -1,4 +1,4 @@
-From 33c4bc9540d6d9aee6d885b89d530130d50b8052 Mon Sep 17 00:00:00 2001
+From ca470a0b0c18a6a3f728c2e5f6cce986d9d28803 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 2 Jun 2021 13:34:35 +0800
 Subject: [PATCH] do not hardcode the full path of dpkg
@@ -16,10 +16,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/debootstrap b/debootstrap
-index 0cce33e..7586c58 100755
+index 20d465d..a02b28c 100755
 --- a/debootstrap
 +++ b/debootstrap
-@@ -553,7 +553,7 @@ fi
+@@ -566,7 +566,7 @@ fi
  
  if in_path dpkg && \
       dpkg --print-architecture >/dev/null 2>&1; then

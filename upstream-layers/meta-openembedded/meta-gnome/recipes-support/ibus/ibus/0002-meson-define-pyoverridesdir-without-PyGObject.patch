@@ -1,0 +1,26 @@
+From 85ce9c83f919090687adc303fad8d27486574d75 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 6 Oct 2026 11:38:08 +0200
+Subject: [PATCH] meson: define pyoverridesdir without PyGObject
+
+The summary prints pyoverridesdir, which is only set when pygobject-3.0
+is found, so meson setup fails with 'Unknown variable name
+"pyoverridesdir"' when it is not.
+
+Upstream-Status: Pending
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index afcb7544..271737f2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -237,6 +237,7 @@ endif
+ pygobject_dep = dependency('pygobject-3.0', version: '>= 3.0.0',
+                            required: false)
+ enable_pygobject = pygobject_dep.found()
++pyoverridesdir = ''
+ if enable_pygobject
+   pyoverridesdir = get_option('python-overrides-dir')
+   if pyoverridesdir == ''

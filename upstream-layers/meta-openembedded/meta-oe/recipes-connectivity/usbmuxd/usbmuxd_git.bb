@@ -6,9 +6,8 @@ LIC_FILES_CHKSUM = "file://COPYING.GPLv2;md5=ebb5c50ab7cab4baeffba14977030c07 \
 
 DEPENDS = "udev libusb1 libplist libimobiledevice-glue"
 
-inherit autotools pkgconfig gitpkgv systemd useradd
+inherit autotools pkgconfig systemd useradd
 
-PKGV = "${GITPKGVTAG}"
 PV = "1.1.2+git"
 
 SRCREV = "01c94c77f59404924f1c46d99c4e5e0c7817281b"

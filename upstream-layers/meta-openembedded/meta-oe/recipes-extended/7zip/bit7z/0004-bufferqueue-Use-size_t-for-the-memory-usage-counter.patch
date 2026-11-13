@@ -1,0 +1,46 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 12:00:00 -0700
+Subject: [PATCH] bufferqueue: Use size_t for the memory usage counter
+
+BufferQueue::mMemoryUsage is a std::atomic<std::uint64_t>. On 32-bit
+targets without native 64-bit atomic instructions, such as riscv32, its
+operations become __atomic_*_8 libcalls, so every program linking the
+static libbit7z needs libatomic, and the tests fail to link:
+
+  ld.lld: error: undefined symbol: __atomic_fetch_add_8
+  >>> referenced by bufferqueue.cpp:21 (src/internal/bufferqueue.cpp:21)
+  ld.lld: error: undefined symbol: __atomic_fetch_sub_8
+  ld.lld: error: undefined symbol: __atomic_load_8
+
+The counter is the total size of the buffers currently held in the
+queue, i.e. a sum of std::vector::size() values of in-memory objects,
+so it always fits in a std::size_t. Use that type, which keeps the
+atomic lock-free on every target and removes the libatomic dependency.
+
+Upstream-Status: Submitted [https://github.com/rikyoz/bit7z/pull/344]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/internal/bufferqueue.hpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+--- a/src/internal/bufferqueue.hpp
++++ b/src/internal/bufferqueue.hpp
+@@ -13,6 +13,7 @@
+ #include "bittypes.hpp"
+ 
+ #include <atomic>
++#include <cstddef>
+ #include <condition_variable>
+ #include <queue>
+ #include <mutex>
+@@ -49,7 +50,9 @@
+         std::condition_variable mEmptyCondition;
+         std::condition_variable mFullCondition;
+         std::atomic_bool mFinished{ false };
+-        std::atomic< std::uint64_t > mMemoryUsage;
++        // Size of the queued in-memory buffers, so it always fits in a size_t,
++        // which keeps the atomic lock-free on 32-bit targets as well.
++        std::atomic< std::size_t > mMemoryUsage;
+         std::uint64_t mMaxMemoryUsage;
+ };
+ 

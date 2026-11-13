@@ -9,7 +9,6 @@ SRCREV ?= "3b180cb10eda683dda7913ecee2e6487288d292d"
 
 inherit setuptools3
 
-
 BBCLASSEXTEND = "native"
 
 RDEPENDS:${PN} = "python3-numpy \

@@ -3,7 +3,7 @@ HOMEPAGE = "https://metacpan.org/release/OALDERS/HTML-Parser-3.83"
 SECTION = "libs"
 LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
-LIC_FILES_CHKSUM = "file://README;beginline=996;endline=1000;md5=68b329da9893e34099c7d8ad5cb9c940"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=c673252ed1ff54b3a0d20b3673061f9d"
 
 DEPENDS += "perl"
 

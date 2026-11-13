@@ -1,4 +1,4 @@
-From b7a476cbcd507c03094811690d5497a7e9e15afc Mon Sep 17 00:00:00 2001
+From 7dd1762bbb80941a134b7be88c3104faeb6829c8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 8 Apr 2021 14:08:06 +0800
 Subject: [PATCH] support to override /usr/bin/arch-test
@@ -11,10 +11,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/debootstrap b/debootstrap
-index 43a7383..0cce33e 100755
+index 76f493a..20d465d 100755
 --- a/debootstrap
 +++ b/debootstrap
-@@ -51,6 +51,10 @@ INRELEASE_PATH=""
+@@ -52,6 +52,10 @@ INRELEASE_PATH=""
  
  DEF_MIRROR="http://deb.debian.org/debian"
  
@@ -25,7 +25,7 @@ index 43a7383..0cce33e 100755
  # set $CONTAINER
  detect_container
  
-@@ -666,12 +670,12 @@ fi
+@@ -679,12 +683,12 @@ fi
  
  ###########################################################################
  

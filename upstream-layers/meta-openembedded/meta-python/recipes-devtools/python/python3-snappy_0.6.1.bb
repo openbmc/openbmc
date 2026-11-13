@@ -9,5 +9,6 @@ SRC_URI[sha256sum] = "b6a107ab06206acc5359d4c5632bd9b22d448702a79b3169b0c62e0fb8
 inherit pypi setuptools3
 
 PYPI_PACKAGE = "python-snappy"
+PYPI_PACKAGE_SDIST = "python-snappy"
 
 RDEPENDS:${PN} += "snappy"

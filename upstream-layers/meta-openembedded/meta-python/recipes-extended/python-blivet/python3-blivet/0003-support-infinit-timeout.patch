@@ -1,7 +1,7 @@
-From 112b825541f498762f373cfc9918e444dda74095 Mon Sep 17 00:00:00 2001
+From 485f01b52fa958d5e8cec581feebd9c725e05e3c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 8 May 2017 16:18:02 +0800
-Subject: [PATCH 03/11] support infinit timeout
+Subject: [PATCH] support infinit timeout
 
 Upstream-Status: Pending
 
@@ -11,10 +11,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index a5da7b6..58117ae 100644
+index efed862..623f732 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -171,6 +171,7 @@ class Path(str):
+@@ -179,6 +179,7 @@ class Path(str):
      def __hash__(self):
          return self._path.__hash__()
  
@@ -22,7 +22,7 @@ index a5da7b6..58117ae 100644
  def timeout_command(argv, timeout, *args, **kwargs):
      """call shell-command and either return its output or kill it
      if it doesn't normally exit within timeout seconds and return None"""
-@@ -182,7 +183,7 @@ def timeout_command(argv, timeout, *args, **kwargs):
+@@ -190,7 +191,7 @@ def timeout_command(argv, timeout, *args, **kwargs):
          while proc.poll() is None:
              time.sleep(0.1)
              now = datetime.datetime.now()
@@ -31,7 +31,7 @@ index a5da7b6..58117ae 100644
                  os.kill(proc.pid, signal.SIGKILL)
                  os.waitpid(-1, os.WNOHANG)
                  program_log.debug("%d seconds timeout" % timeout)
-@@ -196,7 +197,7 @@ def timeout_command(argv, timeout, *args, **kwargs):
+@@ -204,7 +205,7 @@ def timeout_command(argv, timeout, *args, **kwargs):
      program_log.debug("Return code: %d", proc.returncode)
      return (proc.returncode, proc.stdout.read())
  
@@ -40,7 +40,7 @@ index a5da7b6..58117ae 100644
      if env_prune is None:
          env_prune = []
  
-@@ -205,7 +206,10 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
+@@ -213,7 +214,10 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
              os.chroot(root)
  
      with program_log_lock:  # pylint: disable=not-context-manager
@@ -52,7 +52,7 @@ index a5da7b6..58117ae 100644
  
          env = os.environ.copy()
          env.update({"LC_ALL": "C",
-@@ -218,7 +222,7 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
+@@ -226,7 +230,7 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
          else:
              stderr_dir = subprocess.PIPE
  

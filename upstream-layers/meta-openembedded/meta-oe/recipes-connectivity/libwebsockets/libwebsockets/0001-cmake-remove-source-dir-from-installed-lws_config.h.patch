@@ -1,0 +1,34 @@
+From 7de4adc4359dc45fd088ad11a8130dcb0fc95cdc Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Wed, 4 Nov 2026 21:52:32 +0100
+Subject: [PATCH] cmake: remove source dir from installed lws_config.h
+
+lws_config.h is installed and contains LWS_SOURCE_FONTS_DIR, which
+points into the build host's source tree. This makes builds
+non-reproducible, and the path does not exist once the component is
+packaged into a distribution.
+
+Nothing in the tree references LWS_SOURCE_FONTS_DIR, and the fonts'
+install destination is already available as LWS_FONTS_DIR on the
+line above.
+
+Remove the unused definition.
+
+Upstream-Status: Submitted [https://github.com/warmcat/libwebsockets/pull/3687]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ cmake/lws_config.h.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/cmake/lws_config.h.in b/cmake/lws_config.h.in
+index c716d4f0d..7ad2310fc 100644
+--- a/cmake/lws_config.h.in
++++ b/cmake/lws_config.h.in
+@@ -10,7 +10,6 @@
+ #define LWS_INSTALL_LIBDIR "${LWS_ABSOLUTE_INSTALL_LIBDIR}"
+ #define LWS_PLUGIN_DIR "${LWS_INSTALL_PLUGIN_DIR}"
+ #define LWS_FONTS_DIR "${LWS_ABSOLUTE_INSTALL_FONTS_DIR}"
+-#define LWS_SOURCE_FONTS_DIR "${PROJECT_SOURCE_DIR}/contrib/mcufont/fonts"
+ #define LWS_LIBRARY_VERSION_MAJOR ${LWS_LIBRARY_VERSION_MAJOR}
+ #define LWS_LIBRARY_VERSION_MINOR ${LWS_LIBRARY_VERSION_MINOR}
+ #define LWS_LIBRARY_VERSION_PATCH_ELABORATED ${LWS_LIBRARY_VERSION_PATCH_ELABORATED}

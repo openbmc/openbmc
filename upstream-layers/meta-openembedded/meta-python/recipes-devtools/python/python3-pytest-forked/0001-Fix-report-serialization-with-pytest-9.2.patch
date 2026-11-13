@@ -1,0 +1,142 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fish Wang <fishw@asu.edu>
+Date: Wed, 28 Oct 2026 01:55:59 +0000
+Subject: [PATCH] Fix report serialization with pytest 9.2.
+
+pytest 9.2 turned TestReport.nodeid into a property backed by a NodeId
+object. It is not marshalable, so pytest-forked breaks.
+
+- Now serialize_report emits a plain nodeid string.
+- Crash reports use the call phase; pytest 9.2 prints the phase in the
+  short summary, which exposed the ??? placeholder.
+- The forked child writes its traceback to the captured stderr file
+  before exiting with "status 3," so the next similar failure is easier
+  to spot.
+
+Upstream-Status: Submitted [https://github.com/pytest-dev/pytest-forked/pull/112]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CHANGELOG.rst                 |  9 ++++++++
+ src/pytest_forked/__init__.py | 19 +++++++++++-----
+ testing/test_boxed.py         | 43 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 6 deletions(-)
+
+diff --git a/CHANGELOG.rst b/CHANGELOG.rst
+index fe6e527..20d76c0 100644
+--- a/CHANGELOG.rst
++++ b/CHANGELOG.rst
+@@ -1,3 +1,12 @@
++Unreleased
++==========
++
++* Fix compatibility with pytest 9.2: reports now carry a ``NodeId`` object that
++  ``marshal`` cannot serialize, which made every forked test exit with status 3.
++* Report crashes as the ``call`` phase instead of ``???``.
++* Show the traceback when the forked child fails outside the test itself.
++
++
+ v1.7.5
+ ======
+ 
+diff --git a/src/pytest_forked/__init__.py b/src/pytest_forked/__init__.py
+index 6d135cb..2f53266 100644
+--- a/src/pytest_forked/__init__.py
++++ b/src/pytest_forked/__init__.py
+@@ -13,6 +13,10 @@ from _pytest import runner
+ # copied from xdist remote
+ def serialize_report(rep):
+     d = rep.__dict__.copy()
++    # pytest >= 9.2 stores a NodeId object in ``_id`` and exposes ``nodeid``
++    # as a property. convert it to a plain string.
++    if "_id" in d:
++        d["nodeid"] = str(d.pop("_id"))
+     if hasattr(rep.longrepr, "toterminal"):
+         d["longrepr"] = str(rep.longrepr)
+     else:
+@@ -97,6 +101,11 @@ def _worker(runforked_fn, stdout_path, stderr_path, retval_path):
+         code = e.code if e.code is not None else 0
+         os._exit(int(code))
+     except Exception:
++        import traceback
++
++        # pytest's capture has restored fd 2 by now; write to the file directly
++        with open(stderr_path, "a") as f:
++            traceback.print_exc(file=f)
+         os._exit(EXITSTATUS_EXCEPTION)
+     finally:
+         try:
+@@ -221,12 +230,10 @@ def report_process_crash(item, result):
+ 
+     from _pytest import runner
+ 
+-    # pytest >= 4.1
+-    has_from_call = getattr(runner.CallInfo, "from_call", None) is not None
+-    if has_from_call:
+-        call = runner.CallInfo.from_call(lambda: 0 / 0, "???")
+-    else:
+-        call = runner.CallInfo(lambda: 0 / 0, "???")
++    # The child died while running the test body, so report it as the
++    # "call" phase.
++    # pytest >= 9.2 prints the phase in the short summary; handle it here.
++    call = runner.CallInfo.from_call(lambda: 0 / 0, "call")
+     call.excinfo = info
+     rep = runner.pytest_runtest_makereport(item, call)
+     if result.out:
+diff --git a/testing/test_boxed.py b/testing/test_boxed.py
+index 3d67a9c..269c2a4 100644
+--- a/testing/test_boxed.py
++++ b/testing/test_boxed.py
+@@ -1,6 +1,10 @@
++import marshal
+ import os
+ 
+ import pytest
++from _pytest.reports import TestReport
++
++from pytest_forked import serialize_report
+ 
+ needsfork = pytest.mark.skipif(not hasattr(os, "fork"), reason="os.fork required")
+ 
+@@ -119,3 +123,42 @@ def test_forked_followed_by_other_test_tears_down(testdir):
+ def test_is_not_boxed_by_default(testdir):
+     config = testdir.parseconfig(testdir.tmpdir)
+     assert not config.option.forked
++
++
++def test_serialize_report_roundtrips_through_marshal():
++    rep = TestReport(
++        "test_x.py::test_y",
++        ("test_x.py", 1, "test_y"),
++        {},
++        "passed",
++        None,
++        "call",
++        [],
++        0.1,
++        0.0,
++        0.1,
++        [],
++    )
++    d = marshal.loads(marshal.dumps(serialize_report(rep)))
++    assert "_id" not in d
++    rebuilt = TestReport(**d)
++    assert rebuilt.nodeid == rep.nodeid
++    assert rebuilt.outcome == "passed"
++
++
++@needsfork
++def test_child_exception_traceback_is_reported(testdir):
++    p1 = testdir.makepyfile(
++        """
++        def test_function(record_property):
++            record_property("obj", object())
++        """
++    )
++    result = testdir.runpytest(p1, "--forked")
++    result.stdout.fnmatch_lines(
++        [
++            "*EXITED with status 3*",
++            "*ValueError: unmarshallable object*",
++            "*1 failed*",
++        ]
++    )

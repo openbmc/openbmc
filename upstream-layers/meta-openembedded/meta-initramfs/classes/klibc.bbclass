@@ -23,3 +23,6 @@ LDFLAGS:append:toolchain-clang:libc-klibc:arm = " --rtlib=libgcc --unwindlib=lib
 LDFLAGS[export] = "1"
 
 OVERRIDES =. "libc-klibc:"
+
+# klibc is not yet ported to riscv32
+COMPATIBLE_HOST:riscv32 = "null"

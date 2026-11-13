@@ -1,0 +1,36 @@
+From 75186b0a019645a2822c9d567464bb142cc8882a Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 1 Oct 2026 10:42:51 -0700
+Subject: [PATCH] test_syscalls: Do not print strerror(0)
+
+test_open_acc() prints strerror() of the expected error, which is 0 for
+the cases that should succeed. glibc returns "Success" for it, but musl
+returns "No error information", and run-tests.py treats the word "error"
+in the output as a failure:
+
+  FAIL  examples/passthrough-base  suspicious output: script.out: ... 49 [open_acc(O_RDONLY) mode: 0600 message: 'No error information'] START
+
+Print "Success" when no error is expected.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ test/test_syscalls.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/test/test_syscalls.c b/test/test_syscalls.c
+index 115eab8..f849e7b 100644
+--- a/test/test_syscalls.c
++++ b/test/test_syscalls.c
+@@ -1335,8 +1335,10 @@ static int do_test_open_acc(int flags, const char *flags_str, int mode, int err)
+ 	int res;
+ 	int fd;
+ 
++	/* strerror(0) is "Success" on glibc but "No error information" on
++	 * musl, which the test runner flags as a suspicious word. */
+ 	start_test("open_acc(%s) mode: 0%03o message: '%s'", flags_str, mode,
+-		   strerror(err));
++		   err ? strerror(err) : "Success");
+ 	unlink(testfile);
+ 	res = create_testfile(testfile, data, datalen);
+ 	if (res == -1)

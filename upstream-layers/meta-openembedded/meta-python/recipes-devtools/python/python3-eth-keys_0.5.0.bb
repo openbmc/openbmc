@@ -8,4 +8,6 @@ SRC_URI[sha256sum] = "a0abccb83f3d84322591a2c047a1e3aa52ea86b185fa3e82ce311d120c
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "eth-keys"
+
 RDEPENDS:${PN} += "python3-eth-utils"

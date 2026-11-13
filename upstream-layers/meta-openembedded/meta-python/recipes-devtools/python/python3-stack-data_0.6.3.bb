@@ -4,8 +4,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=a3d6c15f7859ae235a78f2758e5a48cf"
 
 DEPENDS = "python3-setuptools-scm-native"
 
-PYPI_PACKAGE = "stack_data"
-
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += "python3-wheel-native"

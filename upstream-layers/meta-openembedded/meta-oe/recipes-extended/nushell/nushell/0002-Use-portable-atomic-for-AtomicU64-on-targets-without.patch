@@ -1,0 +1,108 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 11:00:00 -0700
+Subject: [PATCH] Use portable-atomic for AtomicU64 on targets without 64-bit
+ atomics
+
+std only provides AtomicU64 on targets with 64-bit atomics, so
+fff-search fails to build for e.g. riscv32:
+
+  error[E0432]: unresolved import `std::sync::atomic::AtomicU64`
+   --> src/rescan_throttle.rs:1:25
+    |
+  1 | use std::sync::atomic::{AtomicU64, Ordering};
+    |                         ^^^^^^^^^ no `AtomicU64` in `sync::atomic`
+
+The counters, timestamps and ids kept in AtomicU64 need 64 bits, so
+use the AtomicU64 from portable-atomic on such targets instead,
+through a crate-level import, and keep std's on all other targets.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Cargo.toml             | 5 +++++
+ src/lib.rs             | 6 ++++++
+ src/log.rs             | 3 ++-
+ src/rescan_throttle.rs | 3 ++-
+ src/types.rs           | 4 +++-
+ src/watcher/watch.rs   | 3 ++-
+ 6 files changed, 20 insertions(+), 4 deletions(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -320,6 +320,11 @@
+ version = "0.3"
+ features = ["env-filter"]
+ 
++[target."cfg(not(target_has_atomic = \"64\"))".dependencies.portable-atomic]
++version = "1.13.1"
++features = ["fallback"]
++default-features = false
++
+ [target."cfg(unix)".dependencies.signal-hook-registry]
+ version = "1.4"
+ 
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -103,6 +103,12 @@
+      Enable one, e.g. `--features ripgrep` or `--features zlob`."
+ );
+ 
++// std only provides AtomicU64 on targets with 64-bit atomics.
++#[cfg(target_has_atomic = "64")]
++pub(crate) use std::sync::atomic::AtomicU64;
++#[cfg(not(target_has_atomic = "64"))]
++pub(crate) use portable_atomic::AtomicU64;
++
+ /// Primary entry points with thread-safe [`SharedFilePicker`](shared::FilePicker) instance
+ pub mod shared;
+ pub use shared::*;
+--- a/src/log.rs
++++ b/src/log.rs
+@@ -135,7 +135,8 @@
+ const DEFAULT_RETAIN_RUNS: usize = 20;
+ 
+ pub fn generate_trace_id() -> String {
+-    use std::sync::atomic::{AtomicU64, Ordering};
++    use crate::AtomicU64;
++    use std::sync::atomic::Ordering;
+     static TRACE_COUNTER: AtomicU64 = AtomicU64::new(0);
+ 
+     let nanos = std::time::SystemTime::now()
+--- a/src/rescan_throttle.rs
++++ b/src/rescan_throttle.rs
+@@ -1,6 +1,7 @@
+-use std::sync::atomic::{AtomicU64, Ordering};
++use std::sync::atomic::Ordering;
+ use std::time::Instant;
+ 
++use crate::AtomicU64;
+ use crate::constants::{
+     LARGE_INDEX_FILE_COUNT, RESCAN_MIN_INTERVAL, RESCAN_MIN_INTERVAL_LARGE_INDEX,
+ };
+--- a/src/types.rs
++++ b/src/types.rs
+@@ -2,7 +2,9 @@
+ use std::path::{Path, PathBuf};
+ #[cfg(not(target_os = "windows"))]
+ use std::sync::atomic::AtomicPtr;
+-use std::sync::atomic::{AtomicI32, AtomicU8, AtomicU64, AtomicUsize, Ordering};
++use std::sync::atomic::{AtomicI32, AtomicU8, AtomicUsize, Ordering};
++
++use crate::AtomicU64;
+ 
+ #[cfg(not(target_os = "windows"))]
+ use crate::constants::{FRESH_MMAP_THRESHOLD, MMAP_THRESHOLD};
+--- a/src/watcher/watch.rs
++++ b/src/watcher/watch.rs
+@@ -1,9 +1,10 @@
+ use crate::error::Error;
+ use crate::index::constraints::{GlobPattern, compile_one, glob_matches_into};
++use crate::AtomicU64;
+ use parking_lot::Mutex;
+ use std::path::{Path, PathBuf};
+ use std::sync::Arc;
+-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
++use std::sync::atomic::{AtomicBool, Ordering};
+ use std::sync::mpsc;
+ use tracing::{debug, error};
+ 

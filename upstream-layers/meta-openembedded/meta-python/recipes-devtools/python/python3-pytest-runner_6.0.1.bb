@@ -14,6 +14,8 @@ inherit pypi python_setuptools_build_meta
 DEPENDS += " \
     python3-setuptools-scm-native"
 
+PYPI_PACKAGE_SDIST = "pytest-runner"
+
 RDEPENDS:${PN} = "python3-setuptools python3-debugger python3-json python3-io"
 
 BBCLASSEXTEND = "native nativesdk"

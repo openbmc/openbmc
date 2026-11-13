@@ -13,6 +13,8 @@ SRCREV = "37d5f1225573b91d706a5e547d081f79963a9deb"
 SRC_URI = " \
     git://github.com/sctp/lksctp-tools.git;branch=master;protocol=https \
     file://0001-func_tests-disable-FORTIFY_SOURCE-for-test_1_to_1_re.patch \
+    file://0002-func_tests-pass-invalid-msghdr-pointers-straight-to-.patch \
+    file://0003-connectx-only-export-the-unversioned-sctp_connectx-a.patch \
     file://run-ptest \
     file://v4test.sh \
     file://v6test.sh \

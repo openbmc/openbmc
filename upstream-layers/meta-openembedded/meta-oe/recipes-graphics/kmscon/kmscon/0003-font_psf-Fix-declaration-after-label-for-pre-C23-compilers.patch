@@ -1,0 +1,31 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 10 Oct 2026 00:00:00 +0000
+Subject: [PATCH] font_psf: Fix declaration after label for pre-C23 compilers
+
+kmscon builds with -std=gnu99, where a label (including a case label)
+must be followed by a statement, not a declaration. Clang rejects the
+"uint8_t i" declaration directly after "default:" with
+-Werror,-Wc23-extensions. Give the default case its own block scope.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/font/font_psf.c
++++ b/src/font/font_psf.c
+@@ -394,7 +394,7 @@
+ 			case 0xff:
+ 				ch++;
+ 				break;
+-			default:
++			default: {
+ 				uint8_t i = utf8_len(code.map[0]);
+ 				if (i) {
+ 					code.val = ((uint32_t)(code.map[0] & (0xFF >> (2 + i)))
+@@ -408,6 +408,7 @@
+ 				if (unicode_table_add(self, code.val, ch))
+ 					return 1;
+ 			}
++			}
+ 		}
+ 		ucode_idx = 0;
+ 	}

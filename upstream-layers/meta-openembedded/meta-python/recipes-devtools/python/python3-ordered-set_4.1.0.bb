@@ -7,4 +7,6 @@ SRC_URI[sha256sum] = "694a8e44c87657c59292ede72891eb91d34131f6531463aab3009191c7
 
 inherit pypi python_flit_core ptest-python-pytest
 
+PYPI_PACKAGE_SDIST = "ordered-set"
+
 PTEST_PYTEST_DIR = "test"

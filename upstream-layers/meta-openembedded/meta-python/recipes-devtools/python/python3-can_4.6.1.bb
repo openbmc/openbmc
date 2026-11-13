@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 SRC_URI[sha256sum] = "290fea135d04b8504ebff33889cc6d301e2181a54099116609f940825ffe5005"
 
-PYPI_PACKAGE = "python_can"
+PYPI_PACKAGE = "python-can"
 
 inherit pypi python_setuptools_build_meta
 

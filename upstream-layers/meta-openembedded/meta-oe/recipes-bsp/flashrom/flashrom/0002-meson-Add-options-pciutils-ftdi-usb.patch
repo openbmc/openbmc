@@ -1,4 +1,4 @@
-From 5cf5fc64c6aab35b89b8cf7f69b84b6f5100d7a6 Mon Sep 17 00:00:00 2001
+From 2f57f3797d08b435cac9cda79a7c6b7a978cdb8a Mon Sep 17 00:00:00 2001
 From: Patrick Rudolph <patrick.rudolph@9elements.com>
 Date: Tue, 15 Oct 2024 10:42:05 +0200
 Subject: [PATCH] meson: Add options pciutils, ftdi, usb
@@ -16,10 +16,10 @@ Signed-off-by: Patrick Rudolph <patrick.rudolph@9elements.com>
  2 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 35feb33..b5bb722 100644
+index 876ecd9..5d656c9 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -140,9 +140,9 @@ systems_serial     = [ 'linux', 'openbsd', 'freebsd', 'dragonfly', 'netbsd', 'da
+@@ -134,9 +134,9 @@ systems_serial     = [ 'linux', 'openbsd', 'freebsd', 'dragonfly', 'netbsd', 'da
  
  cpus_port_io = [ 'x86', 'x86_64' ]
  
@@ -33,10 +33,10 @@ index 35feb33..b5bb722 100644
  group_serial = get_option('programmer').contains('group_serial')
  group_jlink  = get_option('programmer').contains('group_jlink')
 diff --git a/meson_options.txt b/meson_options.txt
-index 2829cd1..0e9d769 100644
+index bb09014..7cbf7bc 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -26,6 +26,9 @@ option('ni845x_search_path', type : 'string', value : 'C:\Program Files (x86)\Na
+@@ -23,6 +23,9 @@ option('ni845x_search_path', type : 'string', value : 'C:\Program Files (x86)\Na
  option('delay_minimum_sleep_us', type : 'integer', min : 0, value : 100,
         description : 'Minimum time in microseconds to suspend execution for (rather than polling) when a delay is required.'
                     + ' Larger values may perform better on machines with low timer resolution, at the cost of increased power.')

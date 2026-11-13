@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Roos <thomas@roosesweb.de>
+Date: Thu, 5 Nov 2026 22:30:00 +0100
+Subject: [PATCH] pyproject.toml: do not pin setuptools
+
+lru-dict 1.4.x pins the PEP 517 build to setuptools==80.9.0. OE-Core
+provides a newer setuptools, which builds the extension as well.
+
+Upstream-Status: Inappropriate [oe-specific]
+AI-Generated: Claude Code, Claude Opus 5.5
+Signed-off-by: Thomas Roos <thomas@roosesweb.de>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools==80.9.0"]
++requires = ["setuptools>=80.9.0"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]

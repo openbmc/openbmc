@@ -21,7 +21,7 @@ diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport
 index 922bb836e14..ee2092acece 100644
 --- a/src/core/tsi/ssl_transport_security.cc
 +++ b/src/core/tsi/ssl_transport_security.cc
-@@ -893,7 +893,7 @@ static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
+@@ -1023,7 +1023,7 @@ static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
    int common_name_index = -1;
    X509_NAME_ENTRY* common_name_entry = nullptr;
    ASN1_STRING* common_name_asn1 = nullptr;
@@ -30,7 +30,7 @@ index 922bb836e14..ee2092acece 100644
    int utf8_returned_size = 0;
    if (subject_name == nullptr) {
      VLOG(2) << "Could not get subject name from certificate.";
-@@ -951,7 +951,7 @@ static tsi_result peer_property_from_x509_common_name(
+@@ -1081,7 +1081,7 @@ static tsi_result peer_property_from_x509_common_name(
  static tsi_result peer_property_from_x509_subject(X509* cert,
                                                    tsi_peer_property* property,
                                                    bool is_verified_root_cert) {
@@ -39,7 +39,7 @@ index 922bb836e14..ee2092acece 100644
    if (subject_name == nullptr) {
      GRPC_TRACE_LOG(tsi, INFO) << "Could not get subject name from certificate.";
      return TSI_NOT_FOUND;
-@@ -1047,16 +1047,16 @@ static tsi_result add_subject_alt_names_properties_to_peer(
+@@ -1177,16 +1177,16 @@ static tsi_result add_subject_alt_names_properties_to_peer(
        char ntop_buf[INET6_ADDRSTRLEN];
        int af;
  

@@ -41,6 +41,7 @@ PACKAGECONFIG[opie] = "--with-opie,--without-opie,opie,"
 PACKAGECONFIG[des] = "--with-des,--without-des,,"
 PACKAGECONFIG[ldap] = "--with-ldap=${STAGING_LIBDIR} --enable-ldapdb,--without-ldap --disable-ldapdb,openldap,"
 PACKAGECONFIG[ntlm] = "--enable-ntlm=yes,--enable-ntlm=no,,"
+PACKAGECONFIG[login] = "--enable-login,--disable-login,,"
 
 CFLAGS += "-fPIC"
 

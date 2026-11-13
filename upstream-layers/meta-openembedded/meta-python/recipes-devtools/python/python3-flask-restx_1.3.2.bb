@@ -8,6 +8,8 @@ CVE_PRODUCT = "flask-restx"
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "flask-restx"
+
 RDEPENDS:${PN} += " \
     python3-aniso8601 \
     python3-jsonschema \

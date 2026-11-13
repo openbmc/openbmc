@@ -7,8 +7,6 @@ inherit systemd update-rc.d ptest pypi python_pep517 python_setuptools_build_met
 
 DEPENDS += "python3-wheel-native"
 
-PYPI_PACKAGE = "gpiod_sysfs_proxy"
-
 SRC_URI += " \
     file://gpiod-sysfs-proxy.init.in \
     file://run-ptest.in \

@@ -12,6 +12,7 @@ SRC_URI += " \
     ${@bb.utils.contains('PACKAGECONFIG', 'gridnav', 'file://gridnav.cfg', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'sdl', 'file://sdl.cfg', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'thorvg', 'file://thorvg.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'wayland', 'file://wayland.cfg', '', d)} \
 "
 
 PACKAGECONFIG ??= "drm"
@@ -22,17 +23,15 @@ PACKAGECONFIG[freetype] = ",,freetype"
 PACKAGECONFIG[gridnav] = ",,"
 PACKAGECONFIG[thorvg] = ",,"
 PACKAGECONFIG[sdl] = ",,virtual/libsdl2 libsdl2-image"
+PACKAGECONFIG[wayland] = ",,wayland wayland-protocols wayland-native libxkbcommon"
 
 inherit cml1 python3native
 
 EXTRA_OECMAKE += "-DLV_BUILD_USE_KCONFIG=ON"
 
-LVGL_FLAGS += " \
-    ${@bb.utils.contains('PACKAGECONFIG', 'drm', '-I${STAGING_INCDIR}/libdrm', '', d)} \
-    ${@bb.utils.contains('PACKAGECONFIG', 'freetype', '-I${STAGING_INCDIR}/freetype2', '', d)} \
-"
-CFLAGS += "${LVGL_FLAGS}"
-CXXFLAGS += "${LVGL_FLAGS}"
+# needed for finding wayland protocols
+export SYSROOT
+SYSROOT = "${RECIPE_SYSROOT}"
 
 KCONFIG_CONFIG_ROOTDIR ?= "${S}"
 KCONFIG_FILE ?= "${KCONFIG_CONFIG_ROOTDIR}/Kconfig"

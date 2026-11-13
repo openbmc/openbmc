@@ -36,7 +36,7 @@ diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport
 index 6526d3f..ff03697 100644
 --- a/src/core/tsi/ssl_transport_security.cc
 +++ b/src/core/tsi/ssl_transport_security.cc
-@@ -406,9 +406,9 @@ static int looks_like_ip_address(absl::string_view name) {
+@@ -1021,9 +1021,9 @@ static int looks_like_ip_address(absl::string_view name) {
  static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
                                             size_t* utf8_size) {
    int common_name_index = -1;
@@ -49,7 +49,7 @@ index 6526d3f..ff03697 100644
    int utf8_returned_size = 0;
    if (subject_name == nullptr) {
      VLOG(2) << "Could not get subject name from certificate.";
-@@ -466,7 +466,7 @@ static tsi_result peer_property_from_x509_common_name(
+@@ -1081,7 +1081,7 @@ static tsi_result peer_property_from_x509_common_name(
  static tsi_result peer_property_from_x509_subject(X509* cert,
                                                    tsi_peer_property* property,
                                                    bool is_verified_root_cert) {
@@ -58,7 +58,7 @@ index 6526d3f..ff03697 100644
    if (subject_name == nullptr) {
      GRPC_TRACE_LOG(tsi, INFO) << "Could not get subject name from certificate.";
      return TSI_NOT_FOUND;
-@@ -562,16 +562,16 @@ static tsi_result add_subject_alt_names_properties_to_peer(
+@@ -1177,16 +1177,16 @@ static tsi_result add_subject_alt_names_properties_to_peer(
        char ntop_buf[INET6_ADDRSTRLEN];
        int af;
  
@@ -78,7 +78,7 @@ index 6526d3f..ff03697 100644
                                     ntop_buf, INET6_ADDRSTRLEN);
        if (name == nullptr) {
          LOG(ERROR) << "Could not get IP string from asn1 octet.";
-@@ -855,13 +855,12 @@ static tsi_result x509_store_load_certs(X509_STORE* cert_store,
+@@ -1472,13 +1472,12 @@ static tsi_result x509_store_load_certs(X509_STORE* cert_store,
        break;  // We're at the end of stream.
      }
      if (root_names != nullptr) {
@@ -97,13 +97,13 @@ diff --git a/src/core/tsi/ssl_transport_security_utils.cc b/src/core/tsi/ssl_tra
 index 8f6607c..93876bb 100644
 --- a/src/core/tsi/ssl_transport_security_utils.cc
 +++ b/src/core/tsi/ssl_transport_security_utils.cc
-@@ -281,11 +281,11 @@ bool VerifyCrlCertIssuerNamesMatch(X509_CRL* crl, X509* cert) {
+@@ -282,11 +282,11 @@ bool VerifyCrlCertIssuerNamesMatch(X509_CRL* crl, X509* cert) {
    if (cert == nullptr || crl == nullptr) {
      return false;
    }
 -  X509_NAME* cert_issuer_name = X509_get_issuer_name(cert);
 +  auto* cert_issuer_name = X509_get_issuer_name(cert);
-   if (cert == nullptr) {
+   if (cert_issuer_name == nullptr) {
      return false;
    }
 -  X509_NAME* crl_issuer_name = X509_CRL_get_issuer(crl);
@@ -111,7 +111,7 @@ index 8f6607c..93876bb 100644
    if (crl_issuer_name == nullptr) {
      return false;
    }
-@@ -316,7 +316,7 @@ absl::StatusOr<std::string> IssuerFromCert(X509* cert) {
+@@ -317,7 +317,7 @@ absl::StatusOr<std::string> IssuerFromCert(X509* cert) {
    if (cert == nullptr) {
      return absl::InvalidArgumentError("cert cannot be null");
    }
@@ -120,7 +120,7 @@ index 8f6607c..93876bb 100644
    unsigned char* buf = nullptr;
    int len = i2d_X509_NAME(issuer, &buf);
    if (len < 0 || buf == nullptr) {
-@@ -331,7 +331,7 @@ absl::StatusOr<std::string> AkidFromCertificate(X509* cert) {
+@@ -332,7 +332,7 @@ absl::StatusOr<std::string> AkidFromCertificate(X509* cert) {
    if (cert == nullptr) {
      return absl::InvalidArgumentError("cert cannot be null.");
    }
@@ -129,7 +129,7 @@ index 8f6607c..93876bb 100644
    int j = X509_get_ext_by_NID(cert, NID_authority_key_identifier, -1);
    // Can't have multiple occurrences
    if (j >= 0) {
-@@ -356,7 +356,7 @@ absl::StatusOr<std::string> AkidFromCrl(X509_CRL* crl) {
+@@ -357,7 +357,7 @@ absl::StatusOr<std::string> AkidFromCrl(X509_CRL* crl) {
    if (crl == nullptr) {
      return absl::InvalidArgumentError("Could not get AKID from crl.");
    }

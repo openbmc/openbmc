@@ -7,4 +7,6 @@ SRC_URI[sha256sum] = "b6032923e05e9d75ec17a5af9a98429c46d2839adfaf80604d52e0faac
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "pyserial-asyncio"
+
 RDEPENDS:${PN} += "python3-asyncio python3-core python3-pyserial"

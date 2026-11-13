@@ -4,8 +4,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7c96d2b08b3cec6d3c67fb864d1fd8cc"
 
 DEPENDS = "python3-hatch-vcs-native python3-hatch-fancy-pypi-readme-native"
 
-PYPI_PACKAGE = "scikit_build"
-
 inherit pypi python_hatchling
 
 SRC_URI[sha256sum] = "b9a8d07fca2d5d10d93220bc57a685161d72af1fc76285d55c564ddaa862e584"

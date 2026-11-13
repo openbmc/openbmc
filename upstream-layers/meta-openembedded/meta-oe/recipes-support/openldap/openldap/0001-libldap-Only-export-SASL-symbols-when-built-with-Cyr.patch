@@ -1,0 +1,56 @@
+From 5a05f63b8a693739834069ecd7dbec66010567bc Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 7 Nov 2026 23:46:45 -0800
+Subject: [PATCH] libldap: Only export SASL symbols when built with Cyrus SASL
+
+ldap_host_connected_to(), ldap_int_sasl_config(),
+ldap_int_sasl_get_option(), ldap_int_sasl_open() and
+ldap_int_sasl_set_option() are only compiled with HAVE_CYRUS_SASL,
+but ldap.map.in lists them unconditionally. Linkers that reject
+version script entries for undefined symbols, such as lld (default
+since 17), fail to link libldap without SASL:
+
+  ld.lld: error: version script assignment of 'OPENLDAP_2.200' to
+  symbol 'ldap_int_sasl_config' failed: symbol not defined
+
+Guard them like the other SASL-only entries.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ libraries/libldap/ldap.map.in | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/libraries/libldap/ldap.map.in b/libraries/libldap/ldap.map.in
+index 677d244..65613a3 100644
+--- a/libraries/libldap/ldap.map.in
++++ b/libraries/libldap/ldap.map.in
+@@ -140,7 +140,9 @@ OPENLDAP_2.200
+     ldap_get_message_ber;
+     ldap_get_option;
+     ldap_get_values_len;
++#ifdef HAVE_CYRUS_SASL
+     ldap_host_connected_to;
++#endif
+     ldap_init_fd;
+     ldap_initialize;
+     ldap_install_tls;
+@@ -166,12 +168,18 @@ OPENLDAP_2.200
+     ldap_int_put_controls;
+     ldap_int_sasl_bind;
+     ldap_int_sasl_close;
++#ifdef HAVE_CYRUS_SASL
+     ldap_int_sasl_config;
++#endif
+     ldap_int_sasl_external;
++#ifdef HAVE_CYRUS_SASL
+     ldap_int_sasl_get_option;
++#endif
+     ldap_int_sasl_init;
++#ifdef HAVE_CYRUS_SASL
+     ldap_int_sasl_open;
+     ldap_int_sasl_set_option;
++#endif
+     ldap_int_select;
+     ldap_int_timeval_dup;
+     ldap_int_tls_destroy;

@@ -1,4 +1,4 @@
-From 6c8b0a3f9c09a7a135d95ff18038bcba22e87b86 Mon Sep 17 00:00:00 2001
+From 077f72feece0736243f6a2f9aff169b00dbb685d Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 8 Apr 2021 14:06:05 +0800
 Subject: [PATCH] support to override /usr/sbin and /usr/share
@@ -34,6 +34,3 @@ index 21a9a39..649f465 100644
 -	chmod 0755 $(DESTDIR)/usr/sbin/debootstrap
 +	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)$(sbindir)/debootstrap
 +	chmod 0755 $(DESTDIR)$(sbindir)/debootstrap
--- 
-2.25.1
-

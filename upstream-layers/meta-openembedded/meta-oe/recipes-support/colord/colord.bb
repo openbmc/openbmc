@@ -1,6 +1,6 @@
 require ${BPN}.inc
 
-inherit meson gobject-introspection gsettings gtk-doc gettext bash-completion systemd features_check useradd pkgconfig
+inherit meson gobject-introspection gsettings gtk-doc gettext bash-completion systemd features_check useradd pkgconfig vala
 
 # polkit and gobject-introspection are mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "polkit gobject-introspection-data"
@@ -29,8 +29,12 @@ EXTRA_OEMESON += " \
 	-Dpnp_ids=${datadir}/hwdata/pnp.ids \
 "
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= " \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
+    ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)} \
+"
 PACKAGECONFIG[systemd] = "-Dsystemd=true, -Dsystemd=false, systemd"
+PACKAGECONFIG[vapi] = "-Dvapi=true,-Dvapi=false"
 
 SYSTEMD_SERVICE:${PN} = "colord.service"
 

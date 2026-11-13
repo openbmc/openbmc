@@ -1,0 +1,117 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 9 Nov 2026 09:00:00 -0800
+Subject: [PATCH] ssl: Fix build with OpenSSL 4
+
+OpenSSL 4 makes ASN1_STRING opaque, removes ASN1_STRING_data() and
+ERR_remove_state(), and returns const pointers from
+X509_EXTENSION_get_object() and X509_EXTENSION_get_data().
+
+Use the ASN1_STRING accessors, which are available since OpenSSL 1.1,
+make the extension pointers const, and only call ERR_remove_state() with
+OpenSSL older than 1.1, where it is not a no-op.
+
+Upstream-Status: Inappropriate [v4.4 branch is EOL]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/src/mongo/util/net/openssl_init.cpp b/src/mongo/util/net/openssl_init.cpp
+index c4980bb0..93b6e4fc 100644
+--- a/src/mongo/util/net/openssl_init.cpp
++++ b/src/mongo/util/net/openssl_init.cpp
+@@ -77,7 +77,9 @@ public:
+ 
+         // The `guard` callback will cause an invocation of `getID`, so it must be destroyed first.
+         static thread_local ManagedId managedId;
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
+         static thread_local auto guard = makeGuard([] { ERR_remove_state(0); });
++#endif
+ 
+         return managedId.id;
+     }
+diff --git a/src/mongo/util/net/ssl_manager_openssl.cpp b/src/mongo/util/net/ssl_manager_openssl.cpp
+index 60cde955..fa55bb7d 100644
+--- a/src/mongo/util/net/ssl_manager_openssl.cpp
++++ b/src/mongo/util/net/ssl_manager_openssl.cpp
+@@ -1433,7 +1433,10 @@ SSLX509Name getCertificateSubjectX509Name(X509* cert) {
+ 
+         const auto* str = X509_NAME_ENTRY_get_data(entry);
+         rdn.emplace_back(
+-            buffer, str->type, std::string(reinterpret_cast<const char*>(str->data), str->length));
++            buffer,
++            ASN1_STRING_type(str),
++            std::string(reinterpret_cast<const char*>(ASN1_STRING_get0_data(str)),
++                        ASN1_STRING_length(str)));
+     }
+     if (!rdn.empty()) {
+         entries.push_back(std::move(rdn));
+@@ -2904,7 +2907,7 @@ Future<SSLPeerInfo> SSLManagerOpenSSL::parseAndValidatePeerCertificate(
+             const GENERAL_NAME* currentName = sk_GENERAL_NAME_value(sanNames, i);
+             if (currentName && currentName->type == GEN_DNS) {
+                 std::string dnsName(
+-                    reinterpret_cast<char*>(ASN1_STRING_data(currentName->d.dNSName)));
++                    reinterpret_cast<const char*>(ASN1_STRING_get0_data(currentName->d.dNSName)));
+                 auto swCIDRDNSName = CIDR::parse(dnsName);
+                 if (swCIDRDNSName.isOK()) {
+                     LOGV2_WARNING(23237,
+@@ -2925,14 +2928,16 @@ Future<SSLPeerInfo> SSLManagerOpenSSL::parseAndValidatePeerCertificate(
+                 auto ipAddrStruct = currentName->d.iPAddress;
+                 struct sockaddr_storage ss;
+                 memset(&ss, 0, sizeof(ss));
+-                if (ipAddrStruct->length == 4) {
++                const int ipAddrLength = ASN1_STRING_length(ipAddrStruct);
++                const unsigned char* ipAddrData = ASN1_STRING_get0_data(ipAddrStruct);
++                if (ipAddrLength == 4) {
+                     struct sockaddr_in* sa = reinterpret_cast<struct sockaddr_in*>(&ss);
+                     sa->sin_family = AF_INET;
+-                    memcpy(&(sa->sin_addr), ipAddrStruct->data, ipAddrStruct->length);
+-                } else if (ipAddrStruct->length == 16) {
++                    memcpy(&(sa->sin_addr), ipAddrData, ipAddrLength);
++                } else if (ipAddrLength == 16) {
+                     struct sockaddr_in6* sa = reinterpret_cast<struct sockaddr_in6*>(&ss);
+                     sa->sin6_family = AF_INET6;
+-                    memcpy(&(sa->sin6_addr), ipAddrStruct->data, ipAddrStruct->length);
++                    memcpy(&(sa->sin6_addr), ipAddrData, ipAddrLength);
+                 }
+                 auto ipAddress =
+                     SockAddr(reinterpret_cast<struct sockaddr*>(&ss), sizeof(ss)).getAddr();
+@@ -3026,15 +3031,16 @@ StatusWith<stdx::unordered_set<RoleName>> SSLManagerOpenSSL::_parsePeerRoles(X50
+     stdx::unordered_set<RoleName> roles;
+     for (int i = 0; i < extCount; i++) {
+         X509_EXTENSION* ex = sk_X509_EXTENSION_value(exts, i);
+-        ASN1_OBJECT* obj = X509_EXTENSION_get_object(ex);
++        const ASN1_OBJECT* obj = X509_EXTENSION_get_object(ex);
+ 
+         if (!OBJ_cmp(obj, rolesObj)) {
+             // We've found an extension which has our roles OID
+-            ASN1_OCTET_STRING* data = X509_EXTENSION_get_data(ex);
++            const ASN1_OCTET_STRING* data = X509_EXTENSION_get_data(ex);
+ 
+             return parsePeerRoles(
+-                ConstDataRange(reinterpret_cast<char*>(data->data),
+-                               reinterpret_cast<char*>(data->data) + data->length));
++                ConstDataRange(reinterpret_cast<const char*>(ASN1_STRING_get0_data(data)),
++                               reinterpret_cast<const char*>(ASN1_STRING_get0_data(data)) +
++                                   ASN1_STRING_length(data)));
+         }
+     }
+ 
+@@ -3054,14 +3060,15 @@ StatusWith<boost::optional<std::vector<DERInteger>>> SSLManagerOpenSSL::_parseTL
+     ASN1_OBJECT* featuresObj = OBJ_nid2obj(NID_tlsfeature);
+     for (int i = 0; i < extCount; i++) {
+         X509_EXTENSION* ex = sk_X509_EXTENSION_value(exts, i);
+-        ASN1_OBJECT* obj = X509_EXTENSION_get_object(ex);
++        const ASN1_OBJECT* obj = X509_EXTENSION_get_object(ex);
+ 
+         if (!OBJ_cmp(obj, featuresObj)) {
+             // We've found an extension which has the features OID
+-            ASN1_OCTET_STRING* data = X509_EXTENSION_get_data(ex);
++            const ASN1_OCTET_STRING* data = X509_EXTENSION_get_data(ex);
+             return parseTLSFeature(
+-                ConstDataRange(reinterpret_cast<char*>(data->data),
+-                               reinterpret_cast<char*>(data->data) + data->length));
++                ConstDataRange(reinterpret_cast<const char*>(ASN1_STRING_get0_data(data)),
++                               reinterpret_cast<const char*>(ASN1_STRING_get0_data(data)) +
++                                   ASN1_STRING_length(data)));
+         }
+     }
+     return boost::none;

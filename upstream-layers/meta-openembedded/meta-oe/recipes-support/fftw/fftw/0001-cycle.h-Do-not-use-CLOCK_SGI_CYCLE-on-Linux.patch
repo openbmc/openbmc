@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 25 Oct 2026 18:30:00 +0100
+Subject: [PATCH] cycle.h: Do not use CLOCK_SGI_CYCLE on Linux
+
+musl's <time.h> defines CLOCK_SGI_CYCLE, so on targets without an
+inline-asm cycle counter ahead of it in cycle.h (e.g. aarch64), FFTW
+picks clock_gettime(CLOCK_SGI_CYCLE) as its tick counter. Linux dropped
+the driver behind that clock id and returns EINVAL, leaving the timespec
+uninitialized. Every measurement then reads as (nearly) zero, so
+X(measure_execution_time) keeps doubling the iteration count and any
+FFTW_MEASURE plan never finishes; the bench --verify ptest hangs.
+
+Skip the SGI clock on Linux, which makes musl fall back to the same
+estimate-only planner glibc uses on these architectures. This also
+avoids the duplicate ticks definition with --enable-armv8-cntvct-el0.
+
+Upstream-Status: Submitted [https://github.com/FFTW/fftw3/pull/430]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kernel/cycle.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/cycle.h b/kernel/cycle.h
+index 83438bb..960eb90 100644
+--- a/kernel/cycle.h
++++ b/kernel/cycle.h
+@@ -437,8 +437,13 @@ INLINE_ELAPSED(__inline)
+ #define HAVE_TICK_COUNTER
+ #endif
+ /*----------------------------------------------------------------*/
+-/* SGI/Irix */
+-#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_SGI_CYCLE) && !defined(HAVE_TICK_COUNTER) && !defined(__ANDROID__)
++/* SGI/Irix
++
++   Linux removed the CLOCK_SGI_CYCLE driver and clock_gettime() fails with
++   EINVAL for it, but musl still defines the constant.  Using it leaves the
++   timespec unset, so every measurement reads as zero and the planner keeps
++   doubling the iteration count forever. */
++#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_SGI_CYCLE) && !defined(HAVE_TICK_COUNTER) && !defined(__ANDROID__) && !defined(__linux__)
+ typedef struct timespec ticks;
+ 
+ static inline ticks getticks(void)

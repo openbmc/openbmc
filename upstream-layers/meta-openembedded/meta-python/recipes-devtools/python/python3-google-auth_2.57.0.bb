@@ -11,8 +11,6 @@ SRC_URI += " \
 "
 SRC_URI[sha256sum] = "9b4f96d6a1feb5f7201231f47cfb3de08d8f176f8a61f9e461555116e95a8789"
 
-PYPI_PACKAGE = "google_auth"
-
 RDEPENDS:${PN}-ptest += " \
         python3-aioresponses \
         python3-cryptography \

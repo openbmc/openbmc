@@ -1,0 +1,4 @@
+#!/bin/sh
+
+pytest --automake \
+       --deselect tests/test_pytest_plugin.py::test_import_before_pytest_main

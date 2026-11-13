@@ -11,8 +11,6 @@ SRCNAME = "cassandra-driver"
 SRC_URI += "file://0001-skip-verifying-the-availability-of-setuptools.patch"
 SRC_URI[sha256sum] = "ff6b82ee4533f6fd4474d833e693b44b984f58337173ee98ed76bce08721a636"
 
-PYPI_PACKAGE = "cassandra_driver"
-
 inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} += "\
@@ -22,7 +20,6 @@ RDEPENDS:${PN} += "\
     python3-misc \
     python3-multiprocessing \
     python3-numbers \
-    python3-six \
     libevent \
 "
 

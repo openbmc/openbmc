@@ -11,6 +11,8 @@ SRC_URI[sha256sum] = "e4e3257ef2cf81a3339787a4d5cf924e54c91f095a723f6d2584dae61d
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "javaobj-py3"
+
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} += " \

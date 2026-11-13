@@ -9,6 +9,4 @@ inherit pypi python_flit_core
 
 RDEPENDS:${PN} += "python3-markdown-it-py"
 
-PYPI_PACKAGE = "mdit_py_plugins"
-
 BBCLASSEXTEND = "native nativesdk"

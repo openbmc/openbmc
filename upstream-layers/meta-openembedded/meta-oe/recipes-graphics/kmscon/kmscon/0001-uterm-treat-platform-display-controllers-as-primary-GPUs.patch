@@ -1,0 +1,53 @@
+From 92b87c18f67ba9c01b23b50d014c5c5cfa72717e Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Wed, 7 Oct 2026 13:09:58 +0200
+Subject: [PATCH] uterm: treat platform display controllers as primary GPUs
+
+A GPU only counted as primary when its PCI parent had boot_vga set.
+SoC display controllers such as vc4 on the Raspberry Pi are platform
+devices without a PCI parent, so with gpus=primary kmscon ignored the
+only display in the system and never showed a terminal.
+
+Treat DRM devices on the platform bus as primary. USB displays are
+excluded: on these systems the USB controller is a platform device too,
+so they would otherwise be taken as primary.
+
+Tested on a Raspberry Pi 4 with --gpus=primary: before, card0 (vc4)
+was ignored as "no primary GPU"; now the terminal comes up on HDMI-A
+with the drm2d backend. The USB exclusion is not tested on hardware.
+
+Assisted-By: Claude Opus 5.5
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Backport [https://github.com/kmscon/kmscon/pull/551/changes/e8d5af950b1046f060604932440306dd16c9039e]
+---
+ src/uterm/monitor.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/src/uterm/monitor.c b/src/uterm/monitor.c
+index f2141969..ccb5e422 100644
+--- a/src/uterm/monitor.c
++++ b/src/uterm/monitor.c
+@@ -244,9 +244,21 @@ static bool is_drm_primary(struct uterm_monitor *mon, struct udev_device *dev, c
+ 			log_debug("DRM device %s is primary PCI GPU", node);
+ 			return true;
+ 		}
++		return false;
+ 	}
+ 
+-	return false;
++	/*
++	 * SoC display controllers are platform devices without a boot_vga
++	 * attribute. Treat them as primary. USB displays sit below a platform
++	 * USB controller on such systems, but are never primary.
++	 */
++	if (udev_device_get_parent_with_subsystem_devtype(dev, "usb", NULL))
++		return false;
++	if (!udev_device_get_parent_with_subsystem_devtype(dev, "platform", NULL))
++		return false;
++
++	log_debug("DRM device %s is primary platform GPU", node);
++	return true;
+ }
+ 
+ /*

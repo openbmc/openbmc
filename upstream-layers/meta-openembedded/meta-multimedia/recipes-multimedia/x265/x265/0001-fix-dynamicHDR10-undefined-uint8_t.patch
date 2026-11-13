@@ -1,0 +1,24 @@
+From 3b7d8d1e6134db80db46a927c06c33074dcb4bda Mon Sep 17 00:00:00 2001
+From: ReenigneArcher <reenignearcher@gmail.com>
+Date: Wed, 9 Jul 2025 14:41:33 +0000
+Subject: [PATCH] fix(dynamicHDR10): undefined-uint8_t
+
+(cherry picked from commit 98eec4057fc20850b59ed292b3f13ddeefc2f93f)
+Upstream-Status: Backport [https://github.com/Multicorewareinc/x265/commit/98eec4057fc20850b59ed292b3f13ddeefc2f93f]
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ source/dynamicHDR10/json11/json11.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/source/dynamicHDR10/json11/json11.cpp b/source/dynamicHDR10/json11/json11.cpp
+index 762577735..c111ebb82 100644
+--- a/source/dynamicHDR10/json11/json11.cpp
++++ b/source/dynamicHDR10/json11/json11.cpp
+@@ -22,6 +22,7 @@
+ #include "json11.h"
+ #include <cassert>
+ #include <cmath>
++#include <cstdint>
+ #include <cstdlib>
+ #include <cstdio>
+ #include <limits>

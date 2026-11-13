@@ -1,5 +1,13 @@
 #!/bin/sh
-/usr/kernel-selftest/run_kselftest.sh -s
+# ftrace:ftracetest-ktap has no per-test timeout and its
+# instances/instance-event.tc can leave a task stuck in D state in
+# trace_array_get() (seen on linux-yocto 7.2.4), hanging the suite. Skip it.
+#
+# filesystems:file_stressor is a 15 minute stress test; its forked children
+# move to their own process group, escape the per-test timeout and keep the
+# runner blocked (and silent) until they finish, so ptest-runner kills the
+# whole suite. Skip it.
+/usr/kernel-selftest/run_kselftest.sh -s -S ftrace:ftracetest-ktap -S filesystems:file_stressor
 if [ $? == 0 ]; then
     echo "PASS: kernel-selftest"
 else

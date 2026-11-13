@@ -1,0 +1,103 @@
+From bd850ae8327432ccca79ac1abfaef37b46e48feb Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Thu, 24 Sep 2026 12:02:16 +1000
+Subject: [PATCH] Initalise list_for_each() iterator variables
+
+Clang's -Wuninitialized cannot prove that the argument to
+list_for_each()/list_for_each_safe() are assigned, so it reports
+
+  error: variable 'tpg' is uninitialized when used here
+    list_for_each(&tpg_recovery_list, tpg, recovery_entry) {
+
+Let's fix this by initalising them to NULL.
+
+Upstream-Status: Submitted [https://github.com/open-iscsi/tcmu-runner/pull/714]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ alua.c   | 10 +++++-----
+ target.c |  6 +++---
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/alua.c b/alua.c
+index 656a28f..a67fd6e 100644
+--- a/alua.c
++++ b/alua.c
+@@ -64,7 +64,7 @@ static int tcmu_set_alua_int_setting(struct alua_grp *group,
+ 
+ static void tcmu_release_tgt_ports(struct alua_grp *group)
+ {
+-	struct tgt_port *port, *port_next;
++	struct tgt_port *port = NULL, *port_next;
+ 
+ 	list_for_each_safe(&group->tgt_ports, port, port_next, entry) {
+ 		list_del(&port->entry);
+@@ -262,7 +262,7 @@ free_group:
+ 
+ void tcmu_release_alua_grps(struct list_head *group_list)
+ {
+-	struct alua_grp *group, *group_next;
++	struct alua_grp *group = NULL, *group_next;
+ 
+ 	list_for_each_safe(group_list, group, group_next, entry) {
+ 		list_del(&group->entry);
+@@ -349,7 +349,7 @@ free_names:
+  */
+ struct tgt_port *tcmu_get_enabled_port(struct list_head *group_list)
+ {
+-	struct alua_grp *group;
++	struct alua_grp *group = NULL;
+ 	struct tgt_port *port;
+ 
+ 	list_for_each(group_list, group, entry) {
+@@ -400,7 +400,7 @@ static int alua_sync_state(struct tcmu_device *dev,
+ {
+ 	struct tcmur_device *rdev = tcmu_dev_get_private(dev);
+ 	struct tcmur_handler *rhandler = tcmu_get_runner_handler(dev);
+-	struct alua_grp *group;
++	struct alua_grp *group = NULL;
+ 	uint16_t ao_group_id;
+ 	uint8_t alua_state;
+ 	int ret;
+@@ -655,7 +655,7 @@ static int tcmu_explicit_transition(struct list_head *group_list,
+ 				    uint8_t alua_status)
+ {
+ 	struct tcmu_device *dev = group->dev;
+-	struct alua_grp *tmp_group;
++	struct alua_grp *tmp_group = NULL;
+ 	int ret;
+ 
+ 	tcmu_dev_dbg(dev, "transition group %u new state %u old state %u sup 0x%x\n",
+diff --git a/target.c b/target.c
+index 55ca802..b483cac 100644
+--- a/target.c
++++ b/target.c
+@@ -161,7 +161,7 @@ static bool port_is_on_tgt_port_grp(struct tgt_port *port,
+ 
+ static struct tgt_port_grp *port_is_on_recovery_list(struct tgt_port *port)
+ {
+-	struct tgt_port_grp *tpg;
++	struct tgt_port_grp *tpg = NULL;
+ 
+ 	list_for_each(&tpg_recovery_list, tpg, recovery_entry) {
+ 		if (port_is_on_tgt_port_grp(port, tpg))
+@@ -216,7 +216,7 @@ fail:
+ static void tgt_port_grp_recovery_work_fn(void *arg)
+ {
+ 	struct tgt_port_grp *tpg = arg;
+-	struct tcmur_device *rdev, *tmp_rdev;
++	struct tcmur_device *rdev = NULL, *tmp_rdev;
+ 	bool enable_tpg = false;
+ 	int ret;
+ 
+@@ -280,7 +280,7 @@ int tcmu_add_dev_to_recovery_list(struct tcmu_device *dev)
+ {
+ 	struct tcmur_device *rdev = tcmu_dev_get_private(dev);
+ 	struct list_head alua_list;
+-	struct alua_grp *group;
++	struct alua_grp *group = NULL;
+ 	struct tgt_port_grp *tpg;
+ 	struct tgt_port *port, *enabled_port = NULL;
+ 	int ret;
+-- 
+2.55.0
+

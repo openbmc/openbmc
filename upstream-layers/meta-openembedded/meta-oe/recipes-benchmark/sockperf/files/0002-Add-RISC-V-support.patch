@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 18 Oct 2026 17:20:00 -0700
+Subject: [PATCH] Add RISC-V support
+
+configure rejects riscv hosts with "it has not been ported", and
+os_gettimeoftsc() falls back to the x86 rdtsc instruction for any
+unknown architecture.
+
+Accept riscv* hosts and read the time CSR with rdtime, which Linux lets
+user mode access (unlike the cycle CSR). On rv32 read the high half
+around the low half and retry on carry.
+
+Upstream-Status: Pending
+AI-Generated: Uses Claude Code
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ configure.ac   |  2 ++
+ src/ticks_os.h | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 258bbb0..13900cf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -29,6 +29,7 @@ case "$host" in
+   i386-*-freebsd*) TARGET=FREEBSD; TARGETDIR=x86;;
+   aarch64-*-*) TARGET=AARCH64; TARGETDIR=aarch64;;
+   s390*-*-*) TARGET=S390; TARGETDIR=s390;;
++  riscv*-*-*) TARGET=RISCV; TARGETDIR=riscv;;
+ esac
+  
+ AC_SUBST(AM_RUNTESTFLAGS)
+@@ -48,6 +49,7 @@ AM_CONDITIONAL(POWERPC_FREEBSD, test x$TARGET = xPOWERPC_FREEBSD)
+ AM_CONDITIONAL(FREEBSD, test x$TARGET = xFREEBSD)
+ AM_CONDITIONAL(AARCH64, test x$TARGET = xAARCH64)
+ AM_CONDITIONAL(S390, test x$TARGET = xS390)
++AM_CONDITIONAL(RISCV, test x$TARGET = xRISCV)
+ 
+ AC_SUBST(TARGET)
+ AC_SUBST(TARGETDIR)
+diff --git a/src/ticks_os.h b/src/ticks_os.h
+index 46e313c..023be3a 100644
+--- a/src/ticks_os.h
++++ b/src/ticks_os.h
+@@ -100,6 +100,20 @@ inline ticks_t os_gettimeoftsc() {
+     asm volatile("isb" : : : "memory");
+     asm volatile("mrs %0, cntvct_el0" : "=r" (ret));
+     return ret;
++#elif defined(__riscv)
++    // Linux allows user mode to read the time CSR, but not cycle
++#if __riscv_xlen == 64
++    uint64_t ret;
++    asm volatile("rdtime %0" : "=r"(ret));
++    return (ticks_t)ret;
++#else
++    uint32_t tmp;
++    do {
++        asm volatile("rdtimeh %0" : "=r"(upper_32));
++        asm volatile("rdtime %0" : "=r"(lower_32));
++        asm volatile("rdtimeh %0" : "=r"(tmp));
++    } while (upper_32 != tmp);
++#endif
+ #elif defined(__arm__)
+     // so the compiler will not complain. for
+     // AArch32 compile, this inline is not used

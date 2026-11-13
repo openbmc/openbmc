@@ -1,4 +1,11 @@
 #!/bin/sh
 
 # Only run unit tests, exclude nonregression and conformance tests that need external data files
-ctest -E "(NR-|CONF-|ETS-|testjp2)" -V | sed -u 's/\*\*\*/ /g' | awk '/Test +#/{gsub(/Passed/,"PASS"); gsub(/Failed/,"FAIL"); gsub(/Skipped/,"SKIP"); print $6": "$4; fflush();}'
+# ctest result lines look like: " 1/29 Test  #1: tte0 .....   Passed    0.01 sec"
+# anything other than Passed/Skipped/Disabled (Failed, Timeout, Exception, Not Run) is a FAIL
+ctest -E "(NR-|CONF-|ETS-|testjp2)" -V | awk '/Test +#[0-9]+:/ {
+    if ($0 ~ /Passed/) res = "PASS"
+    else if ($0 ~ /Skipped|Disabled/) res = "SKIP"
+    else res = "FAIL"
+    print res ": " $4; fflush()
+}'

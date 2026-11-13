@@ -12,8 +12,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=cb8aedd3bced19bd8026d96a8b6876d7"
 DEPENDS = "openssl"
 
 SRCREV = "19868984dc4dc697af6a86d65ab32a1f19a43ea4"
-SRC_URI = "git://github.com/OpenSC/OpenSC;branch=master;protocol=https \
+SRC_URI = "git://github.com/OpenSC/OpenSC;branch=master;protocol=https;tag=${PV} \
            file://0001-Changes-for-OpenSSL-4.0.0.patch \
+           file://CVE-2026-103531.patch \
            "
 
 CVE_STATUS[CVE-2024-8443] = "fixed-version: this is fixed since 0.26.0"
@@ -22,18 +23,22 @@ CVE_STATUS[CVE-2024-8443] = "fixed-version: this is fixed since 0.26.0"
 inherit autotools pkgconfig bash-completion
 
 EXTRA_OECONF = " \
-    --disable-ctapi \
     --disable-doc \
     --disable-static \
     --disable-strict \
 "
 EXTRA_OEMAKE = "DESTDIR=${D}"
 
+# Point OBJC at the full CC, helps computing AC_PROG_OBJC correctly
+export OBJC = "${CC}"
+
 PACKAGECONFIG ??= "pcsc"
 
 PACKAGECONFIG[openct] = "--enable-openct,--disable-openct,openct"
 PACKAGECONFIG[pcsc] = "--enable-pcsc,--disable-pcsc,pcsc-lite,pcsc-lite pcsc-lite-lib"
 PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline"
+PACKAGECONFIG[notify] = "--enable-notify,--disable-notify,glib-2.0"
+PACKAGECONFIG[ctapi] = "--enable-ctapi,--disable-ctapi"
 
 FILES:${PN} += "\
     ${libdir}/opensc-pkcs11.so \

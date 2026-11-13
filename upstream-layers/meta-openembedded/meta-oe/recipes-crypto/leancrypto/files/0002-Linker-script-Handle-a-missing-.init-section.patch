@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 19 Oct 2026 22:58:25 -0700
+Subject: [PATCH] Linker script: Handle a missing .init section
+
+Not every C library provides a .init section; musl, for example, has
+no crti.o .init/.fini code on riscv64 and only uses .init_array. The
+linker script then refers to ADDR(.init) of a section which does not
+exist. GNU ld accepts this and yields an empty range, but LLD rejects
+it and the link fails:
+
+  ld.lld: error: internal/src/fips_integrity_check.ld:11: undefined section .init
+  ld.lld: error: internal/src/fips_integrity_check.ld:12: undefined section .init
+
+Only use ADDR(.init) when the section has a size, and otherwise provide
+an empty range at the start of .text, which matches what GNU ld does.
+The symbol values are unchanged whenever .init exists.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ internal/src/fips_integrity_check.ld | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/internal/src/fips_integrity_check.ld b/internal/src/fips_integrity_check.ld
+index 61397f5..e803d2f 100644
+--- a/internal/src/fips_integrity_check.ld
++++ b/internal/src/fips_integrity_check.ld
+@@ -8,8 +8,8 @@ SECTIONS
+ 	.lc_fips_integrity_hash :
+ 	{
+ 		/* Executable code */
+-		PROVIDE(lc_fips_start_init = ADDR(.init));
+-		PROVIDE(lc_fips_end_init = ADDR(.init) + SIZEOF(.init));
++		PROVIDE(lc_fips_start_init = SIZEOF(.init) ? ADDR(.init) : ADDR(.text));
++		PROVIDE(lc_fips_end_init = SIZEOF(.init) ? ADDR(.init) + SIZEOF(.init) : ADDR(.text));
+ 
+ 		/* Executable code */
+ 		PROVIDE(lc_fips_start_text = ADDR(.text));

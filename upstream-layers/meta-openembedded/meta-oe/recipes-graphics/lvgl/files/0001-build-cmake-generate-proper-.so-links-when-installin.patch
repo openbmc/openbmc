@@ -1,0 +1,71 @@
+From a9841c03f4670d1b0373cb869573740df92cd1cf Mon Sep 17 00:00:00 2001
+From: Thorsten Schmelzer <t.schmelzer@phytec.de>
+Date: Tue, 6 Oct 2026 11:58:15 +0200
+Subject: [PATCH] build(cmake): generate proper .so links when installing
+ shared library
+
+Commit 789d453 removed the set_target_properties sections for the
+library installations. That results in only the plain liblvgl.so being
+installed in the install location, when building a shared library.
+Other package and build systems (like yocto), however expect to have a
+proper versioned library and links like this:
+liblvgl.so -> liblvgl.so.9
+liblvgl.so.9 -> liblvgl.so.9.6.0
+liblvgl.so.9.6.0
+
+Fix this by setting VERSION and SOVERSION in set_target_properties
+for lvgl, lvgl_demos and lvgl_examples library targets.
+
+Upstream-Status: Backport [8df3de9c4c5e45ad7b0fef5adc2fa6eaa5d21579]
+
+Signed-off-by: Thorsten Schmelzer <t.schmelzer@phytec.de>
+---
+ env_support/cmake/install.cmake | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/env_support/cmake/install.cmake b/env_support/cmake/install.cmake
+index cb647af9ea9b..93a0272f81c8 100644
+--- a/env_support/cmake/install.cmake
++++ b/env_support/cmake/install.cmake
+@@ -91,6 +91,13 @@ install(
+     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
+ )
+ 
++set_target_properties(
++    lvgl
++    PROPERTIES OUTPUT_NAME lvgl
++    VERSION ${LVGL_VERSION}
++    SOVERSION ${LVGL_SOVERSION}
++)
++
+ install(TARGETS lvgl
+     EXPORT lvglTargets
+     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+@@ -132,6 +139,13 @@ if(CONFIG_LV_BUILD_DEMOS)
+         FILES_MATCHING PATTERN "*.h"
+     )
+ 
++    set_target_properties(
++        lvgl_demos
++        PROPERTIES OUTPUT_NAME lvgl_demos
++        VERSION ${LVGL_VERSION}
++        SOVERSION ${LVGL_SOVERSION}
++    )
++
+     # Demo library target (if you build one)
+     install(TARGETS lvgl_demos
+ 	EXPORT lvglDemosTargets
+@@ -155,6 +169,13 @@ if(CONFIG_LV_BUILD_EXAMPLES)
+         FILES_MATCHING PATTERN "*.h"
+     )
+ 
++    set_target_properties(
++        lvgl_examples
++        PROPERTIES OUTPUT_NAME lvgl_examples
++        VERSION ${LVGL_VERSION}
++        SOVERSION ${LVGL_SOVERSION}
++    )
++
+     install(TARGETS lvgl_examples
+ 	EXPORT lvglExamplesTargets
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

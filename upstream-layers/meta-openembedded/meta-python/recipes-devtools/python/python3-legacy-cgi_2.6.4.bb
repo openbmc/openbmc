@@ -3,8 +3,6 @@ HOMEPAGE = "https://github.com/jackrosenthal/legacy-cgi"
 LICENSE = "PSF-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4b8801e752a2c70ac41a5f9aa243f766"
 
-PYPI_PACKAGE = "legacy_cgi"
-
 inherit python_poetry_core pypi python_hatchling
 
 SRC_URI += "\

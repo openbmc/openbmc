@@ -1,0 +1,35 @@
+From f74adc4243bd9e1a8ee96d187c939e6232510650 Mon Sep 17 00:00:00 2001
+From: Dudemanguy <random342@airmail.cc>
+Date: Thu, 22 Jan 2026 11:12:22 -0600
+Subject: [PATCH] opengl/context: require swap_buffers param for FenceSync
+
+Commits 8854c742711705be1fcfcc6a5875960a3e2593dc and
+5ae0e0ff9a6974453c1aba41ddc8442d12ac9264 eliminated the external
+swapchain API that the render backend (vo_libmpv) was previously using.
+However, it was missed that this was being used to skip the
+gl->FenceSync calls and that logic change was not properly accounted
+for. This meant that vo_libmpv would leak fences since
+ra_gl_ctx_swap_buffers is never called to clean them up.
+
+Fix this by making sure the ra_ctx_params have swap_buffers defined
+before calling gl->FenceSync. All platforms are required to implement
+this anyway with the exception of vo_libmpv since it's a funny special
+case. Fixes #17217.
+Upstream-Status: Backport [https://github.com/mpv-player/mpv/commit/f74adc4243bd9e1a8ee96d187c939e6232510650]
+---
+ video/out/opengl/context.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/video/out/opengl/context.c b/video/out/opengl/context.c
+index 86e8d5daac8b4..86e5c797d670a 100644
+--- a/video/out/opengl/context.c
++++ b/video/out/opengl/context.c
+@@ -232,7 +232,7 @@ bool ra_gl_ctx_submit_frame(struct ra_swapchain *sw, const struct vo_frame *fram
+     if (p->opts->use_glfinish)
+         gl->Finish();
+ 
+-    if (gl->FenceSync) {
++    if (gl->FenceSync && p->params.swap_buffers) {
+         GLsync fence = gl->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+         if (fence)
+             MP_TARRAY_APPEND(p, p->vsync_fences, p->num_vsync_fences, fence);

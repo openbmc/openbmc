@@ -62,8 +62,6 @@ DEPENDS:append:libc-musl = " libtirpc"
 CFLAGS:append:libc-musl = " -I${STAGING_INCDIR}/tirpc"
 LDFLAGS:append:libc-musl = " -ltirpc"
 
-COMPATIBLE_HOST:riscv32 = "null"
-
 INITSCRIPT_NAME = "samba"
 INITSCRIPT_PARAMS = "start 20 3 5 . stop 20 0 1 6 ."
 

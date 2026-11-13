@@ -14,7 +14,7 @@ inherit meson pkgconfig systemd features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 
-EXTRA_OEMESON = "-Dtests=false"
+EXTRA_OEMESON = "-Dtests=false -Dsystemdsystemunitdir=${systemd_system_unitdir}"
 
 SRCREV = "5b4994c8a91290481bef87a5bae95391d0ec677f"
 SRC_URI = "git://gitlab.freedesktop.org/upower/power-profiles-daemon;branch=main;protocol=https"

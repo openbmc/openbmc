@@ -1,0 +1,38 @@
+From d4362c9c99f2d80a6c4f25528934e040e333fd85 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 3 Nov 2026 07:13:41 -0800
+Subject: [PATCH] openssl_helper: Use ASN1_STRING_get_length() with OpenSSL 4.1
+
+OpenSSL 4.1 deprecates ASN1_STRING_length() in favour of
+ASN1_STRING_get_length(), which returns size_t. With -Werror the build
+fails with:
+
+  openssl_helper.c:1255:21: error: 'ASN1_STRING_length' is deprecated:
+  Since OpenSSL 4.1; use ASN1_STRING_get_length() [-Werror,-Wdeprecated-declarations]
+
+Use the new accessor when building against OpenSSL 4.1 or newer and keep
+ASN1_STRING_length() for older versions. A serial number is at most 20
+octets, so the cast to int is safe.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/lib/common/openssl_helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/lib/common/openssl_helper.c b/src/lib/common/openssl_helper.c
+index 7a6980e..e8961de 100644
+--- a/src/lib/common/openssl_helper.c
++++ b/src/lib/common/openssl_helper.c
+@@ -1252,7 +1252,11 @@ int get_certificate_serial_number_length(X509 *cert)
+ 
+     /* Get the raw data of the serial number */
+     serial_bytes = ASN1_STRING_get0_data(serial_number);
++#if OPENSSL_VERSION_NUMBER >= 0x40100000L
++    serial_length = (int)ASN1_STRING_get_length(serial_number);
++#else
+     serial_length = ASN1_STRING_length(serial_number);
++#endif
+ 
+     /* Check if the serial number is negative (MSB of first byte is set) */
+     if (serial_bytes[0] & 0x80)

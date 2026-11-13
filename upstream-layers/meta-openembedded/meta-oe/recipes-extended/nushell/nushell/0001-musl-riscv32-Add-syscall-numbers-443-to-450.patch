@@ -1,0 +1,39 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 10:00:00 -0700
+Subject: [PATCH] musl/riscv32: Add syscall numbers 443 to 450
+
+The riscv32 musl syscall list stops at SYS_mount_setattr (442), while
+the other musl targets and riscv32 glibc also define the newer generic
+syscalls. rustix uses SYS_futex_waitv, so it fails to build for
+riscv32 musl:
+
+  error[E0425]: cannot find value `SYS_futex_waitv` in this scope
+     --> rustix-1.1.4/src/backend/libc/thread/syscalls.rs:678:15
+
+Add quotactl_fd, landlock_*, memfd_secret, process_mrelease,
+futex_waitv and set_mempolicy_home_node, which use the asm-generic
+numbers on riscv32 as well.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/unix/linux_like/linux/musl/b32/riscv32/mod.rs | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+--- a/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
+@@ -623,6 +623,14 @@
+ pub const SYS_process_madvise: c_long = 440;
+ pub const SYS_epoll_pwait2: c_long = 441;
+ pub const SYS_mount_setattr: c_long = 442;
++pub const SYS_quotactl_fd: c_long = 443;
++pub const SYS_landlock_create_ruleset: c_long = 444;
++pub const SYS_landlock_add_rule: c_long = 445;
++pub const SYS_landlock_restrict_self: c_long = 446;
++pub const SYS_memfd_secret: c_long = 447;
++pub const SYS_process_mrelease: c_long = 448;
++pub const SYS_futex_waitv: c_long = 449;
++pub const SYS_set_mempolicy_home_node: c_long = 450;
+ 
+ // Plain syscalls aliased to their time64 variants
+ pub const SYS_clock_gettime: c_long = SYS_clock_gettime64;

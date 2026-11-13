@@ -1,4 +1,4 @@
-From 895e76e75dbb993a8f445072c190a9db4ee50d15 Mon Sep 17 00:00:00 2001
+From 8bc8f1e64df1a285c902c4cbf272fa6e6f0f8e69 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Sat, 7 Mar 2020 08:34:02 -0800
 Subject: [PATCH] Fix nss multilib build on openSUSE 11.x 32bit
@@ -40,6 +40,3 @@ index 337cbeb..dd77fbe 100644
  ifeq (,$(filter-out WIN%,$(OS_TARGET)))
  PROGRAM		=
  TARGETS		=
--- 
-2.25.1
-

@@ -88,4 +88,8 @@ FILES:${PN}-ptest += "${libdir}/tools/"
 FILES:${PN}-ptest += "/opt/"
 FILES:${PN}-doc += "${datadir}/${PN}/man"
 
+OEQA_BUILDPATHS_SKIP = "/home/ubuntu"
+
 COMPATIBLE_HOST = "(x86_64.*|aarch64.*|powerpc64.*|riscv64.*)-linux"
+
+CVE_PRODUCT = "iovisor:bpf_compiler_collection"

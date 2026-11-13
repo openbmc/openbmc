@@ -1,0 +1,50 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 14:00:00 -0700
+Subject: [PATCH] rice-proto: Use AtomicUsize for the agent counter
+
+core only provides AtomicU64 on targets with 64-bit atomics, so
+rice-proto fails to build for e.g. riscv32:
+
+  error[E0432]: unresolved import `core::sync::atomic::AtomicU64`
+    --> rice-proto/src/agent.rs:19:5
+
+AGENT_COUNT only hands out agent ids, like the STUN agent, connection
+check and check list counters, which are already AtomicUsize. Use
+AtomicUsize for it as well and widen the value to the u64 id, so
+Agent::id() is unchanged.
+
+Upstream-Status: Submitted [https://github.com/ystreet/librice/pull/202]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ rice-proto/src/agent.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/rice-proto/src/agent.rs
++++ b/rice-proto/src/agent.rs
+@@ -16,7 +16,7 @@
+ use core::error::Error;
+ use core::fmt::Display;
+ use core::net::SocketAddr;
+-use core::sync::atomic::AtomicU64;
++use core::sync::atomic::AtomicUsize;
+ use core::time::Duration;
+ 
+ use stun_proto::Instant;
+@@ -189,7 +189,7 @@
+         turn_client_proto::types::debug_init();
+         rice_stun_types::debug_init();
+ 
+-        let id = AGENT_COUNT.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
++        let id = AGENT_COUNT.fetch_add(1, core::sync::atomic::Ordering::SeqCst) as u64;
+         let tie_breaker = rand_u64();
+         let controlling = self.controlling;
+         let mut checklistset = ConnCheckListSet::builder(tie_breaker, controlling)
+@@ -210,7 +210,7 @@
+     }
+ }
+ 
+-static AGENT_COUNT: AtomicU64 = AtomicU64::new(0);
++static AGENT_COUNT: AtomicUsize = AtomicUsize::new(0);
+ 
+ impl Default for Agent {
+     fn default() -> Self {

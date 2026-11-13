@@ -12,3 +12,4 @@ RDEPENDS:${PN} += " \
     python3-requests \
 "
 
+PYPI_PACKAGE_SDIST = "requests-ftp"

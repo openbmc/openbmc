@@ -11,7 +11,6 @@ inherit pypi setuptools3
 
 DEPENDS += " \
     python3-setuptools-scm-native \
-    python3-six-native \
 "
 
 RDEPENDS:${PN} += "\

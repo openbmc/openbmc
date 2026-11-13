@@ -17,6 +17,7 @@ SRC_URI = " \
     file://0010-Recognise-riscv64gc-and-riscv32gc-as-valid-architect.patch \
     file://0011-Fix-build-error-with-musl.patch \
     file://0012-Replace-deprecated-ast.Str-and-ast.Index-with-ast.Co.patch \
+    file://0013-libc-Enable-getrandom-on-all-musl-platforms.patch \
 "
 
 SRC_URI[sha256sum] = "358bb03c550f95172f1e31694e4287da3411560df91e931cb25210efdf90e524"

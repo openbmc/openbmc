@@ -11,7 +11,9 @@ LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=aec69d9265f7a44821317ebe1e576f1b \
 "
 
-SRC_URI = "git://github.com/chmln/sd.git;protocol=https;nobranch=1;tag=v${PV}"
+SRC_URI = "git://github.com/chmln/sd.git;protocol=https;nobranch=1;tag=v${PV} \
+           file://0001-Cargo.lock-Update-crossbeam-utils-and-rustix.patch \
+           "
 SRCREV = "4a7b216552d64134c0fa17a59b9d557d89019f0f"
 
 inherit cargo cargo-update-recipe-crates

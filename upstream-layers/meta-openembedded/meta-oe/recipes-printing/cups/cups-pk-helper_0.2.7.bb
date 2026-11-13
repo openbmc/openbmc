@@ -11,13 +11,8 @@ REQUIRED_DISTRO_FEATURES = "polkit"
 
 SRC_URI = " \
     https://www.freedesktop.org/software/cups-pk-helper/releases/cups-pk-helper-${PV}.tar.xz \
-    file://dont-localize-org.opensuse.CupsPkHelper.Mechanism.service.patch \
+    file://dont-override-gettextdatadirs.patch \
 "
 SRC_URI[sha256sum] = "66070ddb448fe9fcee76aa26be2ede5a80f85563e3a4afd59d2bfd79fbe2e831"
-
-do_install:append() {
-    install -d ${D}${datadir}/polkit-1/actions
-    install -m 644 ${S}/src/org.opensuse.cupspkhelper.mechanism.policy.in ${D}${datadir}/polkit-1/actions/org.opensuse.cupspkhelper.mechanism.policy
-}
 
 FILES:${PN} += "${datadir}"

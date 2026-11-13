@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "d5b408a8cd20ed496e8e66d0559560d29bc21cee482f893936a1f05d0d
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "eth-rlp"
+
 RDEPENDS:${PN} = " \
     python3-eth-utils \
     python3-hexbytes \

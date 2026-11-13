@@ -16,5 +16,4 @@ RDEPENDS:${PN} += "\
     python3-io \
     python3-json \
     python3-logging \
-    python3-six \
 "

@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Oct 2026 22:59:58 -0700
+Subject: [PATCH] tuna: Do not import tuna from setup.py
+
+Commit cb5593a2be9c ("tuna: Get the tuna version from a single source")
+made setup.py import tuna.version. setup.py runs from the setuptools
+build backend, which does not put the source directory on sys.path (only
+the legacy backend does), so building with a PEP 517 frontend fails:
+
+  $ python3 -m build --no-isolation --wheel
+  ...
+    File "<string>", line 9, in <module>
+  ModuleNotFoundError: No module named 'tuna'
+  ERROR Backend subprocess exited when trying to invoke get_requires_for_build_wheel
+
+pyproject.toml already takes the version from tuna.version.TUNA_VERSION
+via [tool.setuptools.dynamic], which setuptools reads without importing
+the package, so drop the import and the version argument from setup().
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-rt-users/20261028061243.4061773-1-raj.khem@gmail.com/]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ setup.py | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 8036a64..07ec523 100755
+--- a/setup.py
++++ b/setup.py
+@@ -5,9 +5,6 @@ import sysconfig
+ from os.path import isfile, relpath
+ from setuptools import setup
+ 
+-# Get the tuna version from a single source
+-from tuna.version import TUNA_VERSION
+-
+ if isfile("MANIFEST"):
+     os.unlink("MANIFEST")
+ 
+@@ -19,7 +16,6 @@ if SCHEME not in sysconfig.get_scheme_names():
+ PYTHONLIB = relpath(sysconfig.get_path('platlib', SCHEME), '/usr')
+ 
+ setup(name="tuna",
+-      version = TUNA_VERSION,
+       description = "Application tuning GUI",
+       author = "Arnaldo Carvalho de Melo, John Kacur",
+       author_email = "acme@redhat.com, jkacur@redhat.com",

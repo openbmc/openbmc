@@ -10,8 +10,6 @@ inherit pypi setuptools3 ptest-python-pytest
 
 RDEPENDS:${PN} += "python3-core"
 
-PYPI_PACKAGE = "tokenize_rt"
-
 do_install_ptest:append() {
     install -d ${D}${PTEST_PATH}/testing/resources
     cp -rf ${S}/testing/resources/* ${D}${PTEST_PATH}/testing/resources/

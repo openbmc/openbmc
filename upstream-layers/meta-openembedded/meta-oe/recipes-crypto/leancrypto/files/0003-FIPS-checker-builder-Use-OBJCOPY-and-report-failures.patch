@@ -1,0 +1,96 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 19 Oct 2026 23:09:52 -0700
+Subject: [PATCH] FIPS checker builder: Use $OBJCOPY and report failures
+
+The script that inserts the FIPS integrity digest into leancrypto-fips
+runs the build machine's objcopy. When cross compiling, that objcopy
+usually cannot read the target ELF file. The failure is not noticed
+either: "exit $?" after echo returns the status of echo, so the
+script exits 0, and the library is installed with the placeholder
+digest. At runtime the integrity test then fails and all algorithms
+are put into the error state:
+
+  ERROR: objcopy command failed: 0
+
+Use $OBJCOPY when set, as cross build environments export the objcopy
+for the target there, and keep the exit status so errors fail the
+build.
+
+llvm-objcopy fails when a section to dump does not exist, and some C
+libraries (e.g. musl on RISC-V) provide no .init section. Extract the
+init section separately and use an empty file when it is not present,
+which matches the empty range the linker script provides for it.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ addon/fips_integrity_checker_elf_generator.sh | 34 +++++++++++++------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/addon/fips_integrity_checker_elf_generator.sh b/addon/fips_integrity_checker_elf_generator.sh
+index 10628f5..1675f23 100755
+--- a/addon/fips_integrity_checker_elf_generator.sh
++++ b/addon/fips_integrity_checker_elf_generator.sh
+@@ -9,7 +9,7 @@ RODATASEGMENT=".lc_fips_rodata"
+ FIPSDATASEGMENT=".lc_fips_integrity_data"
+ SECOUTFILE="extracted_sections.digest"
+ 
+-OBJCOPY="objcopy"
++OBJCOPY="${OBJCOPY:-objcopy}"
+ CAT="cat"
+ CUT="cut"
+ 
+@@ -43,30 +43,42 @@ touch $RODATASEGMENT
+ # Extract sections
+ $OBJCOPY							\
+  --dump-section $TEXTSEGMENT=$TEXTSEGMENT			\
+- --dump-section $INITSEGMENT=$INITSEGMENT			\
+  --dump-section $RODATASEGMENT=$RODATASEGMENT			\
+- $SOFILE 2>/dev/null
++ $SOFILE
++ret=$?
++if [ $ret -ne 0 ]
++then
++	echo "ERROR: $OBJCOPY command failed: $ret"
++	exit $ret
++fi
++
++# Not every C library provides an init section (e.g. musl on RISC-V). The
++# linker script then defines an empty init range, which matches the empty
++# file created above. llvm-objcopy fails on a missing section, so extract it
++# separately and only when it is present.
++$OBJCOPY --dump-section $INITSEGMENT=$INITSEGMENT $SOFILE 2>/dev/null
+ if [ $? -ne 0 ]
+ then
+-	echo "ERROR: $OBJCOPY command failed: $?"
+-	exit $?
++	: > $INITSEGMENT
+ fi
+ 
+ # Merge sections into file and create digest
+ $CAT $TEXTSEGMENT $INITSEGMENT $RODATASEGMENT | $HASHER -b - > $SECOUTFILE 2>/dev/null
+-if [ $? -ne 0 ]
++ret=$?
++if [ $ret -ne 0 ]
+ then
+-	echo "ERROR: $CAT command failed: $?"
+-	exit $?
++	echo "ERROR: $CAT command failed: $ret"
++	exit $ret
+ fi
+ 
+ # Insert data into library file using an atomic operation
+ trap "rm -f $SOFILE.$$" 0 1 2 3 15
+ cp $SOFILE $SOFILE.$$
+ $OBJCOPY --update-section $FIPSDATASEGMENT="$SECOUTFILE" $SOFILE.$$
+-if [ $? -ne 0 ]
++ret=$?
++if [ $ret -ne 0 ]
+ then
+-	echo "ERROR: $OBJCOPY command failed: $?"
+-	exit $?
++	echo "ERROR: $OBJCOPY command failed: $ret"
++	exit $ret
+ fi
+ mv -f $SOFILE.$$ $SOFILE

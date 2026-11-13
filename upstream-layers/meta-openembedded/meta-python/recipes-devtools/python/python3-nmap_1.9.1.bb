@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 DEPENDS += "python3-wheel-native"
 
 PYPI_PACKAGE = "python3-nmap"
+PYPI_PACKAGE_SDIST = "python3-nmap"
 
 SRC_URI[sha256sum] = "8465cfb013f5cdfa8a1050c40cdae600b581ee32f1864ec404927aee49b4262c"
 

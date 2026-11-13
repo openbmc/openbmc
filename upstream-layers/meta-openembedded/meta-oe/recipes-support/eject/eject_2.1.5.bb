@@ -34,3 +34,5 @@ ALTERNATIVE_PRIORITY[eject] = "100"
 
 ALTERNATIVE:${PN}-doc = "eject.1"
 ALTERNATIVE_LINK_NAME[eject.1] = "${mandir}/man1/eject.1"
+
+CVE_STATUS[CVE-2026-28065] = "cpe-incorrect: this CVE is for WordPress plugin or theme"

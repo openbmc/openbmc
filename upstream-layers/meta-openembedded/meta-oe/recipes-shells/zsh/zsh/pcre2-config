@@ -1,0 +1,16 @@
+#!/bin/sh
+# libpcre2 inherits binconfig-disabled, so answer the queries zsh's
+# configure makes of pcre2-config using pkg-config instead.
+case "$1" in
+--cflags)
+    exec pkg-config --cflags libpcre2-8
+    ;;
+--libs8)
+    exec pkg-config --libs libpcre2-8
+    ;;
+--version)
+    exec pkg-config --modversion libpcre2-8
+    ;;
+esac
+echo "pcre2-config: unsupported option $1" >&2
+exit 1

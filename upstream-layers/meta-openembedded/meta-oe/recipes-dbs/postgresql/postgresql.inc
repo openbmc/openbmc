@@ -181,6 +181,13 @@ do_configure() {
     fi
 }
 
+# There's a makefile dependency race that causes occasional build
+# failures, so build this object first to avoid the race.
+# https://www.postgresql.org/message-id/CAAnfSTv_Vj9oH2vUs56KwDdbmfrOhuTb1o%2B6TXzBW_uUjOJpkg%40mail.gmail.com
+do_compile:prepend() {
+    make -C src/common jsonapi.o
+}
+
 do_compile:append() {
     oe_runmake -C contrib all
 

@@ -1,4 +1,4 @@
-From d19ad6cc086684ee74db250f5fd35227c98e678a Mon Sep 17 00:00:00 2001
+From 5a25c6991b51c58e8cbf54f1b7c1e2fd80e7c39a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Thu, 6 Jun 2024 10:29:29 +0200
 Subject: [PATCH] Add new thread attributes from Python 3.13
@@ -11,10 +11,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 7 insertions(+)
 
 diff --git a/eventlet/green/thread.py b/eventlet/green/thread.py
-index 224cd1c..c70c9e8 100644
+index 98baf22..2651710 100644
 --- a/eventlet/green/thread.py
 +++ b/eventlet/green/thread.py
-@@ -174,5 +174,12 @@ from eventlet.corolocal import local as _local
+@@ -179,5 +179,12 @@ from eventlet.corolocal import local as _local
  if hasattr(__thread, 'daemon_threads_allowed'):
      daemon_threads_allowed = __thread.daemon_threads_allowed
  
@@ -27,6 +27,3 @@ index 224cd1c..c70c9e8 100644
 +
  if hasattr(__thread, '_shutdown'):
      _shutdown = __thread._shutdown
--- 
-2.43.0
-

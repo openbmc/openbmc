@@ -54,7 +54,7 @@
 SIGNING_PKCS11_URI ?= ""
 SIGNING_PKCS11_MODULE ?= ""
 
-DEPENDS += "softhsm-native pkcs11-provider-native libp11-native opensc-native openssl-native extract-cert-native"
+DEPENDS += "softhsm-native pkcs11-provider-native libp11-native opensc-native openssl-native"
 
 def signing_class_prepare(d):
     import os.path
@@ -112,6 +112,9 @@ signing_import_prepare() {
 
     echo "directories.tokendir = $SOFTHSM2_DIR" > "$SOFTHSM2_CONF"
     echo "objectstore.backend = db" >> "$SOFTHSM2_CONF"
+    echo "log.level = ERROR" >> "$SOFTHSM2_CONF"
+    echo "slots.removable = false" >> "$SOFTHSM2_CONF"
+    echo "slots.mechanisms = ALL" >> "$SOFTHSM2_CONF"
     rm -rf "$SOFTHSM2_DIR"
     mkdir -p "$SOFTHSM2_DIR"
 
@@ -143,7 +146,7 @@ signing_import_cert_from_der() {
 
     # check wether the cert_name/role needs to be defined first,
     # or do so otherwise
-    local uri=$(siging_get_uri $cert_name)
+    local uri=$(signing_get_uri $cert_name)
     if [ -z "$uri" ]; then
         signing_import_define_role "$cert_name"
     fi
@@ -246,7 +249,7 @@ signing_import_cert_from_pem() {
 
     # check wether the cert_name/role needs to be defined first,
     # or do so otherwise
-    local uri=$(siging_get_uri $cert_name)
+    local uri=$(signing_get_uri $cert_name)
     if [ -z "$uri" ]; then
         signing_import_define_role "$cert_name"
     fi
@@ -337,7 +340,6 @@ signing_import_install() {
 
 signing_prepare() {
     export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
-    export OPENSSL_ENGINES="${STAGING_LIBDIR_NATIVE}/engines-3"
     export OPENSSL_CONF="${STAGING_LIBDIR_NATIVE}/openssl-provider-signing.cnf"
     export SSL_CERT_DIR="${STAGING_LIBDIR_NATIVE}/ssl-3/certs"
     export SSL_CERT_FILE="${STAGING_LIBDIR_NATIVE}/ssl-3/cert.pem"
@@ -348,18 +350,15 @@ signing_prepare() {
         echo "Missing OpenSSL module directory at '${OPENSSL_MODULES}'"
         return 1
     fi
-    if [ -d ${OPENSSL_ENGINES} ]; then
-        echo "Using '${OPENSSL_ENGINES}' for OpenSSL run-time PKCS#11 modules"
-    else
-        echo "Missing OpenSSL PKCS11 engine directory at '${OPENSSL_ENGINES}'"
-        return 1
-    fi
 
     export SOFTHSM2_CONF="${WORKDIR}/softhsm2.conf"
     export SOFTHSM2_DIR="${STAGING_DIR_NATIVE}/var/lib/softhsm/tokens"
 
     echo "directories.tokendir = $SOFTHSM2_DIR" > "$SOFTHSM2_CONF"
     echo "objectstore.backend = db" >> "$SOFTHSM2_CONF"
+    echo "log.level = ERROR" >> "$SOFTHSM2_CONF"
+    echo "slots.removable = false" >> "$SOFTHSM2_CONF"
+    echo "slots.mechanisms = ALL" >> "$SOFTHSM2_CONF"
 
     cat > "${OPENSSL_CONF}" <<EOF
 openssl_conf = openssl_init
@@ -447,7 +446,9 @@ signing_extract_cert_der() {
     local role="${1}"
     local output="${2}"
 
-    extract-cert "$(signing_get_uri $role)" "${output}"
+    signing_extract_cert_pem "${role}" "${output}.tmp-pem"
+    openssl x509 -in "${output}.tmp-pem" -outform der -out "${output}"
+    rm "${output}.tmp-pem"
 }
 
 # signing_extract_cert_pem <role> <pem>
@@ -458,9 +459,7 @@ signing_extract_cert_pem() {
     local role="${1}"
     local output="${2}"
 
-    extract-cert "$(signing_get_uri $role)" "${output}.tmp-der"
-    openssl x509 -inform der -in "${output}.tmp-der" -out "${output}"
-    rm "${output}.tmp-der"
+    openssl storeutl -certs -out "${output}" "$(signing_get_uri $role)"
 }
 
 # signing_create_uri_pem <role> <pem>

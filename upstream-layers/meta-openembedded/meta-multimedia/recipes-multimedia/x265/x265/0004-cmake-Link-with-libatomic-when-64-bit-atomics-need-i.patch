@@ -1,0 +1,55 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 21 Oct 2026 15:00:00 -0700
+Subject: [PATCH] cmake: Link with libatomic when 64-bit atomics need it
+
+The encoder uses the ATOMIC_* macros, i.e. the __sync builtins, on
+64-bit counters, e.g. the threaded ME sequence number and timing
+totals. On 32-bit targets without 64-bit atomic instructions, such as
+riscv32, the compiler lowers these to __atomic_*_8 libcalls. libx265 is
+not linked with libatomic, so linking the x265 CLI against it fails:
+
+  ld.lld: error: undefined reference: __atomic_fetch_or_8
+  >>> referenced by libx265.so.217 (disallowed by --no-allow-shlib-undefined)
+
+Check whether 64-bit atomics link on their own, and if not, whether they
+link with libatomic, and add it to PLATFORM_LIBS only in that case, so
+libx265, the CLI and the Libs.private of x265.pc all get it. The test
+variable is global so the compiler cannot optimize the atomic
+operations away.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ source/CMakeLists.txt | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -191,6 +191,27 @@
+     if(NO_ATOMICS)
+         add_definitions(-DNO_ATOMICS=1)
+     endif(NO_ATOMICS)
++    if(NOT NO_ATOMICS)
++        # The atomics on 64-bit counters need libatomic on 32-bit targets
++        # without 64-bit atomic instructions, e.g. riscv32. The variable is
++        # global so the compiler cannot optimize the atomic operations away.
++        set(ATOMIC64_TEST "
++#include <stdint.h>
++uint64_t v;
++int main(void) {
++    __sync_fetch_and_add(&v, 1);
++    return (int)__sync_fetch_and_or(&v, 0);
++}")
++        check_c_source_compiles("${ATOMIC64_TEST}" HAVE_ATOMIC64)
++        if(NOT HAVE_ATOMIC64)
++            set(CMAKE_REQUIRED_LIBRARIES atomic)
++            check_c_source_compiles("${ATOMIC64_TEST}" HAVE_ATOMIC64_WITH_LIBATOMIC)
++            unset(CMAKE_REQUIRED_LIBRARIES)
++            if(HAVE_ATOMIC64_WITH_LIBATOMIC)
++                list(APPEND PLATFORM_LIBS atomic)
++            endif()
++        endif()
++    endif()
+     find_library(VMAF vmaf)
+     option(ENABLE_LIBVMAF "Enable VMAF" OFF)
+     if(ENABLE_LIBVMAF)

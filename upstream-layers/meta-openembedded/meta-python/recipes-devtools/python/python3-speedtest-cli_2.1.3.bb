@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "5e2773233cedb5fa3d8120eb7f97bcc4974b5221b254d33ff16e2f1d41
 
 inherit pypi setuptools3
 
+PYPI_PACKAGE_SDIST = "speedtest-cli"
+
 RDEPENDS:${PN} += " \
     python3-misc \
     python3-threading \

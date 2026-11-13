@@ -1,4 +1,4 @@
-From 0a8c7e5e074c124c2d5e5713fc3038295324cf96 Mon Sep 17 00:00:00 2001
+From 4ec73803526588522f60320ad87177235c64a19b Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Thu, 4 Sep 2025 22:27:26 +0200
 Subject: [PATCH] DataTest: disable testSQLChannel test
@@ -12,15 +12,15 @@ Signed-off-by: Peter Marko <peter.marko@siemens.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Data/testsuite/src/DataTest.cpp b/Data/testsuite/src/DataTest.cpp
-index e18b87edc..60fd266c3 100644
+index e730cbe24..e4d56b2f6 100644
 --- a/Data/testsuite/src/DataTest.cpp
 +++ b/Data/testsuite/src/DataTest.cpp
-@@ -1659,7 +1659,7 @@ CppUnit::Test* DataTest::suite()
+@@ -1778,7 +1778,7 @@ CppUnit::Test* DataTest::suite()
  	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
  	CppUnit_addTest(pSuite, DataTest, testTranscode);
  	CppUnit_addTest(pSuite, DataTest, testSQLParse);
 -	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
 +	//CppUnit_addTest(pSuite, DataTest, testSQLChannel);
  	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
- 
- 	return pSuite;
+ 	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
+ 	CppUnit_addTest(pSuite, DataTest, testExecuteDirectNotImplemented);

@@ -13,3 +13,4 @@ lldpd:x:642:
 opensaf:x:643:
 radiusd:x:651:
 ntp:x:653:
+mosquitto:x:657:

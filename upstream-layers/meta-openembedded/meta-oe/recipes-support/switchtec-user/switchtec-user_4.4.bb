@@ -8,6 +8,7 @@ DEPENDS = "ncurses openssl"
 
 SRC_URI = "git://github.com/Microsemi/switchtec-user.git;protocol=https;branch=master;tag=v${PV} \
            file://0001-lib-diag-do-not-use-a-variable-length-array-in-a-str.patch \
+           file://0002-lib-cap-cli-main-include-switchtec-endian.h-for-mus.patch \
            "
 SRCREV = "d995512f3bf1ceb98eefada813642d5ba5d62cd1"
 

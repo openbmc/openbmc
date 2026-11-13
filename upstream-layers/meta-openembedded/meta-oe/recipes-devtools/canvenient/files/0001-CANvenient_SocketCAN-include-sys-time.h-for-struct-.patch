@@ -1,0 +1,30 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:54:51 +0000
+Subject: [PATCH] CANvenient_SocketCAN: include sys/time.h for struct timeval
+
+On glibc, <linux/can.h>/<sys/socket.h> transitively pull in a full
+definition of struct timeval via <sys/time.h>. musl's headers do not
+provide this transitive include, so struct timeval is only forward
+declared (via <sys/types.h>) and the file fails to build with
+"variable has incomplete type 'struct timeval'". Include
+<sys/time.h> explicitly so the type is fully defined regardless of
+libc.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/drivers/CANvenient_SocketCAN.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/drivers/CANvenient_SocketCAN.c b/src/drivers/CANvenient_SocketCAN.c
+index 1111111..2222222 100644
+--- a/src/drivers/CANvenient_SocketCAN.c
++++ b/src/drivers/CANvenient_SocketCAN.c
+@@ -24,6 +24,7 @@
+ #include <linux/can.h>
+ #include <linux/can/raw.h>
+ #include <libsocketcan.h>
++#include <sys/time.h>
+ #include <time.h>
+ #include <unistd.h>
+ #endif

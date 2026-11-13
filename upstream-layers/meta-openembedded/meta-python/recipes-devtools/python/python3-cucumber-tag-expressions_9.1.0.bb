@@ -8,5 +8,3 @@ SRC_URI += "file://0001-pyprojects-Relax-required-version-of-uv-to-be-0.12.patch
 SRC_URI[sha256sum] = "d960383d5885300ebcbcb14e41657946fde2a59d5c0f485eb291bc6a0e228acc"
 
 inherit pypi python_uv_build
-
-PYPI_PACKAGE = "cucumber_tag_expressions"

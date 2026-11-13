@@ -2,8 +2,6 @@ SUMMARY = "Build backend for CMake based projects"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b4e748e5f102e31c9390dcd6fa66f09"
 
-PYPI_PACKAGE = "scikit_build_core"
-
 DEPENDS = "python3-hatch-vcs-native"
 
 inherit pypi python_hatchling

@@ -1,0 +1,69 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 20 Oct 2026 22:00:00 -0700
+Subject: [PATCH] mana: Link with libatomic when 64-bit atomics need it
+
+shadow_queue.h keeps the producer and consumer indexes in
+_Atomic(uint64_t). On 32-bit targets without native 64-bit atomic
+instructions, such as riscv32, the compiler lowers these to
+__atomic_load_8/__atomic_store_8 libcalls, and libmana fails to link:
+
+  ld.lld: error: undefined symbol: __atomic_load_8
+  ld.lld: error: undefined symbol: __atomic_store_8
+
+Check whether a 64-bit atomic load/store links on its own, and if not,
+whether it links with -latomic. Link libmana with libatomic and add it
+to the libmana.pc private libs only when it is needed, so targets with
+native 64-bit atomics are unchanged.
+
+Upstream-Status: Submitted [https://github.com/linux-rdma/rdma-core/pull/1831]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ CMakeLists.txt                | 21 +++++++++++++++++++++
+ providers/mana/CMakeLists.txt |  5 ++++-
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -510,6 +510,27 @@
+   RDMA_DoFixup("${HAVE_STDATOMIC}" "stdatomic.h")
+ endif()
+ 
++# 64-bit C11 atomics are not lock free on some 32-bit targets (e.g. riscv32)
++# and the compiler emits __atomic_* libcalls that libatomic provides.
++set(ATOMIC64_CHECK_PROGRAM "
++#include <stdatomic.h>
++#include <stdint.h>
++_Atomic(uint64_t) v;
++int main(int argc, const char *argv[]) {
++  atomic_store(&v, (uint64_t)argc);
++  return (int)atomic_load(&v);
++}")
++CHECK_C_SOURCE_COMPILES("${ATOMIC64_CHECK_PROGRAM}" HAVE_ATOMIC64_WITHOUT_LIBATOMIC)
++set(ATOMIC_LIBRARIES "")
++if (NOT HAVE_ATOMIC64_WITHOUT_LIBATOMIC)
++  set(CMAKE_REQUIRED_LIBRARIES "-latomic")
++  CHECK_C_SOURCE_COMPILES("${ATOMIC64_CHECK_PROGRAM}" HAVE_ATOMIC64_WITH_LIBATOMIC)
++  unset(CMAKE_REQUIRED_LIBRARIES)
++  if (HAVE_ATOMIC64_WITH_LIBATOMIC)
++    set(ATOMIC_LIBRARIES "-latomic")
++  endif()
++endif()
++
+ CHECK_INCLUDE_FILE("linux/dma-heap.h" HAVE_LINUX_DMA_HEAP_H)
+ 
+ RDMA_Check_SSE(HAVE_TARGET_SSE)
+--- a/providers/mana/CMakeLists.txt
++++ b/providers/mana/CMakeLists.txt
+@@ -8,8 +8,11 @@
+   wr.c
+ )
+ 
++# shadow_queue.h uses 64-bit atomics
++target_link_libraries(mana LINK_PRIVATE ${ATOMIC_LIBRARIES})
++
+ publish_headers(infiniband
+   manadv.h
+ )
+ 
+-rdma_pkg_config("mana" "libibverbs" "${CMAKE_THREAD_LIBS_INIT}")
++rdma_pkg_config("mana" "libibverbs" "${CMAKE_THREAD_LIBS_INIT} ${ATOMIC_LIBRARIES}")

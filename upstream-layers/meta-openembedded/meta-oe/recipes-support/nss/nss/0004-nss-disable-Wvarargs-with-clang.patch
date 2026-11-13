@@ -1,4 +1,4 @@
-From 72c3150300975524bb0001b5a731f077852c95ab Mon Sep 17 00:00:00 2001
+From d20bdad1360fb57c62660522d5a385e51dca641e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 7 Mar 2020 08:34:02 -0800
 Subject: [PATCH] nss: disable Wvarargs with clang
@@ -40,6 +40,3 @@ index a569a49..687fe58 100644
        # -Wno-parentheses-equality : because clang warns about macro expansions
        WARNING_CFLAGS += $(call disable_warning,parentheses-equality)
        ifdef BUILD_OPT
--- 
-2.25.1
-

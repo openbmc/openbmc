@@ -7,8 +7,6 @@ SRC_URI[sha256sum] = "223dd2cfba325ed55e94933b9e53f3aca13e9fdf76622bd564c18109a2
 
 inherit pypi python_hatchling ptest-python-pytest
 
-PYPI_PACKAGE = "rich_toolkit"
-
 RDEPENDS:${PN} = "\
     python3-click \
     python3-rich \

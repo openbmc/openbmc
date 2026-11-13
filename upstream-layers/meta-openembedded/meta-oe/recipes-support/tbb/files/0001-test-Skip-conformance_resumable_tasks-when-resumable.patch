@@ -1,0 +1,27 @@
+From: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH] test: Skip conformance_resumable_tasks when resumable tasks are disabled
+
+The library only enables resumable tasks when __TBB_RESUMABLE_TASKS is
+set, which excludes Linux with a C library other than glibc (e.g. musl).
+test_resumable_tasks.cpp checks that macro, but the conformance test
+repeats an older list of platforms and fails to build on musl:
+
+  conformance_resumable_tasks.cpp:39:5: error: no member named 'suspend' in namespace 'tbb::task'
+
+Use __TBB_RESUMABLE_TASKS instead, keeping the WINAPI_FAMILY exclusion.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/test/conformance/conformance_resumable_tasks.cpp
++++ b/test/conformance/conformance_resumable_tasks.cpp
+@@ -17,8 +17,7 @@
+ 
+ #include "common/test.h"
+ 
+-#if (!__TBB_WIN8UI_SUPPORT && !defined(WINAPI_FAMILY) && !__ANDROID__ \
+-    && !__QNX__)
++#if __TBB_RESUMABLE_TASKS && !defined(WINAPI_FAMILY)
+ 
+ #include "oneapi/tbb/task.h"
+ #include "oneapi/tbb/task_group.h"
