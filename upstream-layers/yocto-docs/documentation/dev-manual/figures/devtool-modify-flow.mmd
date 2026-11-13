@@ -1,0 +1,110 @@
+---
+config:
+  theme: base
+  look: classic
+  htmlLabels: false
+  fontFamily: '"Nimbus Sans", Helvetica, Arial, sans-serif'
+  fontSize: 13.33
+  themeVariables:
+    primaryColor: "#99c1f1"
+    primaryBorderColor: "#62a0ea"
+    primaryTextColor: "#000000"
+    lineColor: "#000000"
+    edgeLabelBackground: "#ffffff"
+    clusterBkg: "#f6f5f4"
+    clusterBorder: "#c0bfbc"
+    titleColor: "#000000"
+    fontSize: 13.33px
+  themeCSS: |
+    .cluster-label tspan { font-weight: bold; }
+    rect { rx: 7.5px; ry: 7.5px; }
+  flowchart:
+    htmlLabels: false
+    useMaxWidth: false
+    curve: basis
+    padding: 10
+    nodeSpacing: 23
+    rankSpacing: 37
+    wrappingWidth: 300
+---
+%% Regenerate: npx -y @mermaid-js/mermaid-cli -b transparent -i devtool-modify-flow.mmd -o devtool-modify-flow.svg
+%%   && sed -i 's/<text /<text xml:space="preserve" /g' devtool-modify-flow.svg
+%% (xml:space keeps the spaces between words in rsvg-convert, used for the PDF output)
+flowchart TB
+    subgraph scenarios["Ways to start"]
+        recipe2[["Local layer<br/>(recipe)"]]
+        up2[("Upstream source<br/>(SRC_URI)")]
+        recipe1[["Local layer<br/>(recipe)"]]
+        up1[("Upstream source<br/>(SRC_URI)")]
+        recipe3[["Local layer<br/>(recipe)"]]
+        src0[["srctree<br/>(existing, already extracted)"]]
+
+        mod2["devtool modify recipe srctree"]
+        mod1["devtool modify recipe"]
+        mod3["devtool modify -n recipe srctree"]
+
+        recipe2 --> mod2
+        up2 --> mod2
+        recipe1 --> mod1
+        up1 --> mod1
+        recipe3 --> mod3
+        src0 --> mod3
+    end
+
+    srctree[["srctree<br/>(extracted source)"]]
+    subgraph ws["devtool workspace"]
+        wssrc[["sources/<br/>(extracted source)"]]
+        wsappends[["appends/<br/>(bbappend)"]]
+    end
+
+    mod2 -->|"extracts into"| srctree
+    mod2 --> ws
+    mod1 --> ws
+    mod3 --> ws
+
+    edit["Edit source code<br/>(in your editor/IDE)"]
+    idesdk["devtool ide-sdk recipe image<br/>(generate SDK + IDE config)"]
+    wssrc --> edit
+    srctree --> edit
+    wsappends -.->|"or, to work from the IDE"| idesdk
+
+    build["devtool build recipe<br/>or bitbake recipe"]
+    buildimage["devtool build-image image"]
+    edit --> build
+    edit --> buildimage
+
+    idesdk -->|"then edit, build, deploy and debug<br/>in the IDE, no bitbake needed"| edit
+    src0 -->|"edit in place"| edit
+
+    deploy["devtool deploy-target recipe target"]
+    build --> deploy
+
+    subgraph target["Target"]
+        device(["Hardware target"])
+        qemu(["QEMU"])
+    end
+    deploy --> target
+    buildimage -->|"flash, update firmware<br/>or runqemu"| target
+
+    finish["devtool finish recipe layer"]
+    edit -->|"commits in srctree"| finish
+
+    layer[["layer<br/>(patch files)"]]
+    wsconf[["workspace/conf"]]
+    finish --> layer
+    finish --> wsconf
+
+    classDef orange fill:#ffbe6f,stroke:#ffa348,stroke-width:1px,color:#000000;
+    classDef green fill:#8ff0a4,stroke:#57e389,stroke-width:1px,color:#000000;
+    classDef purple fill:#dc8add,stroke:#c061cb,stroke-width:1px,color:#000000;
+    classDef coral fill:#cdab8f,stroke:#b5835a,stroke-width:1px,color:#000000;
+    classDef default fill:#99c1f1,stroke:#62a0ea,stroke-width:1px,color:#000000;
+
+    class mod1,mod2,mod3,build,buildimage,idesdk,deploy,finish orange;
+    class srctree,wssrc,src0,edit green;
+    class wsappends,layer,wsconf purple;
+    class device,qemu coral;
+
+    style scenarios fill:#f6f5f4,stroke:#c0bfbc,stroke-width:1px
+    style ws fill:#f6f5f4,stroke:#c061cb,stroke-width:1px
+    style target fill:#f6f5f4,stroke:#b5835a,stroke-width:1px

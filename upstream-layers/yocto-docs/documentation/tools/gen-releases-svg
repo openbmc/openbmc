@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+#
+# Parse releases.json (from https://dashboard.yoctoproject.org/releases.json)
+# and output a Gantt diagram that shows the state of releases.
+#
+# Copyright (c) Antonin Godard
+#
+# SPDX-License-Identifier: MIT
+#
+
+import argparse
+import datetime
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+
+from pathlib import Path
+
+parser = argparse.ArgumentParser(
+    description="Parse releases.json and output a releases.svg file"
+)
+parser.add_argument("-i", help="Path to the releases.json file", dest="releases_json_path",
+                    default=Path(__file__).resolve().parent.parent / "releases.json")
+parser.add_argument("-o", help="Path to the output SVG", dest="output",
+                    default=Path(__file__).resolve().parent.parent / "ref-manual/svg/releases.svg")
+args = parser.parse_args()
+
+if not shutil.which("mmdc"):
+    sys.exit("mermaid-cli is required for this script to run")
+
+MMD_HEADER = """---
+config:
+  fontFamily: '"Nimbus Sans", Helvetica, Arial, sans-serif'
+  gantt:
+    leftPadding: 5
+    useWidth: 1600
+    useMaxWidth: false
+  themeVariables:
+      activeTaskBkgColor: '#edf5f9'
+      activeTaskBorderColor: '#00557d'
+      sectionBkgColor: '#eff6f9'
+      sectionBkgColor2: '#eff6f9'
+---
+%% Generated with documentation/tools/gen-releases-mmd
+gantt
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+    tickInterval 6month
+    todayMarker off
+"""
+
+with open(args.releases_json_path, "r") as f:
+    releases_from_json = json.load(f)
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    mmdpath = Path(tmpdir) / "diagram.mmd"
+    with open(mmdpath, "w", encoding="utf-8") as mmd:
+        mmd.write(MMD_HEADER)
+
+        first_active_rel_found = False
+        for release in releases_from_json:
+            codename = release["release_codename"]
+            series_version = release["series_version"]
+            if release["status"] == "Active Development":
+                mmd.write(f"    {codename} {series_version} :done, after current_rel, 6M\n")
+                continue
+            if not release["original_release_date"]:
+                continue
+            original_release_date = datetime.datetime.strptime(release["original_release_date"], "%Y-%m-%dT%H:%M:%S%z")
+            if original_release_date < datetime.datetime(2022, 4, 1, tzinfo=datetime.timezone.utc):
+                continue
+            original_release_date = original_release_date.date().isoformat()
+            end_date = datetime.datetime.strptime(release["latest_release_date"], "%Y-%m-%dT%H:%M:%S%z")
+            end_date = end_date.date().isoformat()
+            lts = False
+            if "LTS until" in release["status"]:
+                lts = True
+            status = "done"
+            if release["series"] == "current":
+                status = "active"
+                if not first_active_rel_found:
+                    status += ", current_rel"
+                    first_active_rel_found = True
+                end_date = "6M"
+                if lts:
+                    end_date = "4y"
+            mmd.write(f"    {codename} {series_version}{" (LTS)" if lts else ""}"
+                      f" :{status}, {original_release_date}, {end_date}\n")
+
+    result = subprocess.run(
+        ["mmdc", "--input", mmdpath, "--output", args.output],
+        check=True,
+    )

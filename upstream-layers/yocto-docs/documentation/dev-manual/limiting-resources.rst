@@ -38,7 +38,7 @@ details.
 
    If you want to have a different limit from the rest of the build for a
    recipe, it is also possible to achieve with the following line added to your
-   ``local.conf`` :term:`configuration file`::
+   :ref:`structure-build-conf-local.conf` :term:`configuration file`::
 
       PARALLEL_MAKE:pn-linux-yocto = "-j4"
 
@@ -104,7 +104,7 @@ details.
 
    #.  Then, start a heavy-load build, for example::
 
-          bitbake virtual/kernel -c compile -f
+          $ bitbake virtual/kernel -c compile -f
 
        You can stop the build at anytime with Control + C.
 

@@ -21,8 +21,9 @@ image you want.
 
        INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0*"
 
-   Alternatively, you can adjust ``local.conf`` file, repeating and adjusting the line
-   for all images where the license restriction must apply:
+   Alternatively, you can adjust your distro :term:`configuration file`,
+   repeating and adjusting the line for all images where the license restriction
+   must apply:
 
        INCOMPATIBLE_LICENSE:pn-your-image-name = "GPL-3.0* LGPL-3.0*"
 

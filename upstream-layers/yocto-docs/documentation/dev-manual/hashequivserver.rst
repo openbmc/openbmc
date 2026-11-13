@@ -22,7 +22,7 @@ the :term:`BitBake` repository, which can be found :oe_git:`here </bitbake>`.
 
 To start a basic Hash Equivalence server, one could simply run::
 
-   ./bin/bitbake-hashserv
+   $ ./bin/bitbake-hashserv
 
 This will take all of the default options of the script, which are already
 sufficient to start a local server.

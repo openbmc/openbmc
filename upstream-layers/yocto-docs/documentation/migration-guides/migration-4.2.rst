@@ -164,7 +164,7 @@ Additionally, the :term:`LAYERSERIES_COMPAT` value for the devtool workspace
 layer is now set at the time of creation, thus if you upgrade with the
 workspace layer enabled and you wish to retain it, you will need to manually
 update the :term:`LAYERSERIES_COMPAT` value in ``workspace/conf/layer.conf``
-(or remove the path from :term:`BBLAYERS` in ``conf/bblayers.conf`` and
+(or remove the path from :term:`BBLAYERS` in :ref:`structure-build-conf-bblayers.conf` and
 delete/move the ``workspace`` directory out of the way if you no longer
 need it).
 
@@ -183,7 +183,7 @@ possibly Internet reachable network interfaces. Thus, in this
 release we limit qemu port forwarding to localhost (127.0.0.1).
 
 However, if you need the qemu machine to be reachable from the
-network, then it can be enabled via ``conf/local.conf`` or machine
+network, then it can be enabled via :ref:`structure-build-conf-local.conf` or machine
 config variable ``QB_SLIRP_OPT``::
 
    QB_SLIRP_OPT = "-netdev user,id=net0,hostfwd=tcp::2222-:22"

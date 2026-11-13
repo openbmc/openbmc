@@ -42,12 +42,12 @@ section of the Development Tasks Manual.
 
 .. _system-requirements-minimum-ram:
 
-Minimum System RAM
-==================
+Minimum System RAM and CPU Cores
+================================
 
 You will manage to build an image such as ``core-image-sato`` for the
-``qemux86-64`` machine with as little as &MIN_RAM; Gbytes of RAM on an old
-system with 4 CPU cores, but your builds will be much faster on a system with
+``qemux86-64`` machine with as little as &MIN_RAM; Gbytes of RAM and
+&MIN_CPU_CORES; CPU cores, but your builds will be much faster on a system with
 as much RAM and as many CPU cores as possible.
 
 .. _system-requirements-supported-distros:
@@ -64,16 +64,20 @@ supported on the following distributions:
 
 -  AlmaLinux 8
 -  AlmaLinux 9
+-  AlmaLinux 10
 -  CentOS Stream 9
 -  CentOS Stream 10
 -  Debian 11
 -  Debian 12
 -  Debian 13
+-  Fedora 42
 -  Fedora 43
--  OpenSUSE Leap 15.6
--  OpenSUSE Leap 16.0
+-  Fedora 44
+-  openSUSE Leap 15.6
+-  openSUSE Leap 16.0
 -  Rocky Linux 8
 -  Rocky Linux 9
+-  Rocky Linux 10
 -  Ubuntu 22.04 (LTS)
 -  Ubuntu 24.04 (LTS)
 -  Ubuntu 25.04
@@ -88,10 +92,10 @@ organizations publishing them no longer make updates publicly available:
    (meaning there are running workers).
    See https://endoflife.date for information of EOL releases.
 
--  Fedora 39
--  Fedora 40
--  OpenSUSE Leap 15.5
+-  Fedora 42
+-  openSUSE Leap 15.5
 -  Ubuntu 25.04
+-  Ubuntu 25.10
 
 Note that the Yocto Project doesn't have access to private updates
 that some of these versions may have. Therefore, our testing has
@@ -591,7 +595,7 @@ installer:
 
    .. note::
 
-      The :term:`SDKMACHINE` variable in your ``local.conf`` file determines
+      The :term:`SDKMACHINE` variable determines
       whether you build tools for a 32-bit or 64-bit system.
 
    Once the build completes, you can find the ``.sh`` file that installs

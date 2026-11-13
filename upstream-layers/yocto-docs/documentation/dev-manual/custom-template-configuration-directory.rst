@@ -5,8 +5,8 @@ Creating a Custom Template Configuration Directory
 
 If you are producing your own customized version of the build system for
 use by other users, you might want to provide a custom build configuration
-that includes all the necessary settings and layers (i.e. ``local.conf`` and
-``bblayers.conf`` that are created in a new :term:`Build Directory`) and a custom
+that includes all the necessary settings and layers (i.e. :ref:`structure-build-conf-local.conf` and
+:ref:`structure-build-conf-bblayers.conf` that are created in a new :term:`Build Directory`) and a custom
 message that is shown when setting up the build. This can be done by
 creating one or more template configuration directories in your
 custom distribution layer.
@@ -21,7 +21,7 @@ This can be done by using ``bitbake-layers save-build-conf``::
    TEMPLATECONF=/srv/bitbake-builds/layers/meta-alex/conf/templates/test-1 . /srv/bitbake-builds/layers/openembedded-core/oe-init-build-env build-try-test-1
 
 The above command takes the config files from the currently active :term:`Build Directory` under ``conf``,
-replaces site-specific paths in ``bblayers.conf`` with ``##OECORE##``-relative paths, and copies
+replaces site-specific paths in :ref:`structure-build-conf-bblayers.conf` with ``##OECORE##``-relative paths, and copies
 the config files into a specified layer under a specified template name.
 
 To use those saved templates as a starting point for a build, users should point
@@ -44,7 +44,7 @@ would be::
 If you look at a configuration template directory, you will
 see the ``bblayers.conf.sample``, ``local.conf.sample``, ``conf-summary.txt`` and
 ``conf-notes.txt`` files. The build system uses these files to form the
-respective ``bblayers.conf`` file, ``local.conf`` file, and show
+respective :ref:`structure-build-conf-bblayers.conf` file, ``local.conf`` file, and show
 users usage information about the build they're setting up
 when running the ``oe-init-build-env`` setup script. These can be
 edited further if needed to improve or change the build configurations

@@ -87,7 +87,7 @@ existing ``classes`` subdirectory will continue to work in any context as before
 Other than knowing where to look when manually browsing the class files, this is
 not likely to require any changes to your configuration. However, if in your
 configuration you were using some classes in the incorrect context, you will now
-receive an error during parsing. For example, the following in ``local.conf`` will
+receive an error during parsing. For example, the following in :ref:`structure-build-conf-local.conf` will
 now cause an error::
 
    INHERIT += "testimage"

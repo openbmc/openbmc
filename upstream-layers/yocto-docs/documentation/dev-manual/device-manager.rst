@@ -31,8 +31,8 @@ The content of the resulting ``/dev`` directory is defined in a Device
 Table file. The
 :term:`IMAGE_DEVICE_TABLES`
 variable defines the Device Table to use and should be set in the
-machine or distro configuration file. Alternatively, you can set this
-variable in your ``local.conf`` configuration file.
+machine or distro :term:`configuration file`. Alternatively, you can set this
+variable in your :ref:`structure-build-conf-local.conf` configuration file.
 
 If you do not define the :term:`IMAGE_DEVICE_TABLES` variable, the default
 ``device_table-minimal.txt`` is used::
@@ -63,8 +63,8 @@ permissions ``0600``.
 To have more control over the device nodes, you can use a device manager like
 ``udev`` or ``busybox-mdev``. You choose the device manager by defining the
 :term:`VIRTUAL-RUNTIME_dev_manager <VIRTUAL-RUNTIME>` variable in your machine
-or distro configuration file. Alternatively, you can set this variable in
-your ``local.conf`` configuration file::
+or distro :term:`configuration file`. Alternatively, you can set this variable in
+your :ref:`structure-build-conf-local.conf` configuration file::
 
    VIRTUAL-RUNTIME_dev_manager = "udev"
 

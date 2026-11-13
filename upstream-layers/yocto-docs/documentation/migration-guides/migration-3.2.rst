@@ -100,7 +100,7 @@ This also applies when conditionally adding packages to :term:`PACKAGES` where
 those packages have dependencies, for example (from the ``alsa-plugins`` recipe)::
 
     PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'alsa-plugins-pulseaudio-conf', '', d)}"
-    ...
+    # ... elsewhere in the same recipe ...
     RDEPENDS_${PN}-pulseaudio-conf += "\
             ${MLPREFIX}libasound-module-conf-pulse \
             ${MLPREFIX}libasound-module-ctl-pulse \

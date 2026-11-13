@@ -1,0 +1,76 @@
+---
+config:
+  theme: base
+  look: classic
+  htmlLabels: false
+  fontFamily: '"Nimbus Sans", Helvetica, Arial, sans-serif'
+  fontSize: 13.33
+  themeVariables:
+    primaryColor: "#99c1f1"
+    primaryBorderColor: "#62a0ea"
+    primaryTextColor: "#000000"
+    lineColor: "#000000"
+    edgeLabelBackground: "#ffffff"
+    clusterBkg: "#f6f5f4"
+    clusterBorder: "#c0bfbc"
+    titleColor: "#000000"
+    fontSize: 13.33px
+  themeCSS: |
+    .cluster-label tspan { font-weight: bold; }
+    rect { rx: 7.5px; ry: 7.5px; }
+  flowchart:
+    htmlLabels: false
+    useMaxWidth: false
+    curve: basis
+    padding: 10
+    nodeSpacing: 23
+    rankSpacing: 37
+    wrappingWidth: 270
+---
+%% Regenerate: npx -y @mermaid-js/mermaid-cli -b transparent -i devtool-ide-sdk-workflow.mmd -o devtool-ide-sdk-workflow.svg
+%%   && sed -i 's/<text /<text xml:space="preserve" /g' devtool-ide-sdk-workflow.svg
+%% (xml:space keeps the spaces between words in rsvg-convert, used for the PDF output)
+flowchart TB
+    modify["devtool modify recipe --debug-build"]
+
+    subgraph workspace["devtool workspace"]
+        ws_appends[["appends/recipe.bbappend"]]
+        ws_src[["sources/recipe<br/>(extracted here)"]]
+    end
+
+    gensdk["devtool ide-sdk recipe image<br/>(generate SDK + IDE config)"]
+
+    subgraph loop["Edit/build/debug loop"]
+        edit["Edit source code"]
+        build["Build<br/>(build tool called<br/>directly by the IDE)"]
+        deploy["Deploy to target"]
+        debug["Debug remotely<br/>(e.g. GDB/LLDB + gdbserver/lldb-server)"]
+    end
+
+    finish["devtool finish recipe layer<br/>(turn changes into patches)"]
+    rerun_note>"rerun only if recipe<br/>deps/config change"]
+
+    modify --> ws_appends
+    modify -->|extracts| ws_src
+    ws_appends --> gensdk
+    ws_src --> gensdk
+    gensdk -->|"one-time setup"| edit
+    edit --> build
+    build --> deploy
+    deploy --> debug
+    debug -->|repeat| edit
+    edit -.->|"when done"| finish
+    gensdk -.- rerun_note
+
+    style workspace fill:#f6f5f4,stroke:#c061cb,stroke-width:1px
+    style loop fill:#f6f5f4,stroke:#c0bfbc,stroke-width:1px
+
+    classDef orange fill:#ffbe6f,stroke:#ffa348,stroke-width:1px,color:#000000;
+    classDef green fill:#8ff0a4,stroke:#57e389,stroke-width:1px,color:#000000;
+    classDef purple fill:#dc8add,stroke:#c061cb,stroke-width:1px,color:#000000;
+    classDef note fill:#f6f5f4,stroke:#c0bfbc,stroke-width:1px,color:#5e5c64;
+    classDef default fill:#99c1f1,stroke:#62a0ea,stroke-width:1px,color:#000000;
+    class modify,gensdk,build,deploy,debug,finish orange;
+    class ws_src,edit green;
+    class ws_appends purple;
+    class rerun_note note;

@@ -83,16 +83,16 @@ How to make those adjustments without tedious manual editing
 The following sed command can be used to remove S = "${WORKDIR}/git
 across a whole layer::
 
-   sed -i "/^S = \"\${WORKDIR}\/git\"/d" `find . -name '*.bb' -o -name '*.inc' -o -name '*.bbclass'`
+   $ sed -i "/^S = \"\${WORKDIR}\/git\"/d" `find . -name '*.bb' -o -name '*.inc' -o -name '*.bbclass'`
 
 Then, the following command can tweak the remaining :term:`S` assignments to
 refer to :term:`UNPACKDIR` instead of :term:`WORKDIR`::
 
-   sed -i "s/^S = \"\${WORKDIR}\//S = \"\${UNPACKDIR}\//g" `find . -name '*.bb' -o -name '*.inc' -o -name '*.bbclass'`
+   $ sed -i "s/^S = \"\${WORKDIR}\//S = \"\${UNPACKDIR}\//g" `find . -name '*.bb' -o -name '*.inc' -o -name '*.bbclass'`
 
 The first change can introduce a lot of consecutive empty lines, so those can be removed with::
 
-   sed -i -z -E 's/([ \t\f\v\r]*\n){3,}/\n\n/g' `find . -name '*.bb' -o -name '*.inc'`
+   $ sed -i -z -E 's/([ \t\f\v\r]*\n){3,}/\n\n/g' `find . -name '*.bb' -o -name '*.inc'`
 
 
 BitBake Git fetcher ``tag`` parameter
@@ -312,11 +312,11 @@ The following classes have been removed in this release:
    #. Use the specific FIT image recipe rather than the base kernel recipe.
       For example, instead of::
 
-         bitbake linux-yocto
+         $ bitbake linux-yocto
 
       the FIT image is now build by::
 
-         bitbake linux-yocto-fitimage
+         $ bitbake linux-yocto-fitimage
 
       For custom kernel recipes, creating a corresponding custom FIT image recipe
       is usually a good approach.

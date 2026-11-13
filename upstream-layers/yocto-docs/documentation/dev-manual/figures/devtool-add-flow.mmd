@@ -1,0 +1,107 @@
+---
+config:
+  theme: base
+  look: classic
+  htmlLabels: false
+  fontFamily: '"Nimbus Sans", Helvetica, Arial, sans-serif'
+  fontSize: 13.33
+  themeVariables:
+    primaryColor: "#99c1f1"
+    primaryBorderColor: "#62a0ea"
+    primaryTextColor: "#000000"
+    lineColor: "#000000"
+    edgeLabelBackground: "#ffffff"
+    clusterBkg: "#f6f5f4"
+    clusterBorder: "#c0bfbc"
+    titleColor: "#000000"
+    fontSize: 13.33px
+  themeCSS: |
+    .cluster-label tspan { font-weight: bold; }
+    rect { rx: 7.5px; ry: 7.5px; }
+  flowchart:
+    htmlLabels: false
+    useMaxWidth: false
+    curve: basis
+    padding: 10
+    nodeSpacing: 23
+    rankSpacing: 37
+    wrappingWidth: 300
+---
+%% Regenerate: npx -y @mermaid-js/mermaid-cli -b transparent -i devtool-add-flow.mmd -o devtool-add-flow.svg
+%%   && sed -i 's/<text /<text xml:space="preserve" /g' devtool-add-flow.svg
+%% (xml:space keeps the spaces between words in rsvg-convert, used for the PDF output)
+flowchart TB
+    subgraph scenarios["Ways to start"]
+        up2[("Upstream source<br/>(SRC_URI)")]
+        src0[["srctree<br/>(existing local source)"]]
+        up1[("Upstream source<br/>(SRC_URI)")]
+
+        add2["devtool add recipe srctree fetchuri"]
+        add3["devtool add recipe srctree"]
+        add1["devtool add recipe fetchuri"]
+
+        up2 --> add2
+        src0 --> add2
+        src0 --> add3
+        up1 --> add1
+    end
+
+    srctree[["srctree<br/>(extracted source)"]]
+    subgraph ws["devtool workspace"]
+        wssrc[["sources/<br/>(extracted source)"]]
+        wsrecipes[["appends/ recipes/<br/>(recipe, bbappend)"]]
+    end
+
+    add2 --> srctree
+    add2 --> ws
+    add3 --> ws
+    add1 --> ws
+
+    editrecipe["devtool edit-recipe recipe"]
+    wsrecipes --> editrecipe
+    srctree --> editrecipe
+    wssrc --> editrecipe
+    edit["Edit source code<br/>(in your editor/IDE)"]
+    idesdk["devtool ide-sdk recipe image<br/>(generate SDK + IDE config)"]
+    editrecipe --> edit
+    editrecipe -.->|"or, to build/deploy/debug<br/>directly from the IDE"| idesdk
+
+    buildimage["devtool build-image image"]
+    build["devtool build recipe<br/>or bitbake recipe"]
+    edit --> buildimage
+    edit --> build
+
+    idesdk -->|"then edit, build, deploy and debug<br/>in the IDE, no bitbake needed"| edit
+
+    deploy["devtool deploy-target recipe target"]
+    build --> deploy
+
+    subgraph target["Target"]
+        device(["Hardware target"])
+        qemu(["QEMU"])
+    end
+    deploy --> target
+    buildimage -->|"flash, update firmware<br/>or runqemu"| target
+
+    finish["devtool finish recipe layer"]
+    edit -->|"commits in srctree"| finish
+
+    layer[["layer<br/>(patch files)"]]
+    wsconf[["workspace/conf"]]
+    finish --> layer
+    finish --> wsconf
+
+    classDef orange fill:#ffbe6f,stroke:#ffa348,stroke-width:1px,color:#000000;
+    classDef green fill:#8ff0a4,stroke:#57e389,stroke-width:1px,color:#000000;
+    classDef purple fill:#dc8add,stroke:#c061cb,stroke-width:1px,color:#000000;
+    classDef coral fill:#cdab8f,stroke:#b5835a,stroke-width:1px,color:#000000;
+    classDef default fill:#99c1f1,stroke:#62a0ea,stroke-width:1px,color:#000000;
+
+    class add1,add2,add3,editrecipe,build,buildimage,idesdk,deploy,finish orange;
+    class srctree,wssrc,src0,edit green;
+    class wsrecipes,layer,wsconf purple;
+    class device,qemu coral;
+
+    style scenarios fill:#f6f5f4,stroke:#c0bfbc,stroke-width:1px
+    style ws fill:#f6f5f4,stroke:#c061cb,stroke-width:1px
+    style target fill:#f6f5f4,stroke:#b5835a,stroke-width:1px

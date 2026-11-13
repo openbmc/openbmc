@@ -312,7 +312,7 @@ the layer into which to write an append file::
 
 The ``*.bbappend`` file is created at the
 appropriate path within the specified layer directory, which may or may
-not be in your ``bblayers.conf`` file. If an append file already exists,
+not be in your :ref:`structure-build-conf-bblayers.conf` file. If an append file already exists,
 the command updates it appropriately.
 
 .. _devtool-checking-on-the-upgrade-status-of-a-recipe:
@@ -460,8 +460,7 @@ Here is an example that resets the workspace directory that contains the
 
    $ devtool reset mtr
    NOTE: Cleaning sysroot for recipe mtr...
-   NOTE: Leaving source tree /home/scottrif/bitbake-builds/build/workspace/sources/mtr as-is; if you no longer need it then please delete it manually
-   $
+   NOTE: Leaving source tree /home/user/bitbake-builds/build/workspace/sources/mtr as-is; if you no longer need it then please delete it manually
 
 .. _devtool-finish-working-on-a-recipe:
 
@@ -475,7 +474,7 @@ This is roughly equivalent to the ``devtool update-recipe`` command followed by
 the ``devtool reset`` command. The changes must have been committed to the git
 repository created by ``devtool``. Here is an example::
 
-  $ devtool finish recipe /path/to/custom/layer
+  $ devtool finish <recipe> <path/to/custom/layer>
 
 .. _devtool-building-your-recipe:
 
@@ -613,7 +612,7 @@ You can create a workspace layer anywhere by supplying a pathname with
 the command. The following command creates a new workspace layer named
 "new-workspace"::
 
-   $ devtool create-workspace /home/scottrif/new-workspace
+   $ devtool create-workspace /home/user/new-workspace
 
 .. _devtool-get-the-status-of-the-recipes-in-your-workspace:
 
@@ -633,8 +632,7 @@ Here is sample output after using
 to create and add the ``mtr_0.86.bb`` recipe to the ``workspace`` directory::
 
    $ devtool status
-   mtr:/home/scottrif/bitbake-builds/build/workspace/sources/mtr (/home/scottrif/bitbake-builds/build/workspace/recipes/mtr/mtr_0.86.bb)
-   $
+   mtr:/home/user/bitbake-builds/build/workspace/sources/mtr (/home/user/bitbake-builds/build/workspace/recipes/mtr/mtr_0.86.bb)
 
 .. _devtool-search-for-available-target-recipes:
 
@@ -680,6 +678,10 @@ of SDKs are generated:
 
 -  ``shared`` mode: this creates a cross-compiling toolchain and the
    corresponding shared sysroot directories of the supplied recipe(s).
+
+The ``--mode`` option can be repeated to combine both modes, for example
+``--mode=modified --mode=shared`` (see
+:ref:`dev-manual/devtool:combining modified and shared mode`).
 
 The ``--target`` option can be used to specify a ``username@hostname`` string
 and create a remote debugging configuration for the recipe. Similarly to

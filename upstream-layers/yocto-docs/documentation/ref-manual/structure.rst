@@ -116,7 +116,7 @@ and so forth.)
 
 This directory adds additional recipes and append files used by the
 OpenEmbedded selftests to verify the behavior of the build system. You
-do not have to add this layer to your ``bblayers.conf`` file unless you
+do not have to add this layer to your :ref:`structure-build-conf-bblayers.conf` file unless you
 want to run the selftests.
 
 .. _structure-meta-skeleton:
@@ -310,7 +310,7 @@ file, it is recommended to put them into a distro :term:`configuration file`, or
 to create layer :term:`configuration fragments <Configuration Fragment>` from
 changes made here.
 
-The :term:`OpenEmbedded Build System` can create the ``local.conf`` file from a
+The :term:`OpenEmbedded Build System` can create the :ref:`structure-build-conf-local.conf` file from a
 ``local.conf.sample`` file when you ``source`` the top-level build environment
 setup script :ref:`structure-core-script`.
 
@@ -343,7 +343,7 @@ file, it uses ``sed`` to substitute final
 This configuration file defines
 :ref:`layers <dev-manual/layers:understanding and creating layers>`,
 which are directory trees, traversed (or walked) by BitBake. The
-``bblayers.conf`` file uses the :term:`BBLAYERS`
+:ref:`structure-build-conf-bblayers.conf` file uses the :term:`BBLAYERS`
 variable to list the layers BitBake tries to find.
 
 The OpenEmbedded build system can create it from a ``bblayers.conf.sample`` file
@@ -382,7 +382,7 @@ want to access downloaded files (:term:`DL_DIR`).
 This file can be shared for multiple build directories. For example,
 :doc:`bitbake-setup <bitbake:bitbake-user-manual/bitbake-user-manual-environment-setup>`
 makes the :ref:`structure-build-conf-site.conf` file a symbolic link to a common
-``site.conf`` file::
+:ref:`structure-build-conf-auto.conf` file::
 
    ├── poky-master-poky-distro_poky-machine_qemux86-64/
    │   └── build/
@@ -831,9 +831,9 @@ For reference information on classes, see the
 This directory contains the core set of configuration files that start
 from ``bitbake.conf`` and from which all other configuration files are
 included. See the include statements at the end of the ``bitbake.conf``
-file and you will note that even ``local.conf`` is loaded from there.
+file and you will note that even :ref:`structure-build-conf-local.conf` is loaded from there.
 While ``bitbake.conf`` sets up the defaults, you can often override
-these by using the (``local.conf``) file, machine file or the
+these by using the (:ref:`structure-build-conf-local.conf`) file, machine file or the
 distribution configuration file.
 
 .. _structure-meta-conf-machine:
@@ -891,7 +891,7 @@ and lists of files and directories with known permissions.
 
 This directory contains OpenEmbedded Python library code used during the
 build process. It is enabled via the ``addpylib`` directive in
-``meta/conf/local.conf``. For more information, see
+``meta/conf/layer.conf``. For more information, see
 :ref:`bitbake-user-manual/bitbake-user-manual-metadata:extending python library code`.
 
 .. _structure-meta-recipes-bsp:

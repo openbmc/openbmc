@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+#
+# SPDX-License-Identifier: MIT
+#
+# Author: Antonin Godard <antonin.godard@bootlin.com>
+#
+# Copyright (C) 2026 Bootlin
+#
+
+import argparse
+import logging
+import subprocess
+import sys
+
+from pathlib import Path
+from sphinx.util.inventory import InventoryFile
+from typing import List
+
+
+DOCS_DIR = Path(__file__).parent.parent
+# False positives:
+# - variables we know exist but have a specific syntax
+# - we keep documentation for it here, already saying it is obsolete
+VAR_EXCEPTIONS = (
+    "CONFLICT_IMAGE_FEATURES",
+    "CONFLICT_TUNE_FEATURES",
+    "FEATURE_PACKAGES",
+    "LAYERRECOMMENDS",
+    "REQUIRED_IMAGE_FEATURES",
+    "VIRTUAL-RUNTIME",
+    "module_autoload",
+    "module_conf",
+)
+
+
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Use the Sphinx's inventory to "
+                                     "check for variables not present in "
+                                     "OE-Core/meta-yocto/BitBake")
+
+    parser.add_argument("--debug",
+                        action="store_true",
+                        help="Print debug messages")
+
+    parser.add_argument("--yocto-docs-inv",
+                        type=Path,
+                        default=DOCS_DIR / "_build/html/objects.inv",
+                        help="Input yocto-docs inventory file")
+
+    parser.add_argument("--bitbake-inv",
+                        type=Path,
+                        default=DOCS_DIR / "_build/doctrees/__intersphinx_cache__/bitbake_objects.inv",
+                        help="Input bitbake inventory file")
+
+    parser.add_argument("oecore_dir",
+                        type=Path,
+                        help="Path to openembedded-core")
+
+    parser.add_argument("meta_yocto_dir",
+                        type=Path,
+                        help="Path to meta-yocto")
+
+    parser.add_argument("bitbake_dir",
+                        type=Path,
+                        help="Path to bitbake")
+
+    return parser.parse_args()
+
+
+def var_exists_in(var: str, gitdir: Path) -> bool:
+    """
+    In gitdir, check if a grepping for "<var>" return something (then return
+    True, False otherwise).
+
+    Special case where in OE-Core we can have:
+        BB_RENAMED_VARIABLES[<var>] = "..."
+    Then exclude that.
+    """
+    cmd = [
+        "git", "-C", gitdir, "grep", "--extended-regexp",
+        "--max-count=1", "--quiet",
+        "-e", fr"\<{var}\>", "--and", "--not",
+        "-e", fr"BB_RENAMED_VARIABLES\[{var}\]"
+    ]
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError:
+        return False
+
+    logging.debug(f"{var} found in {gitdir.name}")
+    return True
+
+
+def var_exists(var: str, repos: List[Path]):
+    return any(var_exists_in(var, d) for d in repos)
+
+
+def check_inventory(inv_path: Path, uri: str, repos: List[Path]) -> int:
+    exit_code = 0
+    inv = InventoryFile.loads(inv_path.read_bytes(), uri="")
+    for entry, inv_item in sorted(inv.data["std:term"].items()):
+        if inv_item.uri.startswith(uri) \
+                and entry not in VAR_EXCEPTIONS \
+                and not var_exists(entry, repos):
+            exit_code = 1
+            logging.error("Variable %s not found in OE-Core, meta-yocto, or BitBake" % entry)
+    return exit_code
+
+
+def main():
+    exit_code = 0
+    args = parse_arguments()
+
+    if args.debug:
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+    else:
+        logging.basicConfig(format="%(levelname)s: %(message)s")
+
+    if not (args.yocto_docs_inv.exists() and args.bitbake_inv.exists()):
+        logging.error(f"yocto-docs and bitbake inventories not found at {args.yocto_docs_inv}/"
+                      f"{args.bitbake_inv}. Build the documentation or use the "
+                      "--yocto-docs-inv/--bitbake-inv options")
+        sys.exit(1)
+
+    exit_code = check_inventory(args.yocto_docs_inv, "ref-manual/variables.html#term-",
+                                (args.oecore_dir, args.meta_yocto_dir, args.bitbake_dir))
+
+    exit_code = check_inventory(args.bitbake_inv, "bitbake-user-manual/bitbake-user-manual-ref-variables.html#term-",
+                                (args.oecore_dir, args.meta_yocto_dir, args.bitbake_dir))
+
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    main()

@@ -573,14 +573,14 @@ patched file to still compile without errors.
 Use the ``devtool`` command as explained by the warning. First, unpack the
 source into devtool workspace::
 
-   devtool modify <recipe>
+   $ devtool modify <recipe>
 
 This will apply all of the patches, and create new commits out of them in
 the workspace --- with the patch context updated.
 
 Then, replace the patches in the recipe layer::
 
-   devtool finish --force-patch-refresh <recipe> <layer_path>
+   $ devtool finish --force-patch-refresh <recipe> <layer_path>
 
 The patch updates then need be reviewed (preferably with a side-by-side diff
 tool) to ensure they are indeed doing the right thing i.e.:

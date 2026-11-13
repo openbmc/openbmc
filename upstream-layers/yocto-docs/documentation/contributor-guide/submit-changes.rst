@@ -57,20 +57,20 @@ Set up Git
 The first thing to do is to install Git packages. Here is an example
 on Debian and Ubuntu::
 
-   sudo apt install git-core git-email
+   $ sudo apt install git-core git-email
 
 Then, you need to set a name and e-mail address that Git will
 use to identify your commits::
 
-   git config --global user.name "Ada Lovelace"
-   git config --global user.email "ada.lovelace@gmail.com"
+   $ git config --global user.name "<firstname> <lastname>"
+   $ git config --global user.email "<email>"
 
 By default, Git adds a signature line at the end of patches containing the Git
 version. We suggest to remove it as it doesn't add useful information.
 
 Remove it with the following command::
 
-   git config --global format.signature ""
+   $ git config --global format.signature ""
 
 Clone the Git repository for the component to modify
 ----------------------------------------------------
@@ -79,8 +79,8 @@ After identifying the component to modify as described in the
 ":doc:`/contributor-guide/identify-component`" section, clone the
 corresponding Git repository. Here is an example for OpenEmbedded-Core::
 
-  git clone https://git.openembedded.org/openembedded-core
-  cd openembedded-core
+  $ git clone https://git.openembedded.org/openembedded-core
+  $ cd openembedded-core
 
 Create a new branch
 -------------------
@@ -177,7 +177,7 @@ to add the upgraded version.
           is to look for prefixes used in previous commits touching the
           same files or directories::
 
-             git log --oneline <paths>
+             $ git log --oneline <paths>
 
    #.  For the commit description, provide detailed information
        that describes what you changed, why you made the change, and the
@@ -278,7 +278,7 @@ Here is the general procedure on how to create patches to be sent through email:
    For this purpose, a good solution is to store the cover letter contents
    in the branch itself::
 
-      git branch --edit-description
+      $ git branch --edit-description
 
    This will open a text editor to fill in the description for your
    changes. This description can be updated when necessary and will
@@ -334,19 +334,19 @@ functional testing of the changes will be performed by ``patchtest``. Currently,
 it only supports testing patches for ``openembedded-core`` branches. To setup,
 perform the following::
 
-    pip install -r meta/lib/patchtest/requirements.txt
-    source oe-init-build-env
-    bitbake-layers add-layer ../meta-selftest
+    $ pip install -r meta/lib/patchtest/requirements.txt
+    $ source oe-init-build-env
+    $ bitbake-layers add-layer ../meta-selftest
 
 Once these steps are complete and you have generated your patch files,
 you can run ``patchtest`` like so::
 
-    patchtest --patch <patch_name>
+    $ patchtest --patch <patch_name>
 
 Alternatively, if you want ``patchtest`` to iterate over and test
 multiple patches stored in a directory, you can use::
 
-    patchtest --directory <directory_name>
+    $ patchtest --directory <directory_name>
 
 By default, ``patchtest`` uses its own modules' file paths to determine what
 repository and test suite to check patches against. If you wish to test
@@ -354,7 +354,7 @@ patches against a repository other than ``openembedded-core`` and/or use
 a different set of tests, you can use the ``--repodir`` and ``--testdir``
 flags::
 
-    patchtest --patch <patch_name> --repodir <path/to/repo> --testdir <path/to/testdir>
+    $ patchtest --patch <patch_name> --repodir <path/to/repo> --testdir <path/to/testdir>
 
 Finally, note that ``patchtest`` is designed to test patches in a standalone
 way, so if your patches are meant to apply on top of changes made by
@@ -394,13 +394,14 @@ Mail Transport Agent (MTA) such as ``msmtp``, ``sendmail``, or
 through a direct SMTP configuration in your Git ``~/.gitconfig`` file.
 
 Here are the settings for letting ``git send-email`` send e-mail through your
-regular STMP server, using a Google Mail account as an example::
+regular STMP server, such as ``smtp.gmail.com`` for a Google Mail
+account::
 
-   git config --global sendemail.smtpserver smtp.gmail.com
-   git config --global sendemail.smtpserverport 587
-   git config --global sendemail.smtpencryption tls
-   git config --global sendemail.smtpuser ada.lovelace@gmail.com
-   git config --global sendemail.smtppass = XXXXXXXX
+   $ git config --global sendemail.smtpserver <smtp server>
+   $ git config --global sendemail.smtpserverport 587
+   $ git config --global sendemail.smtpencryption tls
+   $ git config --global sendemail.smtpuser <email>
+   $ git config --global sendemail.smtppass <password>
 
 These settings will appear in the ``.gitconfig`` file in your home directory.
 
@@ -463,7 +464,7 @@ Sending Patches via Email
 At this stage, you are ready to send your patches via email. Here's the
 typical usage of ``git send-email``::
 
-   git send-email --to <mailing-list-address> *.patch
+   $ git send-email --to <mailing-list-address> *.patch
 
 Then, review each subject line and list of recipients carefully, and then
 allow the command to send each message.
@@ -476,7 +477,7 @@ or any layer other than :oe_git:`openembedded-core </openembedded-core/>`,
 please add the appropriate prefix so that it is clear which layer the patch is intended
 to be applied to::
 
-   git format-patch --subject-prefix="meta-oe][PATCH" ...
+   $ git format-patch --subject-prefix="meta-oe][PATCH" ...
 
 .. note::
 
@@ -488,13 +489,13 @@ to be applied to::
    Here's a command you can use if you just have one patch in your
    branch::
 
-      git send-email --to <mailing-list-address> -1
+      $ git send-email --to <mailing-list-address> -1
 
    If you have multiple patches and a cover letter, you can send
    patches for all the commits between the reference branch
    and the tip of your branch::
 
-      git send-email --cover-letter --cover-from-description=auto --to <mailing-list-address> -M <ref-branch>
+      $ git send-email --cover-letter --cover-from-description=auto --to <mailing-list-address> -M <ref-branch>
 
 See the `git send-email manual page <https://git-scm.com/docs/git-send-email>`__
 for details.
@@ -517,7 +518,7 @@ author name. The following will ensure that your e-mails have an additional
 maintainers accepting your patches don't have to fix commit author information
 manually::
 
-   git config --global sendemail.from "linus.torvalds@kernel.org"
+   $ git config --global sendemail.from "<email>"
 
 The ``sendemail.from`` should match your ``user.email`` setting,
 which appears in the ``Signed-off-by`` line of your commits.
@@ -530,12 +531,12 @@ with ``git send-email``, you can use Git configuration settings.
 
 -  To set the right mailing list address for a given repository::
 
-      git config --local sendemail.to openembedded-devel@lists.openembedded.org
+      $ git config --local sendemail.to openembedded-devel@lists.openembedded.org
 
 -  If the mailing list requires a subject prefix for the layer
    (this only works when the repository only contains one layer)::
 
-      git config --local format.subjectprefix "meta-something][PATCH"
+      $ git config --local format.subjectprefix "meta-something][PATCH"
 
 Using Scripts to Push a Change Upstream and Request a Pull
 ==========================================================
@@ -597,7 +598,7 @@ have been followed:
       enter the following command to bring up a short list of all
       commits against a specific file::
 
-         git shortlog -- filename
+         $ git shortlog -- filename
 
       Just provide the name of the file for which you are interested. The
       information returned is not ordered by history but does include a
@@ -719,7 +720,7 @@ follows:
       ``git format-patch``, for example to submit a patch to the
       "&DISTRO_NAME_NO_CAP_MINUS_ONE;" branch use::
 
-         git format-patch --subject-prefix='&DISTRO_NAME_NO_CAP_MINUS_ONE;][PATCH' ...
+         $ git format-patch --subject-prefix='&DISTRO_NAME_NO_CAP_MINUS_ONE;][PATCH' ...
 
 Taking Patch Review into Account
 ================================
@@ -745,7 +746,7 @@ without the reported issues.
 A single patch can be amended using ``git commit --amend``, and multiple
 patches can be easily reworked and reordered through an interactive Git rebase::
 
-   git rebase -i <ref-branch>
+   $ git rebase -i <ref-branch>
 
 See `this tutorial <https://hackernoon.com/beginners-guide-to-interactive-rebasing-346a3f9c3a6d>`__
 for practical guidance about using Git interactive rebasing.
@@ -755,7 +756,7 @@ sending the revised patch to mark the new iteration as ``[PATCH v2]``,
 ``[PATCH v3]``, etc as appropriate. This can be done by passing the ``-v``
 argument to ``git format-patch`` with a version number::
 
-   git format-patch -v2 <ref-branch>
+   $ git format-patch -v2 <ref-branch>
 
 
 After generating updated patches (v2, v3, and so on) via ``git
@@ -847,53 +848,3 @@ branches in both the "openembedded-core" and "meta-yocto" repositories.
 Other layers may have similar testing branches but there is no formal
 requirement or standard for these so please check the documentation for the
 layers you are contributing to.
-
-Acceptance of AI Generated Code
-===============================
-
-The Yocto Project and OpenEmbedded follow the guidance of the Linux Foundation
-in regards to the use of generative AI tools. See:
-https://www.linuxfoundation.org/legal/generative-ai.
-
-All of the existing guidelines in this document are expected to be followed,
-including in the :doc:`/contributor-guide/recipe-style-guide`, and contributing the changes with
-additional requirements to the items in section
-:ref:`contributor-guide/submit-changes:Implement and commit changes`.
-
-All AI Generated Code must be labeled as such in the commit message,
-prior to your ``Signed-off-by`` line. It is also strongly recommended,
-that any patches or code within the commit also have a comment or other
-indication that this code was AI generated.
-
-For example, here is a properly formatted commit message::
-
-   component: Add the ability to ...
-
-   AI-Generated: Uses GitHub Copilot
-
-   Signed-off-by: Your Name <your.name@domain>
-
-The ``Signed-off-by`` line must be written by you, and not the AI helper.
-As a reminder, when contributing a change, your ``Signed-off-by`` line is
-required and the stipulations in the `Developer's Statement of Origin
-1.1 <https://developercertificate.org/>`__ still apply.
-
-Additionally, you must stipulate AI contributions conform to the Linux
-Foundation policy, specifically:
-
-#. Contributors should ensure that the terms and conditions of the generative AI
-   tool do not place any contractual restrictions on how the tool's output can
-   be used that are inconsistent with the project's open source software
-   license, the project's intellectual property policies, or the Open Source
-   Definition.
-
-#. If any pre-existing copyrighted materials (including pre-existing open
-   source code) authored or owned by third parties are included in the AI tool's
-   output, prior to contributing such output to the project, the Contributor
-   should confirm that they have permission from the third party
-   owners -- such as the form of an open source license or public domain
-   declaration that complies with the project's licensing policies -- to use and
-   modify such pre-existing materials and contribute them to the project.
-   Additionally, the contributor should provide notice and attribution of such
-   third party rights, along with information about the applicable license
-   terms, with their contribution.

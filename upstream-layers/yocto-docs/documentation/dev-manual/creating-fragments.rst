@@ -86,7 +86,7 @@ For now, our fragment exists and is listed by the
 enable this fragment, use the :ref:`ref-bitbake-config-build-enable-fragment`
 command::
 
-   bitbake-config-build enable-fragment meta-custom/custom-fragment
+   $ bitbake-config-build enable-fragment meta-custom/custom-fragment
 
 .. note::
 
@@ -143,4 +143,4 @@ configuration file:
 You can then use the :ref:`ref-bitbake-config-build-enable-fragment` command to
 set a value to the ``CUSTOM_VARIABLE`` variable::
 
-   bitbake-config-build enable-fragment custom-builtin-fragment/somevalue
+   $ bitbake-config-build enable-fragment custom-builtin-fragment/somevalue

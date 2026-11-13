@@ -436,7 +436,7 @@ By default, patches created with ``git format-patch`` have a `Git` version signa
 To avoid having a `Git` signature at the end of generated or updated patches,
 you can use `Git` configuration settings::
 
-   git config --global format.signature ""
+   $ git config --global format.signature ""
 
 .. note::
    Patches generated or updated by ``devtool`` are created with no signature.

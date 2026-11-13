@@ -173,7 +173,7 @@ New Features / Enhancements in 4.2
       command, which allowed to spot and fix a regression in the
       ``quilt`` ptest::
 
-         yocto_testresults_query.py regression-report 4.2_M1 4.2_M2
+         $ yocto_testresults_query.py regression-report 4.2_M1 4.2_M2
 
       See this `blog post about regression detection
       <https://bootlin.com/blog/continuous-integration-in-yocto-improving-the-regressions-detection/>`__.
@@ -242,7 +242,7 @@ New Features / Enhancements in 4.2
 -  bitbake-layers improvements:
 
    -  ``layerindex-fetch``: checkout layer(s) branch when clone exists
-   -  ``create``: add ``-a``/``--add-layer option`` to add layer to ``bblayers.conf`` after creating layer
+   -  ``create``: add ``-a``/``--add-layer option`` to add layer to :ref:`structure-build-conf-bblayers.conf` after creating layer
    -  ``show-layers``: improve output layout
 
 -  Other BitBake improvements:

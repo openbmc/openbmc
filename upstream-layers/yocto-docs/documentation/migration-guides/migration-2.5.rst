@@ -138,11 +138,11 @@ BitBake Changes
    :ref:`ref-classes-archiver` classes). There is a BitBake option to complete this for
    any arbitrary task. For example::
 
-      bitbake <target> -c fetchall
+      $ bitbake <target> -c fetchall
 
    should now be replaced with::
 
-      bitbake <target> --runall=fetch
+      $ bitbake <target> --runall=fetch
 
 .. _migration-2.5-python-and-python3-changes:
 

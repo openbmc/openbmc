@@ -256,7 +256,7 @@ Miscellaneous changes
 - The Python development shell (previously known as ``devpyshell``) feature has been
   renamed to ``pydevshell``. To start it you should now run::
 
-     bitbake <target> -c pydevshell
+     $ bitbake <target> -c pydevshell
 
 - The ``packagegroups-core-full-cmdline-libs`` packagegroup is no longer produced, as
   libraries should normally be brought in via dependencies. If you have any references

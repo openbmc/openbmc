@@ -26,7 +26,7 @@ adding statements to your configuration file so that the build process
 checks local directories first for existing tarballs before checking the
 Internet.
 
-Here is an efficient way to set it up in your ``local.conf`` file::
+Here is an efficient way to set it up in a :term:`configuration file`::
 
    SOURCE_MIRROR_URL ?= "file:///home/you/your-download-dir/"
    INHERIT += "own-mirrors"

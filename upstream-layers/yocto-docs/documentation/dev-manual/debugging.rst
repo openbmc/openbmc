@@ -113,7 +113,7 @@ variables>` did not work out as expected.
 
 BitBake's ``bitbake-getvar`` command is used to display variable values after
 parsing. The following command displays the variable value for :term:`OVERRIDES`
-after the configuration files (i.e. ``local.conf``, ``bblayers.conf``,
+after the configuration files (i.e. ``local.conf``, :ref:`structure-build-conf-bblayers.conf`,
 ``bitbake.conf`` and so forth) have been parsed::
 
    $ bitbake-getvar OVERRIDES
@@ -144,7 +144,7 @@ helpful during debugging.
 Variables that are exported to the environment are preceded by
 ``export`` in the output of ``bitbake-getvar``. See the following example::
 
-   export CC="i586-poky-linux-gcc -m32 -march=i586 --sysroot=/home/ulf/poky/build/tmp/sysroots/qemux86"
+   export CC="i586-poky-linux-gcc -m32 -march=i586 --sysroot=/home/user/poky/build/tmp/sysroots/qemux86"
 
 Shell functions and tasks can also be inspected with the same mechanism::
 
@@ -522,7 +522,7 @@ task dependency mechanisms.
 
    .. code-block:: none
 
-      WARNING: /home/ulf/openembedded-core/meta/recipes-sato/matchbox-desktop/matchbox-desktop_2.1.bb.do_compile is tainted from a forced run
+      WARNING: /home/user/openembedded-core/meta/recipes-sato/matchbox-desktop/matchbox-desktop_2.1.bb.do_compile is tainted from a forced run
 
 
    The purpose of the warning is to let you know that the work directory
@@ -787,7 +787,7 @@ In this example, compiling the "neard" package is causing the problem.
 So the first thing to do is build "neard" locally. Before you start the
 build, set the
 :term:`PARALLEL_MAKE` variable
-in your ``local.conf`` file to a high number (e.g. "-j 20"). Using a
+in your :ref:`structure-build-conf-local.conf` file to a high number (e.g. "-j 20"). Using a
 high value for :term:`PARALLEL_MAKE` increases the chances of the race
 condition showing up::
 
@@ -810,7 +810,7 @@ be visible. In this case, there is a missing dependency for the ``neard``
 Makefile target. Here is some abbreviated, sample output with the
 missing dependency clearly visible at the end::
 
-   i586-poky-linux-gcc  -m32 -march=i586 --sysroot=/home/scott-lenovo/......
+   i586-poky-linux-gcc  -m32 -march=i586 --sysroot=<path/to/sysroot>
       .
       .
       .
@@ -821,7 +821,6 @@ missing dependency clearly visible at the end::
                      ^
    compilation terminated.
    make: *** [tools/snep-send.o] Error 1
-   $
 
 
 Creating a Patch for the Fix
@@ -943,7 +942,7 @@ To run a ``debuginfod`` server, you need to do the following:
    (it already is in :term:`OpenEmbedded-Core (OE-Core)` defaults and
    :term:`Poky` reference distribution).
 
-   If not, set in your distro config file or in ``local.conf``::
+   If not, set in your distro :term:`configuration file` or in :ref:`structure-build-conf-local.conf`::
 
       DISTRO_FEATURES:append = " debuginfod"
 
@@ -1010,7 +1009,7 @@ debugger.
 #. *Configure your build system to construct the companion debug
    filesystem:*
 
-   In your ``local.conf`` file, set the following::
+   In your :ref:`structure-build-conf-local.conf` file, set the following::
 
       IMAGE_GEN_DEBUGFS = "1"
       IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
@@ -1029,7 +1028,7 @@ debugger.
 
 #. *Configure the system to include gdbserver in the target filesystem:*
 
-   Make the following addition in your ``local.conf`` file::
+   Make the following addition in your :ref:`structure-build-conf-local.conf` file::
 
       EXTRA_IMAGE_FEATURES:append = " tools-debug"
 
@@ -1115,11 +1114,11 @@ debugger.
    After running gdbserver on the target, you need to run Gdb on the
    host and configure it and connect to the target. Use these commands::
 
-      $ cd directory-holding-the-debugfs-directory
-      $ arch-gdb
+      $ cd <debugfs-directory>
+      $ <arch>-gdb
       (gdb) set sysroot debugfs
       (gdb) set substitute-path /usr/src/debug debugfs/usr/src/debug
-      (gdb) target remote IP-of-target:1234
+      (gdb) target remote <IP-of-target>:1234
 
    At this
    point, everything should automatically load (i.e. matching binaries,
@@ -1165,7 +1164,7 @@ debug on the target hardware.
 To support this kind of debugging, you need do the following:
 
 -  Ensure that GDB is on the target. You can do this by making
-   the following addition to your ``local.conf`` file::
+   the following addition to your :ref:`structure-build-conf-local.conf` file::
 
       EXTRA_IMAGE_FEATURES:append = " tools-debug"
 
@@ -1174,7 +1173,7 @@ To support this kind of debugging, you need do the following:
 
       IMAGE_INSTALL:append = " packagename-dbg"
 
-   Alternatively, you can add the following to ``local.conf`` to include
+   Alternatively, you can add the following to :ref:`structure-build-conf-local.conf` to include
    all the debug symbols::
 
       EXTRA_IMAGE_FEATURES:append = " dbg-pkgs"
@@ -1183,7 +1182,7 @@ To support this kind of debugging, you need do the following:
 
    To improve the debug information accuracy, you can reduce the level
    of optimization used by the compiler. For example, when adding the
-   following line to your ``local.conf`` file, you will reduce optimization
+   following line to your :ref:`structure-build-conf-local.conf` file, you will reduce optimization
    from :term:`FULL_OPTIMIZATION` of "-O2" to :term:`DEBUG_OPTIMIZATION`
    of "-O -fno-omit-frame-pointer"::
 

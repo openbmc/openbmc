@@ -16,14 +16,13 @@ modifications to reflect Wic capabilities. You can see the original
 documentation for those commands at the following link:
 https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html
 
-Command: part or partition
-==========================
+Command: part
+=============
 
-Either of these commands creates a partition on the system and uses the
+This command creates a partition on the system and uses the
 following syntax::
 
    part [mntpoint]
-   partition [mntpoint]
 
 If you do not
 provide mntpoint, Wic creates a partition but does not mount it.
@@ -54,7 +53,7 @@ Here is an example that uses "/" as the mountpoint. The command uses
       part / --source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
 
 Here is a list that describes other supported options you can use with
-the ``part`` and ``partition`` commands:
+the ``part`` command:
 
 -  ``--size``: The minimum partition size. Specify as an integer value
    optionally followed by one of the units "k" / "K" for kibibyte,

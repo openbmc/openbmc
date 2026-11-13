@@ -72,25 +72,25 @@ command, you can determine which fragments can be enabled for your build.
 For example, the following command would enable the
 :ref:`ref-fragments-core-yocto-sstate-mirror-cdn` fragment::
 
-   bitbake-config-build enable-fragment core/yocto/sstate-mirror-cdn
+   $ bitbake-config-build enable-fragment core/yocto/sstate-mirror-cdn
 
 .. note::
 
    Multiple fragments can be enabled at once with the same command::
 
-      bitbake-config-build enable-fragment <fragment1> <fragment2> ...
+      $ bitbake-config-build enable-fragment <fragment1> <fragment2> ...
 
 :term:`Built-in fragments <Built-in Fragment>` are enabled the same way, and
 their values are defined from the command-line directly. For example, the
 following command sets the ``qemuarm64`` :term:`MACHINE` through the
 :ref:`ref-fragments-builtin-core-machine` fragment::
 
-   bitbake-config-build enable-fragment machine/qemuarm64
+   $ bitbake-config-build enable-fragment machine/qemuarm64
 
 This fragment can be overridden from the command-line by setting it to another
 value, for example::
 
-   bitbake-config-build enable-fragment machine/qemux86-64
+   $ bitbake-config-build enable-fragment machine/qemux86-64
 
 In the above example, the new value of :term:`MACHINE` is now equal to
 ``qemux86-64``.
@@ -118,18 +118,18 @@ command. The list of enabled fragments can be obtained with
 For example, the following command disables the
 :ref:`ref-fragments-core-yocto-sstate-mirror-cdn` fragment::
 
-   bitbake-config-build disable-fragment core/yocto/sstate-mirror-cdn
+   $ bitbake-config-build disable-fragment core/yocto/sstate-mirror-cdn
 
 Likewise, :term:`Built-in Fragments <Built-in Fragment>` are disabled the
 same way. For example, this would disable the ``machine/qemuarm64`` fragment::
 
-   bitbake-config-build disable-fragment machine/qemuarm64
+   $ bitbake-config-build disable-fragment machine/qemuarm64
 
 .. note::
 
    Multiple fragments can be disabled at once with the same command::
 
-      bitbake-config-build disable-fragment <fragment1> <fragment2>
+      $ bitbake-config-build disable-fragment <fragment1> <fragment2>
 
 .. _ref-bitbake-config-build-disable-all-fragments:
 
@@ -142,7 +142,7 @@ currently enabled fragments.  The list of enabled fragments can be obtained with
 
 This command is run without arguments::
 
-   bitbake-config-build disable-all-fragments
+   $ bitbake-config-build disable-all-fragments
 
 Core Fragments
 ==============
@@ -223,6 +223,16 @@ This configuration fragment does multiple things:
 
 -  Includes the VEX statements to the input SPDX document using the
    :term:`SPDX_INCLUDE_VEX` variable.
+
+.. _ref-fragments-core-yocto-monitor-disk-space:
+
+``core/yocto/monitor-disk-space``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``core/yocto/monitor-disk-space`` :term:`configuration fragment` can be used
+to produce warnings or errors when the disk currently in use during the build
+is out of space, by setting a sensible value for the :term:`BB_DISKMON_DIRS`
+variable. See the definition of :term:`BB_DISKMON_DIRS` for more information.
 
 Yocto Project Autobuilder Fragments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

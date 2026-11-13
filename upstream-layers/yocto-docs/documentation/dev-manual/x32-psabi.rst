@@ -38,7 +38,7 @@ follows:
 
 -  There is support for large images.
 
-To use the x32 psABI, you need to edit your ``conf/local.conf``
+To use the x32 psABI, you need to edit your :ref:`structure-build-conf-local.conf`
 configuration file as follows::
 
    MACHINE = "qemux86-64"

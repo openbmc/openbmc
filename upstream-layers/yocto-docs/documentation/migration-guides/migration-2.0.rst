@@ -195,7 +195,7 @@ configuration are now automatically removed from sysroot as well as
 removed from any other place managed by shared state. This automatic
 cleanup means that the build system now properly handles situations such
 as renaming the build system side of recipes, removal of layers from
-``bblayers.conf``, and :term:`DISTRO_FEATURES`
+:ref:`structure-build-conf-bblayers.conf`, and :term:`DISTRO_FEATURES`
 changes.
 
 Additionally, work directories for old versions of recipes are now

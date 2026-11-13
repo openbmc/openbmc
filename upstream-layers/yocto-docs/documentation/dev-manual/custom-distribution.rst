@@ -26,7 +26,7 @@ layer. The following steps provide some more detail:
    so that you can keep your Metadata and code for the distribution
    separate. It is strongly recommended that you create and use your own
    layer for configuration and code. Using your own layer as compared to
-   just placing configurations in a ``local.conf`` configuration file
+   just placing configurations in a :ref:`structure-build-conf-local.conf` configuration file
    makes it easier to reproduce the same build configuration when using
    multiple build machines. See the
    ":ref:`dev-manual/layers:Creating Your Own Layer`"
@@ -39,8 +39,9 @@ layer. The following steps provide some more detail:
 
    .. note::
 
-      The :term:`DISTRO` variable in your ``local.conf`` file determines the
-      name of your distribution.
+      The :term:`DISTRO` variable in your :ref:`structure-build-conf-local.conf` file determines the
+      name of your distribution. You can also use the
+      :ref:`ref-fragments-builtin-core-distro` configuration fragment.
 
    You can split out parts of your configuration file into include files
    and then "require" them from within your distribution configuration
@@ -80,16 +81,19 @@ layer. The following steps provide some more detail:
 -  *Provide miscellaneous variables:* Be sure to define any other
    variables for which you want to create a default or enforce as part
    of the distribution configuration. You can include nearly any
-   variable from the ``local.conf`` file. The variables you use are not
+   variable from the :ref:`structure-build-conf-local.conf` file. The variables you use are not
    limited to the list in the previous bulleted item.
 
--  *Point to Your distribution configuration file:* In your ``local.conf``
+-  *Point to Your distribution configuration file:* In your :ref:`structure-build-conf-local.conf`
    file in the :term:`Build Directory`, set your :term:`DISTRO` variable to
    point to your distribution's configuration file. For example, if your
    distribution's configuration file is named ``mydistro.conf``, then
    you point to it as follows::
 
       DISTRO = "mydistro"
+
+   You can also set the :ref:`ref-fragments-builtin-core-distro` configuration
+   fragment from the command-line.
 
 -  *Add more to the layer if necessary:* Use your layer to hold other
    information needed for the distribution:

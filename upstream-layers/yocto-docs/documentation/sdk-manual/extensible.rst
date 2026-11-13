@@ -149,7 +149,7 @@ architecture. The example assumes the SDK installer is located in
    Poky (Yocto Project Reference Distro) Extensible SDK installer version 2.5
    ==========================================================================
    Enter target directory for SDK (default: poky_sdk):
-   You are about to install the SDK to "/home/scottrif/poky_sdk". Proceed [Y/n]? Y
+   You are about to install the SDK to "/home/user/poky_sdk". Proceed [Y/n]? Y
    Extracting SDK..............done
    Setting it up...
    Extracting buildtools...
@@ -162,7 +162,7 @@ architecture. The example assumes the SDK installer is located in
    done
    SDK has been successfully set up and is ready to be used.
    Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g.
-    $ . /home/scottrif/poky_sdk/environment-setup-core2-64-poky-linux
+    $ . /home/user/poky_sdk/environment-setup-core2-64-poky-linux
 
 .. note::
 
@@ -197,7 +197,7 @@ script is for an IA-based target machine using i586 tuning:
 
 .. code-block:: console
 
-   $ cd /home/scottrif/poky_sdk
+   $ cd /home/user/poky_sdk
    $ source environment-setup-core2-64-poky-linux
    SDK environment now set up; additionally you may now run devtool to perform development tasks.
    Run devtool --help for further details.

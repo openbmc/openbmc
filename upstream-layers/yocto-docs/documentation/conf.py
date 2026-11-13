@@ -242,4 +242,21 @@ intersphinx_mapping = {
 # -- sphinx_copybutton configuration -----------------------------------------
 
 # sphinx-copybutton configuration
-copybutton_prompt_text = "$ "
+# Applies to the copy button only; a mouse selection is untouched.
+# Not scoped to console blocks, so every alternative has to be safe in a
+# BitBake or configuration example too.
+# No rule for a bare "#": it opens a comment, a root prompt, and a
+# line of program output alike.
+copybutton_prompt_text = "|".join((
+    r"^(?:\S+[@:]\S*)?\$\s+",   # "$ ", and "user@host:~$ "
+    r"^\S+[@:]\S*#\s+",         # "root@machine:~# ", a root prompt
+    r"^[A-Za-z]:\\[^>]*>\s*",   # "C:\WINDOWS\system32>", cmd.exe
+    r"^DISKPART>\s*",           # diskpart prints a prompt of its own
+    r"^pydevshell>\s+",         # bitbake -c pydevshell
+    r"^>>> ",                   # a Python interpreter session
+    r"^\(gdb\)\s+",             # a gdb session
+))
+copybutton_prompt_is_regexp = True
+copybutton_only_copy_prompt_lines = True
+copybutton_remove_prompts = True
+copybutton_line_continuation_character = "\\"

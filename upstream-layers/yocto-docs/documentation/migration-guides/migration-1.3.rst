@@ -12,7 +12,7 @@ Local Configuration
 -------------------
 
 Differences include changes for
-:term:`SSTATE_MIRRORS` and ``bblayers.conf``.
+:term:`SSTATE_MIRRORS` and :ref:`structure-build-conf-bblayers.conf`.
 
 .. _migration-1.3-sstate-mirrors:
 
@@ -42,7 +42,7 @@ The ``meta-yocto`` layer consists of two parts that correspond to the
 Poky reference distribution and the reference hardware Board Support
 Packages (BSPs), respectively: ``meta-yocto`` and ``meta-yocto-bsp``.
 When running BitBake for the first time after upgrading, your
-``conf/bblayers.conf`` file will be updated to handle this change and
+:ref:`structure-build-conf-bblayers.conf` file will be updated to handle this change and
 you will be asked to re-run or restart for the changes to take effect.
 
 .. _1.3-recipes:

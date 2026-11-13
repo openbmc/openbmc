@@ -193,9 +193,9 @@ The support for having multiple Git revisions per URL in :term:`SRC_URI` was
 removed from BitBake, which means the following syntax is not supported
 anymore::
 
-   SRC_URI = "git://some.host/somepath;bareclone=1;branch=branchX,branchY;name=nameX,nameY"
-   SRCREV_nameX = "xxxxxxxxxxxxxxxxxxxx"
-   SRCREV_nameY = "yyyyyyyyyyyyyyyyyyyy"
+   SRC_URI = "git://<some.host>/<somepath>;bareclone=1;branch=<branchX>,<branchY>;name=<nameX>,<nameY>"
+   SRCREV_<nameX> = "<revision SHA for nameX>"
+   SRCREV_<nameY> = "<revision SHA for nameY>"
 
 This was rarely used in the core repositories because it would only ever make
 sense for bare clones (the ``bareclone=1`` :term:`SRC_URI` option) where recipes
@@ -205,10 +205,10 @@ places.
 If one of your recipes is using this mechanism, you can split the code source
 fetching into two separate entries::
 
-   SRC_URI = "git://some.host/somepath;bareclone=1;branch=branchX;name=nameX \
-              git://some.host/somepath;bareclone=1;branch=branchY;name=nameY"
-   SRCREV_nameX = "xxxxxxxxxxxxxxxxxxxx"
-   SRCREV_nameY = "yyyyyyyyyyyyyyyyyyyy"
+   SRC_URI = "git://<some.host>/<somepath>;bareclone=1;branch=<branchX>;name=<nameX> \
+              git://<some.host>/<somepath>;bareclone=1;branch=<branchY>;name=<nameY>"
+   SRCREV_<nameX> = "<revision SHA for nameX>"
+   SRCREV_<nameY> = "<revision SHA for nameY>"
 
 Git fetcher: Branch parameter now required in :term:`SRC_URI`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,7 +216,7 @@ Git fetcher: Branch parameter now required in :term:`SRC_URI`
 The ``branch`` parameter is now required when specifying a Git repository in
 :term:`SRC_URI`, for example::
 
-   SRC_URI = "git://some.host/somepath;branch=branchX"
+   SRC_URI = "git://<some.host>/<somepath>;branch=<branchX>"
 
 A missing ``branch`` parameter used to produce a warning, and will now produce
 an error.

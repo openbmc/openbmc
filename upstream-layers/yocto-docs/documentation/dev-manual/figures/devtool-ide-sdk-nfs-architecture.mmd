@@ -1,0 +1,89 @@
+---
+config:
+  theme: base
+  look: classic
+  htmlLabels: false
+  fontFamily: '"Nimbus Sans", Helvetica, Arial, sans-serif'
+  fontSize: 13.33
+  themeVariables:
+    primaryColor: "#99c1f1"
+    primaryBorderColor: "#62a0ea"
+    primaryTextColor: "#000000"
+    lineColor: "#000000"
+    edgeLabelBackground: "#ffffff"
+    clusterBkg: "#f6f5f4"
+    clusterBorder: "#c0bfbc"
+    titleColor: "#000000"
+    fontSize: 13.33px
+  themeCSS: |
+    .cluster-label tspan { font-weight: bold; }
+    rect { rx: 7.5px; ry: 7.5px; }
+  flowchart:
+    htmlLabels: false
+    useMaxWidth: false
+    curve: basis
+    padding: 10
+    nodeSpacing: 23
+    rankSpacing: 37
+    wrappingWidth: 300
+---
+%% Regenerate: npx -y @mermaid-js/mermaid-cli -b transparent -i devtool-ide-sdk-nfs-architecture.mmd -o devtool-ide-sdk-nfs-architecture.svg
+%%   && sed -i 's/<text /<text xml:space="preserve" /g' devtool-ide-sdk-nfs-architecture.svg
+%% (xml:space keeps the spaces between words in rsvg-convert, used for the PDF output)
+flowchart TB
+    idesdk["devtool ide-sdk --nfs=rootfs-dbg<br/>(bitbake tinfoil client)"]
+    ideconfig[["IDE configuration<br/>(e.g. build tool preset,<br/>debugger launch config)"]]
+    ide["IDE (e.g. VSCode)"]
+    srcdir[["S = e.g. workspace/sources/&lt;recipe&gt;<br/>(source code, extracted by<br/>devtool modify, edited in the IDE)"]]
+
+    subgraph sdk["SDK (regular bitbake environment)"]
+        subgraph recipe_workdir["Recipe WORKDIR(s)"]
+            native_sysroot[["recipe-sysroot-native<br/>build tool (e.g. CMake)<br/>cross-compiler (e.g. &lt;arch&gt;-gcc)<br/>debugger (e.g. gdb)"]]
+            builddir[["B (build directory)<br/>build artifacts"]]
+            sysroot[["recipe-sysroot<br/>(target headers & libs)"]]
+            destdir[["D = image<br/>(non-stripped, relocated rpath,<br/>managed by pseudo)"]]
+        end
+
+        subgraph image_workdir["Image WORKDIR"]
+            rootfsdbg_src[["rootfs-dbg<br/>(stripped binaries + debug symbols<br/>of every recipe, combined by<br/>image-combined-dbg)"]]
+        end
+    end
+
+    subgraph nfs["NFS export"]
+        rootfsdbg[["&lt;workspace&gt;/nfs-exports/<br/>&lt;image-recipe&gt;/rootfs-dbg<br/>(copy, kept in sync by<br/>devtool deploy-target;<br/>persists across debug sessions)"]]
+    end
+
+    subgraph target["Target device"]
+        appbin["Application binary<br/>(running)"]
+        debugserver["debug-server<br/>(e.g. gdbserver)"]
+    end
+
+    idesdk -->|generates| ideconfig
+    idesdk -->|"generates the SDK (via bitbake)"| sdk
+    rootfsdbg_src -->|"deployed, extracted<br/>(--nfs=rootfs-dbg)"| rootfsdbg
+    ideconfig --> ide
+    ideconfig --> native_sysroot
+    ide -->|"calls directly, no bitbake needed"| native_sysroot
+    ide -->|"edit source"| srcdir
+    native_sysroot -->|"reads source from"| srcdir
+    native_sysroot -->|"builds in"| builddir
+    native_sysroot -.->|"--sysroot"| sysroot
+    builddir -->|install| destdir
+    destdir -->|"devtool deploy-target<br/>(direct write, no SSH)"| rootfsdbg
+    native_sysroot -->|"debug symbols:<br/>unstripped binary"| destdir
+    native_sysroot -->|"debug symbols:<br/>other recipes'<br/>shared libraries"| rootfsdbg
+    native_sysroot -->|"remote debug<br/>protocol"| debugserver
+    debugserver -->|"attach / run"| appbin
+    target -->|"booted from<br/>(NFS-mounted<br/>root filesystem)"| rootfsdbg
+
+    style sdk fill:#f6f5f4,stroke:#3584e4,stroke-width:1px
+    style recipe_workdir fill:#ffffff,stroke:#62a0ea,stroke-width:1px
+    style image_workdir fill:#ffffff,stroke:#57e389,stroke-width:1px
+    style nfs fill:#f6f5f4,stroke:#c061cb,stroke-width:1px
+    style target fill:#f6f5f4,stroke:#b5835a,stroke-width:1px
+
+    classDef orange fill:#ffbe6f,stroke:#ffa348,stroke-width:1px,color:#000000;
+    classDef green fill:#8ff0a4,stroke:#57e389,stroke-width:1px,color:#000000;
+    classDef default fill:#99c1f1,stroke:#62a0ea,stroke-width:1px,color:#000000;
+    class idesdk orange;
+    class srcdir,rootfsdbg green;

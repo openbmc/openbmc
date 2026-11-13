@@ -51,7 +51,8 @@ section:
 #. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable
    is set to "qemux86-64", which is fine if you are building for the QEMU
    emulator in 64-bit mode. However, if you are not, you need to set the
-   :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
+   :term:`MACHINE` variable appropriately in your
+   :ref:`structure-build-conf-local.conf` file
    found in the :term:`Build Directory` (i.e.  ``bitbake-builds/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
@@ -60,7 +61,8 @@ section:
 
    In this example we wish to build for qemux86 so we must set the
    :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
-   As described we do this by appending to ``conf/local.conf``::
+   As described we do this by appending to
+   :ref:`structure-build-conf-local.conf`::
 
       MACHINE = "qemux86"
       MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-modules"
@@ -73,7 +75,6 @@ section:
       $ bitbake-layers create-layer ../layers/meta-mylayer
       NOTE: Starting bitbake server...
       Add your new layer with 'bitbake-layers add-layer ../layers/meta-mylayer'
-      $
 
    .. note::
 
@@ -91,12 +92,11 @@ section:
 #. *Inform the BitBake Build Environment About Your Layer:* As directed
    when you created your layer, you need to add the layer to the
    :term:`BBLAYERS` variable in the
-   ``bblayers.conf`` file as follows::
+   :ref:`structure-build-conf-bblayers.conf` file as follows::
 
       $ cd bitbake-builds/build
       $ bitbake-layers add-layer ../../meta-mylayer
       NOTE: Starting bitbake server...
-      $
 
 #. *Build the Clean Image:* The final step in preparing to work on the
    kernel is to build an initial image using ``bitbake``::
@@ -146,7 +146,7 @@ section:
 #. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable is
    set to "qemux86-64", which is fine if you are building for the QEMU emulator
    in 64-bit mode. However, if you are not, you need to set the :term:`MACHINE`
-   variable appropriately in your ``conf/local.conf`` file found in the
+   variable appropriately in your :ref:`structure-build-conf-local.conf` file found in the
    :term:`Build Directory` (i.e.  ``bitbake-builds/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
@@ -156,7 +156,8 @@ section:
 
    In this example we wish to build for qemux86 so we must set the
    :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
-   As described we do this by appending to ``conf/local.conf``::
+   As described we do this by appending to
+   :ref:`structure-build-conf-local.conf`::
 
       MACHINE = "qemux86"
       MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-modules"
@@ -186,12 +187,11 @@ section:
 #. *Inform the BitBake Build Environment About Your Layer:* As directed
    when you created your layer, you need to add the layer to the
    :term:`BBLAYERS` variable in the
-   ``bblayers.conf`` file as follows::
+   :ref:`structure-build-conf-bblayers.conf` file as follows::
 
       $ cd bitbake-builds/build
       $ bitbake-layers add-layer ../../meta-mylayer
       NOTE: Starting bitbake server ...
-      $
 
 #. *Create a Local Copy of the Kernel Git Repository:* You can find Git
    repositories of supported Yocto Project kernels organized under
@@ -681,9 +681,9 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
              printk("*************************************\n");
 
              if (per_cpu(cpu_loops_per_jiffy, this_cpu)) {
-                   .
-                   .
-                   .
+                   /*
+                    * ... remaining code unchanged ...
+                    */
 
 #. *Build the Updated Kernel Source:* To build the updated kernel
    source, use ``devtool``::
@@ -719,7 +719,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
 
       .. code-block:: none
 
-         # dmesg | less
+         root@qemux86:~# dmesg | less
 
       You should see
       the results of your ``printk`` statements as part of the output
@@ -817,9 +817,9 @@ Section.
              printk("*************************************\n");
 
              if (per_cpu(cpu_loops_per_jiffy, this_cpu)) {
-                   .
-                   .
-                   .
+                   /*
+                    * ... remaining code unchanged ...
+                    */
 
 #. *Stage and Commit Your Changes:* Use standard Git commands to stage
    and commit the changes you just made::
@@ -832,16 +832,16 @@ Section.
    pick up the changes.
 
 #. *Update Your local.conf File to Point to Your Source Files:* In
-   addition to your ``local.conf`` file specifying to use
+   addition to your :ref:`structure-build-conf-local.conf` file specifying to use
    "kernel-modules" and the "qemux86" machine, it must also point to the
    updated kernel source files. Add
    :term:`SRC_URI` and
    :term:`SRCREV` statements similar
-   to the following to your ``local.conf``::
+   to the following to your :ref:`structure-build-conf-local.conf`::
 
       $ cd bitbake-builds/build/conf
 
-   Add the following to the ``local.conf``::
+   Add the following to the :ref:`structure-build-conf-local.conf`::
 
       SRC_URI:pn-linux-yocto = "git:///path-to/linux-yocto-4.12;protocol=file;name=machine;branch=standard/base; \
                                 git:///path-to/yocto-kernel-cache;protocol=file;type=kmeta;name=meta;branch=yocto-4.12;destsuffix=${KMETA}"
@@ -856,7 +856,7 @@ Section.
       example, the branch is ``standard/base`` and the machine is ``qemux86``.
 
 #. *Build the Image:* With the source modified, your changes staged and
-   committed, and the ``local.conf`` file pointing to the kernel files,
+   committed, and the :ref:`structure-build-conf-local.conf` file pointing to the kernel files,
    you can now use BitBake to build the image::
 
       $ cd bitbake-builds/build
@@ -875,7 +875,7 @@ Section.
 
    .. code-block:: none
 
-      # dmesg | less
+      root@qemux86:~# dmesg | less
 
    You should see the results of your
    ``printk`` statements as part of the output when you scroll down the
@@ -1190,7 +1190,7 @@ information on how to use the output as a configuration fragment.
 Where do you put your configuration fragment files? You can place these
 files in an area pointed to by
 :term:`SRC_URI` as directed by your
-``bblayers.conf`` file, which is located in your layer. The OpenEmbedded
+:ref:`structure-build-conf-bblayers.conf` file, which is located in your layer. The OpenEmbedded
 build system picks up the configuration and adds it to the kernel's
 configuration. For example, suppose you had a set of configuration
 options in a file called ``myconfig.cfg``. If you put that file inside a
@@ -1250,32 +1250,32 @@ Here is sample output from the :ref:`ref-tasks-kernel_configcheck` task:
 
    ---------- CONFIG_X86_TSC -----------------
    Config: CONFIG_X86_TSC
-   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc-cpu.cfg
+   From: /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc-cpu.cfg
    Requested value:  CONFIG_X86_TSC=y
    Actual value:
 
 
    ---------- CONFIG_X86_BIGSMP -----------------
    Config: CONFIG_X86_BIGSMP
-   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
-         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
+   From: /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
+         /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
    Requested value:  # CONFIG_X86_BIGSMP is not set
    Actual value:
 
 
    ---------- CONFIG_NR_CPUS -----------------
    Config: CONFIG_NR_CPUS
-   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
-         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc.cfg
-         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
+   From: /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
+         /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc.cfg
+         /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
    Requested value:  CONFIG_NR_CPUS=8
    Actual value:     CONFIG_NR_CPUS=1
 
 
    ---------- CONFIG_SCHED_SMT -----------------
    Config: CONFIG_SCHED_SMT
-   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
-         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
+   From: /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
+         /home/user/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
    Requested value:  CONFIG_SCHED_SMT=y
    Actual value:
 
@@ -1551,8 +1551,8 @@ directory. Next, ``make`` the scripts:
 
 .. code-block:: none
 
-   # cd /usr/src/kernel
-   # make scripts
+   root@machine:~# cd /usr/src/kernel
+   root@machine:/usr/src/kernel# make scripts
 
 Because all SDK image recipes include ``dev-pkgs``, the
 ``kernel-dev`` packages will be installed as part of the SDK image and
@@ -1598,7 +1598,7 @@ looks much like the one provided with the ``hello-mod`` template::
 
    modules_install:
         $(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
-   ...
+   # ... remaining rules ...
 
 The important point to note here is the :term:`KERNEL_SRC` variable. The
 :ref:`ref-classes-module` class sets this variable and the :term:`KERNEL_PATH`

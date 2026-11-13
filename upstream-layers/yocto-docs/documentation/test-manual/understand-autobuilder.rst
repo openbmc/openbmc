@@ -58,7 +58,7 @@ Combining these two entries you can see that ``qemux86-64`` is a three step
 build where ``bitbake BBTARGETS`` would be run, then ``bitbake SANITYTARGETS``
 for each step; all for ``MACHINE="qemux86-64"`` but with differing
 :term:`SDKMACHINE` settings. In step 1, an extra variable is added to the
-``auto.conf`` file to enable wic image generation.
+:ref:`structure-build-conf-auto.conf` file to enable wic image generation.
 
 While not every detail of this is covered here, you can see how the
 template mechanism allows quite complex configurations to be built up
@@ -222,7 +222,7 @@ following:
    ``bitbake-layers add-layer`` command (logging as stepXa)
 
 #. Call the ``scripts/setup-config`` script to generate the necessary
-   ``auto.conf`` configuration file for the build
+   :ref:`structure-build-conf-auto.conf` configuration file for the build
 
 #. Run the ``bitbake BBTARGETS`` command (logging as stepXb)
 

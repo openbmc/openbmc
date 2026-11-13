@@ -7,7 +7,7 @@ Conserving Disk Space During Builds
 ===================================
 
 To help conserve disk space during builds, you can add the following
-statement to your project's ``local.conf`` configuration file found in
+statement to your project's :ref:`structure-build-conf-local.conf` configuration file found in
 the :term:`Build Directory`::
 
    INHERIT += "rm_work"
@@ -33,7 +33,7 @@ disk space. However, only the most recent ones are likely to be reused.
 The following command is a quick way to purge all the cache files which
 haven't been used for a least a specified number of days::
 
-   find build/sstate-cache -type f -mtime +$DAYS -delete
+   $ find build/sstate-cache -type f -mtime +$DAYS -delete
 
 The above command relies on the fact that BitBake touches the sstate cache
 files as it accesses them, when it has write access to the cache.
@@ -49,7 +49,7 @@ requires a full build environment to be available and doesn't work well
 covering multiple releases. It won't work either on limited environments
 such as BSD based NAS::
 
-   sstate-cache-management.py --remove-duplicated --cache-dir=sstate-cache
+   $ sstate-cache-management.py --remove-duplicated --cache-dir=sstate-cache
 
 This command will ask you to confirm the deletions it identifies.
 Run ``sstate-cache-management.py`` for more details about this script.

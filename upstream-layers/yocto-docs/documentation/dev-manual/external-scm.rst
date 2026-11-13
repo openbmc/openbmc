@@ -21,7 +21,7 @@ Here is an example::
 during the packaging phase.
 
 Then, you can add the following to your
-``local.conf``::
+:ref:`structure-build-conf-local.conf` file::
 
    SRCREV:pn-PN = "${AUTOREV}"
 

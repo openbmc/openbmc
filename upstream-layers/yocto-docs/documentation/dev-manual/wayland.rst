@@ -48,7 +48,7 @@ Wayland with Kernel Mode Setting
 (`KMS <https://wiki.archlinux.org/index.php/Kernel_Mode_Setting>`__)
 support, include the "wayland" flag in the
 :term:`DISTRO_FEATURES`
-statement in your ``local.conf`` file::
+statement in your distro :term:`configuration file`::
 
    DISTRO_FEATURES:append = " wayland"
 
@@ -63,7 +63,7 @@ Installing Wayland and Weston
 To install the Wayland feature into an image, you must include the
 following
 :term:`CORE_IMAGE_EXTRA_INSTALL`
-statement in your ``local.conf`` file::
+statement in your distro :term:`configuration file`::
 
    CORE_IMAGE_EXTRA_INSTALL += "wayland weston"
 
@@ -80,11 +80,11 @@ the CLI, you need to do the following after your image is built:
 
 #. Run these commands to export ``XDG_RUNTIME_DIR``::
 
-      mkdir -p /tmp/$USER-weston
-      chmod 0700 /tmp/$USER-weston
-      export XDG_RUNTIME_DIR=/tmp/$USER-weston
+      user@machine:~$ mkdir -p /tmp/$USER-weston
+      user@machine:~$ chmod 0700 /tmp/$USER-weston
+      user@machine:~$ export XDG_RUNTIME_DIR=/tmp/$USER-weston
 
 #. Launch Weston in the shell::
 
-      weston
+      user@machine:~$ weston
 

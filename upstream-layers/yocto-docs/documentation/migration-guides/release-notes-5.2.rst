@@ -383,7 +383,7 @@ New Features / Enhancements in |yocto-ver|
          was left off in the previous execution.
 
    -  ``knotty`` now hints the user if :term:`MACHINE` was not set in
-      the ``local.conf`` file.
+      the :ref:`structure-build-conf-local.conf` file.
 
    -  ``utils``: add Go mod h1 checksum support, specific to Go modules. Use
       with ``goh1``.
