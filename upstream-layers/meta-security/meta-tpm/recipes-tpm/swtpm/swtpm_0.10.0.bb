@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/stefanberger/swtpm.git;branch=stable-0.10;protocol=h
 PE = "2"
 
 PARALLEL_MAKE = ""
-inherit autotools pkgconfig perlnative
+inherit autotools pkgconfig perlnative useradd
 
 TSS_USER = "tss"
 TSS_GROUP = "tss"

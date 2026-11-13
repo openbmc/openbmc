@@ -1,14 +1,21 @@
+From 106a4283f450d9cf6caab9e63d45aeb5a6c9718b Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Tue, 18 May 2021 15:10:53 +0000
+Subject: [PATCH] sssd: update to 2.5.0
+
 nsupdate path is needed for various exec call
 but don't run natvie tests on it.
 
-
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
+---
+ src/external/nsupdate.m4 | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-Index: sssd-2.5.0/src/external/nsupdate.m4
-===================================================================
---- sssd-2.5.0.orig/src/external/nsupdate.m4
-+++ sssd-2.5.0/src/external/nsupdate.m4
+diff --git a/src/external/nsupdate.m4 b/src/external/nsupdate.m4
+index a137f38..ab08f57 100644
+--- a/src/external/nsupdate.m4
++++ b/src/external/nsupdate.m4
 @@ -3,16 +3,4 @@ AC_MSG_CHECKING(for executable nsupdate)
  if test -x "$NSUPDATE"; then
    AC_DEFINE_UNQUOTED([NSUPDATE_PATH], ["$NSUPDATE"], [The path to nsupdate])

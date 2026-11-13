@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;beginline=7;endline=12;md5=8df67d60bde9d6c7b7
 
 DEPENDS = "openssl zlib"
 
-SRC_URI = "git://github.com/nmap/ncrack.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/nmap/ncrack.git;branch=master;protocol=https \
+           file://0001-fix-ftbfs-with-OpenSSL-4.patch \
+"
 SRCREV = "7fab46addcb99326cbf60f41dbde22a1e87aebad"
 
 PV = "0.7+git"

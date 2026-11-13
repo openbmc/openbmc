@@ -1,0 +1,53 @@
+From 76a0eabaad402ed935c1294f98663cf58a806a06 Mon Sep 17 00:00:00 2001
+From: Ujjwal Sarswat <ujjwal.sarswat@canonical.com>
+Date: Tue, 28 Jul 2026 07:54:33 +0530
+Subject: [PATCH] fix: ftbfs with OpenSSL 4
+
+Upstream-Status: Pending [https://github.com/nmap/ncrack/pull/147]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ opensshlib/cipher-3des1.c | 4 ++++
+ opensshlib/cipher-bf1.c   | 4 ++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/opensshlib/cipher-3des1.c b/opensshlib/cipher-3des1.c
+index 790faa2..30bd6bb 100644
+--- a/opensshlib/cipher-3des1.c
++++ b/opensshlib/cipher-3des1.c
+@@ -26,6 +26,8 @@
+ 
+ #include "ssherr.h"
+ 
++#ifdef WITH_SSH1
++
+ /*
+  * This is used by SSH1:
+  *
+@@ -155,3 +157,5 @@ evp_ssh1_3des(void)
+ 	EVP_CIPHER_meth_set_flags(ssh1_3des, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH);
+ 	return ssh1_3des;
+ }
++
++#endif /* WITH_SSH1 */
+diff --git a/opensshlib/cipher-bf1.c b/opensshlib/cipher-bf1.c
+index 8e3aac3..97c7de6 100644
+--- a/opensshlib/cipher-bf1.c
++++ b/opensshlib/cipher-bf1.c
+@@ -20,7 +20,7 @@
+ 
+ #include "includes.h"
+ 
+-#ifdef WITH_OPENSSL
++#if defined(WITH_OPENSSL) && defined(WITH_SSH1)
+ 
+ #include <sys/types.h>
+ 
+@@ -99,4 +99,4 @@ evp_ssh1_bf(void)
+ 	EVP_CIPHER_meth_set_do_cipher(ssh1_bf, bf_ssh1_do_cipher);
+ 	return (ssh1_bf);
+ }
+-#endif /* WITH_OPENSSL */
++#endif /* WITH_OPENSSL && WITH_SSH1 */
+-- 
+2.47.3
+

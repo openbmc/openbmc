@@ -1,4 +1,4 @@
-From ab120a9642516cdfdae5c5b8a91e42e2c9898172 Mon Sep 17 00:00:00 2001
+From 8913c8c4b207ae6dfd3ae58d886e2074d53cc268 Mon Sep 17 00:00:00 2001
 From: Valentin Kunin <kunin@google.com>
 Date: Mon, 20 May 2024 21:09:27 +0000
 Subject: [PATCH] revert configure: add checks for all tools used by make
@@ -15,10 +15,10 @@ Signed-off-by: Valentin Kunin <kunin@google.com>
  1 file changed, 11 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index eb6051ea..a52c4725 100644
+index 4a1f1b022772..5a745e9c5c22 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -663,17 +663,6 @@ AM_CONDITIONAL([SYSD_SYSUSERS], [test "x$systemd_sysusers" = "xyes" && test "x$s
+@@ -658,17 +658,6 @@ AM_CONDITIONAL([SYSD_SYSUSERS], [test "x$systemd_sysusers" = "xyes" && test "x$s
  AC_CHECK_PROG(systemd_tmpfiles, systemd-tmpfiles, yes)
  AM_CONDITIONAL([SYSD_TMPFILES], [test "x$systemd_tmpfiles" = "xyes" && test "x$tmpfilesdir" != "xno"])
  
@@ -29,12 +29,13 @@ index eb6051ea..a52c4725 100644
 -      AC_CHECK_PROG(adduser, adduser, yes)
 -      AC_CHECK_PROG(addgroup, addgroup, yes)
 -      AS_IF([test "x$addgroup" != "xyes" && test "x$groupadd" != "xyes" ],
--         [AC_MSG_ERROR([addgroup or groupadd are needed.])])
+-         [AC_MSG_WARN([addgroup or groupadd are needed for install.])])
 -      AS_IF([test "x$adduser" != "xyes" && test "x$useradd" != "xyes" ],
--         [AC_MSG_ERROR([adduser or useradd are needed.])])])
+-         [AC_MSG_WARN([adduser or useradd are needed for install.])])])
 -
  AC_SUBST([PATH])
  
  dnl --------- Doxy Gen -----------------------
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+2.43.0
+

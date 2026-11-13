@@ -1,3 +1,8 @@
+From 394e022694d03dc456f00df656c8a0c5e59a1d49 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Tue, 18 May 2021 15:10:53 +0000
+Subject: [PATCH] sssd: update to 2.5.0
+
 from ../sssd-2.5.0/src/util/sss_pam_data.c:27:
 | ../sssd-2.5.0/src/util/debug.h:88:44: error: unknown type name 'uid_t'; did you mean 'uint_t'?
 |    88 | int chown_debug_file(const char *filename, uid_t uid, gid_t gid);
@@ -11,11 +16,14 @@ from ../sssd-2.5.0/src/util/sss_pam_data.c:27:
 
 Upstream-Status: Pending
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
+---
+ src/util/debug.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Index: sssd-2.7.1/src/util/debug.h
-===================================================================
---- sssd-2.7.1.orig/src/util/debug.h
-+++ sssd-2.7.1/src/util/debug.h
+diff --git a/src/util/debug.h b/src/util/debug.h
+index 22c8ebd..5736d3d 100644
+--- a/src/util/debug.h
++++ b/src/util/debug.h
 @@ -24,6 +24,8 @@
  #include "config.h"
  
@@ -24,4 +32,4 @@ Index: sssd-2.7.1/src/util/debug.h
 +#include <sys/types.h>
  #include <stdbool.h>
  #include <sys/types.h>
- 
+ #include <libintl.h>

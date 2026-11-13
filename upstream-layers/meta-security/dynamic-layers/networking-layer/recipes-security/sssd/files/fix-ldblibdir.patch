@@ -1,3 +1,8 @@
+From 937a58aaa95036529e03926ab79d407438777981 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 16 Jun 2021 14:42:33 +0800
+Subject: [PATCH] sssd: fix for ldblibdir and systemd etc
+
 When calculate value of ldblibdir, it checks whether the directory of
 $ldblibdir exists. If not, it assigns ldblibdir with ${libdir}/ldb. It is not
 suitable for cross compile. Fix it that only re-assign ldblibdir when its value
@@ -11,10 +16,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/external/libldb.m4 b/src/external/libldb.m4
-index c400add..5e5f06d 100644
+index e8285a9..e98913c 100644
 --- a/src/external/libldb.m4
 +++ b/src/external/libldb.m4
-@@ -19,7 +19,7 @@ if test x"$with_ldb_lib_dir" != x; then
+@@ -22,7 +22,7 @@ if test x"$with_ldb_lib_dir" != x; then
      ldblibdir=$with_ldb_lib_dir
  else
      ldblibdir="`$PKG_CONFIG --variable=modulesdir ldb`"

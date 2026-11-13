@@ -1,0 +1,45 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 6 Sep 2026 20:05:00 -0700
+Subject: [PATCH] tspi_asn1: use ASN1_STRING_get0_data() accessor
+
+OpenSSL 4.0 completes the opaquing of struct asn1_string_st, so reaching
+into ASN1_OCTET_STRING directly no longer compiles:
+
+  src/tspi/tspi_asn1.c:240:33: error: incomplete definition of type
+      'ASN1_OCTET_STRING' (aka 'struct asn1_string_st')
+    240 |    memcpy(rawBlob, tssBlob->blob->data, decBlobSize);
+        |                    ~~~~~~~~~~~~~^
+
+Use the ASN1_STRING_get0_data() accessor instead. It has been available
+since OpenSSL 1.1.0 and is the documented replacement for touching the
+->data member; the rest of this file already goes through accessors
+(ASN1_INTEGER_get(), ASN1_OCTET_STRING_set()).
+
+No functional change.
+
+Upstream-Status: Inappropriate [upstream is dormant; git.code.sf.net
+master is still at 94144b0 "Bumped version to 0.3.15" from 2020-11-03,
+which is the SRCREV this recipe already pins]
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/tspi/tspi_asn1.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/tspi/tspi_asn1.c b/src/tspi/tspi_asn1.c
+index f17ce41..14d216b 100644
+--- a/src/tspi/tspi_asn1.c
++++ b/src/tspi/tspi_asn1.c
+@@ -237,7 +237,8 @@ Tspi_DecodeBER_TssBlob(UINT32 berBlobSize,		/* in */
+ 
+ 	if (*rawBlobSize != 0) {
+ 		if (decBlobSize <= *rawBlobSize) {
+-			memcpy(rawBlob, tssBlob->blob->data, decBlobSize);
++			memcpy(rawBlob, ASN1_STRING_get0_data(tssBlob->blob),
++			       decBlobSize);
+ 		}
+ 		else {
+ 			TSS_BLOB_free(tssBlob);
+--
+2.51.0
+

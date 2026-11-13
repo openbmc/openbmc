@@ -24,7 +24,7 @@ SRC_URI = "https://github.com/SSSD/sssd/releases/download/${PV}/${BP}.tar.gz \
            file://fix-ldblibdir.patch \
            file://musl_fixup.patch \
            "
-SRC_URI[sha256sum] = "e8aa5e6b48ae465bea7064048715ce7e9c53b50ec6a9c69304f59e0d35be40ff"
+SRC_URI[sha256sum] = "05ea79e89f0be399983925b8874ac196d6dc5fd4416f83609557b9fc8ef798b5"
 
 inherit autotools pkgconfig gettext python3native features_check systemd useradd github-releases
 
@@ -70,6 +70,8 @@ EXTRA_OECONF += " \
     --with-os=fedora \
     --with-sssd-user=sssd \
 "
+
+CFLAGS:append:libc-musl = " -D_GNU_SOURCE"
 
 do_configure:prepend () {
     mkdir -p ${AUTOTOOLS_AUXDIR}/build

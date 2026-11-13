@@ -1,0 +1,51 @@
+From 39f87887bcdf037fe077e04f582db927cb35d2bc Mon Sep 17 00:00:00 2001
+From: Scott Murray <scott.murray@konsulko.com>
+Date: Thu, 29 Oct 2026 19:46:41 +0200
+Subject: [PATCH] Handle CC values with arguments
+
+OpenEmbedded / Yocto Project builds pass a value for CC that includes
+several arguments (e.g. --sysroot).  The embedded spaces in the value
+break pycparser's expectation for the value of the cpp_path argument to
+its API calls.  To handle this, add logic to split the value of CC for
+use in cpp_path and cpp_args.  shlex is used to hopefully handle quoted
+spaces or potentially spaces in the compiler path, but this has not
+been tested.
+
+Upstream-Status: Pending
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ setup.py | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 1216065..0160a76 100644
+--- a/setup.py
++++ b/setup.py
+@@ -2,6 +2,7 @@ import site
+ import sys
+ import os
+ import platform
++import shlex
+ from setuptools import setup
+ from setuptools.command.build_ext import build_ext
+ from pkgconfig import pkgconfig
+@@ -22,11 +23,17 @@ site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
+ 
+ 
+ def cpp_path():
+-    return os.environ.get("CC", "cc")
++    cc = os.environ.get("CC", "cc")
++    return shlex.split(cc)[0]
+ 
+ 
+ def cpp_args(args=[]):
+-    return ["-E"] + args
++    cc = os.environ.get("CC", "cc")
++    split = shlex.split(cc)
++    cc_args = ["-E"]
++    if len(split) > 1:
++        cc_args = split[1:] + ["-E"]
++    return cc_args + args
+ 
+ 
+ class type_generator(build_ext):

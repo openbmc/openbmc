@@ -5,7 +5,7 @@ require suricata.inc
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd1e02800a1f548"
 
 SRC_URI = "http://www.openinfosecfoundation.org/download/suricata-${PV}.tar.gz"
-SRC_URI[sha256sum] = "81cee7bae69848a9751b2ce0867620eefa52b192e79c20b5eac897600b28b191"
+SRC_URI[sha256sum] = "b264584edda4a3b2b462050099c7c54f4f35ac0c7164e41084be9b216c090f8c"
 
 DEPENDS = "jansson lz4"
 DEPENDS:append:libc-musl = " libunwind"

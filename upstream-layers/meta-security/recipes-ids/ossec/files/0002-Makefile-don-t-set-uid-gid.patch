@@ -1,7 +1,7 @@
-From d9ec907881b72d42b4918f7cfb46516ce8e77772 Mon Sep 17 00:00:00 2001
+From 9572062689514907fb613e0bad2cab2489141f92 Mon Sep 17 00:00:00 2001
 From: Armin Kuster <akuster808@gmail.com>
 Date: Sat, 24 Apr 2021 23:07:29 +0000
-Subject: [PATCH 2/2] Makefile: don't set uid/gid
+Subject: [PATCH] Makefile: don't set uid/gid
 
 Upstream-Status: Inappropriate [embedded specific]
 
@@ -246,6 +246,3 @@ index dfb8cb58..a4d69ef6 100644
  
  	rm -f ${PREFIX}/etc/shared/merged.mg
  
--- 
-2.25.1
-

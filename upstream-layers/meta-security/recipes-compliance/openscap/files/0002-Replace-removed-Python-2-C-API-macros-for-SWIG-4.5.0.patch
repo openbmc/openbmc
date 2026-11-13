@@ -1,0 +1,87 @@
+From 26b6cb16a1450d10eb5e14fa4f0ff62d48ff62fd Mon Sep 17 00:00:00 2001
+From: Matthew Burket <mburket@redhat.com>
+Date: Tue, 1 Sep 2026 11:02:05 -0500
+Subject: [PATCH] Replace removed Python 2 C API macros for SWIG 4.5.0
+ compatibility
+
+Back ported from https://src.fedoraproject.org/rpms/openscap/pull-request/35
+
+Co-authored-by: Jitka Plesnikova <jplesnik@redhat.com>
+Upstream-Status: Backport [https://github.com/OpenSCAP/openscap/commit/26b6cb16]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ swig/openscap.i | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/swig/openscap.i b/swig/openscap.i
+index 7970481f0..1d23b0a32 100644
+--- a/swig/openscap.i
++++ b/swig/openscap.i
+@@ -48,8 +48,6 @@
+ {
+     if (PyLong_Check($input))
+         $1 = (time_t) PyLong_AsLong($input);
+-    else if (PyInt_Check($input))
+-        $1 = (time_t) PyInt_AsLong($input);
+     else if (PyFloat_Check($input))
+         $1 = (time_t) PyFloat_AsDouble($input);
+     else {
+@@ -80,8 +78,8 @@
+     $1 = (char **) malloc((size+1)*sizeof(char *));
+     for (i = 0; i < size; i++) {
+       PyObject *o = PyList_GetItem($input,i);
+-      /*if (PyString_Check(o))*/
+-        $1[i] = PyString_AsString(PyList_GetItem($input,i));
++      /*if (PyBytes_Check(o))*/
++        $1[i] = PyBytes_AsString(PyList_GetItem($input,i));
+       /*else {
+         PyErr_SetString(PyExc_TypeError,"list must contain strings");
+         free($1);
+@@ -329,7 +327,7 @@ int rule_result_output_callback_wrapper(struct xccdf_rule_result* rule_result, v
+         return -1;
+     }
+     Py_DECREF(arglist);
+-    dres = PyInt_AsLong(result);
++    dres = PyLong_AsLong(result);
+     Py_XDECREF(result);
+     PyGILState_Release(state);
+     return dres;
+@@ -366,7 +364,7 @@ int rule_start_callback_wrapper(struct xccdf_rule* rule, void *arg)
+         return -1;
+     }
+     Py_DECREF(arglist);
+-    dres = PyInt_AsLong(result);
++    dres = PyLong_AsLong(result);
+     Py_XDECREF(result);
+     PyGILState_Release(state);
+     return dres;
+@@ -403,7 +401,7 @@ int agent_reporter_callback_wrapper(const struct oval_result_definition* res_def
+         return -1;
+     }
+     Py_DECREF(arglist);
+-    dres = PyInt_AsLong(result);
++    dres = PyLong_AsLong(result);
+     Py_XDECREF(result);
+     PyGILState_Release(state);
+     return dres;
+@@ -438,7 +436,7 @@ int validate_callback_wrapper(const char* file, int line, const char* msg, void
+         return -1;
+     }
+     Py_DECREF(arglist);
+-    dres = PyInt_AsLong(result);
++    dres = PyLong_AsLong(result);
+     Py_XDECREF(result);
+     PyGILState_Release(state);
+     return dres;
+@@ -474,7 +472,7 @@ char * sub_callback_wrapper(xccdf_subst_type_t type, const char *id, void *arg)
+         return NULL;
+     }
+     Py_DECREF(arglist);
+-    dres = PyString_AsString(result);
++    dres = PyBytes_AsString(result);
+     if (dres == NULL) {
+         if (PyErr_Occurred() != NULL)
+             PyErr_PrintEx(0);
+-- 
+2.47.3
+
