@@ -633,7 +633,7 @@ variable.
 
    Internally, this is implemented by prepending the task (e.g.
    "task-compile:") to the value of
-   :term:`OVERRIDES` for the local datastore of the
+   :term:`OVERRIDES` for the local :term:`datastore` of the
    ``do_compile`` task.
 
    You can also use this syntax with other combinations (e.g.
@@ -654,7 +654,7 @@ variable.
 Key Expansion
 -------------
 
-Key expansion happens when the BitBake datastore is finalized. To better
+Key expansion happens when the BitBake :term:`datastore` is finalized. To better
 understand this, consider the following example::
 
    A${B} = "X"
@@ -1295,7 +1295,7 @@ An example BitBake function is::
 
 Because the
 Python "bb" and "os" modules are already imported, you do not need to
-import these modules. Also in these types of functions, the datastore
+import these modules. Also in these types of functions, the :term:`datastore`
 ("d") is a global variable and is always automatically available.
 
 .. note::
@@ -1355,7 +1355,7 @@ Here are some things to know about Python functions:
 
 -  Python functions can take parameters.
 
--  The BitBake datastore is not automatically available. Consequently,
+-  The BitBake :term:`datastore` is not automatically available. Consequently,
    you must pass it in as a parameter to the function.
 
 -  The "bb" and "os" Python modules are automatically available. You do
@@ -1684,20 +1684,20 @@ Consequently, if you do want something to get passed into the build task
 environment, you must take these two steps:
 
 #. Tell BitBake to load what you want from the environment into the
-   datastore. You can do so through the
+   :term:`datastore`. You can do so through the
    :term:`BB_ENV_PASSTHROUGH` and
    :term:`BB_ENV_PASSTHROUGH_ADDITIONS` variables. For
    example, assume you want to prevent the build system from accessing
    your ``$HOME/.ccache`` directory. The following command adds the
    the environment variable ``CCACHE_DIR`` to BitBake's passthrough
-   list to allow that variable into the datastore::
+   list to allow that variable into the :term:`datastore`::
 
       export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CCACHE_DIR"
 
-#. Tell BitBake to export what you have loaded into the datastore to the
+#. Tell BitBake to export what you have loaded into the :term:`datastore` to the
    task environment of every running task. Loading something from the
-   environment into the datastore (previous step) only makes it
-   available in the datastore. To export it to the task environment of
+   environment into the :term:`datastore` (previous step) only makes it
+   available in the :term:`datastore`. To export it to the task environment of
    every running task, use a command similar to the following in your
    local configuration file ``local.conf`` or your distribution
    configuration file::
@@ -1716,9 +1716,9 @@ Sometimes, it is useful to be able to obtain information from the
 original execution environment. BitBake saves a copy of the original
 environment into a special variable named :term:`BB_ORIGENV`.
 
-The :term:`BB_ORIGENV` variable returns a datastore object that can be
-queried using the standard datastore operators such as
-``getVar(, False)``. The datastore object is useful, for example, to
+The :term:`BB_ORIGENV` variable returns a :term:`datastore` object that can be
+queried using the standard :term:`datastore` operators such as
+``getVar(, False)``. The :term:`datastore` object is useful, for example, to
 find the original ``DISPLAY`` variable. Here is an example::
 
    origenv = d.getVar("BB_ORIGENV", False)
@@ -1731,7 +1731,7 @@ Variable Flags
 ==============
 
 Variable flags (varflags) help control a task's functionality and
-dependencies. BitBake reads and writes varflags to the datastore using
+dependencies. BitBake reads and writes varflags to the :term:`datastore` using
 the following command forms::
 
    variable = d.getVarFlags("variable")
@@ -1791,6 +1791,9 @@ functionality of the task:
    shouldn't access the network outside of ``do_fetch`` as it usually
    undermines fetcher source mirroring, image and licence manifests, software
    auditing and supply chain security.
+   Tasks without the network flag will run with PR_SET_NO_NEW_PRIVS,
+   which prevents executables from gaining privileges through
+   file capabilities.
 
 -  ``[noexec]``: When set to "1", marks the task as being empty, with
    no execution required. You can use the ``[noexec]`` flag to set up
@@ -1912,17 +1915,17 @@ set so that the handler only sees the "BuildStarted" and
 event matching the eventmask is triggered. A global variable "e" is
 defined, which represents the current event. With the ``getName(e)``
 method, you can get the name of the triggered event. The global
-datastore is available as "d". In legacy code, you might see "e.data"
-used to get the datastore. However, realize that "e.data" is deprecated
+:term:`datastore` is available as "d". In legacy code, you might see "e.data"
+used to get the :term:`datastore`. However, realize that "e.data" is deprecated
 and you should use "d" going forward.
 
-The context of the datastore is appropriate to the event in question.
+The context of the :term:`datastore` is appropriate to the event in question.
 For example, "BuildStarted" and "BuildCompleted" events run before any
-tasks are executed so would be in the global configuration datastore
+tasks are executed so would be in the global configuration :term:`datastore`
 namespace. No recipe-specific metadata exists in that namespace. The
 "BuildStarted" and "BuildCompleted" events also run in the main
 cooker/server process rather than any worker context. Thus, any changes
-made to the datastore would be seen by other cooker/server events within
+made to the :term:`datastore` would be seen by other cooker/server events within
 the current build but not seen outside of that build or in any worker
 context. Task events run in the actual tasks in question consequently
 have recipe-specific and task-specific contents. These events run in the
@@ -1936,9 +1939,9 @@ might have an interest in viewing:
    consists of ``bitbake.conf``, ``base.bbclass`` and any global
    :term:`INHERIT` statements; has been parsed. You can see multiple such
    events when each of the workers parse the base configuration or if
-   the server changes configuration and reparses. Any given datastore
+   the server changes configuration and reparses. Any given :term:`datastore`
    only has one such event executed against it, however. If
-   :term:`BB_INVALIDCONF` is set in the datastore by the event
+   :term:`BB_INVALIDCONF` is set in the :term:`datastore` by the event
    handler, the configuration is reparsed and a new event triggered,
    allowing the metadata to update configuration.
 
@@ -2180,8 +2183,8 @@ mentions where to find others.
 Functions for Accessing Datastore Variables
 -------------------------------------------
 
-It is often necessary to access variables in the BitBake datastore using
-Python functions. The BitBake datastore has an API that allows you this
+It is often necessary to access variables in the BitBake :term:`datastore` using
+Python functions. The BitBake :term:`datastore` has an API that allows you this
 access. Here is a list of available operations:
 
 .. list-table::
@@ -2202,7 +2205,7 @@ access. Here is a list of available operations:
      - Adds "value" to the start of the variable "X". Acts like
        ``d.setVar("X","value")`` if the variable "X" does not exist.
    * - ``d.delVar("X")``
-     - Deletes the variable "X" from the datastore. Does nothing if the variable
+     - Deletes the variable "X" from the :term:`datastore`. Does nothing if the variable
        "X" does not exist.
    * - ``d.renameVar("X", "Y")``
      - Renames the variable "X" to "Y". Does nothing if the variable "X" does
@@ -2220,7 +2223,7 @@ access. Here is a list of available operations:
      - Prepends "value" to the named flag on the variable "X". Acts like
        ``d.setVarFlag("X", flag, "value")`` if the named flag does not exist.
    * - ``d.delVarFlag("X", flag)``
-     - Deletes the named flag on the variable "X" from the datastore.
+     - Deletes the named flag on the variable "X" from the :term:`datastore`.
    * - ``d.setVarFlags("X", flagsdict)``
      - Sets the flags specified in the ``flagsdict()``
        parameter. ``setVarFlags`` does not clear previous flags. Think of this
@@ -2265,7 +2268,7 @@ Testing and Debugging BitBake Python code
 -----------------------------------------
 
 The OpenEmbedded build system implements a convenient ``pydevshell`` target which
-you can use to access the BitBake datastore and experiment with your own Python
+you can use to access the BitBake :term:`datastore` and experiment with your own Python
 code. See :yocto_docs:`Using a Python Development Shell
 </dev-manual/python-development-shell.html#using-a-python-development-shell>` in the Yocto
 Project manual for details.

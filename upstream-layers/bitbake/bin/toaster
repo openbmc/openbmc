@@ -293,7 +293,7 @@ case $CMD in
 
         # Create configuration file
         conf=${BUILDDIR}/conf/local.conf
-        line='INHERIT+="toaster buildhistory"'
+        line='INHERIT += "toaster buildhistory"'
         grep -q "$line" $conf || echo $line >> $conf
 
         if [ $WEBSERVER -eq 0 ] ; then

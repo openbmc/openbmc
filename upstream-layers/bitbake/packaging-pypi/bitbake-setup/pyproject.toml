@@ -20,7 +20,9 @@ classifiers = [
 ]
 
 dependencies = [
-  # bitbake-setup is mostly self-contained
+  # bitbake-setup is mostly self-contained, but hashserver needs websockets
+  "websockets >= 9.0; python_version == '3.9'",
+  "websockets >= 10.0; python_version >= '3.10'"
 ]
 
 [project.optional-dependencies]

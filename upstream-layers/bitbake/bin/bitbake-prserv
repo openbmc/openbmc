@@ -11,7 +11,7 @@ import argparse
 import warnings
 warnings.simplefilter("default")
 
-__version__ = "2.19.1"
+__version__ = "2.20.0"
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib"))
 

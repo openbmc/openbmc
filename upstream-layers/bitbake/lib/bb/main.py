@@ -217,8 +217,8 @@ def create_bitbake_parser():
                         default=[], metavar="SIGNATURE_HANDLER",
                         help="Dump out the signature construction information, with no task "
                              "execution. The SIGNATURE_HANDLER parameter is passed to the "
-                             "handler. Two common values are none and printdiff but the handler "
-                             "may define more/less. none means only dump the signature, printdiff"
+                             "handler. Two common values are lockedsigs and printdiff but the handler "
+                             "may define more/less. lockedsigs means only dump the signature, printdiff"
                              " means recursively compare the dumped signature with the most recent"
                              " one in a local build or sstate cache (can be used to find out why tasks re-run"
                              " when that is not expected)")

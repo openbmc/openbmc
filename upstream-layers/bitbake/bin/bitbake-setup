@@ -21,7 +21,7 @@ import sys
 import textwrap
 import time
 
-__version__ = "2.19.1"
+__version__ = "2.20.0"
 
 bindir = os.path.abspath(os.path.dirname(__file__))
 sys.path[0:0] = [os.path.join(os.path.dirname(bindir), 'lib')]

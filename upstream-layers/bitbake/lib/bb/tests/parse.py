@@ -511,6 +511,53 @@ EXTRA_OECONF:append = " foobar"
             test_helper("include_all some.conf", " bar foo")
             test_helper("include_all some3.conf", " foobar")
 
+    def test_include_all_duplicate_bbpath(self):
+        # A directory listed more than once in BBPATH is only searched once
+        with tempfile.TemporaryDirectory() as tempdir:
+            os.makedirs(tempdir + "/conf1")
+            os.makedirs(tempdir + "/conf2")
+            with open(tempdir + "/conf1/some.conf", "w") as f:
+                f.write(self.someconf1)
+            with open(tempdir + "/conf2/some.conf", "w") as f:
+                f.write(self.someconf2)
+
+            self.d.setVar("BBPATH", ":".join([tempdir + "/conf1", tempdir + "/conf2", tempdir + "/conf1"]))
+
+            with self.parsehelper("include_all some.conf") as f:
+                with self.assertLogs("BitBake.Parsing", level="WARNING") as logs:
+                    d = bb.parse.handle(f.name, bb.data.createCopy(self.d))['']
+                    # assertLogs fails if nothing is logged at all
+                    bb.parse.logger.warning("parse done")
+            self.assertEqual(d.getVar("EXTRA_OECONF"), " foo bar")
+            self.assertEqual(logs.output, ["WARNING:BitBake.Parsing:parse done"])
+
+    def test_duplicate_bbpath(self):
+        # A directory listed more than once in BBPATH is fatal
+        bbpath = os.path.realpath(os.path.join(os.path.dirname(__file__), "parse-tests"))
+        with tempfile.TemporaryDirectory(prefix="parsetest") as builddir:
+            def run_bitbake(entries):
+                env = os.environ.copy()
+                env["BBPATH"] = ":".join(entries)
+                env["BB_ENV_PASSTHROUGH_ADDITIONS"] = "TOPDIR"
+                env["TOPDIR"] = builddir
+                return subprocess.run(["bitbake", "-e"], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, cwd=builddir)
+
+            link = os.path.join(builddir, "link")
+            os.symlink(bbpath, link)
+
+            # The same directory spelled the same, with a trailing slash or
+            # through a symlink is a duplicate
+            for dup in (bbpath, bbpath + "/", link):
+                with self.subTest(dup=dup):
+                    result = run_bitbake([bbpath, dup])
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("BBPATH contains duplicate entries:\n    %s %s\n" % (bbpath, dup), result.stdout)
+
+            # Empty entries from stray colons are not duplicates
+            result = run_bitbake(["", bbpath, "", ""])
+            self.assertEqual(result.returncode, 0, result.stdout)
+            self.assertNotIn("BBPATH contains duplicate entries", result.stdout)
+
     def test_file_variables(self):
         # Tests the values of FILE and __BB_RECIPE_FILE in different
         # combinations of bbappends, includes, and inherits

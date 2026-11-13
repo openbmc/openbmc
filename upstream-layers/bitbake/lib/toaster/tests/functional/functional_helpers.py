@@ -23,6 +23,8 @@ from selenium.common.exceptions import NoSuchElementException
 logger = logging.getLogger("toaster")
 toaster_processes = []
 
+MASTER_PROJECT_ID = '4'
+
 class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
     wait_toaster_time = 10
 

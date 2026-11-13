@@ -619,7 +619,8 @@ class Cache(object):
                     if not f:
                         continue
                     f, exist = f.rsplit(":", 1)
-                    if (exist == "True" and not os.path.exists(f)) or (exist == "False" and os.path.exists(f)):
+                    file_exists = bb.parse.cached_mtime_noerror(f) != 0
+                    if (exist == "True" and not file_exists) or (exist == "False" and file_exists):
                         self.logger.debug2("%s's file checksum list file %s changed",
                                              fn, f)
                         self.remove(fn)
@@ -736,7 +737,7 @@ class MulticonfigCache(Mapping):
                 # we might have calculated incorrect total size because a file
                 # might've been written out just after we checked its size
                 cachesize = current_progress
-            current_percent = 100 * current_progress / cachesize
+            current_percent = 100 * current_progress // cachesize
             if current_percent > previous_percent:
                 previous_percent = current_percent
                 bb.event.fire(bb.event.CacheLoadProgress(current_progress, cachesize),

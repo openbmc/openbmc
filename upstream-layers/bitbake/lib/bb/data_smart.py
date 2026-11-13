@@ -18,6 +18,7 @@ BitBake build tools.
 
 import builtins
 import copy
+import functools
 import re
 import sys
 from collections.abc import MutableMapping
@@ -29,6 +30,10 @@ from bb   import utils
 from bb.COW  import COWDictBase
 
 logger = logging.getLogger("BitBake.Data")
+
+@functools.lru_cache(maxsize=8192)
+def compile_python_expression(code, varname):
+    return compile(code, varname, "eval")
 
 __setvar_keyword__ = [":append", ":prepend", ":remove"]
 __setvar_regexp__ = re.compile(r'(?P<base>.*?)(?P<keyword>:append|:prepend|:remove)(:(?P<add>[^A-Z]*))?$')
@@ -133,7 +138,7 @@ class VariableParse:
             varname = 'Var <%s>' % self.varname
         else:
             varname = '<expansion>'
-        codeobj = compile(code.strip(), varname, "eval")
+        codeobj = compile_python_expression(code.strip(), varname)
 
         parser = bb.codeparser.PythonParser(self.varname, logger)
         parser.parse_python(code)

@@ -183,7 +183,19 @@ class StdoutNoopContextManager:
 
 
 def exec_func(func, d, dirs = None):
-    """Execute a BB 'function'"""
+    """Execute a function or a task.
+
+    Arguments:
+
+    -  ``func``: name of the function/task to execute.
+    -  ``d``: the data store.
+    -  ``dirs``: list of directories to create before executing the task.
+
+    If ``dirs`` is ``None``, this function will look at the value of the ``dirs``
+    varflag defined for ``func`` and create directories using this list instead.
+
+    No return value.
+    """
 
     try:
         oldcwd = os.getcwd()
@@ -938,6 +950,20 @@ def ensure_task_prefix(name):
     return name
 
 def addtask(task, before, after, d):
+    """Adds a task to the task graph. If called from a recipe, the task is added
+    in the scope of the recipe. If called from an :ref:`Anonymous Python function
+    <bitbake-user-manual/bitbake-user-manual-metadata:anonymous python functions>`,
+    the task is added in the global scope, so for each recipe being built.
+
+    Arguments:
+
+    -  ``task``: name of the task to add to the graph.
+    -  ``before``: task to depend on (optional, can be ``None``).
+    -  ``after``: tasks that depend on the task being added (optional, can be ``None``).
+    -  ``d``: the data store.
+
+    No return value.
+    """
     task = ensure_task_prefix(task)
 
     d.setVarFlag(task, "task", 1)
@@ -963,6 +989,18 @@ def addtask(task, before, after, d):
                 d.setVarFlag(entry, "deps", [task] + existing)
 
 def deltask(task, d):
+    """Deletes a task from the task graph. If called from a recipe, the task is
+    removed within the scope of the recipe. If called from an :ref:`Anonymous Python
+    function <bitbake-user-manual/bitbake-user-manual-metadata:anonymous python functions>`,
+    the task is removed globally, so for each recipe being built.
+
+    Arguments:
+
+    -  ``task``: name of the task to add.
+    -  ``d``: the data store.
+
+    No return value.
+    """
     task = ensure_task_prefix(task)
 
     bbtasks = d.getVar('__BBTASKS', False) or []

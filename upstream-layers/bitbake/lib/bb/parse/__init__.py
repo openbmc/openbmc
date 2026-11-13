@@ -48,18 +48,22 @@ class SkipPackage(SkipRecipe):
 
 __mtime_cache = {}
 def cached_mtime(f):
-    if f not in __mtime_cache:
+    # A cached 0 is a failure recorded by cached_mtime_noerror(), stat again
+    # to raise the real error (or pick up the file if it has appeared since)
+    if __mtime_cache.get(f, 0) == 0:
         res = os.stat(f)
         __mtime_cache[f] = (res.st_mtime_ns, res.st_size, res.st_ino)
     return __mtime_cache[f]
 
 def cached_mtime_noerror(f):
+    # Failures are cached as 0 so that repeated lookups of a missing file
+    # don't hit the filesystem again
     if f not in __mtime_cache:
         try:
             res = os.stat(f)
             __mtime_cache[f] = (res.st_mtime_ns, res.st_size, res.st_ino)
         except OSError:
-            return 0
+            __mtime_cache[f] = 0
     return __mtime_cache[f]
 
 def check_mtime(f, mtime):

@@ -1706,6 +1706,59 @@ class FetchLatestVersionTest(FetcherTest):
                 r = bb.utils.vercmp_string(verstring, v_larger)
                 self.assertTrue(r == -1, msg="Package %s, version: %s <= %s" % (k[0], v_larger, verstring))
 
+class WgetChecksumTest(FetcherTest):
+    content = b"bitbake wget test data\n" * 64
+    corrupt = b"x" * len(content)
+
+    def setUp(self):
+        super().setUp()
+        self.serverdir = os.path.join(self.tempdir, "server")
+        for subdir in ["upstream", "mirror"]:
+            os.makedirs(os.path.join(self.serverdir, subdir))
+        self.server = HTTPService(self.serverdir, host="127.0.0.1")
+        self.server.start()
+        self.baseurl = "http://127.0.0.1:%s" % self.server.port
+        self.url = "%s/upstream/test.bin;sha256sum=%s" % (
+            self.baseurl, hashlib.sha256(self.content).hexdigest())
+
+    def tearDown(self):
+        self.server.stop()
+        super().tearDown()
+
+    def write(self, path, data):
+        with open(path, "wb") as f:
+            f.write(data)
+
+    def assertDownloaded(self):
+        with open(os.path.join(self.dldir, "test.bin"), "rb") as f:
+            self.assertEqual(f.read(), self.content)
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test.bin.tmp")))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir,
+            "test.bin_bad-checksum_%s" % hashlib.sha256(self.corrupt).hexdigest())))
+
+    def test_wget_corrupt_partial_download(self):
+        self.write(os.path.join(self.serverdir, "upstream", "test.bin"), self.content)
+        self.write(os.path.join(self.dldir, "test.bin.tmp"), self.corrupt)
+
+        fetcher = bb.fetch.Fetch([self.url], self.d)
+        # Skip wget, so the fetcher verifies the file seeded above as is
+        with unittest.mock.patch.object(bb.fetch.wget.Wget, "_runwget"):
+            with self.assertRaises(bb.fetch.FetchError):
+                fetcher.download()
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test.bin.tmp")))
+
+        fetcher.download()
+        self.assertDownloaded()
+
+    def test_wget_mirror_after_checksum_failure(self):
+        self.write(os.path.join(self.serverdir, "upstream", "test.bin"), self.corrupt)
+        self.write(os.path.join(self.serverdir, "mirror", "test.bin"), self.content)
+        self.d.setVar("MIRRORS", "%s/upstream/ %s/mirror/" % (self.baseurl, self.baseurl))
+
+        fetcher = bb.fetch.Fetch([self.url], self.d)
+        fetcher.download()
+        self.assertDownloaded()
+
 class FetchCheckStatusTest(FetcherTest):
     test_wget_uris = ["https://downloads.yoctoproject.org/releases/sato/sato-engine-0.1.tar.gz",
                       "https://downloads.yoctoproject.org/releases/sato/sato-engine-0.2.tar.gz",

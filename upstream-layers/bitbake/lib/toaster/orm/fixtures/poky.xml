@@ -8,24 +8,30 @@
 
   <!-- Bitbake versions which correspond to the metadata release -->
   <object model="orm.bitbakeversion" pk="1">
+    <field type="CharField" name="name">blacksail</field>
+    <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="branch">2.20</field>
+    <field type="CharField" name="dirpath"></field>
+  </object>
+  <object model="orm.bitbakeversion" pk="2">
     <field type="CharField" name="name">wrynose</field>
     <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">2.18</field>
     <field type="CharField" name="dirpath"></field>
   </object>
-  <object model="orm.bitbakeversion" pk="2">
+  <object model="orm.bitbakeversion" pk="3">
     <field type="CharField" name="name">HEAD</field>
     <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">HEAD</field>
     <field type="CharField" name="dirpath"></field>
   </object>
-  <object model="orm.bitbakeversion" pk="3">
+  <object model="orm.bitbakeversion" pk="4">
     <field type="CharField" name="name">master</field>
     <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">master</field>
     <field type="CharField" name="dirpath"></field>
   </object>
-  <object model="orm.bitbakeversion" pk="4">
+  <object model="orm.bitbakeversion" pk="5">
     <field type="CharField" name="name">scarthgap</field>
     <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">2.8</field>
@@ -35,30 +41,37 @@
 
   <!-- Releases available -->
   <object model="orm.release" pk="1">
+    <field type="CharField" name="name">blacksail</field>
+    <field type="CharField" name="description">Yocto Project 6.1 "Blacksail"</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
+    <field type="CharField" name="branch_name">blacksail</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="https://git.yoctoproject.org/meta-yocto/log/?h=blacksail"&gt;Yocto Project Blacksail branch&lt;/a&gt;.</field>
+  </object>
+  <object model="orm.release" pk="2">
     <field type="CharField" name="name">wrynose</field>
     <field type="CharField" name="description">Yocto Project 6.0 "Wrynose"</field>
-    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">2</field>
     <field type="CharField" name="branch_name">wrynose</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="https://git.yoctoproject.org/meta-yocto/log/?h=wrynose"&gt;Yocto Project Wrynose branch&lt;/a&gt;.</field>
   </object>
-  <object model="orm.release" pk="2">
+  <object model="orm.release" pk="3">
     <field type="CharField" name="name">local</field>
     <field type="CharField" name="description">Local Yocto Project</field>
-    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">2</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">3</field>
     <field type="CharField" name="branch_name">HEAD</field>
     <field type="TextField" name="helptext">Toaster will run your builds with the version of the Yocto Project you have cloned or downloaded to your computer.</field>
   </object>
-  <object model="orm.release" pk="3">
+  <object model="orm.release" pk="4">
     <field type="CharField" name="name">master</field>
     <field type="CharField" name="description">Yocto Project master</field>
-    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">3</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">4</field>
     <field type="CharField" name="branch_name">master</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="https://git.yoctoproject.org/meta-yocto/log/"&gt;Yocto Project Master branch&lt;/a&gt;.</field>
   </object>
-  <object model="orm.release" pk="4">
+  <object model="orm.release" pk="5">
     <field type="CharField" name="name">scarthgap</field>
     <field type="CharField" name="description">Yocto Project 5.0 "Scarthgap"</field>
-    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">4</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">5</field>
     <field type="CharField" name="branch_name">scarthgap</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="https://git.yoctoproject.org/meta-yocto/log/?h=scarthgap"&gt;Yocto Project Scarthgap branch&lt;/a&gt;.</field>
   </object>
@@ -112,6 +125,18 @@
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
     <field type="CharField" name="layer_name">meta-yocto-bsp</field>
   </object>
+  <object model="orm.releasedefaultlayer" pk="13">
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
+    <field type="CharField" name="layer_name">openembedded-core</field>
+  </object>
+  <object model="orm.releasedefaultlayer" pk="14">
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
+    <field type="CharField" name="layer_name">meta-poky</field>
+  </object>
+  <object model="orm.releasedefaultlayer" pk="15">
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
+    <field type="CharField" name="layer_name">meta-yocto-bsp</field>
+  </object>
 
   <!-- Default layers provided by poky
        openembedded-core
@@ -130,28 +155,35 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
-    <field type="CharField" name="branch">wrynose</field>
+    <field type="CharField" name="branch">blacksail</field>
     <field type="CharField" name="dirpath">meta</field>
   </object>
   <object model="orm.layer_version" pk="2">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
-    <field type="CharField" name="branch">HEAD</field>
-    <field type="CharField" name="commit">HEAD</field>
+    <field type="CharField" name="branch">wrynose</field>
     <field type="CharField" name="dirpath">meta</field>
   </object>
   <object model="orm.layer_version" pk="3">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
-    <field type="CharField" name="branch">master</field>
+    <field type="CharField" name="branch">HEAD</field>
+    <field type="CharField" name="commit">HEAD</field>
     <field type="CharField" name="dirpath">meta</field>
   </object>
   <object model="orm.layer_version" pk="4">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
+    <field type="CharField" name="branch">master</field>
+    <field type="CharField" name="dirpath">meta</field>
+  </object>
+  <object model="orm.layer_version" pk="5">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
+    <field type="IntegerField" name="layer_source">0</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
     <field type="CharField" name="branch">scarthgap</field>
     <field type="CharField" name="dirpath">meta</field>
   </object>
@@ -164,32 +196,39 @@
     <field type="CharField" name="vcs_web_tree_base_url">https://git.yoctoproject.org/meta-yocto/tree/%path%?h=%branch%</field>
     <field type="CharField" name="vcs_web_file_base_url">https://git.yoctoproject.org/meta-yocto/tree/%path%?h=%branch%</field>
   </object>
-  <object model="orm.layer_version" pk="5">
-    <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
-    <field type="IntegerField" name="layer_source">0</field>
-    <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
-    <field type="CharField" name="branch">wrynose</field>
-    <field type="CharField" name="dirpath">meta-poky</field>
-  </object>
   <object model="orm.layer_version" pk="6">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
     <field type="IntegerField" name="layer_source">0</field>
-    <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
-    <field type="CharField" name="branch">HEAD</field>
-    <field type="CharField" name="commit">HEAD</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
+    <field type="CharField" name="branch">blacksail</field>
     <field type="CharField" name="dirpath">meta-poky</field>
   </object>
   <object model="orm.layer_version" pk="7">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
     <field type="IntegerField" name="layer_source">0</field>
-    <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
-    <field type="CharField" name="branch">master</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
+    <field type="CharField" name="branch">wrynose</field>
     <field type="CharField" name="dirpath">meta-poky</field>
   </object>
   <object model="orm.layer_version" pk="8">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
     <field type="IntegerField" name="layer_source">0</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
+    <field type="CharField" name="branch">HEAD</field>
+    <field type="CharField" name="commit">HEAD</field>
+    <field type="CharField" name="dirpath">meta-poky</field>
+  </object>
+  <object model="orm.layer_version" pk="9">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
+    <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
+    <field type="CharField" name="branch">master</field>
+    <field type="CharField" name="dirpath">meta-poky</field>
+  </object>
+  <object model="orm.layer_version" pk="10">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
+    <field type="IntegerField" name="layer_source">0</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
     <field type="CharField" name="branch">scarthgap</field>
     <field type="CharField" name="dirpath">meta-poky</field>
   </object>
@@ -202,32 +241,39 @@
     <field type="CharField" name="vcs_web_tree_base_url">https://git.yoctoproject.org/meta-yocto/tree/%path%?h=%branch%</field>
     <field type="CharField" name="vcs_web_file_base_url">https://git.yoctoproject.org/meta-yocto/tree/%path%?h=%branch%</field>
   </object>
-  <object model="orm.layer_version" pk="9">
-    <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
-    <field type="IntegerField" name="layer_source">0</field>
-    <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
-    <field type="CharField" name="branch">wrynose</field>
-    <field type="CharField" name="dirpath">meta-yocto-bsp</field>
-  </object>
-  <object model="orm.layer_version" pk="10">
-    <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
-    <field type="IntegerField" name="layer_source">0</field>
-    <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
-    <field type="CharField" name="branch">HEAD</field>
-    <field type="CharField" name="commit">HEAD</field>
-    <field type="CharField" name="dirpath">meta-yocto-bsp</field>
-  </object>
   <object model="orm.layer_version" pk="11">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
     <field type="IntegerField" name="layer_source">0</field>
-    <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
-    <field type="CharField" name="branch">master</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
+    <field type="CharField" name="branch">blacksail</field>
     <field type="CharField" name="dirpath">meta-yocto-bsp</field>
   </object>
   <object model="orm.layer_version" pk="12">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
     <field type="IntegerField" name="layer_source">0</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
+    <field type="CharField" name="branch">wrynose</field>
+    <field type="CharField" name="dirpath">meta-yocto-bsp</field>
+  </object>
+  <object model="orm.layer_version" pk="13">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
+    <field type="IntegerField" name="layer_source">0</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
+    <field type="CharField" name="branch">HEAD</field>
+    <field type="CharField" name="commit">HEAD</field>
+    <field type="CharField" name="dirpath">meta-yocto-bsp</field>
+  </object>
+  <object model="orm.layer_version" pk="14">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
+    <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
+    <field type="CharField" name="branch">master</field>
+    <field type="CharField" name="dirpath">meta-yocto-bsp</field>
+  </object>
+  <object model="orm.layer_version" pk="15">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
+    <field type="IntegerField" name="layer_source">0</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
     <field type="CharField" name="branch">scarthgap</field>
     <field type="CharField" name="dirpath">meta-yocto-bsp</field>
   </object>

@@ -294,7 +294,7 @@ overview of their function and contents.
 
    :term:`BB_ENV_PASSTHROUGH`
       Specifies the internal list of variables to allow through from
-      the external environment into BitBake's datastore. If the value of
+      the external environment into BitBake's :term:`datastore`. If the value of
       this variable is not specified (which is the default), the following
       list is used: :term:`BBPATH`, :term:`BB_PRESERVE_ENV`, and
       :term:`BB_ENV_PASSTHROUGH_ADDITIONS`.
@@ -306,7 +306,7 @@ overview of their function and contents.
 
    :term:`BB_ENV_PASSTHROUGH_ADDITIONS`
       Specifies an additional set of variables to allow through from the
-      external environment into BitBake's datastore. This list of variables
+      external environment into BitBake's :term:`datastore`. This list of variables
       are on top of the internal list set in
       :term:`BB_ENV_PASSTHROUGH`.
 
@@ -458,7 +458,7 @@ overview of their function and contents.
       which is used to determine if the cache can be reused.
 
       One of the ways BitBake determines whether to re-parse the main
-      metadata is through checksums of the variables in the datastore of
+      metadata is through checksums of the variables in the :term:`datastore` of
       the base configuration data. There are variables that you typically
       want to exclude when checking whether or not to re-parse and thus
       rebuild the cache. As an example, you would usually exclude ``TIME``
@@ -594,16 +594,16 @@ overview of their function and contents.
       Contains a copy of the original external environment in which BitBake
       was run. The copy is taken before any variable values configured to
       pass through from the external environment are filtered into BitBake's
-      datastore.
+      :term:`datastore`.
 
       .. note::
 
-         The contents of this variable is a datastore object that can be
-         queried using the normal datastore operations.
+         The contents of this variable is a :term:`datastore` object that can be
+         queried using the normal :term:`datastore` operations.
 
    :term:`BB_PRESERVE_ENV`
       Disables environment filtering and instead allows all variables through
-      from the external environment into BitBake's datastore.
+      from the external environment into BitBake's :term:`datastore`.
 
       .. note::
 
@@ -780,8 +780,8 @@ overview of their function and contents.
 
    :term:`BB_SIGNATURE_EXCLUDE_FLAGS`
       Lists variable flags (varflags) that can be safely excluded from
-      checksum and dependency data for keys in the datastore. When
-      generating checksum or dependency data for keys in the datastore, the
+      checksum and dependency data for keys in the :term:`datastore`. When
+      generating checksum or dependency data for keys in the :term:`datastore`, the
       flags set against that key are normally included in the checksum.
 
       For more information on varflags, see the

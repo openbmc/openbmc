@@ -46,6 +46,15 @@ Python f-strings may also be used::
       warn,
       warnonce,
 
+``bb.build``
+============
+
+.. automodule:: bb.build
+   :members:
+      addtask,
+      deltask,
+      exec_func
+
 ``bb.utils``
 ============
 

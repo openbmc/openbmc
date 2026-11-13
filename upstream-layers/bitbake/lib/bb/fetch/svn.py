@@ -165,7 +165,7 @@ class Svn(FetchMethod):
                         else:
                             bb.debug(1, "svn repository has externals:\n%s" % output)
                 except bb.fetch.FetchError:
-                    passs
+                    pass
             scmdata = ud.parm.get("scmdata", "")
             if scmdata == "keep":
                 tar_flags = []

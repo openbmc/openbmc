@@ -55,7 +55,8 @@ class IncludeAllNode(AstNode):
         s = data.expand(self.what_file)
         logger.debug2("CONF %s:%s: including %s", self.filename, self.lineno, s)
 
-        for path in data.getVar("BBPATH").split(":"):
+        # A directory listed more than once in BBPATH is only searched once
+        for path in dict.fromkeys(data.getVar("BBPATH").split(":")):
             bb.parse.ConfHandler.include(self.filename, os.path.join(path, s), self.lineno, data, False)
 
 class ExportNode(AstNode):
@@ -310,8 +311,9 @@ class PyLibNode(AstNode):
             bb.utils._context[self.namespace] = __import__(self.namespace)
             toimport = getattr(bb.utils._context[self.namespace], "BBIMPORTS", [])
             for i in toimport:
-                bb.utils._context[self.namespace] = __import__(self.namespace + "." + i)
-                mod = getattr(bb.utils._context[self.namespace], i)
+                mod = bb.utils._context[self.namespace] = __import__(self.namespace + "." + i)
+                for submod in i.split("."):
+                    mod = getattr(mod, submod)
                 fn = getattr(mod, "__file__")
                 funcs = {}
                 for f in dir(mod):

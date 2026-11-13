@@ -928,7 +928,7 @@ def get_fetcher_environment(d):
     origenv = d.getVar("BB_ORIGENV")
     for name in bb.fetch.FETCH_EXPORT_VARS:
         value = d.getVar(name)
-        if not value and origenv:
+        if not value and origenv is not None:
             value = origenv.getVar(name)
         if value:
             newenv[name] = value
@@ -961,7 +961,7 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None, extra
     origenv = d.getVar("BB_ORIGENV", False)
     env = os.environ.copy()
     for var in exportvars:
-        val = d.getVar(var) or (origenv and origenv.getVar(var))
+        val = d.getVar(var) or (origenv is not None and origenv.getVar(var))
         if val:
             env[var] = val
 
@@ -1079,7 +1079,7 @@ def build_mirroruris(origud, mirrors, ld):
 
     return uris, uds
 
-def rename_bad_checksum(ud, suffix):
+def rename_bad_checksum(ud, suffix, localpath=None):
     """
     Renames files to have suffix from parameter
     """
@@ -1087,10 +1087,13 @@ def rename_bad_checksum(ud, suffix):
     if ud.localpath is None:
         return
 
+    if localpath is None:
+        localpath = ud.localpath
+
     new_localpath = "%s_bad-checksum_%s" % (ud.localpath, suffix)
-    bb.warn("Renaming %s to %s" % (ud.localpath, new_localpath))
-    if not bb.utils.movefile(ud.localpath, new_localpath):
-        bb.warn("Renaming %s to %s failed, grep movefile in log.do_fetch to see why" % (ud.localpath, new_localpath))
+    bb.warn("Renaming %s to %s" % (localpath, new_localpath))
+    if not bb.utils.movefile(localpath, new_localpath):
+        bb.warn("Renaming %s to %s failed, grep movefile in log.do_fetch to see why" % (localpath, new_localpath))
 
 
 def try_mirror_url(fetch, origud, ud, ld, check = False):
@@ -1901,6 +1904,7 @@ class Fetch(object):
             m = ud.method
             done = False
 
+            lf = None
             try:
                 lf = bb.utils.lockfile(ud.lockfile, shared=True)
 

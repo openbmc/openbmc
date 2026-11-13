@@ -17,7 +17,7 @@ import argparse
 import warnings
 warnings.simplefilter("default")
 
-__version__ = "2.19.1"
+__version__ = "2.20.0"
 
 bindir = os.path.dirname(__file__)
 toolname = os.path.basename(__file__).split(".")[0]

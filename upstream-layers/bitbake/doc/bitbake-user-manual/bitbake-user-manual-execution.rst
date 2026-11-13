@@ -191,7 +191,7 @@ supports wildcards. An example would be::
 
 BitBake parses each
 recipe and append file located with :term:`BBFILES` and stores the values of
-various variables into the datastore.
+various variables into the :term:`datastore`.
 
 .. note::
 
