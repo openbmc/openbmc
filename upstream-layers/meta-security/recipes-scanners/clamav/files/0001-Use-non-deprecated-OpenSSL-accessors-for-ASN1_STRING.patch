@@ -1,0 +1,122 @@
+From 13ff91836da6f85e16a6db0aa0517dccab76aa82 Mon Sep 17 00:00:00 2001
+From: Bob Beck <beck@openssl.org>
+Date: Fri, 5 Dec 2025 15:50:23 -0700
+Subject: [PATCH] Use non deprecated OpenSSL accessors for ASN1_STRING values.
+
+This changes your time conversion routine to use
+ASN1_STRING_get0_data() and ASN1_STRING_length() rather than
+directly using the values from the object.
+
+OpenSSL plans to make ASN1_STRING opaque soon:
+https://github.com/openssl/openssl/issues/29117
+
+The accessor in question is in OpenSSL 1.1 as well as
+BoringSSL and LibreSSL so should be widely available.
+
+As the returned value is const, and you are changing it
+to pass to strptime, I've made it make a copy to work with.
+
+Since I added another allocation I converted it to single
+return to ensure everything gets freed appropriately.
+
+Upstream-Status: Pending [https://github.com/Cisco-Talos/clamav/pull/1642]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ libclamav/crypto.c | 46 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 27 insertions(+), 19 deletions(-)
+
+diff --git a/libclamav/crypto.c b/libclamav/crypto.c
+index 8b398e402..61c6d5434 100644
+--- a/libclamav/crypto.c
++++ b/libclamav/crypto.c
+@@ -1748,9 +1748,10 @@ X509 *cl_load_cert(const char *certpath)
+ 
+ struct tm *cl_ASN1_GetTimeT(ASN1_TIME *timeobj)
+ {
+-    struct tm *t;
+-    char *str;
+-    const char *fmt = NULL;
++    struct tm *ret = NULL;
++    struct tm *t   = NULL;
++    char *str      = NULL;
++    const char *data, *fmt = NULL;
+     time_t localt;
+ #ifdef _WIN32
+     struct tm localtm, *ltm;
+@@ -1758,18 +1759,21 @@ struct tm *cl_ASN1_GetTimeT(ASN1_TIME *timeobj)
+     struct tm localtm;
+ #endif
+ 
+-    if (!(timeobj) || !(timeobj->data))
+-        return NULL;
++    if (timeobj == NULL || (data = ASN1_STRING_get0_data(timeobj)) == NULL)
++        goto done;
++
++    str = CLI_STRNDUP(data, ASN1_STRING_length(timeobj));
++    if (NULL == str)
++        goto done;
+ 
+-    str = (char *)(timeobj->data);
+     if (strlen(str) < 12)
+-        return NULL;
++        goto done;
+ 
+     t = (struct tm *)calloc(1, sizeof(struct tm));
+     if (!(t))
+-        return NULL;
++        goto done;
+ 
+-    if (timeobj->type == V_ASN1_UTCTIME) {
++    if (ASN1_STRING_type(timeobj) == V_ASN1_UTCTIME) {
+         /* two digit year */
+         fmt = "%y%m%d%H%M%S";
+         if (str[3] == '0') {
+@@ -1778,7 +1782,7 @@ struct tm *cl_ASN1_GetTimeT(ASN1_TIME *timeobj)
+         } else {
+             str[3]--;
+         }
+-    } else if (timeobj->type == V_ASN1_GENERALIZEDTIME) {
++    } else if (ASN1_STRING_type(timeobj) == V_ASN1_GENERALIZEDTIME) {
+         /* four digit year */
+         fmt = "%Y%m%d%H%M%S";
+         if (str[5] == '0') {
+@@ -1789,15 +1793,11 @@ struct tm *cl_ASN1_GetTimeT(ASN1_TIME *timeobj)
+         }
+     }
+ 
+-    if (!(fmt)) {
+-        free(t);
+-        return NULL;
+-    }
++    if (!(fmt))
++        goto done;
+ 
+-    if (!strptime(str, fmt, t)) {
+-        free(t);
+-        return NULL;
+-    }
++    if (!strptime(str, fmt, t))
++        goto done;
+ 
+     /* Convert to local time */
+     localt = time(NULL);
+@@ -1808,7 +1808,15 @@ struct tm *cl_ASN1_GetTimeT(ASN1_TIME *timeobj)
+     localtime_r(&localt, &localtm);
+ #endif
+     t->tm_isdst = localtm.tm_isdst;
+-    return t;
++
++    ret = t;
++    t   = NULL;
++
++done:
++    free(t);
++    free(str);
++
++    return ret;
+ }
+ 
+ X509_CRL *cl_load_crl(const char *file)
+-- 
+2.47.3
+

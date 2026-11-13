@@ -11,9 +11,10 @@ DEPENDS:class-native = "pkgconfig-native swig-native curl-native libxml2-native 
 
 SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=main;protocol=https \
            file://0001-CMakeLists.txt-fix-installation-directory-for-system.patch \
-          "
+           file://0002-Replace-removed-Python-2-C-API-macros-for-SWIG-4.5.0.patch \
+"
 
-SRCREV = "24986066961363e24fcff83294995b3cfe4058ba"
+SRCREV = "4ac56ce0e6dfdea7215b5ad202b3db20855d2507"
 
 COMPATIBLE_HOST:libc-musl = "null"
 

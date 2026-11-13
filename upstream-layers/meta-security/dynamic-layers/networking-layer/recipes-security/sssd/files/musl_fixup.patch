@@ -1,4 +1,7 @@
-fix musl build failures
+From 05abd666016db971d8738685a31277771d16b29d Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Sun, 4 Jul 2021 08:50:06 -0700
+Subject: [PATCH] fix musl build failures
 
 Missing _PATH_HOSTS and some NETDB defines when musl is enabled.
 
@@ -8,22 +11,25 @@ These are work arounds for now while we figure out where the real fix should res
 |  1199 |                   _PATH_HOSTS);
 |       |                   ^~~~~~~~~~~
 
-and 
+and
 
 i./sssd-2.5.1/src/sss_client/nss_ipnetworks.c:415:21: error: 'NETDB_INTERNAL' undeclared (first use in this function)
 |   415 |         *h_errnop = NETDB_INTERNAL;
 
-
 Upstream-Status: Pending
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
+---
+ src/providers/fail_over.c | 4 ++++
+ src/sss_client/sss_cli.h  | 8 ++++++++
+ 2 files changed, 12 insertions(+)
 
-Index: sssd-2.5.1/src/providers/fail_over.c
-===================================================================
---- sssd-2.5.1.orig/src/providers/fail_over.c
-+++ sssd-2.5.1/src/providers/fail_over.c
-@@ -31,6 +31,10 @@
- #include <talloc.h>
+diff --git a/src/providers/fail_over.c b/src/providers/fail_over.c
+index d56c20f..2c6ceb6 100644
+--- a/src/providers/fail_over.c
++++ b/src/providers/fail_over.c
+@@ -33,6 +33,10 @@
  #include <netdb.h>
+ #include <arpa/inet.h>
  
 +#if !defined(_PATH_HOSTS)
 +#define _PATH_HOSTS     "/etc/hosts"
@@ -32,12 +38,12 @@ Index: sssd-2.5.1/src/providers/fail_over.c
  #include "util/dlinklist.h"
  #include "util/refcount.h"
  #include "util/util.h"
-Index: sssd-2.5.1/src/sss_client/sss_cli.h
-===================================================================
---- sssd-2.5.1.orig/src/sss_client/sss_cli.h
-+++ sssd-2.5.1/src/sss_client/sss_cli.h
-@@ -44,6 +44,14 @@ typedef int errno_t;
- #define EOK 0
+diff --git a/src/sss_client/sss_cli.h b/src/sss_client/sss_cli.h
+index 57e1ead..f58510f 100644
+--- a/src/sss_client/sss_cli.h
++++ b/src/sss_client/sss_cli.h
+@@ -52,6 +52,14 @@ typedef int errno_t;
+ #define NETDB_INTERNAL (-1)
  #endif
  
 +#ifndef NETDB_INTERNAL

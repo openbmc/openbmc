@@ -15,15 +15,16 @@ LIC_FILES_CHKSUM = "file://COPYING.txt;md5=2c0b5770a62017a3121c69bb9f680b0c \
 
 DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c libcheck rust-native cargo-native"
 
-SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/1.4;protocol=https \
+SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/1.5;protocol=https \
+           file://0001-Use-non-deprecated-OpenSSL-accessors-for-ASN1_STRING.patch \
            file://clamd.conf \
            file://freshclam.conf \
            file://volatiles.03_clamav \
            file://tmpfiles.clamav \
            "
 
-# ClamAV version 1.4.4
-SRCREV = "f6d84be3c0048deb15c54d67e140dae062e5b82b"
+# ClamAV version 1.5.4
+SRCREV = "fa59fca15872bb8a914ba4c68188bcc8a502cbdf"
 
 COMPATIBLE_HOST:libc-musl:class-target = "null"
 # As of 1.4.3 compilation is broken on 32-bit platforms

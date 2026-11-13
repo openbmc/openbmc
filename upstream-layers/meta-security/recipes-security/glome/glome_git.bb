@@ -10,7 +10,7 @@ inherit meson pkgconfig
 
 DEPENDS += "openssl"
 
-SRC_URI = "git://github.com/google/glome.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/google/glome.git;branch=main;protocol=https"
 SRCREV = "48d28f82bd51ae4bccc84fbbee93c375b026596b"
 
 FILES:${PN} += "${libdir}/security"
