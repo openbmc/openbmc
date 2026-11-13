@@ -1,0 +1,40 @@
+From a02970f522567169fa1851ab1b5431793e365cb0 Mon Sep 17 00:00:00 2001
+From: Devaraj Ranganna <devaraj.ranganna@arm.com>
+Date: Thu, 18 Sep 2025 22:07:38 +0100
+Subject: [PATCH 02/14] Corstone-1000: Enable different DRBG configurations
+
+The following DRBG configurations are enabled:
+
+* `CC3XX_CONFIG_DRBG_CTR_ENABLE`
+* `CC3XX_CONFIG_DRBG_HMAC_ENABLE`
+* `CC3XX_CONFIG_DRBG_HASH_ENABLE`
+
+The choice of DRBG is defined by `CC3XX_CONFIG_ENABLE_RANDOM_CTR_DRBG`.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Devaraj Ranganna <devaraj.ranganna@arm.com>
+---
+ platform/ext/target/arm/corstone1000/cc3xx_config.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/cc3xx_config.h b/platform/ext/target/arm/corstone1000/cc3xx_config.h
+index 68707f3a2194..8c53cace937c 100644
+--- a/platform/ext/target/arm/corstone1000/cc3xx_config.h
++++ b/platform/ext/target/arm/corstone1000/cc3xx_config.h
+@@ -100,6 +100,13 @@
+ #error "cc3xx_config: RNG config must select a single DRBG"
+ #endif /* CC3XX_CONFIG_RNG_DRBG_HMAC + CC3XX_CONFIG_RNG_DRBG_CTR + CC3XX_CONFIG_RNG_DRBG_HASH */
+ 
++/* Whether the CTR_DRBG is enabled through the generic interface */
++#define CC3XX_CONFIG_DRBG_CTR_ENABLE
++/* Whether the HMAC_DRBG is enabled through the generic interface */
++#define CC3XX_CONFIG_DRBG_HMAC_ENABLE
++/* Whether the HASH_DRBG is enabled through the generic interface */
++#define CC3XX_CONFIG_DRBG_HASH_ENABLE
++
+ /* Whether an external TRNG should be used in place of the standard CC3XX TRNG */
+ /* #define CC3XX_CONFIG_RNG_EXTERNAL_TRNG */
+ 
+-- 
+2.39.5
+

@@ -1,0 +1,45 @@
+From f05f9b75f60697be84217d0957e8864d58ee71bb Mon Sep 17 00:00:00 2001
+From: Oscar Belshaw <Oscar.Belshaw@arm.com>
+Date: Tue, 11 Aug 2026 15:40:27 +0100
+Subject: [PATCH] plat: corstone1000: align BL config mapping
+
+ARM_FW_CONFIG_BASE starts after the meminfo_t structure and is therefore
+not page aligned. Translation table mappings require page-aligned base
+addresses and sizes.
+
+Map the enclosing page from ARM_SHARED_RAM_BASE while retaining
+ARM_FW_CONFIG_BASE as the configuration load address. This prevents
+mmap_add_region_check() from returning -EINVAL during BL2 initialization.
+
+Only the mapping is widened: the reserved meminfo_t space at the start of
+shared RAM and the firmware configuration load addresses are unchanged.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/54909]
+
+Signed-off-by: Oscar Belshaw <Oscar.Belshaw@arm.com>
+
+---
+ .../arm/board/corstone1000/common/include/platform_def.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/plat/arm/board/corstone1000/common/include/platform_def.h b/plat/arm/board/corstone1000/common/include/platform_def.h
+index 382426869b..6673010d2f 100644
+--- a/plat/arm/board/corstone1000/common/include/platform_def.h
++++ b/plat/arm/board/corstone1000/common/include/platform_def.h
+@@ -334,11 +334,11 @@
+  * Map the region for the optional device tree configuration with read and
+  * write permissions
+  */
+-#define ARM_MAP_BL_CONFIG_REGION	MAP_REGION_FLAT( \
+-					ARM_FW_CONFIG_BASE, \
+-					(ARM_FW_CONFIG_LIMIT \
+-					 - ARM_FW_CONFIG_BASE), \
+-					MT_MEMORY | MT_RW | MT_SECURE)
++#define ARM_MAP_BL_CONFIG_REGION	MAP_REGION_FLAT( \
++					ARM_SHARED_RAM_BASE, \
++					(ARM_FW_CONFIG_LIMIT \
++					 - ARM_SHARED_RAM_BASE), \
++					MT_MEMORY | MT_RW | MT_SECURE)
+ 
+ #define CORSTONE1000_DEVICE_BASE	(0x1A000000)
+ #define CORSTONE1000_DEVICE_SIZE	(0x26000000)

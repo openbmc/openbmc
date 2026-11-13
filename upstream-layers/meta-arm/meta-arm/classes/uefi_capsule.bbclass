@@ -55,14 +55,39 @@ python() {
                 "UEFI_FIRMWARE_BINARIES", \
                 "UEFI_CAPSULE_CONFIG_GENERATOR_SCRIPT", \
                 "CAPSULE_ALL_COMPONENTS", \
-                "CAPSULE_SELECTED_COMPONENTS", \
-                "PAYLOAD_CERTIFICATE_PATH", \
-                "PAYLOAD_PRIVATE_KEY_PATH"]:
+                "CAPSULE_SELECTED_COMPONENTS"]:
         if not d.getVar(var):
             raise bb.parse.SkipRecipe(f"{var} not set")
 }
 
 IMAGE_CMD:uefi_capsule(){
+    signing_pem_dir="${WORKDIR}/uefi-capsule-signing-pems"
+    rm -rf "$signing_pem_dir"
+    install -d -m 0700 "$signing_pem_dir"
+
+    set -- ${CAPSULE_CERTIFICATE_PATHS}
+    signing_pem_paths=""
+    signing_pem_index=0
+    for private_key_path in ${CAPSULE_PRIVATE_KEY_PATHS}; do
+        if [ "$#" -eq 0 ]; then
+            bbfatal "CAPSULE_PRIVATE_KEY_PATHS has more entries than CAPSULE_CERTIFICATE_PATHS"
+        fi
+
+        certificate_path="$1"
+        shift
+
+        signing_pem_path="$signing_pem_dir/$signing_pem_index.pem"
+        install -m 0600 "$private_key_path" "$signing_pem_path"
+        cat "$certificate_path" >> "$signing_pem_path"
+
+        signing_pem_paths="$signing_pem_paths $signing_pem_path"
+        signing_pem_index="$(expr "$signing_pem_index" + 1)"
+    done
+
+    if [ "$#" -ne 0 ]; then
+        bbfatal "CAPSULE_CERTIFICATE_PATHS has more entries than CAPSULE_PRIVATE_KEY_PATHS"
+    fi
+
     # Generates the UEFI capsule payloads JSON
     ${PYTHON} ${UEFI_CAPSULE_CONFIG_GENERATOR_SCRIPT} \
              --selected_components ${CAPSULE_SELECTED_COMPONENTS}\
@@ -74,15 +99,12 @@ IMAGE_CMD:uefi_capsule(){
              --monotonic_counts ${CAPSULE_MONOTONIC_COUNTS} \
              --payloads ${UEFI_FIRMWARE_BINARIES} \
              --update_image_indexes ${CAPSULE_INDEXES} \
-             --private_keys ${CAPSULE_PRIVATE_KEY_PATHS} \
+             --signing_pems $signing_pem_paths \
              --certificates ${CAPSULE_CERTIFICATE_PATHS} \
              --output ${CAPSULE_CONFIG_FILE}
 
     # Force the GenerateCapsule script to use python3
     export PYTHON_COMMAND=${PYTHON}
-
-    # Append the certificate to the private key to create a PEM bundle compatible with EDK2 tools
-    cat ${PAYLOAD_CERTIFICATE_PATH} >> ${PAYLOAD_PRIVATE_KEY_PATH}
 
     # Generate the UEFI capsule image using the EDK2 GenerateCapsule tool
     ${STAGING_BINDIR_NATIVE}/edk2-BaseTools/BinWrappers/PosixLike/GenerateCapsule \

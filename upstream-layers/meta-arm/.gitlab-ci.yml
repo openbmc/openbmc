@@ -1,4 +1,4 @@
-image: ${MIRROR_GHCR}/siemens/kas/kas:5.2
+image: ${MIRROR_GHCR}/siemens/kas/kas:5.5
 
 variables:
   # These are needed as the k8s executor doesn't respect the container
@@ -284,6 +284,7 @@ qemuarm64:
       - DISTRO: poky-tiny
         FIRMWARE: [u-boot, edk2]
         TESTING: testimage
+      - TF: tf-rmm
 
 qemuarm-secureboot:
   extends: .build

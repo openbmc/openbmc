@@ -1,11 +1,3 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files/optee-os/corstone1000:"
-
-SRC_URI:append = " \
-        file://0001-plat-corstone1000-Specify-GIC-version-in-plat-specif.patch \
-        file://0002-gic-Refactor-implementation-of-GICv3-to-add-GICv4-su.patch \
-        file://0003-plat-corstone1000-Swap-GIC-600-for-GIC-700-for-Corte.patch \
-"
-
 COMPATIBLE_MACHINE = "corstone1000"
 
 OPTEEMACHINE = "corstone1000"

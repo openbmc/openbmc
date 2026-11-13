@@ -2,8 +2,8 @@ require recipes-security/optee/optee-os.inc
 
 DEPENDS += "dtc-native"
 
-# v4.10.0
-SRCREV = "753afbbee1682f5d16fd30e87b31058a4fd4f4b8"
+# v4.11.0
+SRCREV = "f54190f22611dd5ad5d22546fd4209aa100f56bd"
 PV .= "+git"
 UPSTREAM_CHECK_COMMITS = "1"
 

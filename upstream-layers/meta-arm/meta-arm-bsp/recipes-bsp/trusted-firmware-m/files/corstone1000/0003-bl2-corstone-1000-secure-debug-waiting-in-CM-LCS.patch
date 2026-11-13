@@ -1,0 +1,93 @@
+From d8141d0d445bc5117b21dc684410b115e82d5568 Mon Sep 17 00:00:00 2001
+From: Devaraj Ranganna <devaraj.ranganna@arm.com>
+Date: Mon, 22 Sep 2025 12:59:43 +0100
+Subject: [PATCH 03/14] bl2: corstone-1000: secure debug waiting in CM LCS
+
+Currently, when the device is in Secure Enable (SE) LCS state,
+setting the dcu_en register causes a CC-312 reset. Because CC-312 and
+the device share a power domain, this effectively resets the device.
+
+Temporarily perform the secure-debug handshake while the device
+remains in the CM provisioned state. The long-term solution is to
+complete the secure-debug handshake, reset the device, and apply
+dcu_en during BL2.
+
+Upstream-Status: Inappropriate [Need to be redesigned]
+Signed-off-by: Devaraj Ranganna <devaraj.ranganna@arm.com>
+Signed-off-by: Ahmed Gomaa <Ahmed.Gomaa@arm.com>
+---
+ .../arm/corstone1000/bl2/boot_hal_bl2.c       | 46 ++++++++++++-------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+index 9bc0f20e1045..d034efe59f5d 100644
+--- a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
++++ b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+@@ -187,7 +187,7 @@ int32_t boot_platform_post_init(void)
+     int32_t result;
+     enum tfm_plat_err_t plat_err;
+ #ifdef PLATFORM_PSA_ADAC_SECURE_DEBUG
+-    bool provisioning_required;
++    /* bool provisioning_required; */
+ #endif
+ 
+ #ifdef CRYPTO_HW_ACCELERATOR
+@@ -204,26 +204,40 @@ int32_t boot_platform_post_init(void)
+     }
+ 
+ #ifdef PLATFORM_PSA_ADAC_SECURE_DEBUG
+-    plat_err = tfm_plat_provisioning_is_required(&provisioning_required);
++    /*
++     * TODO: Currently, when the device is in Secure Enable (SE) LCS state,
++     * setting `dcu_en` register causes CC-312 reset, which effectively resets
++     * the device as they are both on the same power domain. Therefore,
++     * temporarily perform the secure-debug handshake while the device remains
++     * in the CM provisioned state.
++     *
++     * The long-term solution is to complete the secure-debug handshake, reset
++     * the device, and apply `dcu_en` during BL2.
++     *
++     * TF-M 2.3 splits the provisioning check into an error return and a Boolean
++     * output value. Keep the complete gate commented while this workaround is
++     * required:
++     *
++     * plat_err = tfm_plat_provisioning_is_required(&provisioning_required);
++     * if (plat_err != TFM_PLAT_ERR_SUCCESS) {
++     *     BOOT_LOG_ERR("Platform provisioning required check failed");
++     *     FIH_PANIC;
++     * }
++     *
++     * if (!provisioning_required) {
++     */
++
++    plat_err = tfm_plat_otp_read(SECURE_DEBUG_ROTPK_ID, 32, secure_debug_rotpk);
+     if (plat_err != TFM_PLAT_ERR_SUCCESS) {
+-        BOOT_LOG_ERR("Platform provisioning required check failed");
+-        FIH_PANIC;
++        return plat_err;
+     }
+ 
+-    if (!provisioning_required) {
+-
+-        plat_err = tfm_plat_otp_read(SECURE_DEBUG_ROTPK_ID, 32, secure_debug_rotpk);
+-        if (plat_err != TFM_PLAT_ERR_SUCCESS) {
+-            return plat_err;
+-        }
+-
+ #ifndef PSA_ADAC_AS_TFM_RUNTIME_SERVICE
+-        result = tfm_to_psa_adac_corstone1000_secure_debug(secure_debug_rotpk, 32);
+-        BOOT_LOG_INF("%s: Corstone-1000 Secure Debug is a %s.\r\n", __func__,
+-                (result == 0) ? "success" : "failure");
++    result = tfm_to_psa_adac_corstone1000_secure_debug(secure_debug_rotpk, 32);
++    BOOT_LOG_INF("%s: Corstone-1000 Secure Debug is a %s.\r\n", __func__,
++            (result == 0) ? "success" : "failure");
+ #endif /* PSA_ADAC_AS_TFM_RUNTIME_SERVICE */
+-
+-    }
++    /* } */
+ #endif /* PLATFORM_PSA_ADAC_SECURE_DEBUG */
+ 
+     return 0;
+-- 
+2.39.5
+

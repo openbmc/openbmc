@@ -44,3 +44,8 @@ do_deploy() {
 }
 
 addtask deploy after do_install
+
+# FIXME - The RMM build embeds TMPDIR paths in the generated binaries.
+# Skip the buildpaths QA check until these references can be removed.
+INSANE_SKIP:${PN} += "buildpaths"
+INSANE_SKIP:${PN}-dbg += "buildpaths"

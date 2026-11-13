@@ -1,4 +1,4 @@
-From 962b8b4f2baf4a84de1fc76382ef7aa240ec1534 Mon Sep 17 00:00:00 2001
+From eaa2884eef6015b530ea66317b908f035ce73124 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 11 Feb 2025 17:54:45 +0000
 Subject: [PATCH] arm_ffa: sandbox: Improve the readability of clearing the X
@@ -40,10 +40,10 @@ index b0881822d78..5c46547beab 100644
  /* number of emulated FF-A secure partitions (SPs) */
  #define SANDBOX_PARTITIONS_CNT (4)
 diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-index d2f051f7e2a..dcf5bce9435 100644
+index 954cada27ce..48b6d1fec2e 100644
 --- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
 +++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-@@ -83,7 +83,7 @@ static int sandbox_ffa_version(struct udevice *emul, ffa_value_t *pargs, ffa_val
+@@ -80,7 +80,7 @@ static int sandbox_ffa_version(struct udevice *emul, ffa_value_t *pargs, ffa_val
  	res->a0 = priv->fwk_version;
  
  	/* x1-x7 MBZ */
@@ -52,7 +52,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  
  	return 0;
  }
-@@ -111,7 +111,7 @@ static int sandbox_ffa_id_get(struct udevice *emul, ffa_value_t *pargs, ffa_valu
+@@ -108,7 +108,7 @@ static int sandbox_ffa_id_get(struct udevice *emul, ffa_value_t *pargs, ffa_valu
  	res->a2 = priv->id;
  
  	/* x3-x7 MBZ */
@@ -61,7 +61,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  
  	return 0;
  }
-@@ -136,14 +136,14 @@ static int sandbox_ffa_features(ffa_value_t *pargs, ffa_value_t *res)
+@@ -133,14 +133,14 @@ static int sandbox_ffa_features(ffa_value_t *pargs, ffa_value_t *res)
  		res->a2 = RXTX_BUFFERS_MIN_SIZE;
  		res->a3 = 0;
  		/* x4-x7 MBZ */
@@ -78,7 +78,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  	log_err("FF-A interface %lx not implemented\n", pargs->a1);
  
  	return ffa_to_std_errmap[NOT_SUPPORTED];
-@@ -248,7 +248,7 @@ cleanup:
+@@ -245,7 +245,7 @@ cleanup:
  	res->a1 = 0;
  
  	/* x3-x7 MBZ */
@@ -87,7 +87,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  
  	return ret;
  }
-@@ -305,7 +305,7 @@ feedback:
+@@ -302,7 +302,7 @@ feedback:
  	res->a1 = 0;
  
  	/* x3-x7 MBZ */
@@ -96,7 +96,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  
  	return ret;
  }
-@@ -352,7 +352,7 @@ feedback:
+@@ -349,7 +349,7 @@ feedback:
  	res->a1 = 0;
  
  	/* x3-x7 MBZ */
@@ -105,7 +105,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  
  	return ret;
  }
-@@ -388,7 +388,7 @@ static int sandbox_ffa_rx_release(struct udevice *emul, ffa_value_t *pargs, ffa_
+@@ -385,7 +385,7 @@ static int sandbox_ffa_rx_release(struct udevice *emul, ffa_value_t *pargs, ffa_
  	res->a1 = 0;
  
  	/* x3-x7 MBZ */
@@ -114,7 +114,7 @@ index d2f051f7e2a..dcf5bce9435 100644
  
  	return ret;
  }
-@@ -448,7 +448,7 @@ static int sandbox_ffa_msg_send_direct_req(struct udevice *emul,
+@@ -445,7 +445,7 @@ static int sandbox_ffa_msg_send_direct_req(struct udevice *emul,
  		res->a2 = -INVALID_PARAMETERS;
  
  		/* x3-x7 MBZ */

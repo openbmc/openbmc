@@ -1,0 +1,38 @@
+From bff45da697fecf64927fbc38eacfcf41f20b763b Mon Sep 17 00:00:00 2001
+From: Michael D Kinney <michael.d.kinney@intel.com>
+Date: Wed, 14 Oct 2026 12:34:35 -0700
+Subject: [PATCH] NetworkPkg/UefiPxeBcDxe: Clear ICMP error buffer before
+ copying
+
+Zero the ICMP error buffer before copying fragments so short packets do not
+leave stale bytes from a previous error.
+
+Signed-off-by: Michael D Kinney <michael.d.kinney@intel.com>
+
+Upstream-Status: Backport [fa789071ff0b29f1e568bfe153ef7f3d76bd60e4]
+CVE: CVE-2026-97631
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+---
+ NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c b/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c
+index 9e97ba4904c7..7795e4f187d2 100644
+--- a/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c
++++ b/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c
+@@ -321,6 +321,7 @@ PxeBcIcmpErrorDpcHandle (
+   // Copy ICMP error fragments into Mode->IcmpError in order. The maximum
+   // buffer size is sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR); truncate any excess.
+   //
++  ZeroMem (&Mode->IcmpError, sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
+   for (Index = 0, IcmpError = (UINT8 *)&Mode->IcmpError, CopiedLen = 0;
+        (Index < RxData->FragmentCount) &&
+        (CopiedLen < sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
+@@ -445,6 +446,7 @@ PxeBcIcmp6ErrorDpcHandle (
+   // Copy ICMP error fragments into Mode->IcmpError in order. The maximum
+   // buffer size is sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR); truncate any excess.
+   //
++  ZeroMem (&Mode->IcmpError, sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
+   for (Index = 0, Icmp6Error = (UINT8 *)&Mode->IcmpError, CopiedLen = 0;
+        (Index < RxData->FragmentCount) &&
+        (CopiedLen < sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));

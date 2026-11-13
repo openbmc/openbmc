@@ -1,4 +1,4 @@
-From 7fb2abeb111ed33c08efb04d0790bb0767f7737f Mon Sep 17 00:00:00 2001
+From 63dfe8e3dc0744024185b36e912d1de8322b6fcb Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Thu, 20 Mar 2025 16:01:56 +0000
 Subject: [PATCH] corstone1000: Enable secure boot configs
@@ -13,7 +13,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  1 file changed, 3 insertions(+)
 
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index c0fecb4aea1..c44911e6f64 100644
+index 0102680a91d..e88410f3868 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -12,6 +12,7 @@ CONFIG_SYS_BOOTM_LEN=0x800000

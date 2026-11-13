@@ -4,8 +4,8 @@ DEPENDS:append = "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'optee-ftpm', 'optee-ftpm', '' , d)} \
 "
 
-EXTRA_OEMAKE:append = "\
-    ${@bb.utils.contains('MACHINE_FEATURES', 'optee-ftpm', \
-        'CFG_CORE_HEAP_SIZE=131072 CFG_EARLY_TA=y EARLY_TA_PATHS="${STAGING_DIR_TARGET}/${base_libdir}/optee_armtz/${FTPM_UUID}.stripped.elf"', \
-        '', d)} \
-"
+python() {
+    if bb.utils.contains('MACHINE_FEATURES', 'optee-ftpm', True, False, d):
+        d.appendVar('EARLY_TA_PATHS', ' ${STAGING_DIR_TARGET}/${base_libdir}/optee_armtz/${FTPM_UUID}.stripped.elf')
+        d.appendVar('EXTRA_OEMAKE', ' CFG_CORE_HEAP_SIZE=131072')
+}

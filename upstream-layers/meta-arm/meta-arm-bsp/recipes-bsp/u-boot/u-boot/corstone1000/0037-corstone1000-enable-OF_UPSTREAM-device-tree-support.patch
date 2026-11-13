@@ -1,4 +1,4 @@
-From e1b46cabacd2bbbde5ac42a01af21126788f274e Mon Sep 17 00:00:00 2001
+From c413bd895bf3f9dedddf0b519476acf59682ac2a Mon Sep 17 00:00:00 2001
 From: Frazer Carsley <frazer.carsley@arm.com>
 Date: Mon, 19 Jan 2026 15:16:52 +0000
 Subject: [PATCH] corstone1000: enable OF_UPSTREAM device tree support
@@ -35,10 +35,10 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  delete mode 100644 arch/arm/dts/corstone1000.dtsi
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 7c8cf3a5a1d..89b3728379b 100644
+index 2b65cd9105c..aa1409b7c03 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -1206,9 +1206,6 @@ dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
+@@ -1188,9 +1188,6 @@ dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
  
  dtb-$(CONFIG_ARCH_QEMU) += qemu-arm.dtb qemu-arm64.dtb
  
@@ -502,7 +502,7 @@ index 1b9c3a9ed16..db8919298e1 100644
  		if (!virtio_bus) {
  			log_err("Cannot find virtio device, err (%d)\n", ret);
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index 4ec23b4af1c..6ff855e7ce9 100644
+index a4b448f7380..465a72cfde6 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -7,7 +7,7 @@ CONFIG_NR_DRAM_BANKS=1
@@ -523,4 +523,4 @@ index 4ec23b4af1c..6ff855e7ce9 100644
 +CONFIG_OF_UPSTREAM_VENDOR="arm"
  CONFIG_VERSION_VARIABLE=y
  CONFIG_NET_RANDOM_ETHADDR=y
- CONFIG_REGMAP=y
+ CONFIG_CLK=y

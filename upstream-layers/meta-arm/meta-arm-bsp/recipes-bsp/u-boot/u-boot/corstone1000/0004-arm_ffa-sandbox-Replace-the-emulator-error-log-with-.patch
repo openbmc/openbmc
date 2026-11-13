@@ -1,4 +1,4 @@
-From 28ecd80dd073448b1ec200f1bf4b6c2c4659af16 Mon Sep 17 00:00:00 2001
+From 1c41fc705dc986935000ecb49a167ab823b11116 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 17 Oct 2024 22:11:22 +0100
 Subject: [PATCH] arm_ffa: sandbox: Replace the emulator error log with debug
@@ -17,7 +17,7 @@ Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/2025070215
  1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-index 1521d9b66ac..d2f051f7e2a 100644
+index 6198d687354..954cada27ce 100644
 --- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
 +++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
 @@ -1,6 +1,6 @@
@@ -28,7 +28,7 @@ index 1521d9b66ac..d2f051f7e2a 100644
   *
   * Authors:
   *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
-@@ -658,8 +658,7 @@ void sandbox_arm_ffa_smccc_smc(ffa_value_t *args, ffa_value_t *res)
+@@ -655,8 +655,7 @@ void sandbox_arm_ffa_smccc_smc(ffa_value_t *args, ffa_value_t *res)
  			args->a0);
  	}
  

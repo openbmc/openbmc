@@ -1,4 +1,4 @@
-From 33f002d751efb756f2eac188be11a53dd90e1018 Mon Sep 17 00:00:00 2001
+From 22fc93a4070651895d1d7a32f61fe6066ae53f92 Mon Sep 17 00:00:00 2001
 From: Emekcan Aras <emekcan.aras@arm.com>
 Date: Thu, 20 Mar 2025 15:49:26 +0000
 Subject: [PATCH] corstone1000: set CONFIG_FFA_SHARED_MM_BUF_ADDR
@@ -13,7 +13,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index d7c5d030e9a..3e0fe47bbaf 100644
+index 8d8602bbc95..896f97c654f 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -14,7 +14,7 @@ CONFIG_FWU_NUM_IMAGES_PER_BANK=4

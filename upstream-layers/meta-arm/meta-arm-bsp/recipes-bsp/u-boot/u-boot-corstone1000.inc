@@ -100,8 +100,7 @@ SRC_URI:append = " \
     file://0050-doc-arm64-document-FF-A-runtime-path-for-EFI-variabl.patch \
     file://0051-doc-bootefi-note-two-phase-runtime-variables-selftes.patch \
     file://0052-efi_loader-align-FF-A-cache-maintenance-with-runtime.patch \
-    file://0053-efi_loader-fix-AllocatePages-overlap-status.patch \
-    file://0054-corstone1000-a320-enable-bootefi-selftest.patch \
+    file://0053-corstone1000-a320-enable-bootefi-selftest.patch \
 "
 
 uboot_configure_config:append() {

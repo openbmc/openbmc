@@ -1,4 +1,4 @@
-From 4a608633474b545eac07c3e4dd27bdad7bdfb005 Mon Sep 17 00:00:00 2001
+From c26404d7403748b60e61205b68b08912c34f436d Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Oct 2024 17:24:43 +0000
 Subject: [PATCH] arm_ffa: Add FFA_MEM_RECLAIM support
@@ -47,10 +47,10 @@ index 3eec735d741..d2c4fb49f79 100644
  - FF-A bus discovery makes sure FF-A framework is responsive and compatible
    with the driver
 diff --git a/drivers/firmware/arm-ffa/arm-ffa-uclass.c b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
-index 2ba0b925fa6..597b4e994b4 100644
+index d09e31177d7..84023f6a94c 100644
 --- a/drivers/firmware/arm-ffa/arm-ffa-uclass.c
 +++ b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
-@@ -109,6 +109,18 @@ static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
+@@ -106,6 +106,18 @@ static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
  			"DENIED: Memory region ownership, permission, access or attributes error",
  		},
  	},
@@ -69,7 +69,7 @@ index 2ba0b925fa6..597b4e994b4 100644
  };
  
  /**
-@@ -1114,6 +1126,44 @@ int ffa_memory_share_hdlr(struct udevice *dev, struct ffa_mem_ops_args *args)
+@@ -1111,6 +1123,44 @@ int ffa_memory_share_hdlr(struct udevice *dev, struct ffa_mem_ops_args *args)
  	return ffa_memory_ops(dev, FFA_MEM_SHARE, args);
  }
  
@@ -114,7 +114,7 @@ index 2ba0b925fa6..597b4e994b4 100644
  /* FF-A driver operations (used by clients for communicating with FF-A)*/
  
  /**
-@@ -1225,6 +1275,32 @@ int ffa_memory_share(struct udevice *dev, struct ffa_mem_ops_args *args)
+@@ -1222,6 +1272,32 @@ int ffa_memory_share(struct udevice *dev, struct ffa_mem_ops_args *args)
  	return ops->memory_share(dev, args);
  }
  
@@ -148,10 +148,10 @@ index 2ba0b925fa6..597b4e994b4 100644
   * ffa_do_probe() - probing FF-A framework
   * @dev:	the FF-A bus device (arm_ffa)
 diff --git a/drivers/firmware/arm-ffa/arm-ffa.c b/drivers/firmware/arm-ffa/arm-ffa.c
-index df904cae412..de36f5647d2 100644
+index 8f7c5794f95..863dc7e5cac 100644
 --- a/drivers/firmware/arm-ffa/arm-ffa.c
 +++ b/drivers/firmware/arm-ffa/arm-ffa.c
-@@ -85,6 +85,7 @@ static const struct ffa_bus_ops ffa_ops = {
+@@ -82,6 +82,7 @@ static const struct ffa_bus_ops ffa_ops = {
  	.sync_send_receive = ffa_msg_send_direct_req_hdlr,
  	.rxtx_unmap = ffa_unmap_rxtx_buffers_hdlr,
  	.memory_share = ffa_memory_share_hdlr,

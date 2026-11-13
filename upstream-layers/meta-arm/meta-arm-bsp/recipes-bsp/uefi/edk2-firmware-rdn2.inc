@@ -11,6 +11,7 @@ SRC_URI_EDK2_PLATFORMS = "git://gitlab.arm.com/infra-solutions/reference-design/
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:append = " file://0001-Changes-in-acpica-20260408-are-now-causing-issues-wi.patch;patchdir=edk2-platforms"
+SRC_URI:remove = "file://0001-DynamicTablesPkg-fix-SmbiosType2Genertor-build-failu.patch"
 
 SRCBRANCH_edk2 = "refinfra"
 SRCBRANCH_edk2_platforms = "refinfra"

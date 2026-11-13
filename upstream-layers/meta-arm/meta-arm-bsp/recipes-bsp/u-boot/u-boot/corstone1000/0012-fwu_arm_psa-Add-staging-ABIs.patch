@@ -1,4 +1,4 @@
-From c885fd3ccc82db134a67ccb138cdaac4c5fe9ebf Mon Sep 17 00:00:00 2001
+From 0f217059335a4f2b6de93b0343bf8966e3380560 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 6 Feb 2025 11:37:33 +0000
 Subject: [PATCH] fwu_arm_psa: Add staging ABIs
@@ -34,7 +34,7 @@ Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/2025070215
  5 files changed, 523 insertions(+), 2 deletions(-)
 
 diff --git a/include/efi_api.h b/include/efi_api.h
-index 77a05f752e5..1d8765ab58d 100644
+index d4fdd50c49e..450bc69a847 100644
 --- a/include/efi_api.h
 +++ b/include/efi_api.h
 @@ -25,6 +25,9 @@
@@ -48,10 +48,10 @@ index 77a05f752e5..1d8765ab58d 100644
  enum efi_timer_delay {
  	EFI_TIMER_STOP = 0,
 diff --git a/include/efi_loader.h b/include/efi_loader.h
-index 3e70ac07055..0340847c0b4 100644
+index 3a4d502631c..8deaa56a27e 100644
 --- a/include/efi_loader.h
 +++ b/include/efi_loader.h
-@@ -394,6 +394,11 @@ extern const efi_guid_t smbios3_guid;
+@@ -398,6 +398,11 @@ extern const efi_guid_t smbios3_guid;
  extern const efi_guid_t efi_guid_text_input_protocol;
  extern const efi_guid_t efi_guid_text_output_protocol;
  
@@ -239,10 +239,10 @@ index ba294359b5e..a8f0ff93d51 100644
 +
  #endif
 diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
-index f19e78ae9d1..f28fcf85f68 100644
+index 52887f7c274..28b93abfe39 100644
 --- a/lib/efi_loader/efi_capsule.c
 +++ b/lib/efi_loader/efi_capsule.c
-@@ -15,6 +15,11 @@
+@@ -16,6 +16,11 @@
  #include <fdtdec.h>
  #include <fs.h>
  #include <fwu.h>
@@ -254,7 +254,7 @@ index f19e78ae9d1..f28fcf85f68 100644
  #include <hang.h>
  #include <malloc.h>
  #include <mapmem.h>
-@@ -40,6 +45,10 @@ const efi_guid_t fwu_guid_os_request_fw_revert =
+@@ -38,6 +43,10 @@ const efi_guid_t fwu_guid_os_request_fw_revert =
  const efi_guid_t fwu_guid_os_request_fw_accept =
  		FWU_OS_REQUEST_FW_ACCEPT_GUID;
  
@@ -265,7 +265,7 @@ index f19e78ae9d1..f28fcf85f68 100644
  #define FW_ACCEPT_OS	(u32)0x8000
  
  #ifdef CONFIG_EFI_CAPSULE_ON_DISK
-@@ -196,6 +205,12 @@ efi_fmp_find(efi_guid_t *image_type, u8 image_index, u64 instance,
+@@ -194,6 +203,12 @@ efi_fmp_find(efi_guid_t *image_type, u8 image_index, u64 instance,
  			continue;
  		fmp = fmp_handler->protocol_interface;
  
@@ -278,7 +278,7 @@ index f19e78ae9d1..f28fcf85f68 100644
  		/* get device's image info */
  		info_size = 0;
  		image_info = NULL;
-@@ -586,7 +601,7 @@ static efi_status_t efi_capsule_update_firmware(
+@@ -585,7 +600,7 @@ static efi_status_t efi_capsule_update_firmware(
  	capsule_size = capsule_data->capsule_image_size
  			- capsule_data->header_size;
  
@@ -287,7 +287,7 @@ index f19e78ae9d1..f28fcf85f68 100644
  		return EFI_UNSUPPORTED;
  
  	handles = NULL;
-@@ -597,6 +612,10 @@ static efi_status_t efi_capsule_update_firmware(
+@@ -596,6 +611,10 @@ static efi_status_t efi_capsule_update_firmware(
  	if (ret != EFI_SUCCESS)
  		return EFI_UNSUPPORTED;
  
@@ -298,7 +298,7 @@ index f19e78ae9d1..f28fcf85f68 100644
  	/* Payload */
  	for (item = capsule->embedded_driver_count;
  	     item < capsule->embedded_driver_count
-@@ -611,7 +630,8 @@ static efi_status_t efi_capsule_update_firmware(
+@@ -610,7 +629,8 @@ static efi_status_t efi_capsule_update_firmware(
  
  		image = (void *)capsule + capsule->item_offset_list[item];
  

@@ -1,7 +1,7 @@
-From 4c8504fe21f91bf462486afdfe4113f8bbc9f930 Mon Sep 17 00:00:00 2001
+From af41adfbb40010685175eddd53a0a3f41b18775a Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Sun, 11 Jan 2026 20:34:13 +0000
-Subject: [PATCH 46/53] corstone1000: enable bootefi selftest
+Subject: [PATCH] corstone1000: enable bootefi selftest
 
 Enable UEFI selftest command in Corstone-1000 defconfig
 
@@ -16,10 +16,10 @@ Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index 350607892fa..8de2f9bd440 100644
+index d52b8681a6f..94f440ab66c 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
-@@ -41,6 +41,8 @@ CONFIG_SYS_PROMPT="corstone1000# "
+@@ -43,6 +43,8 @@ CONFIG_SYS_PROMPT="corstone1000# "
  # CONFIG_CMD_CONSOLE is not set
  CONFIG_CMD_FWU_METADATA=y
  CONFIG_CMD_BOOTZ=y
@@ -28,7 +28,7 @@ index 350607892fa..8de2f9bd440 100644
  # CONFIG_CMD_XIMG is not set
  CONFIG_CMD_NVEDIT_EFI=y
  CONFIG_CMD_GPT=y
-@@ -79,6 +81,7 @@ CONFIG_SYSRESET=y
+@@ -80,6 +82,7 @@ CONFIG_SYSRESET=y
  CONFIG_SYSRESET_PSCI=y
  CONFIG_TEE=y
  CONFIG_OPTEE=y

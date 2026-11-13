@@ -1,4 +1,4 @@
-From 9b0a2622667bfe5794c77161d973d6f59871668c Mon Sep 17 00:00:00 2001
+From fc11a0288d1d5d431a9c3b3ddca147f73454f281 Mon Sep 17 00:00:00 2001
 From: Frazer Carsley <frazer.carsley@arm.com>
 Date: Wed, 25 Feb 2026 14:28:08 +0000
 Subject: [PATCH] corstone1000-a320: Add Corstone1000 board variant
@@ -61,10 +61,10 @@ Signed-off-by: Michael Safwat <michael.safwat@arm.com>
  create mode 100644 doc/device-tree-bindings/arm/arm,corstone1000-a320.yml
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 625d2e995d2..aacc39fa60c 100644
+index 514bf2000b4..17f82a0aedc 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -2405,6 +2405,7 @@ source "arch/arm/mach-npcm/Kconfig"
+@@ -2416,6 +2416,7 @@ source "arch/arm/mach-npcm/Kconfig"
  
  source "board/armltd/total_compute/Kconfig"
  source "board/armltd/corstone1000/Kconfig"
@@ -344,7 +344,7 @@ index 00000000000..6715e15ec37
 +};
 +
 diff --git a/arch/arm/include/asm/armv8/cpu.h b/arch/arm/include/asm/armv8/cpu.h
-index e906fdf1bf1..1ae679f7119 100644
+index d8f0e16dadd..eea564e3020 100644
 --- a/arch/arm/include/asm/armv8/cpu.h
 +++ b/arch/arm/include/asm/armv8/cpu.h
 @@ -1,6 +1,7 @@
@@ -359,15 +359,16 @@ index e906fdf1bf1..1ae679f7119 100644
  #define MIDR_PARTNUM_CORTEX_A73		0xD09
  #define MIDR_PARTNUM_CORTEX_A75		0xD0A
  #define MIDR_PARTNUM_CORTEX_A76		0xD0B
-+#define MIDR_PARTNUM_CORTEX_A320		0xD8F
++#define MIDR_PARTNUM_CORTEX_A320	0xD8F
+ #define MIDR_PARTNUM_CORTEX_A720	0xD81
  #define MIDR_PARTNUM_SHIFT		0x4
  #define MIDR_PARTNUM_MASK		(0xFFF << MIDR_PARTNUM_SHIFT)
- 
-@@ -40,3 +42,4 @@ is_cortex_a(72)
+@@ -41,4 +43,5 @@ is_cortex_a(72)
  is_cortex_a(73)
  is_cortex_a(75)
  is_cortex_a(76)
 +is_cortex_a(320)
+ is_cortex_a(720)
 diff --git a/board/armltd/corstone1000-a320/Kconfig b/board/armltd/corstone1000-a320/Kconfig
 new file mode 100644
 index 00000000000..607e5f6689b

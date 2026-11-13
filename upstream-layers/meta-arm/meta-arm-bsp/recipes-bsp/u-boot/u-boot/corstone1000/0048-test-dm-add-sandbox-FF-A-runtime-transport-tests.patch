@@ -1,7 +1,7 @@
-From d12b38b7af88fdb37487d5196e214c8a4ad561fc Mon Sep 17 00:00:00 2001
+From 56bb46d57bc6d2f2105d2d6d08e49d6f1396e212 Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Wed, 14 Jan 2026 13:55:02 +0000
-Subject: [PATCH 48/53] test: dm: add sandbox FF-A runtime transport tests
+Subject: [PATCH] test: dm: add sandbox FF-A runtime transport tests
 
 Exercise FF-A runtime helpers via sandbox DM tests
 
@@ -53,7 +53,7 @@ index be2790f4960..a20eb159b73 100644
  #define SANDBOX_SERVICE3_UUID	"55d532ed-0942-e699-722d-c09ca798d9cd"
  
 diff --git a/test/dm/Makefile b/test/dm/Makefile
-index 474e77a2151..218b0b1411f 100644
+index 0e3c63568dd..102b1e98284 100644
 --- a/test/dm/Makefile
 +++ b/test/dm/Makefile
 @@ -1,7 +1,7 @@
@@ -65,7 +65,7 @@ index 474e77a2151..218b0b1411f 100644
  
  # Tests for particular subsystems - when enabling driver model for a new
  # subsystem you must add sandbox tests here.
-@@ -95,6 +95,7 @@ obj-$(CONFIG_ACPI_PMC) += pmc.o
+@@ -98,6 +98,7 @@ obj-$(CONFIG_ACPI_PMC) += pmc.o
  obj-$(CONFIG_DM_PMIC) += pmic.o
  obj-$(CONFIG_DM_PWM) += pwm.o
  obj-$(CONFIG_ARM_FFA_TRANSPORT) += ffa.o

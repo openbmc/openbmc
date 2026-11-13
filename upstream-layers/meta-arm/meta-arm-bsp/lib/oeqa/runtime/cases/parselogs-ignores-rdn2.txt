@@ -1,2 +1,3 @@
 arch_timer: Failed to initialize memory-mapped timer.
 PCI: OF: of_root node is NULL, cannot create PCI host bridge node
+_OSC: platform retains control of PCIe features (AE_ERROR)
