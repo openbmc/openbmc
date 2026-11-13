@@ -35,12 +35,14 @@ verbose = False
 # [0=Codename, 1=Yocto Project Version, 2=Release Date, 3=Current Version, 4=Support Level, 5=Poky Version, 6=BitBake branch]
 current_releases = [
     # Release slot #1
-    ['Wrynose','6.0','April 2026','6.0 (April 2026)','Long Term Support (until April 2030)','','2.18'],
+    ['Blacksail','6.1','October 2026','6.1 (October 2026)','Support for 7 months (until April 2027)','','2.20'],
     # Release slot #2 'local'
-    ['HEAD','HEAD','','Local Yocto Project','HEAD','','HEAD'],
+    ['Wrynose','6.0','April 2026','6.0 (April 2026)','Long Term Support (until April 2030)','','2.18'],
     # Release slot #3 'master'
-    ['Master','master','','Yocto Project master','master','','master'],
+    ['HEAD','HEAD','','Local Yocto Project','HEAD','','HEAD'],
     # Release slot #4
+    ['Master','master','','Yocto Project master','master','','master'],
+    # Release slot #5
     ['Scarthgap','5.0','April 2024','5.0 (April 2024)','Long Term Support (until April 2028)','','2.8'],
     #['Whinlatter','5.3','October 2025','5.3 (October 2024)','Support for 7 months (until May 2026)','','2.14'],
     #['Styhead','5.1','November 2024','5.1.0 (November 2024)','Support for 7 months (until May 2025)','','2.10'],

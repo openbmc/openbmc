@@ -736,7 +736,7 @@ class MulticonfigCache(Mapping):
                 # we might have calculated incorrect total size because a file
                 # might've been written out just after we checked its size
                 cachesize = current_progress
-            current_percent = 100 * current_progress / cachesize
+            current_percent = 100 * current_progress // cachesize
             if current_percent > previous_percent:
                 previous_percent = current_percent
                 bb.event.fire(bb.event.CacheLoadProgress(current_progress, cachesize),

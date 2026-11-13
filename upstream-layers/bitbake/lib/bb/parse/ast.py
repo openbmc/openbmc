@@ -310,8 +310,9 @@ class PyLibNode(AstNode):
             bb.utils._context[self.namespace] = __import__(self.namespace)
             toimport = getattr(bb.utils._context[self.namespace], "BBIMPORTS", [])
             for i in toimport:
-                bb.utils._context[self.namespace] = __import__(self.namespace + "." + i)
-                mod = getattr(bb.utils._context[self.namespace], i)
+                mod = bb.utils._context[self.namespace] = __import__(self.namespace + "." + i)
+                for submod in i.split("."):
+                    mod = getattr(mod, submod)
                 fn = getattr(mod, "__file__")
                 funcs = {}
                 for f in dir(mod):

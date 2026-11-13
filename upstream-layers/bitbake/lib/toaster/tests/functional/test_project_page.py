@@ -16,7 +16,7 @@ from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import TimeoutException
-from tests.functional.functional_helpers import SeleniumFunctionalTestCase
+from tests.functional.functional_helpers import SeleniumFunctionalTestCase, MASTER_PROJECT_ID
 from orm.models import Build, Project, Target
 from selenium.webdriver.common.by import By
 
@@ -29,7 +29,7 @@ class TestProjectPageBase(SeleniumFunctionalTestCase):
     def _navigate_to_project_page(self):
         # Navigate to project page
         if TestProjectPageBase.project_id is None:
-            TestProjectPageBase.project_id = self.create_new_project(self.PROJECT_NAME, '3', None, True)
+            TestProjectPageBase.project_id = self.create_new_project(self.PROJECT_NAME, MASTER_PROJECT_ID, None, True)
 
         url = reverse('project', args=(TestProjectPageBase.project_id,))
         self.get(url)

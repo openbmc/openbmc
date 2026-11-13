@@ -33,7 +33,7 @@ from bb.ui import toasterui
 from bb.ui import eventreplay
 from bb import __version__ as libbb_version
 
-__version__ = "2.19.1"
+__version__ = "2.20.0"
 
 if __name__ == "__main__":
     if __version__ != libbb_version:

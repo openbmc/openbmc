@@ -928,7 +928,7 @@ def get_fetcher_environment(d):
     origenv = d.getVar("BB_ORIGENV")
     for name in bb.fetch.FETCH_EXPORT_VARS:
         value = d.getVar(name)
-        if not value and origenv:
+        if not value and origenv is not None:
             value = origenv.getVar(name)
         if value:
             newenv[name] = value
@@ -961,7 +961,7 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None, extra
     origenv = d.getVar("BB_ORIGENV", False)
     env = os.environ.copy()
     for var in exportvars:
-        val = d.getVar(var) or (origenv and origenv.getVar(var))
+        val = d.getVar(var) or (origenv is not None and origenv.getVar(var))
         if val:
             env[var] = val
 

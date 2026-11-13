@@ -10,7 +10,7 @@
 import re
 from django.urls import reverse
 import pytest
-from tests.functional.functional_helpers import SeleniumFunctionalTestCase
+from tests.functional.functional_helpers import SeleniumFunctionalTestCase, MASTER_PROJECT_ID
 from orm.models import Project
 from selenium.webdriver.common.by import By
 
@@ -25,7 +25,7 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
     def setUp(self):
         super(FuntionalTestBasic, self).setUp()
         if not FuntionalTestBasic.project_id:
-            FuntionalTestBasic.project_id = self.create_new_project('selenium-project', '3', None, False)
+            FuntionalTestBasic.project_id = self.create_new_project('selenium-project', MASTER_PROJECT_ID, None, False)
 
  #  testcase (1515)
     def test_verify_left_bar_menu(self):

@@ -12,7 +12,7 @@ from django.urls import reverse
 from selenium.webdriver import Keys
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import TimeoutException
-from tests.functional.functional_helpers import SeleniumFunctionalTestCase
+from tests.functional.functional_helpers import SeleniumFunctionalTestCase, MASTER_PROJECT_ID
 from selenium.webdriver.common.by import By
 
 from .utils import get_projectId_from_url
@@ -32,7 +32,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
         """ Navigate to project BitBake variables page """
         # check if the menu is displayed
         if TestProjectConfig.project_id is None:
-            TestProjectConfig.project_id = self.create_new_project(self.PROJECT_NAME, '3', None, True)
+            TestProjectConfig.project_id = self.create_new_project(self.PROJECT_NAME, MASTER_PROJECT_ID, None, True)
 
         url = reverse('projectconf', args=(TestProjectConfig.project_id,))
         self.get(url)

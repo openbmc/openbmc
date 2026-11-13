@@ -24,7 +24,7 @@ import bb.siggen
 import bb.msg
 from bb import __version__ as libbb_version
 
-__version__ = "2.19.1"
+__version__ = "2.20.0"
 
 if __version__ != libbb_version:
     sys.exit("Bitbake core library version and program version mismatch!")

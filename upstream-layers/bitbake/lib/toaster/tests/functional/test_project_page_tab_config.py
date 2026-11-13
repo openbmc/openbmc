@@ -13,7 +13,7 @@ from django.urls import reverse
 from selenium.webdriver import Keys
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, TimeoutException
-from tests.functional.functional_helpers import SeleniumFunctionalTestCase
+from tests.functional.functional_helpers import SeleniumFunctionalTestCase, MASTER_PROJECT_ID
 from selenium.webdriver.common.by import By
 
 from .utils import get_projectId_from_url, wait_until_build, wait_until_build_cancelled
@@ -25,7 +25,7 @@ class TestProjectConfigTabBase(SeleniumFunctionalTestCase):
     def _navigate_to_project_page(self):
         # Navigate to project page
         if TestProjectConfigTabBase.project_id is None:
-            TestProjectConfigTabBase.project_id = self.create_new_project(self.PROJECT_NAME, '3', None, True)
+            TestProjectConfigTabBase.project_id = self.create_new_project(self.PROJECT_NAME, MASTER_PROJECT_ID, None, True)
         url = reverse('project', args=(TestProjectConfigTabBase.project_id,))
         self.get(url)
         self.wait_until_visible('#config-nav')
@@ -256,7 +256,7 @@ class TestProjectConfigTab(TestProjectConfigTabBase):
                     - meta-poky
                     - meta-yocto-bsp
         """
-        project_id = self.create_new_project(self.PROJECT_NAME + "-ST", '3', None, True)
+        project_id = self.create_new_project(self.PROJECT_NAME + "-ST", MASTER_PROJECT_ID, None, True)
         url = reverse('project', args=(project_id,))
         self.get(url)
         self.wait_until_visible('#config-nav')
@@ -388,7 +388,7 @@ class TestProjectConfigTab(TestProjectConfigTabBase):
 
     def test_project_page_custom_image_no_image(self):
         """ Test project page tab "New custom image" when no custom image """
-        project_id = self.create_new_project(self.PROJECT_NAME + "-CustomImage", '3', None, True)
+        project_id = self.create_new_project(self.PROJECT_NAME + "-CustomImage", MASTER_PROJECT_ID, None, True)
         url = reverse('project', args=(project_id,))
         self.get(url)
         self.wait_until_visible('#config-nav')
@@ -474,7 +474,7 @@ class TestProjectConfigTabDB(TestProjectConfigTabBase):
             wait_until_build_cancelled(self)
 
         # Create a new project for remaining asserts
-        project_id = self.create_new_project(self.PROJECT_NAME + "-MostBuilt", '2', None, True)
+        project_id = self.create_new_project(self.PROJECT_NAME + "-MostBuilt", MASTER_PROJECT_ID, None, True)
         url = reverse('project', args=(project_id,))
         self.get(url)
         self.wait_until_visible('#config-nav')

@@ -11,7 +11,7 @@ import warnings
 warnings.simplefilter("default")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib'))
 
-__version__ = "2.19.1"
+__version__ = "2.20.0"
 
 import unittest
 try:
@@ -35,6 +35,7 @@ tests = ["bb.tests.codeparser",
          "bb.tests.fetch_import",
          "bb.tests.parse",
          "bb.tests.runqueue",
+         "bb.tests.server",
          "bb.tests.setup",
          "bb.tests.siggen",
          "bb.tests.utils",
