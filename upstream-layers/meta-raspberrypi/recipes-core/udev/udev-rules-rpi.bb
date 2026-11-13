@@ -8,7 +8,12 @@ SRC_URI = " \
 	"
 SRCREV = "5ce3ef2b7f377c23fea440ca9df0e30f3f8447cf"
 
+inherit useradd
+
 INHIBIT_DEFAULT_DEPS = "1"
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "--system i2c; --system spi; --system gpio"
 
 do_install () {
     install -d ${D}${sysconfdir}/udev/rules.d

@@ -7,31 +7,35 @@ name: Compliance
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   dco:
     name: DCO
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - name: Build a temporary DCO image
+          persist-credentials: false
+      - name: Build the DCO image
+        id: docker
         uses: ./.github/actions/docker-build
         with:
           docker_image: dco-check
-          id: ${{ github.event.number }}
       - name: Do DCO check
         run: |
           docker run --rm --security-opt apparmor=unconfined \
+            --label "meta-raspberrypi-ci.runner=$RUNNER_NAME" \
             --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:/work:ro" \
             --env "BASE_REF=$GITHUB_BASE_REF" \
-            "dco-check-${{ github.event.number }}"
-      - name: Cleanup temporary docker image
-        uses: ./.github/actions/docker-clean-image
-        with:
-          docker_image: dco-check-${{ github.event.number }}
+            "${{ steps.docker.outputs.image }}"
+      - name: Cleanup CI docker containers and images
+        uses: ./.github/actions/docker-cleanup
         if: always()
       - name: Cleanup dangling docker images
         uses: ./.github/actions/docker-clean-dangling
@@ -41,9 +45,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Do reuse check
         continue-on-error: true
-        uses: fsfe/reuse-action@v1
+        uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6.0.0

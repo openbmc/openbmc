@@ -8,8 +8,8 @@ Signed-off-by: Peter A. Bigot <pab@pabigot.com>
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
 ---
- usr/bin/bthelper | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ usr/bin/bthelper | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/usr/bin/bthelper b/usr/bin/bthelper
 index 2133fbc..1fc9245 100755
@@ -35,6 +35,15 @@ index 2133fbc..1fc9245 100755
  else
      echo Raspberry Pi BDADDR already set
  fi
+@@ -39,7 +39,7 @@ fi
+ # management interface: without it Secure Simple Pairing stays off and the
+ # SMP channels, which LE pairing needs, are never registered. Leave the
+ # adapter down, so that bluetoothd powers it on itself.
+-/bin/hciconfig $dev down
++/usr/bin/hciconfig $dev down
+ if pidof bluetoothd > /dev/null; then
+     /usr/bin/bluetoothctl power on > /dev/null
+ else
 -- 
 2.31.1
 

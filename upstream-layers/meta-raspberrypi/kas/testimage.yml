@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+header:
+  version: 14
+
+local_conf_header:
+  testimage: |
+    IMAGE_CLASSES += "testimage"
+    TESTIMAGE_AUTO = "1"
+    # Don't testimage initramfs
+    TESTIMAGE_AUTO:pn-core-image-initramfs-boot = "0"
+  kvm: |
+    QEMU_USE_KVM = ""
+  slirp: |
+    TEST_RUNQEMUPARAMS = "slirp"
+  sshd: |
+    IMAGE_FEATURES += "ssh-server-dropbear"
+  sshkeys: |
+    CORE_IMAGE_EXTRA_INSTALL += "ssh-pregen-hostkeys"
+  sshpregen: |
+    # Allow the use of the pregen keys as this is CI so safe
+    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:raspberrypi = "raspberrypi"
+    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:raspberrypi0 = "raspberrypi0"
+    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:raspberrypi2 = "raspberrypi2"
+    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:raspberrypi3-64 = "raspberrypi3-64"
+    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:raspberrypi4-64 = "raspberrypi4-64"
+  failing_tests: |
+    TEST_SUITES:remove = "parselogs"

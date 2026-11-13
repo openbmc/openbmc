@@ -76,14 +76,31 @@ This layer depends on:
 
 ## Quick Start with kas
 
-1. Install kas build tool from PyPi (sudo pip3 install kas)
-2. Set the `machine: ` in kas-poky-rpi.yml to one of the supported boards (see conf/machine/*.conf)
-3. kas build meta-raspberrypi/kas-poky-rpi.yml
-4. Use bmaptool to copy the generated .wic.bz2 file to the SD card
-5. Boot your RPI
+1. Install the kas build tool from PyPI:
 
-To adjust the build configuration with specific options (I2C, SPI, ...), simply add
-a section as follows:
+   ```
+   pip3 install kas
+   ```
+
+2. Select the appropriate machine configuration file from `kas/`
+   (for example `raspberrypi4.yml`, `raspberrypi3-64.yml`, etc.)
+
+3. Run the build:
+
+   ```
+   kas build meta-raspberrypi/kas/<machine>.yml
+   ```
+
+4. Use `bmaptool` to copy the generated `.wic.bz2` image to the SD card
+
+5. Boot your Raspberry Pi
+
+The kas configuration is split into a shared `base.yml` and per-machine
+configuration files. Machine selection is done by choosing the appropriate
+kas file rather than editing a `machine` variable.
+
+To adjust the build configuration with specific options (I2C, SPI, etc.),
+extend the configuration by adding a `local_conf_header` section, for example:
 
 ```
 local_conf_header:
@@ -92,10 +109,16 @@ local_conf_header:
     RPI_EXTRA_CONFIG = "dtoverlay=disable-bt"
 ```
 
-To configure the machine, you have to update the `machine` variable.
-And the same for the `distro`.
+Additional configurations can be layered by including extra kas files. For example,
+to enable runtime testing with `testimage`:
 
-For further information, you can read more at <https://kas.readthedocs.io/en/latest/index.html>
+```
+kas build meta-raspberrypi/kas/raspberrypi4.yml:meta-raspberrypi/kas/testimage.yml
+```
+
+For further details, see the kas documentation:
+https://kas.readthedocs.io/en/latest/index.html
+
 
 ## Contributing
 

@@ -10,7 +10,7 @@ SRC_URI = "\
     git://github.com/RPi-Distro/pi-bluetooth;branch=master;protocol=https \
     file://0001-bthelper-correct-path-for-hciconfig-under-Yocto.patch \
 "
-SRCREV = "87248a382d1a81b80a62730975135d87fffd7ef1"
+SRCREV = "6d8eeb2f3f400b94dbbab548e6a2c1278921506b"
 
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', 'update-rc.d', d)}
 # hciuart.service replaces what was brcm43438.service 

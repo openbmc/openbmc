@@ -1,10 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+#
 header:
-  version: 8
+  version: 14
 
-machine: raspberrypi4
+machine: unset
 distro: poky
 target:
   - core-image-base
+
+defaults:
+  repos:
+    branch: master
 
 repos:
   meta-raspberry:
@@ -12,48 +18,34 @@ repos:
   bitbake:
     url: https://git.openembedded.org/bitbake
     path: layers/bitbake
-    branch: master
     layers:
       bitbake: disabled
 
   openembedded-core:
     url: https://git.openembedded.org/openembedded-core
     path: layers/openembedded-core
-    branch: master
     layers:
       meta:
 
   meta-yocto:
     url: https://git.yoctoproject.org/meta-yocto
     path: layers/meta-yocto
-    branch: master
     layers:
       meta-poky:
-      meta-yocto-bsp:
 
-  meta-openembedded:
-    url: http://git.openembedded.org/meta-openembedded
-    path: layers/meta-openembedded
-    branch: master
-    layers:
-      meta-oe:
-      meta-python:
-      meta-networking:
-      meta-perl:
-
-  meta-qt5:
-    url: https://github.com/meta-qt5/meta-qt5/
-    path: layers/meta-qt5
-    branch: master
+env:
+  BB_LOGCONFIG: ""
+  BB_HASHSERVE: "auto"
 
 bblayers_conf_header:
   standard: |
     POKY_BBLAYERS_CONF_VERSION = "2"
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
+
 local_conf_header:
   reduce_diskspace: |
-    INHERIT += "rm_work_and_downloads"
+    INHERIT += "rm_work"
   standard: |
     CONF_VERSION = "2"
     PACKAGE_CLASSES = "package_rpm"
@@ -72,7 +64,3 @@ local_conf_header:
         HALT,${DL_DIR},100M,1K \
         HALT,${SSTATE_DIR},100M,1K \
         HALT,/tmp,10M,1K"
-  license: |
-    # Uncomment next line to allow the license
-    # See: linux-firmware-rpidistro in docs/ipcompliance.md
-    #LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"

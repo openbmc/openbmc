@@ -180,7 +180,7 @@ IMAGE_CMD:rpi-sdimg () {
     fi
 }
 
-ROOTFS_POSTPROCESS_COMMAND += " rpi_generate_sysctl_config ; "
+ROOTFS_POSTPROCESS_COMMAND += " rpi_generate_sysctl_config"
 
 rpi_generate_sysctl_config() {
     # systemd sysctl config

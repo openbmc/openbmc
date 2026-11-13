@@ -299,6 +299,17 @@ the header extension should set the following in local.conf:
 
     ENABLE_DWC2_HOST = "1"
 
+## Enable USB OTG support
+
+Users who want the DWC2 controller to operate in OTG (dual-role) mode should
+set the following in local.conf:
+
+    ENABLE_DWC2_OTG = "1"
+
+Note that `ENABLE_DWC2_PERIPHERAL`, `ENABLE_DWC2_HOST` and `ENABLE_DWC2_OTG`
+are mutually exclusive. Enabling more than one of them results in a build
+error.
+
 ## Set CPUs to be isolated from the standard Linux scheduler
 
 By default Linux will use all available CPUs for scheduling tasks. For real time
