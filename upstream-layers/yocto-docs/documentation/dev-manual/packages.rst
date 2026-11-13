@@ -33,7 +33,7 @@ or to not install a package at all.
 The following list introduces variables you can use to prevent packages
 from being installed into your image. Each of these variables only works
 with IPK and RPM package types, not for Debian packages.
-Also, you can use these variables from your ``local.conf`` file
+Also, you can use these variables in a distro :term:`configuration file`
 or attach them to a specific image recipe by using a recipe name
 override. For more detail on the variables, see the descriptions in the
 Yocto Project Reference Manual's glossary chapter.
@@ -163,7 +163,7 @@ be consistent and correct with the latest changes.
 The simplest form for a PR Service is for a single host development system
 that builds the package feed (building system). For this scenario, you can
 enable a local PR Service by setting :term:`PRSERV_HOST` in your
-``local.conf`` file in the :term:`Build Directory`::
+:ref:`structure-build-conf-local.conf` file in the :term:`Build Directory`::
 
    PRSERV_HOST = "localhost:0"
 
@@ -179,14 +179,16 @@ you need to start the PR Service using the ``bitbake-prserv`` command::
    bitbake-prserv --host ip --port port --start
 
 In addition to
-hand-starting the service, you need to update the ``local.conf`` file of
+hand-starting the service, you need to update the
+:ref:`structure-build-conf-local.conf` file of
 each building system as described earlier so each system points to the
 server and port.
 
 It is also recommended you use build history, which adds some sanity
 checks to binary package versions, in conjunction with the server that
 is running the PR Service. To enable build history, add the following to
-each building system's ``local.conf`` file::
+each building system's :ref:`structure-build-conf-local.conf` file (or set this
+in your distro :term:`configuration file`)::
 
    # It is recommended to activate "buildhistory" for testing the PR service
    INHERIT += "buildhistory"
@@ -558,10 +560,8 @@ to use. In your configuration, you use the
 :term:`PACKAGE_CLASSES`
 variable to specify the format:
 
-#. Open the ``local.conf`` file inside your :term:`Build Directory` (e.g.
-   ``bitbake-builds/build/conf/local.conf``).
-
-#. Select the desired package format as follows::
+#. Select the desired package format as follows from your
+   :ref:`structure-build-conf-local.conf` or distro :term:`configuration file`::
 
       PACKAGE_CLASSES ?= "package_packageformat"
 
@@ -878,7 +878,7 @@ signed package feeds for IPK and RPM packages.
 
 The steps you need to take to enable signed package feed use are similar
 to the steps used to sign RPM packages. You must define the following in
-your ``local.config`` or ``distro.config`` file::
+your :ref:`structure-build-conf-local.conf` or distro :term:`configuration file`::
 
    INHERIT += "sign_package_feed"
    PACKAGE_FEED_GPG_NAME = "key_name"
@@ -959,7 +959,7 @@ NPM packages:
    part of the OpenEmbedded environment. You need to get the package by
    cloning the :oe_git:`meta-openembedded </meta-openembedded>`
    repository. Be sure to add the path to your local copy
-   to your ``bblayers.conf`` file.
+   to your :ref:`structure-build-conf-bblayers.conf` file.
 
 -  ``devtool`` cannot detect native libraries in module dependencies.
    Consequently, you must manually add packages to your recipe.

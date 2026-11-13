@@ -35,8 +35,8 @@ Enabling and Disabling Build History
 
 Build history is disabled by default. To enable it, add the following
 :term:`INHERIT` statement and set the :term:`BUILDHISTORY_COMMIT` variable to
-"1" at the end of your ``conf/local.conf`` file found in the
-:term:`Build Directory`::
+"1" in a :term:`configuration file`, such as the
+:ref:`structure-build-conf-local.conf` file::
 
    INHERIT += "buildhistory"
    BUILDHISTORY_COMMIT = "1"
@@ -53,7 +53,7 @@ build output information and commit it as a single commit to a local
    during the build.
 
 You can disable build history by removing the previous statements from
-your ``conf/local.conf`` file.
+your :term:`configuration file`.
 
 Understanding What the Build History Contains
 =============================================
@@ -134,7 +134,7 @@ You can use the
 ``buildhistory-collect-srcrevs`` command with the ``-a`` option to
 collect the stored :term:`SRCREV` values from build history and report them
 in a format suitable for use in global configuration (e.g.,
-``local.conf`` or a distro include file) to override floating
+a distro include :term:`configuration file`) to override floating
 :term:`AUTOREV` values to a fixed set of revisions. Here is some example
 output from this command::
 
@@ -260,8 +260,7 @@ dependency graphs, so you can see why something was pulled into the
 image. If you are just interested in this information and not interested
 in collecting specific package or SDK information, you can enable
 writing only image information without any history by adding the
-following to your ``conf/local.conf`` file found in the
-:term:`Build Directory`::
+following to a :term:`configuration file`::
 
    INHERIT += "buildhistory"
    BUILDHISTORY_COMMIT = "0"
@@ -305,8 +304,8 @@ The following list shows the files produced for SDKs:
    specific to the extensible SDK although you can set it differently if
    you would like to pull in specific files from the standard SDK.
 
-   The default files are ``conf/local.conf``, ``conf/bblayers.conf``,
-   ``conf/auto.conf``, ``conf/locked-sigs.inc``, and
+   The default files are :ref:`structure-build-conf-local.conf`, :ref:`structure-build-conf-bblayers.conf`,
+   :ref:`structure-build-conf-auto.conf`, ``conf/locked-sigs.inc``, and
    ``conf/devtool.conf``. Thus, for an extensible SDK, these files get
    copied into the ``sdk-files`` directory.
 

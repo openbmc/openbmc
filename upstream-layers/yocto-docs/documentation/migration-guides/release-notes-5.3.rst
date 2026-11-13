@@ -570,7 +570,7 @@ New Features / Enhancements in |yocto-ver|
    -  Include additional information about Meson setting in the SDK environment
       setup script (host system, CPU family, etc.).
 
-   -  Add Go to :term:`SDK_TOOLCHAIN_LANGS`, except for the following
+   -  Add Go to ``SDK_TOOLCHAIN_LANGS``, except for the following
       architecture on which this is not supported:
 
       -  RISC-V 32 bits (``rv32``)
@@ -648,7 +648,7 @@ New Features / Enhancements in |yocto-ver|
          OOM kills.
 
       -  A new SDK test is now running for Go after ``go`` was added to
-         :term:`SDK_TOOLCHAIN_LANGS`.
+         ``SDK_TOOLCHAIN_LANGS``.
 
       -  Commands sent over SSH (using the ``OESSHTarget`` class) will now error
          when an SSH failure occurs. It is possible to ignore these errors by

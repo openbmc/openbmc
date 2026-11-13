@@ -251,7 +251,7 @@ The following changes have been made for the Poky distribution:
    distribution. The ``meta-yocto-bsp`` layer retains its original name
    since it provides reference machines for the Yocto Project and it is
    otherwise unrelated to Poky. References to ``meta-yocto`` in your
-   ``conf/bblayers.conf`` should automatically be updated, so you should
+   :ref:`structure-build-conf-bblayers.conf` should automatically be updated, so you should
    not need to change anything unless you are relying on this naming
    elsewhere.
 

@@ -88,6 +88,61 @@ Our automated testing includes it through the ``poky-altcfg`` :term:`DISTRO` and
 we don't really need it to be the default: it is tested, it works, and people
 can choose to use it.
 
+Why don't I get an email when my patch merges?
+----------------------------------------------
+
+Where the project uses mailing lists for patch submission, many of the components
+such as bitbake and OpenEmbedded-Core haven't found it appropriate to reply on the
+mailing list for each patch that merges for two main reasons. Firstly, it would
+generate a lot of email traffic with content that may only be useful to a small
+number of people and quite annoying for other uninterested people to filter through.
+That could be avoided by only sending emails direct to the submitters.
+
+Secondly, sending such emails accurately takes time and it wasn't felt to be the
+best use of limited maintainer time. We do track patch status to some level
+in `patchwork <https://patchwork.yoctoproject.org/.>`__ and there is automated
+tooling which could extend on top of that but it hasn't been possible to fit
+that into the projects workflows with enough accuracy at this time.
+
+It is very easy to check whether a patch has merged by looking at the repository, or
+pulling and rebasing.
+
+
+Why doesn't the project use GitHub?
+-----------------------------------
+
+This is not a simple question and there is no right answer to it but there is some
+background worth appreciating.
+
+Some components within the project do accept pull requests from GitHub, others don't.
+The README in the component in question should make the process clear for that
+component. GitHub itself is a commercial operation and there are concerns about what
+happens if they change direction or decide to discontinue it as there is precedent in
+the past for that kind of thing happening. Equally, there are open alternatives to it.
+
+The bigger issue is the model. Mailing lists allow for wide peer review. The people
+performing that review are extremely valuable with experience built up over decades.
+The GitHub model doesn't really lend itself to them being able to easily see or be
+aware of changes beyond the maintainer accepting the pull request. That model also
+tends to focus on the single maintainer with total authority, which for components
+like OE-Core, simply isn't how things operate for us. Moving to such a model would
+alienate our existing reviewers and our community consensus approach to changes.
+
+Another issue is that GitHub and similar forges use the Pull Request mechanism,
+heavily leaning into reviewing and testing the Pull Request as a whole (e.g. the
+automated testing (CI) only runs on the last commit of the Pull Request, and
+per-commit reviews are painful to write and follow-up on). Using GitHub or a
+similar forge would require the project to completely change its reviewing process
+(or have two wildly different processes which would be inconsistent and confusing).
+
+So yes, for a contributor wanting to make a quick submission, GitHub and similar models
+are attractive, but they would likely come at a cost to the project's long term health.
+They can work well for the single or limited number of maintainer model, and for components
+with the setup, but not for other areas which benefit from wide peer review. We live
+in hope that tools can catch up with that, we'd even love to develop them ourselves if
+we had time but sadly, we don't at this point.
+
+
 Building environment
 ====================
 
@@ -119,8 +174,8 @@ of other mirrors including the Yocto Project source mirror if those
 fail.
 
 As an example, you could add a specific server for the build system to
-attempt before any others by adding something like the following to the
-``local.conf`` configuration file::
+attempt before any others by adding something like the following to
+a :term:`configuration file`::
 
    PREMIRRORS:prepend = "\
        git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
@@ -159,8 +214,8 @@ technique is useful if you want to create a mirror server. If not,
 however, the technique can simply waste time during the build.
 
 Finally, consider an example where you are behind an HTTP-only firewall.
-You could make the following changes to the ``local.conf`` configuration
-file as long as the :term:`PREMIRRORS` server is current::
+You could make the following changes to a :term:`configuration
+file` as long as the :term:`PREMIRRORS` server is current::
 
    PREMIRRORS:prepend = "\
        git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \

@@ -113,7 +113,7 @@ variables>` did not work out as expected.
 
 BitBake's ``bitbake-getvar`` command is used to display variable values after
 parsing. The following command displays the variable value for :term:`OVERRIDES`
-after the configuration files (i.e. ``local.conf``, ``bblayers.conf``,
+after the configuration files (i.e. ``local.conf``, :ref:`structure-build-conf-bblayers.conf`,
 ``bitbake.conf`` and so forth) have been parsed::
 
    $ bitbake-getvar OVERRIDES
@@ -787,7 +787,7 @@ In this example, compiling the "neard" package is causing the problem.
 So the first thing to do is build "neard" locally. Before you start the
 build, set the
 :term:`PARALLEL_MAKE` variable
-in your ``local.conf`` file to a high number (e.g. "-j 20"). Using a
+in your :ref:`structure-build-conf-local.conf` file to a high number (e.g. "-j 20"). Using a
 high value for :term:`PARALLEL_MAKE` increases the chances of the race
 condition showing up::
 
@@ -943,7 +943,7 @@ To run a ``debuginfod`` server, you need to do the following:
    (it already is in :term:`OpenEmbedded-Core (OE-Core)` defaults and
    :term:`Poky` reference distribution).
 
-   If not, set in your distro config file or in ``local.conf``::
+   If not, set in your distro :term:`configuration file` or in :ref:`structure-build-conf-local.conf`::
 
       DISTRO_FEATURES:append = " debuginfod"
 
@@ -1010,7 +1010,7 @@ debugger.
 #. *Configure your build system to construct the companion debug
    filesystem:*
 
-   In your ``local.conf`` file, set the following::
+   In your :ref:`structure-build-conf-local.conf` file, set the following::
 
       IMAGE_GEN_DEBUGFS = "1"
       IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
@@ -1029,7 +1029,7 @@ debugger.
 
 #. *Configure the system to include gdbserver in the target filesystem:*
 
-   Make the following addition in your ``local.conf`` file::
+   Make the following addition in your :ref:`structure-build-conf-local.conf` file::
 
       EXTRA_IMAGE_FEATURES:append = " tools-debug"
 
@@ -1165,7 +1165,7 @@ debug on the target hardware.
 To support this kind of debugging, you need do the following:
 
 -  Ensure that GDB is on the target. You can do this by making
-   the following addition to your ``local.conf`` file::
+   the following addition to your :ref:`structure-build-conf-local.conf` file::
 
       EXTRA_IMAGE_FEATURES:append = " tools-debug"
 
@@ -1174,7 +1174,7 @@ To support this kind of debugging, you need do the following:
 
       IMAGE_INSTALL:append = " packagename-dbg"
 
-   Alternatively, you can add the following to ``local.conf`` to include
+   Alternatively, you can add the following to :ref:`structure-build-conf-local.conf` to include
    all the debug symbols::
 
       EXTRA_IMAGE_FEATURES:append = " dbg-pkgs"
@@ -1183,7 +1183,7 @@ To support this kind of debugging, you need do the following:
 
    To improve the debug information accuracy, you can reduce the level
    of optimization used by the compiler. For example, when adding the
-   following line to your ``local.conf`` file, you will reduce optimization
+   following line to your :ref:`structure-build-conf-local.conf` file, you will reduce optimization
    from :term:`FULL_OPTIMIZATION` of "-O2" to :term:`DEBUG_OPTIMIZATION`
    of "-O -fno-omit-frame-pointer"::
 

@@ -116,9 +116,10 @@ Using Multilib
 --------------
 
 After you have set up the recipes, you need to define the actual
-combination of multiple libraries you want to build. You accomplish this
-through your ``local.conf`` configuration file in the
-:term:`Build Directory`. An example configuration would be as follows::
+combination of multiple libraries you want to build. You can accomplish this
+through your :ref:`structure-build-conf-local.conf` configuration file in the
+:term:`Build Directory`, or a custom machine :term:`configuration file`. An
+example configuration would be as follows::
 
    MACHINE = "qemux86-64"
    require conf/multilib.conf

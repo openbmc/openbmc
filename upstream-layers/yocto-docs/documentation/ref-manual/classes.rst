@@ -288,11 +288,8 @@ to ``${TMPDIR}/buildstats/``. You can analyze the elapsed time using
 chart of the entire build process and can be useful for highlighting
 bottlenecks.
 
-Collecting build statistics is enabled by default through the
-:term:`USER_CLASSES` variable from your
-``local.conf`` file. Consequently, you do not have to do anything to
-enable the class. However, if you want to disable the class, simply
-remove ":ref:`ref-classes-buildstats`" from the :term:`USER_CLASSES` list.
+If you want to enable the class, you can add ":ref:`ref-classes-buildstats`" to
+the :term:`USER_CLASSES` variable.
 
 .. _ref-classes-buildstats-summary:
 
@@ -1319,8 +1316,7 @@ information on how to build an :term:`Initramfs`, see the
 the Yocto Project Development Tasks Manual.
 
 Various other classes are used by the :ref:`ref-classes-kernel` and :ref:`ref-classes-module` classes
-internally including the :ref:`ref-classes-kernel-arch`, :ref:`ref-classes-module-base`, and
-:ref:`ref-classes-linux-kernel-base` classes.
+internally including the :ref:`ref-classes-kernel-arch` and :ref:`ref-classes-module-base` classes.
 
 .. _ref-classes-kernel-arch:
 
@@ -1599,16 +1595,6 @@ The :ref:`ref-classes-libc*` classes support recipes that build packages with ``
 The :ref:`ref-classes-license` class provides license manifest creation and license
 exclusion. This class is enabled by default using the default value for
 the :term:`INHERIT_DISTRO` variable.
-
-.. _ref-classes-linux-kernel-base:
-
-``linux-kernel-base``
-=====================
-
-The :ref:`ref-classes-linux-kernel-base` class provides common functionality for
-recipes that build out of the Linux kernel source tree. These builds
-goes beyond the kernel itself. For example, the Perf recipe also
-inherits this class.
 
 .. _ref-classes-linuxloader:
 
@@ -2013,9 +1999,9 @@ code specific to particular package types resides in these
 package-specific classes: :ref:`ref-classes-package_deb`,
 :ref:`ref-classes-package_rpm`, :ref:`ref-classes-package_ipk`.
 
-You can control the list of resulting package formats by using the
-:term:`PACKAGE_CLASSES` variable defined in your ``conf/local.conf``
-configuration file, which is located in the :term:`Build Directory`.
+You can control the list of resulting package formats by setting the
+:term:`PACKAGE_CLASSES` variable in your :ref:`structure-build-conf-local.conf`
+file or distro :term:`configuration file`.
 When defining the variable, you can specify one or more package types.
 Since images are generated from packages, a packaging class is needed
 to enable image generation. The first class listed in this variable is
@@ -2068,7 +2054,7 @@ packages are written out in a ``.deb`` file format to the
 
 This class inherits the :ref:`ref-classes-package` class and
 is enabled through the :term:`PACKAGE_CLASSES`
-variable in the ``local.conf`` file.
+variable.
 
 .. _ref-classes-package_ipk:
 
@@ -2082,7 +2068,7 @@ are written out in a ``.ipk`` file format to the
 
 This class inherits the :ref:`ref-classes-package` class and
 is enabled through the :term:`PACKAGE_CLASSES`
-variable in the ``local.conf`` file.
+variable.
 
 .. _ref-classes-package_rpm:
 
@@ -2096,7 +2082,7 @@ are written out in a ``.rpm`` file format to the
 
 This class inherits the :ref:`ref-classes-package` class and
 is enabled through the :term:`PACKAGE_CLASSES`
-variable in the ``local.conf`` file.
+variable.
 
 .. _ref-classes-packagedata:
 
@@ -2205,6 +2191,18 @@ for setuptools_rust and another "backend" for building Python Wheels.
 
 The :ref:`ref-classes-python_mesonpy` class enables building Python modules which use the
 meson-python build system.
+
+Internally this uses the :ref:`ref-classes-python_pep517` class.
+
+.. _ref-classes-python_pbr:
+
+``python_pbr``
+==============
+
+The :ref:`ref-classes-python_pbr` class enables building Python projects which
+use the `Python Build Reasonableness <https://pypi.org/project/pbr/>`__ backend.
+
+This class adds ``python3-pbr-native`` to the recipe's build-time dependencies.
 
 Internally this uses the :ref:`ref-classes-python_pep517` class.
 
@@ -2619,7 +2617,8 @@ recipe are no longer needed. However, by default, the build system
 preserves these files for inspection and possible debugging purposes. If
 you would rather have these files deleted to save disk space as the build
 progresses, you can enable :ref:`ref-classes-rm-work` by adding the following to
-your ``local.conf`` file, which is found in the :term:`Build Directory`::
+your :ref:`structure-build-conf-local.conf` file, which is found in the
+:term:`Build Directory`::
 
    INHERIT += "rm_work"
 
@@ -2628,7 +2627,8 @@ recipe, enabling :ref:`ref-classes-rm-work` will potentially result in your
 changes to the source being lost. To exclude some recipes from having their work
 directories deleted by :ref:`ref-classes-rm-work`, you can add the names of the
 recipe or recipes you are working on to the :term:`RM_WORK_EXCLUDE` variable,
-which can also be set in your ``local.conf`` file. Here is an example::
+which can also be set in your :ref:`structure-build-conf-local.conf` file. Here
+is an example::
 
    RM_WORK_EXCLUDE += "busybox glibc"
 
@@ -2709,7 +2709,7 @@ It is used to generate a JSON specification file from the features listed in
 The :ref:`ref-classes-sanity` class checks to see if prerequisite software is present
 on the host system so that users can be notified of potential problems
 that might affect their build. The class also performs basic user
-configuration checks from the ``local.conf`` configuration file to
+configuration checks from the :ref:`structure-build-conf-local.conf` configuration file to
 prevent common mistakes that cause build failures. Distribution policy
 usually determines whether to include this class.
 
@@ -3852,7 +3852,8 @@ using the Vala programming language.
 The :ref:`ref-classes-vex` class is used to generate metadata needed by external
 tools to check for vulnerabilities, for example CVEs.
 
-In order to use this class, inherit the class in the ``local.conf`` file and it
+In order to use this class, inherit the class in your
+:ref:`structure-build-conf-local.conf` or distro :term:`configuration file` and it
 will add the ``generate_vex`` task for every recipe::
 
    INHERIT += "vex"

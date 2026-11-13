@@ -116,3 +116,13 @@ Release notes and migration guides for the different Yocto Project releases.
    :hidden:
 
    downloads
+
+Governance and History
+======================
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Governance and History
+   :hidden:
+
+   Governance and History <governance/index>

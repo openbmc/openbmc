@@ -242,7 +242,7 @@ New Features / Enhancements in 4.2
 -  bitbake-layers improvements:
 
    -  ``layerindex-fetch``: checkout layer(s) branch when clone exists
-   -  ``create``: add ``-a``/``--add-layer option`` to add layer to ``bblayers.conf`` after creating layer
+   -  ``create``: add ``-a``/``--add-layer option`` to add layer to :ref:`structure-build-conf-bblayers.conf` after creating layer
    -  ``show-layers``: improve output layout
 
 -  Other BitBake improvements:

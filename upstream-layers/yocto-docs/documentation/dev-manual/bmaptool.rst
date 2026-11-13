@@ -28,8 +28,9 @@ Following, is an example that shows how to flash a Wic image. Realize
 that while this example uses a Wic image, you can use `bmaptool` to flash
 any type of image. Use these steps to flash an image using `bmaptool`:
 
-#. *Update your local.conf File:* You need to have the following set
-   in your ``local.conf`` file before building your image::
+#. *Update your image types:* You need to have the :term:`IMAGE_FSTYPES`
+   set in image recipe, distro :term:`configuration file` or
+   :ref:`structure-build-conf-local.conf` file before building your image::
 
       IMAGE_FSTYPES += "wic wic.bmap"
 

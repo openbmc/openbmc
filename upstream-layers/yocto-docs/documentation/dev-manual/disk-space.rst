@@ -7,7 +7,7 @@ Conserving Disk Space During Builds
 ===================================
 
 To help conserve disk space during builds, you can add the following
-statement to your project's ``local.conf`` configuration file found in
+statement to your project's :ref:`structure-build-conf-local.conf` configuration file found in
 the :term:`Build Directory`::
 
    INHERIT += "rm_work"

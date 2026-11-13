@@ -144,7 +144,7 @@ Fixes in Yocto-4.1.1
 -  ref-manual: add :term:`OVERLAYFS_QA_SKIP`
 -  ref-manual: add previous overlayfs-etc variables
 -  ref-manual: add pypi class
--  ref-manual: add :term:`SDK_TOOLCHAIN_LANGS`
+-  ref-manual: add ``SDK_TOOLCHAIN_LANGS``
 -  ref-manual: add section for create-spdx class
 -  ref-manual: add serial-autologin-root to :term:`IMAGE_FEATURES` documentation
 -  ref-manual: add :term:`UBOOT_MKIMAGE_KERNEL_TYPE`

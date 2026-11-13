@@ -55,9 +55,10 @@ particular working environment and set of practices.
 #.  *Gather the Hardware:* Based on the size and make-up of the team,
     get the hardware together. Ideally, any development, build, or test
     engineer uses a system that runs a supported Linux distribution.
-    These systems, in general, should be high performance (e.g. dual,
-    six-core Xeons with 24 Gbytes of RAM and plenty of disk space). You
-    can help ensure efficiency by having any machines used for testing
+    These systems, in general, should be high performance (e.g. a minimum
+    of &MIN_RAM; Gbytes of RAM, at least &MIN_DISK_SPACE; Gbytes of disk space
+    and a minimum of &MIN_CPU_CORES; CPU cores).
+    You can help ensure efficiency by having any machines used for testing
     or that run Autobuilders be as high performance as possible.
 
     .. note::
@@ -299,8 +300,7 @@ Project Build Host:
    officially supported. For a list of the distributions under
    validation and their status, see the ":ref:`Supported Linux
    Distributions <system-requirements-supported-distros>`"
-   section in the Yocto Project Reference Manual and the wiki page at
-   :yocto_wiki:`Distribution Support </Distribution_Support>`.
+   section in the Yocto Project Reference Manual.
 
 #. *Have Enough Free Memory:* Your system should have at least 50 Gbytes
    of free disk space for building images.

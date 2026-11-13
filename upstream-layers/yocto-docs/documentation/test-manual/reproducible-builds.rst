@@ -94,12 +94,12 @@ run::
 This defaults to including a ``world`` build so, if other layers are added, it
 would also run the tests for recipes in the additional layers. Different build
 targets can be defined using the :term:`OEQA_REPRODUCIBLE_TEST_TARGET` variable
-in ``local.conf``. For example, running reproducibility tests for only the
+in :ref:`structure-build-conf-local.conf`. For example, running reproducibility tests for only the
 ``python3-numpy`` recipe can be done by setting::
 
    OEQA_REPRODUCIBLE_TEST_TARGET = "python3-numpy"
 
-in local.conf before running the ``oe-selftest`` command shown above.
+in :ref:`structure-build-conf-local.conf` before running the ``oe-selftest`` command shown above.
 
 Reproducibility builds the target list twice. The first build will be run using
 :ref:`Shared State <overview-manual/concepts:Shared State>` if available, the
@@ -150,7 +150,7 @@ Using :term:`OEQA_REPRODUCIBLE_TEST_* <OEQA_REPRODUCIBLE_TEST_LEAF_TARGETS>` var
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to test the reproducibility of a set of recipes, you can define
-:term:`OEQA_REPRODUCIBLE_TEST_LEAF_TARGETS`, in your local.conf::
+:term:`OEQA_REPRODUCIBLE_TEST_LEAF_TARGETS`, in your :ref:`structure-build-conf-local.conf`::
 
    OEQA_REPRODUCIBLE_TEST_LEAF_TARGETS = "my-recipe"
 

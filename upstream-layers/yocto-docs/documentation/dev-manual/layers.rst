@@ -75,7 +75,7 @@ Follow these general steps to create your layer without using tools:
       Add your new layer with 'bitbake-layers add-layer meta-scottrif'
 
    In order to use a layer with the :term:`OpenEmbedded Build System`, you
-   need to add the layer to your ``bblayers.conf`` configuration
+   need to add the layer to your :ref:`structure-build-conf-bblayers.conf` configuration
    file, as hinted by the previous command. See the
    ":ref:`dev-manual/layers:adding a layer using the \`\`bitbake-layers\`\`
    script`" section for more information.
@@ -219,7 +219,7 @@ following list:
       The dependency is created during any
       build that includes the layer ``meta-one``. However, you might not
       want this dependency for all machines. For example, suppose you
-      are building for machine "two" but your ``bblayers.conf`` file has
+      are building for machine "two" but your :ref:`structure-build-conf-bblayers.conf` file has
       the ``meta-one`` layer included. During the build, the
       ``base-files`` for machine "two" will also have the dependency on
       ``foo``.
@@ -267,7 +267,7 @@ following list:
       The build for machine "one" will pick up your machine-specific file as
       long as you have the file in
       ``meta-one/recipes-core/base-files/base-files/``. However, if you
-      are building for a different machine and the ``bblayers.conf``
+      are building for a different machine and the :ref:`structure-build-conf-bblayers.conf`
       file includes the ``meta-one`` layer and the location of your
       machine-specific file is the first location where that file is
       found according to :term:`FILESPATH`, builds for all machines will
@@ -466,7 +466,7 @@ Enabling Your Layer
 
 Before the OpenEmbedded build system can use your new layer, you need to
 enable it. To enable your layer, simply add your layer's path to the
-:term:`BBLAYERS` variable in your ``conf/bblayers.conf`` file, which is
+:term:`BBLAYERS` variable in your :ref:`structure-build-conf-bblayers.conf` file, which is
 found in the :term:`Build Directory`. The following example shows how to
 enable your new ``meta-mylayer`` layer (note how your new layer exists
 outside of the official ``poky`` repository which you would have checked
@@ -485,7 +485,7 @@ out earlier)::
        "
 
 BitBake parses each ``conf/layer.conf`` file from the top down as
-specified in the :term:`BBLAYERS` variable within the ``conf/bblayers.conf``
+specified in the :term:`BBLAYERS` variable within the :ref:`structure-build-conf-bblayers.conf`
 file. During the processing of each ``conf/layer.conf`` file, BitBake
 adds the recipes, classes and configurations contained within the
 particular layer to the source directory.
@@ -607,7 +607,7 @@ important as it ensures that items in the list remain colon-separated.
    append file would not even use the :term:`FILESEXTRAPATHS` statement.
 
 The end result of this ``.bbappend`` file is that on a Raspberry Pi, where
-``rpi`` will exist in the list of :term:`OVERRIDES`, the file
+``rpi`` will exist in the list of :term:`FILESOVERRIDES`, the file
 ``meta-raspberrypi/recipes-bsp/formfactor/formfactor/rpi/machconfig`` will be
 used during :ref:`ref-tasks-fetch` and the test for a non-zero file size in
 :ref:`ref-tasks-install` will return true, and the file will be installed.
@@ -667,7 +667,7 @@ file is in the layer at ``recipes-graphics/xorg-xserver``::
 Building off of the previous example, we once again are setting the
 :term:`FILESEXTRAPATHS` variable.  In this case we are also using
 :term:`SRC_URI` to list additional source files to use when ``rpi`` is found in
-the list of :term:`OVERRIDES`.  The :ref:`ref-tasks-install` task will then perform a
+the list of :term:`FILESOVERRIDES`.  The :ref:`ref-tasks-install` task will then perform a
 check for an additional :term:`MACHINE_FEATURES` that if set will cause these
 additional files to be installed.  These additional files are listed in
 :term:`FILES` so that they will be packaged.
@@ -822,9 +822,9 @@ The following list describes the available commands:
 -  ``show-cross-depends:`` Lists dependency relationships between
    recipes that cross layer boundaries.
 
--  ``add-layer:`` Adds a layer to ``bblayers.conf``.
+-  ``add-layer:`` Adds a layer to :ref:`structure-build-conf-bblayers.conf`.
 
--  ``remove-layer:`` Removes a layer from ``bblayers.conf``
+-  ``remove-layer:`` Removes a layer from :ref:`structure-build-conf-bblayers.conf`
 
 -  ``flatten:`` Flattens the layer configuration into a separate
    output directory. Flattening your layer configuration builds a
@@ -870,13 +870,13 @@ The following list describes the available commands:
 
 -  ``layerindex-fetch``: Fetches a layer from a layer index, along
    with its dependent layers, and adds the layers to the
-   ``conf/bblayers.conf`` file.
+   :ref:`structure-build-conf-bblayers.conf` file.
 
 -  ``layerindex-show-depends``: Finds layer dependencies from the
    layer index.
 
 -  ``save-build-conf``: Saves the currently active build configuration
-   (``conf/local.conf``, ``conf/bblayers.conf``) as a template into a layer.
+   (:ref:`structure-build-conf-local.conf`, :ref:`structure-build-conf-bblayers.conf`) as a template into a layer.
    This template can later be used for setting up builds via :term:`TEMPLATECONF`.
    For information about saving and using configuration templates, see
    ":ref:`dev-manual/custom-template-configuration-directory:creating a custom template configuration directory`".
@@ -893,7 +893,7 @@ Adding a Layer Using the ``bitbake-layers`` Script
 ==================================================
 
 Once you create your general layer, you must add it to your
-``bblayers.conf`` file. Adding the layer to this configuration file
+:ref:`structure-build-conf-bblayers.conf` file. Adding the layer to this configuration file
 makes the OpenEmbedded build system aware of your layer so that it can
 search it for metadata.
 
@@ -904,7 +904,7 @@ Add your layer by using the ``bitbake-layers add-layer`` command::
 Here is an example that adds a
 layer named ``meta-scottrif`` to the configuration file. Following the
 command that adds the layer is another ``bitbake-layers`` command that
-shows the layers that are in your ``bblayers.conf`` file:
+shows the layers that are in your :ref:`structure-build-conf-bblayers.conf` file:
 
 .. code-block:: console
 

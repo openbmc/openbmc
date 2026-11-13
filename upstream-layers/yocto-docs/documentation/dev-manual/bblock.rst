@@ -72,7 +72,7 @@ To unlock all recipes, do not specify any recipe::
 Configuration file
 ------------------
 
-``bblock`` will dump the signatures in the ``build/conf/bblock.conf`` file,
+``bblock`` will dump the signatures in the :ref:`structure-build-conf-bblock.conf` file,
 included by default in :oe_git:`meta/conf/bitbake.conf </openembedded-core/tree/meta/conf/bitbake.conf>`.
 
 To dump the file, use the ``-d`` option::

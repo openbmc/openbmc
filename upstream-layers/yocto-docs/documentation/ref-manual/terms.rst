@@ -195,19 +195,31 @@ universal, the list includes them just in case:
       build system what to build and what to put into the image to support a
       particular platform.
 
-      Configuration files end with a ``.conf`` filename extension. The
-      :file:`conf/local.conf` configuration file in the :term:`Build Directory`
-      contains user-defined variables that affect every build. The
-      :file:`meta-poky/conf/distro/poky.conf` configuration file defines Yocto
-      "distro" configuration variables used only when building with this
-      policy. Machine configuration files, which are located throughout the
-      :term:`Source Directory`, define variables for specific hardware and are
-      only used when building for that target (e.g. the
-      :file:`machine/beaglebone.conf` configuration file defines variables for
-      the Texas Instruments ARM Cortex-A8 development board).
-      :term:`Configuration Fragments <Configuration Fragment>` such as
-      :ref:`ref-fragments-core-yocto-sstate-mirror-cdn` define snippets of
-      configuration that can be enabled from the command-line.
+      Configuration files end with a ``.conf`` filename extension. There are
+      multiple types of configuration files, such as:
+
+      -  The :ref:`structure-build-conf-local.conf` configuration file in the
+         :term:`Build Directory` contains user-defined variables that affect
+         every build.
+
+      -  The :file:`meta-poky/conf/distro/poky.conf` configuration file defines
+         Yocto "distro" configuration variables used only when building with
+         this policy. See the :ref:`dev-manual/custom-distribution:creating your
+         own distribution` section of the Yocto Project Reference Manual for
+         more information.
+
+      -  Machine configuration files, which are located in
+         :ref:`bsp-manual/bsp:BSP Layers`, define variables for specific
+         hardware and are only used when building for that target (e.g. the
+         :file:`machine/beaglebone.conf` configuration file defines variables
+         for the Texas Instruments ARM Cortex-A8 development board).
+
+      -  :term:`Configuration Fragments <Configuration Fragment>` such as
+         :ref:`ref-fragments-core-yocto-sstate-mirror-cdn` define snippets of
+         configuration that can be enabled from the command-line.
+
+      See also the :doc:`/ref-manual/structure` section of the Yocto Project
+      Reference Manual for more example of configuration files.
 
    :term:`Configuration Fragment`
       A :term:`Configuration Fragment` (also called Standard :term:`Configuration
@@ -254,11 +266,11 @@ universal, the list includes them just in case:
    :term:`Container Layer`
       A flexible definition that typically refers to a single Git checkout
       which contains multiple (and typically related) sub-layers which can
-      be included independently in your project's ``bblayers.conf`` file.
+      be included independently in your project's :ref:`structure-build-conf-bblayers.conf` file.
 
       In some cases, such as with OpenEmbedded's :oe_git:`meta-openembedded </meta-openembedded>`
       layer, the top level ``meta-openembedded/`` directory is not itself an actual layer,
-      so you would never explicitly include it in a ``bblayers.conf`` file;
+      so you would never explicitly include it in a :ref:`structure-build-conf-bblayers.conf` file;
       rather, you would include any number of its layer subdirectories, such as
       :oe_git:`meta-oe </meta-openembedded/tree/meta-oe>`, :oe_git:`meta-python
       </meta-openembedded/tree/meta-python>` and so on.
@@ -267,7 +279,7 @@ universal, the list includes them just in case:
       :yocto_git:`meta-security </meta-security>`)
       have a top-level directory that is itself an actual layer, as well as
       a variety of sub-layers, both of which could be included in your
-      ``bblayers.conf`` file.
+      :ref:`structure-build-conf-bblayers.conf` file.
 
       In either case, the phrase "container layer" is simply used to describe
       a directory structure which contains multiple valid OpenEmbedded layers.

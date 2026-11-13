@@ -95,7 +95,7 @@ Once you start running the tests, the following happens:
    to reach the login prompt. You can change the timeout period by
    setting
    :term:`TEST_QEMUBOOT_TIMEOUT`
-   in the ``local.conf`` file.
+   in a :term:`configuration file`.
 
 #. Once the boot process is reached and the login prompt appears, the
    tests run. The full boot log is written to
@@ -223,7 +223,7 @@ The final thing you need to do when setting :term:`TEST_TARGET` to
 "SystemdbootTarget" is to set up the test image:
 
 #. *Set up your local.conf file:* Make sure you have the following
-   statements in your ``local.conf`` file::
+   statements in your :ref:`structure-build-conf-local.conf` file::
 
       IMAGE_FSTYPES += "tar.gz"
       IMAGE_CLASSES += "testimage"
@@ -244,7 +244,7 @@ power:
    :term:`TEST_POWERCONTROL_EXTRA_ARGS` as a command that runs on the host
    and does power cycling. The test code passes one argument to that
    command: off, on or cycle (off then on). Here is an example that
-   could appear in your ``local.conf`` file::
+   could appear in your :ref:`structure-build-conf-local.conf` file::
 
       TEST_POWERCONTROL_CMD = "powercontrol.exp test 10.11.12.1 nuc1"
 
@@ -318,7 +318,7 @@ You can start the tests automatically or manually:
 
 -  *Automatically running tests:* To run the tests automatically after the
    OpenEmbedded build system successfully creates an image, first set the
-   :term:`TESTIMAGE_AUTO` variable to "1" in your ``local.conf`` file in the
+   :term:`TESTIMAGE_AUTO` variable to "1" in your :ref:`structure-build-conf-local.conf` file in the
    :term:`Build Directory`::
 
       TESTIMAGE_AUTO = "1"
@@ -330,7 +330,7 @@ You can start the tests automatically or manually:
 
 -  *Manually running tests:* To manually run the tests, first globally
    inherit the :ref:`ref-classes-testimage` class by editing your
-   ``local.conf`` file::
+   :ref:`structure-build-conf-local.conf` file::
 
       IMAGE_CLASSES += "testimage"
 
@@ -346,7 +346,7 @@ individual tests. Tests are usually grouped together by the area tested
 
 You can add tests to any layer provided you place them in the proper
 area and you extend :term:`BBPATH` in
-the ``local.conf`` file as normal. Be sure that tests reside in
+the :ref:`structure-build-conf-local.conf` file as normal. Be sure that tests reside in
 ``layer/lib/oeqa/runtime/cases``.
 
 .. note::
@@ -356,7 +356,7 @@ the ``local.conf`` file as normal. Be sure that tests reside in
 
 You can change the set of tests run by appending or overriding
 :term:`TEST_SUITES` variable in
-``local.conf``. Each name in :term:`TEST_SUITES` represents a required test
+:ref:`structure-build-conf-local.conf`. Each name in :term:`TEST_SUITES` represents a required test
 for the image. Test modules named within :term:`TEST_SUITES` cannot be
 skipped even if a test is not suitable for an image (e.g. running the
 RPM tests on an image without ``rpm``). Appending "auto" to
@@ -401,7 +401,7 @@ test execution off to a scheduler. You can only export tests that are
 defined in :term:`TEST_SUITES`.
 
 If your image is already built, make sure the following are set in your
-``local.conf`` file::
+:ref:`structure-build-conf-local.conf` file::
 
    IMAGE_CLASSES += "testexport"
    TEST_TARGET_IP = "IP-address-for-the-test-target"

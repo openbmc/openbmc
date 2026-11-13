@@ -122,12 +122,12 @@ Reference Manual provides details about classes and how to use them.
 Configurations
 --------------
 
-The configuration files (``.conf``) define various configuration
+The :term:`configuration files <Configuration File>` (``.conf``) define various configuration
 variables that govern the OpenEmbedded build process. These files fall
 into several areas that define machine configuration options,
 distribution configuration options, compiler tuning options, general
 common configuration options, and user configuration options in
-``conf/local.conf``, which is found in the :term:`Build Directory`.
+:ref:`structure-build-conf-local.conf`, which is found in the :term:`Build Directory`.
 
 
 Layers
@@ -228,8 +228,9 @@ the Build Environment>`, you can specify which directory will be the
 Setting up the build environment creates a :term:`Build Directory`
 if one does not already exist. BitBake uses the :term:`Build Directory`
 for all its work during builds. The Build Directory has a ``conf`` subdirectory
-that contains default versions of your ``local.conf`` and ``bblayers.conf``
-configuration files. These default :term:`configuration files <Configuration
+that contains default versions of your :ref:`structure-build-conf-local.conf`
+and :ref:`structure-build-conf-bblayers.conf`
+:term:`configuration files <Configuration File>`. These default :term:`configuration files <Configuration
 File>` are created only if they do not already exist in the :term:`Build
 Directory` at the time you source the build environment setup script.
 
@@ -272,23 +273,23 @@ Here is a non-exhaustive list:
 
 .. note::
 
-   Configurations set in the ``conf/local.conf`` file can also be set
-   in the ``conf/site.conf`` and ``conf/auto.conf`` configuration files.
+   Configurations set in the :ref:`structure-build-conf-local.conf` file can also be set
+   in the :ref:`structure-build-conf-site.conf` and :ref:`structure-build-conf-auto.conf` configuration files.
 
-The ``bblayers.conf`` file tells BitBake what layers you want considered
+The :ref:`structure-build-conf-bblayers.conf` file tells BitBake what layers you want considered
 during the build. By default, the layers listed in this file include
 layers minimally needed by the build system. However, you must manually
 add any custom layers you have created. You can find more information on
-working with the ``bblayers.conf`` file in the
+working with the :ref:`structure-build-conf-bblayers.conf` file in the
 ":ref:`dev-manual/layers:enabling your layer`"
 section in the Yocto Project Development Tasks Manual.
 
-The files ``site.conf`` and ``auto.conf`` are not created by the
-environment initialization script. If you want the ``site.conf`` file,
-you need to create it yourself. The ``auto.conf`` file is typically
+The files ``site.conf`` and :ref:`structure-build-conf-auto.conf` are not created by the
+environment initialization script. If you want the :ref:`structure-build-conf-auto.conf` file,
+you need to create it yourself. The :ref:`structure-build-conf-auto.conf` file is typically
 created by an autobuilder:
 
--  *site.conf:* You can use the ``conf/site.conf`` configuration
+-  *site.conf:* You can use the :ref:`structure-build-conf-site.conf` configuration
    file to configure multiple build directories. For example, suppose
    you had several build environments and they shared some common
    features. You can set these default build properties here. A good
@@ -297,7 +298,7 @@ created by an autobuilder:
 
 -  *auto.conf:* The file is usually created and written to by an
    autobuilder. The settings put into the file are typically the same as
-   you would find in the ``conf/local.conf`` or the ``conf/site.conf``
+   you would find in the :ref:`structure-build-conf-local.conf` or the :ref:`structure-build-conf-site.conf`
    files.
 
 You can edit all configuration files to further define any particular
@@ -308,16 +309,16 @@ When you launch your build with the ``bitbake target`` command, BitBake
 sorts out the configurations to ultimately define your build
 environment. It is important to understand that the
 :term:`OpenEmbedded Build System` reads the
-configuration files in a specific order: ``site.conf``, ``auto.conf``,
-and ``local.conf``. And, the build system applies the normal assignment
+configuration files in a specific order: ``site.conf``, :ref:`structure-build-conf-auto.conf`,
+and :ref:`structure-build-conf-local.conf`. And, the build system applies the normal assignment
 statement rules as described in the
 ":doc:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata`" chapter
 of the BitBake User Manual. Because the files are parsed in a specific
 order, variable assignments for the same variable could be affected. For
-example, if the ``auto.conf`` file and the ``local.conf`` set variable1
-to different values, because the build system parses ``local.conf``
-after ``auto.conf``, variable1 is assigned the value from the
-``local.conf`` file.
+example, if the :ref:`structure-build-conf-auto.conf` file and the ``local.conf`` set variable1
+to different values, because the build system parses :ref:`structure-build-conf-local.conf`
+after :ref:`structure-build-conf-auto.conf`, variable1 is assigned the value from the
+:ref:`structure-build-conf-local.conf` file.
 
 Metadata, Machine Configuration, and Policy Configuration
 ---------------------------------------------------------
@@ -388,7 +389,7 @@ Repositories <>` also shows layers categorized under "Yocto Metadata Layers."
    found in the OpenEmbedded Layer Index. Such layers are either
    deprecated or experimental in nature.
 
-BitBake uses the ``conf/bblayers.conf`` file, which is part of the user
+BitBake uses the :ref:`structure-build-conf-bblayers.conf` file, which is part of the user
 configuration, to find what layers it should be using as part of the
 build.
 
@@ -399,7 +400,7 @@ A distribution layer provides policy configurations for your
 distribution. Best practices dictate that you isolate these types of
 configurations into their own layer. Settings you provide in
 ``conf/distro/distro.conf`` override similar settings that BitBake finds
-in your ``conf/local.conf`` file in the :term:`Build Directory`.
+in your :ref:`structure-build-conf-local.conf` file in the :term:`Build Directory`.
 
 The following list provides some explanation and references for what you
 typically find in a distribution layer (recall that
@@ -537,7 +538,7 @@ source tree used by the group).
 
 The canonical method through which to include a local project is to use the
 :ref:`ref-classes-externalsrc` class to include that local project. You use
-either ``local.conf`` or a recipe's append file to override or set the
+either :ref:`structure-build-conf-local.conf` or a recipe's append file to override or set the
 recipe to point to the local directory from which to fetch the source.
 
 Source Control Managers (Optional)

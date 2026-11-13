@@ -1,0 +1,81 @@
+---
+config:
+  theme: base
+  look: classic
+  htmlLabels: false
+  fontFamily: '"Nimbus Sans", Helvetica, Arial, sans-serif'
+  fontSize: 13.33
+  themeVariables:
+    primaryColor: "#99c1f1"
+    primaryBorderColor: "#62a0ea"
+    primaryTextColor: "#000000"
+    lineColor: "#000000"
+    edgeLabelBackground: "#ffffff"
+    clusterBkg: "#f6f5f4"
+    clusterBorder: "#c0bfbc"
+    titleColor: "#000000"
+    fontSize: 13.33px
+  themeCSS: |
+    .cluster-label tspan { font-weight: bold; }
+    rect { rx: 7.5px; ry: 7.5px; }
+  flowchart:
+    htmlLabels: false
+    useMaxWidth: false
+    curve: basis
+    padding: 10
+    nodeSpacing: 23
+    rankSpacing: 37
+    wrappingWidth: 300
+---
+%% Regenerate: npx -y @mermaid-js/mermaid-cli -b transparent -i devtool-upgrade-flow.mmd -o devtool-upgrade-flow.svg
+%%   && sed -i 's/<text /<text xml:space="preserve" /g' devtool-upgrade-flow.svg
+%% (xml:space keeps the spaces between words in rsvg-convert, used for the PDF output)
+flowchart TB
+    recipe[["Local layer<br/>(recipe)"]]
+    up[("Upstream source<br/>(new version, SRC_URI)")]
+
+    upgrade["devtool upgrade -V version recipe"]
+    recipe --> upgrade
+    up --> upgrade
+
+    ws[["devtool workspace<br/>appends/ recipes/ sources/"]]
+    upgrade --> ws
+
+    resolve["Resolve conflicts<br/>(in your editor/IDE)"]
+    ws --> resolve
+
+    build["devtool build recipe<br/>or bitbake recipe"]
+    buildimage["devtool build-image image"]
+    resolve --> build
+    resolve --> buildimage
+
+    deploy["devtool deploy-target recipe target"]
+    build --> deploy
+
+    subgraph target["Target"]
+        device(["Hardware target"])
+        qemu(["QEMU"])
+    end
+    deploy --> target
+    buildimage -->|"flash, update firmware<br/>or runqemu"| target
+
+    finish["devtool finish recipe layer"]
+    resolve -->|"commits in srctree"| finish
+
+    layer[["layer<br/>(patch files)"]]
+    wsconf[["workspace/conf"]]
+    finish --> layer
+    finish --> wsconf
+
+    classDef orange fill:#ffbe6f,stroke:#ffa348,stroke-width:1px,color:#000000;
+    classDef green fill:#8ff0a4,stroke:#57e389,stroke-width:1px,color:#000000;
+    classDef purple fill:#dc8add,stroke:#c061cb,stroke-width:1px,color:#000000;
+    classDef coral fill:#cdab8f,stroke:#b5835a,stroke-width:1px,color:#000000;
+    classDef default fill:#99c1f1,stroke:#62a0ea,stroke-width:1px,color:#000000;
+
+    class upgrade,build,buildimage,deploy,finish orange;
+    class resolve green;
+    class ws,layer,wsconf purple;
+    class device,qemu coral;
+
+    style target fill:#f6f5f4,stroke:#b5835a,stroke-width:1px

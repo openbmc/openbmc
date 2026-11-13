@@ -43,9 +43,9 @@ following requirements:
    much more will help to run multiple builds and increase
    performance by reusing build artifacts.
 
--  At least &MIN_RAM; Gbytes of RAM, though a modern build host with as
-   much RAM and as many CPU cores as possible is strongly recommended to
-   maximize build performance.
+-  At least &MIN_RAM; Gbytes of RAM and &MIN_CPU_CORES; CPU cores, though a
+   modern build host with as much RAM and as many CPU cores as possible is
+   strongly recommended to maximize build performance.
 
 -  Runs a supported Linux distribution (i.e. recent releases of Fedora,
    openSUSE, CentOS, Debian, or Ubuntu). For a list of Linux
@@ -376,7 +376,7 @@ layer>`:
       git clone -b &DISTRO_NAME_NO_CAP; https://git.yoctoproject.org/meta-raspberrypi ../layers/meta-raspberrypi
 
 #.  **Add Your Layer to the Layer Configuration File:** Before you can use
-    it, you must add the layer and its dependencies to your ``bblayers.conf``
+    it, you must add the layer and its dependencies to your :ref:`structure-build-conf-bblayers.conf`
     file, which is found in the :term:`Build Directory` (``conf/``) directory.
 
     For this, the ``bitbake-layers add-layer`` command can be used:
@@ -410,7 +410,7 @@ layer>`:
     `Synaptics` license. See the :yocto_git:`ipcompliance.md
     </meta-raspberrypi/tree/docs/ipcompliance.md>` document for more information.
     Add the ``synaptics-killswitch`` value to the :term:`LICENSE_FLAGS_ACCEPTED`
-    variable, in the ``conf/local.conf`` file of your build directory::
+    variable, in the :ref:`structure-build-conf-local.conf` file of your build directory::
 
        LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"
 

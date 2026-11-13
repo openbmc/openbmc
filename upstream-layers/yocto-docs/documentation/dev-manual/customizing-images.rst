@@ -10,7 +10,7 @@ Customizing Images Using ``local.conf``
 =======================================
 
 Probably the easiest way to customize an image is to add a package by
-way of the ``local.conf`` configuration file. Because it is limited to
+way of the :ref:`structure-build-conf-local.conf` configuration file. Because it is limited to
 local use, this method generally only allows you to add packages and is
 not as flexible as creating your own customized image. When you add
 packages using local variables this way, you need to realize that these
@@ -56,7 +56,8 @@ high-level image features by using the
 variables. Although the functions for both variables are nearly
 equivalent, best practices dictate using :term:`IMAGE_FEATURES` from within
 a recipe and using :term:`EXTRA_IMAGE_FEATURES` from within your
-``local.conf`` file, which is found in the :term:`Build Directory`.
+:ref:`structure-build-conf-local.conf` for temporary changes (which is found in the :term:`Build
+Directory`) and a distro :term:`configuration file` for permanent changes.
 
 To understand how these features work, the best reference is
 :ref:`meta/classes-recipe/image.bbclass <ref-classes-image>`.
@@ -90,9 +91,9 @@ image does not contain an SSH server.
 
 You can customize your image and change these defaults. Edit the
 :term:`IMAGE_FEATURES` variable in your recipe or use the
-:term:`EXTRA_IMAGE_FEATURES` in your ``local.conf`` file so that it
-configures the image you are working with to include
-``ssh-server-dropbear`` or ``ssh-server-openssh``.
+:term:`EXTRA_IMAGE_FEATURES` in your :ref:`structure-build-conf-local.conf` file (or distro
+:term:`configuration file`) so that it configures the image you are working with
+to include ``ssh-server-dropbear`` or ``ssh-server-openssh``.
 
 .. note::
 

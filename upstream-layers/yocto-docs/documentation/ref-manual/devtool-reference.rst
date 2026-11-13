@@ -312,7 +312,7 @@ the layer into which to write an append file::
 
 The ``*.bbappend`` file is created at the
 appropriate path within the specified layer directory, which may or may
-not be in your ``bblayers.conf`` file. If an append file already exists,
+not be in your :ref:`structure-build-conf-bblayers.conf` file. If an append file already exists,
 the command updates it appropriately.
 
 .. _devtool-checking-on-the-upgrade-status-of-a-recipe:
@@ -680,6 +680,10 @@ of SDKs are generated:
 
 -  ``shared`` mode: this creates a cross-compiling toolchain and the
    corresponding shared sysroot directories of the supplied recipe(s).
+
+The ``--mode`` option can be repeated to combine both modes, for example
+``--mode=modified --mode=shared`` (see
+:ref:`dev-manual/devtool:combining modified and shared mode`).
 
 The ``--target`` option can be used to specify a ``username@hostname`` string
 and create a remote debugging configuration for the recipe. Similarly to

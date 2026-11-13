@@ -78,7 +78,7 @@ section in the Yocto Project Development Tasks Manual.
 The BSP layer's base directory (``meta-bsp_root_name``) is the root
 directory of that Layer. This directory is what you add to the
 :term:`BBLAYERS` variable in the
-``conf/bblayers.conf`` file found in your
+:ref:`structure-build-conf-bblayers.conf` file found in your
 :term:`Build Directory`, which is
 established after you run the OpenEmbedded build environment setup
 script (i.e. :ref:`structure-core-script`).
@@ -802,7 +802,7 @@ workflow.
    need to get the build environment ready by sourcing an environment
    setup script (i.e. ``oe-init-build-env``) and you need to be sure two
    key configuration files are configured appropriately: the
-   ``conf/local.conf`` and the ``conf/bblayers.conf`` file. You must
+   :ref:`structure-build-conf-local.conf` and the :ref:`structure-build-conf-bblayers.conf` file. You must
    make the OpenEmbedded build system aware of your new layer. See the
    ":ref:`dev-manual/layers:enabling your layer`"
    section in the Yocto Project Development Tasks Manual for information
@@ -1098,7 +1098,7 @@ list describes them in order of preference:
 
 #. *Use the LICENSE_FLAGS Variable to Define the Recipes that Have Commercial or
    Other Types of Specially-Licensed Packages:* For each of those recipes, you can
-   specify a matching license string in a ``local.conf`` variable named
+   specify a matching license string in a :ref:`structure-build-conf-local.conf` variable named
    :term:`LICENSE_FLAGS_ACCEPTED`.
    Specifying the matching license string signifies that you agree to
    the license. Thus, the build system can build the corresponding
@@ -1165,7 +1165,7 @@ Use these steps to create a BSP layer:
    :yocto_git:`Source Repositories <>`. To get examples of what you need
    in your configuration file, locate a layer (e.g. "meta-ti") and
    examine the
-   :yocto_git:`local.conf </meta-ti/tree/meta-ti-bsp/conf/layer.conf>`
+   :yocto_git:`layer.conf </meta-ti/tree/meta-ti-bsp/conf/layer.conf>`
    file.
 
 -  *Create a Machine Configuration File:* Create a

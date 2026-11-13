@@ -111,18 +111,15 @@ glossary before or in the same patch it is used, so that `:term:` can be used.
 
 ### Admonitions
 
-Sphinx has predefined admonitions that can be used to highlight a bit of text or
-add a side-note to the documentation. For example:
+Sphinx has predefined [admonitions](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#directives)
+that can be used to highlight a bit of text or add a side-note to the
+documentation. For example:
 
 ```rst
 .. note::
 
    This is a note admonition.
 ```
-
-We try to limit our usage of these admonitions to `note` and `warning`, as the
-Sphinx documentation [warns](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#directives)
-that most themes only style these two admonitions.
 
 ## ReStructured Text Syntax standards
 
@@ -203,10 +200,11 @@ arrows and clipart to the new SVG document.
 
 ### Fonts
 
-The recommended font for description text and labels is `Nimbus Roman`, size 10.
+The recommended font for description text and labels is `Nimbus Sans`.
+
 Labels are in bold.
 
-`template.svg` contains ready-to-copy labels.
+`template.svg` contains ready-to-copy text and labels.
 
 ### Text boxes
 

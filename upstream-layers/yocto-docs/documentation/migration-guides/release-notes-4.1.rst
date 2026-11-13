@@ -100,7 +100,7 @@ New Features / Enhancements in 4.1
 
    - :ref:`Support for using the regular build system as an SDK <sdk-manual/extensible:Setting up the Extensible SDK environment directly in a Yocto build>`
    - :ref:`ref-classes-image-buildinfo` class now also writes build information to SDKs
-   - New :term:`SDK_TOOLCHAIN_LANGS` variable to control support of rust / go in SDK
+   - New ``SDK_TOOLCHAIN_LANGS`` variable to control support of rust / go in SDK
    - rust-llvm: enabled :ref:`ref-classes-nativesdk` variant
    - python3-pluggy: enabled for :ref:`ref-classes-native` / :ref:`ref-classes-nativesdk`
 

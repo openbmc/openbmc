@@ -51,7 +51,8 @@ section:
 #. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable
    is set to "qemux86-64", which is fine if you are building for the QEMU
    emulator in 64-bit mode. However, if you are not, you need to set the
-   :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
+   :term:`MACHINE` variable appropriately in your
+   :ref:`structure-build-conf-local.conf` file
    found in the :term:`Build Directory` (i.e.  ``bitbake-builds/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
@@ -60,7 +61,8 @@ section:
 
    In this example we wish to build for qemux86 so we must set the
    :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
-   As described we do this by appending to ``conf/local.conf``::
+   As described we do this by appending to
+   :ref:`structure-build-conf-local.conf`::
 
       MACHINE = "qemux86"
       MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-modules"
@@ -91,7 +93,7 @@ section:
 #. *Inform the BitBake Build Environment About Your Layer:* As directed
    when you created your layer, you need to add the layer to the
    :term:`BBLAYERS` variable in the
-   ``bblayers.conf`` file as follows::
+   :ref:`structure-build-conf-bblayers.conf` file as follows::
 
       $ cd bitbake-builds/build
       $ bitbake-layers add-layer ../../meta-mylayer
@@ -146,7 +148,7 @@ section:
 #. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable is
    set to "qemux86-64", which is fine if you are building for the QEMU emulator
    in 64-bit mode. However, if you are not, you need to set the :term:`MACHINE`
-   variable appropriately in your ``conf/local.conf`` file found in the
+   variable appropriately in your :ref:`structure-build-conf-local.conf` file found in the
    :term:`Build Directory` (i.e.  ``bitbake-builds/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
@@ -156,7 +158,8 @@ section:
 
    In this example we wish to build for qemux86 so we must set the
    :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
-   As described we do this by appending to ``conf/local.conf``::
+   As described we do this by appending to
+   :ref:`structure-build-conf-local.conf`::
 
       MACHINE = "qemux86"
       MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-modules"
@@ -186,7 +189,7 @@ section:
 #. *Inform the BitBake Build Environment About Your Layer:* As directed
    when you created your layer, you need to add the layer to the
    :term:`BBLAYERS` variable in the
-   ``bblayers.conf`` file as follows::
+   :ref:`structure-build-conf-bblayers.conf` file as follows::
 
       $ cd bitbake-builds/build
       $ bitbake-layers add-layer ../../meta-mylayer
@@ -832,16 +835,16 @@ Section.
    pick up the changes.
 
 #. *Update Your local.conf File to Point to Your Source Files:* In
-   addition to your ``local.conf`` file specifying to use
+   addition to your :ref:`structure-build-conf-local.conf` file specifying to use
    "kernel-modules" and the "qemux86" machine, it must also point to the
    updated kernel source files. Add
    :term:`SRC_URI` and
    :term:`SRCREV` statements similar
-   to the following to your ``local.conf``::
+   to the following to your :ref:`structure-build-conf-local.conf`::
 
       $ cd bitbake-builds/build/conf
 
-   Add the following to the ``local.conf``::
+   Add the following to the :ref:`structure-build-conf-local.conf`::
 
       SRC_URI:pn-linux-yocto = "git:///path-to/linux-yocto-4.12;protocol=file;name=machine;branch=standard/base; \
                                 git:///path-to/yocto-kernel-cache;protocol=file;type=kmeta;name=meta;branch=yocto-4.12;destsuffix=${KMETA}"
@@ -856,7 +859,7 @@ Section.
       example, the branch is ``standard/base`` and the machine is ``qemux86``.
 
 #. *Build the Image:* With the source modified, your changes staged and
-   committed, and the ``local.conf`` file pointing to the kernel files,
+   committed, and the :ref:`structure-build-conf-local.conf` file pointing to the kernel files,
    you can now use BitBake to build the image::
 
       $ cd bitbake-builds/build
@@ -1190,7 +1193,7 @@ information on how to use the output as a configuration fragment.
 Where do you put your configuration fragment files? You can place these
 files in an area pointed to by
 :term:`SRC_URI` as directed by your
-``bblayers.conf`` file, which is located in your layer. The OpenEmbedded
+:ref:`structure-build-conf-bblayers.conf` file, which is located in your layer. The OpenEmbedded
 build system picks up the configuration and adds it to the kernel's
 configuration. For example, suppose you had a set of configuration
 options in a file called ``myconfig.cfg``. If you put that file inside a

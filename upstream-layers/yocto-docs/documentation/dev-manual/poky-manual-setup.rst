@@ -103,7 +103,7 @@ an entire Linux distribution, including the toolchain, from source.
     Directory` contains all the files created during the build.
 
 #.  **Examine Your Local Configuration File:** When you set up the build
-    environment, a local configuration file named ``local.conf`` becomes
+    environment, a local configuration file named :ref:`structure-build-conf-local.conf` becomes
     available in a ``conf`` sub-directory of the :term:`Build Directory`. For
     this example, the defaults are set to build for a ``qemux86-64`` target,
     which is suitable for emulation. The package manager used is set to the RPM
@@ -118,13 +118,11 @@ an entire Linux distribution, including the toolchain, from source.
        This is relevant only when your network and the server that you use
        can download these artifacts faster than you would be able to build them.
 
-       To use such mirrors, uncomment the below lines in your ``conf/local.conf``
-       file in the :term:`Build Directory`::
+       To use such mirrors, run the following command:
 
-          BB_HASHSERVE_UPSTREAM = "wss://hashserv.yoctoproject.org/ws"
-          SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
-          BB_HASHSERVE = "auto"
-          BB_SIGNATURE_HANDLER = "OEEquivHash"
+       .. code-block:: console
+
+         $ bitbake-config-build enable-fragment core/yocto/sstate-mirror-cdn
 
        The hash equivalence server needs the websockets python module version 9.1
        or later. Debian GNU/Linux 12 (Bookworm) and later, Fedora, CentOS Stream

@@ -309,7 +309,7 @@ following two locations:
 .. code-block:: text
 
    meta-yocto/meta-yocto-bsp/files/wic
-   openembedded-core/files/wic
+   openembedded-core/meta/files/wic
 
 Use the following command to list the available kickstart files:
 
@@ -530,9 +530,7 @@ file:
 
 The previous example shows the easiest way to create an image by running
 in cooked mode and supplying a kickstart file and the "-e" option to
-point to the existing build artifacts. Your ``local.conf`` file needs to
-have the :term:`MACHINE` variable set
-to the machine you are using, which is "qemux86" in this example.
+point to the existing build artifacts (the "qemux86" machine is used here).
 
 Once the image builds, the output provides image location, artifact use,
 and kickstart file information.
@@ -608,8 +606,7 @@ untouched:
 Once the lines are changed, the
 example generates the ``directdisksdb-gpt`` image. The command points
 the process at the ``core-image-minimal`` artifacts for the Next Unit of
-Computing (nuc) :term:`MACHINE` the
-``local.conf``:
+Computing (nuc) :term:`MACHINE`:
 
 .. code-block:: console
 
@@ -680,7 +677,7 @@ default output directory, which is the current directory:
 
 For this example,
 :term:`MACHINE` did not have to be
-specified in the ``local.conf`` file since the artifact is manually
+specified since the artifact is manually
 specified.
 
 Using Wic to Manipulate an Image

@@ -32,7 +32,7 @@ through a :wikipedia:`REST <Representational_state_transfer>`
 API, store the information about the layers in the Toaster database, and
 then show the information to users. Users are then able to view that
 information and build layers from Toaster itself without having to
-clone or edit the BitBake layers configuration file ``bblayers.conf``.
+clone or edit the BitBake layers configuration file :ref:`structure-build-conf-bblayers.conf`.
 
 Tying a layer source into Toaster is convenient when you have many
 custom layers that need to be built on a regular basis by a community of

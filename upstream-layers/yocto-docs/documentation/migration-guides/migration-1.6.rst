@@ -247,15 +247,15 @@ the :ref:`ref-classes-autotools` or ``autotools_stage`` classes.
 
 ``qemu-native`` now builds without SDL-based graphical output support by
 default. The following additional lines are needed in your
-``local.conf`` to enable it::
+:ref:`structure-build-conf-local.conf` to enable it::
 
    PACKAGECONFIG_pn-qemu-native = "sdl"
    ASSUME_PROVIDED += "libsdl-native"
 
 .. note::
 
-   The default ``local.conf`` contains these statements. Consequently, if you
-   are building a headless system and using a default ``local.conf``
+   The default :ref:`structure-build-conf-local.conf` contains these statements. Consequently, if you
+   are building a headless system and using a default :ref:`structure-build-conf-local.conf`
    file, you will need comment these two lines out.
 
 .. _migration-1.6-core-image-basic:

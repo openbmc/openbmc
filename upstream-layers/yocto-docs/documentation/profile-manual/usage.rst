@@ -48,7 +48,7 @@ For this section, we'll assume you've already performed the basic setup
 outlined in the ":ref:`profile-manual/intro:General Setup`" section.
 
 In particular, you'll get the most mileage out of perf if you profile an
-image built with the following in your ``local.conf`` file::
+image built with the following in a :term:`configuration file`::
 
    INHIBIT_PACKAGE_STRIP = "1"
 
@@ -296,7 +296,7 @@ The problem is that perf can't find the symbol information for the
 ``busybox`` binary, which is actually stripped out by the Yocto build
 system.
 
-One way around that is to put the following in your ``local.conf`` file
+One way around that is to put the following in a :term:`configuration file`
 when you build the image::
 
    INHIBIT_PACKAGE_STRIP = "1"
@@ -306,13 +306,14 @@ what can we do to get perf to resolve the symbols? Basically we need to
 install the debugging information for the BusyBox package.
 
 To generate the debug info for the packages in the image, we can add
-``dbg-pkgs`` to :term:`EXTRA_IMAGE_FEATURES` in ``local.conf``. For example::
+``dbg-pkgs`` to :term:`EXTRA_IMAGE_FEATURES` in
+:ref:`structure-build-conf-local.conf`. For example::
 
    EXTRA_IMAGE_FEATURES:append = " dbg-pkgs"
 
 Additionally, in order to generate the type of debugging information that perf
 understands, we also need to set :term:`PACKAGE_DEBUG_SPLIT_STYLE`
-in the ``local.conf`` file::
+in a :term:`configuration file`::
 
    PACKAGE_DEBUG_SPLIT_STYLE = 'debug-file-directory'
 
@@ -1867,8 +1868,8 @@ Practically speaking, that means you need to do the following:
       $ bitbake core-image-sato-sdk
 
 -  Or build a non-SDK image but include the profiling tools
-   (edit ``local.conf`` and add ``tools-profile`` to the end of
-   :term:`EXTRA_IMAGE_FEATURES` variable)::
+   (add ``tools-profile`` to the :term:`EXTRA_IMAGE_FEATURES`
+   variable)::
 
       $ bitbake core-image-sato
 
@@ -1894,7 +1895,7 @@ section of this manual, and boot the resulting target image.
 .. note::
 
    If you have a :term:`Build Directory` containing multiple machines, you need
-   to have the :term:`MACHINE` you're connecting to selected in ``local.conf``, and
+   to have the :term:`MACHINE` you're connecting to selected, and
    the kernel in that machine's :term:`Build Directory` must match the kernel on
    the booted system exactly, or you'll get the above ``crosstap`` message
    when you try to call a script.

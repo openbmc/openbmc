@@ -99,15 +99,13 @@ build the SDK installer. Follow these steps:
    to get a :term:`build host` ready.
 
 #. *Make Sure You Are Building an Installer for the Correct Machine:*
-   Check to be sure that your :term:`MACHINE` variable in the ``local.conf``
-   file in your :term:`Build Directory` matches the architecture
+   Check to be sure that your :term:`MACHINE` matches the architecture
    for which you are building.
 
 #. *Make Sure Your SDK Machine is Correctly Set:* If you are building a
    toolchain designed to run on an architecture that differs from your
    current development host machine (i.e. the build host), be sure that
-   the :term:`SDKMACHINE` variable in the ``local.conf`` file in your
-   :term:`Build Directory` is correctly set.
+   the :term:`SDKMACHINE` variable is correctly set.
 
    .. note::
 
@@ -153,12 +151,11 @@ build the SDK installer. Follow these steps:
          of libraries, you need to be sure your SDK has the appropriate
          static development libraries. Use the
          :term:`TOOLCHAIN_TARGET_TASK`
-         variable inside your ``local.conf`` file before building the
-         SDK installer. Doing so ensures that the eventual SDK
-         installation process installs the appropriate library packages
+         variable to install the appropriate library packages
          as part of the SDK. Here is an example using ``libc``
-         static development libraries: TOOLCHAIN_TARGET_TASK:append = "
-         libc-staticdev"
+         static development libraries::
+
+            TOOLCHAIN_TARGET_TASK:append = " libc-staticdev"
 
 #. *Run the Installer:* You can now run the SDK installer from
    ``tmp/deploy/sdk`` in the :term:`Build Directory`. Here is an example:

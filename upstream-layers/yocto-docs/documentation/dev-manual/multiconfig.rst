@@ -20,7 +20,7 @@ To accomplish a multiple configuration build, you must define each
 target's configuration separately using a parallel :term:`configuration file` in
 the :term:`Build Directory` or configuration directory within a layer, and you
 must follow a required file hierarchy. Additionally, you must enable the
-multiple configuration builds in your ``local.conf`` file.
+multiple configuration builds in your :ref:`structure-build-conf-local.conf` file.
 
 Follow these steps to set up and execute multiple configuration builds:
 
@@ -74,7 +74,7 @@ Follow these steps to set up and execute multiple configuration builds:
 -  *Add the BitBake Multi-configuration Variable to the Local
    Configuration File*: Use the
    :term:`BBMULTICONFIG`
-   variable in your ``conf/local.conf`` configuration file to specify
+   variable in your :ref:`structure-build-conf-local.conf` configuration file to specify
    each multiconfig. Continuing with the example from the previous
    figure, the :term:`BBMULTICONFIG` variable needs to enable two
    multiconfigs: "x86" and "arm" by specifying each configuration file::
@@ -85,7 +85,7 @@ Follow these steps to set up and execute multiple configuration builds:
 
       A "default" configuration already exists by definition. This
       configuration is named: "" (i.e. empty string) and is defined by
-      the variables coming from your ``local.conf``
+      the variables coming from your :ref:`structure-build-conf-local.conf`
       file. Consequently, the previous example actually adds two
       additional configurations to your build: "arm" and "x86" along
       with "".
@@ -107,7 +107,7 @@ Follow these steps to set up and execute multiple configuration builds:
    -  A ``core-image-sato`` image that is configured through the ``arm.conf``
       configuration file
 
-   -  A ``core-image-base`` that is configured through your ``local.conf``
+   -  A ``core-image-base`` that is configured through your :ref:`structure-build-conf-local.conf`
       configuration file
 
 .. note::
@@ -178,7 +178,7 @@ Suggested best practices
 ========================
 
 -  :term:`TMPDIR` (other than the default set in bitbake.conf) is only set in
-   ``local.conf`` by the user. This means that we should **not** manipulate
+   :ref:`structure-build-conf-local.conf` by the user. This means that we should **not** manipulate
    :term:`TMPDIR` in any way within the Machine or Distro :term:`configuration
    file`.
 

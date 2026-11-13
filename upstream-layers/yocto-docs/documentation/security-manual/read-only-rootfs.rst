@@ -28,7 +28,7 @@ image's recipe file via the :term:`IMAGE_FEATURES` variable::
    IMAGE_FEATURES += "read-only-rootfs"
 
 As an alternative, you can add the same feature
-from within your :term:`Build Directory`'s ``local.conf`` file with the
+from within your distro :term:`configuration file` with the
 associated :term:`EXTRA_IMAGE_FEATURES` variable, as in::
 
    EXTRA_IMAGE_FEATURES = "read-only-rootfs"

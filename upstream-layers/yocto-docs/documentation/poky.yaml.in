@@ -46,3 +46,5 @@ MIN_DISK_SPACE : "140"
 MIN_DISK_SPACE_RM_WORK : "40"
 # RAM (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64) on a 4 core system
 MIN_RAM : "32"
+# Recommended minimum number of CPU cores
+MIN_CPU_CORES : "16"

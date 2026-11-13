@@ -224,6 +224,16 @@ This configuration fragment does multiple things:
 -  Includes the VEX statements to the input SPDX document using the
    :term:`SPDX_INCLUDE_VEX` variable.
 
+.. _ref-fragments-core-yocto-monitor-disk-space:
+
+``core/yocto/monitor-disk-space``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``core/yocto/monitor-disk-space`` :term:`configuration fragment` can be used
+to produce warnings or errors when the disk currently in use during the build
+is out of space, by setting a sensible value for the :term:`BB_DISKMON_DIRS`
+variable. See the definition of :term:`BB_DISKMON_DIRS` for more information.
+
 Yocto Project Autobuilder Fragments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

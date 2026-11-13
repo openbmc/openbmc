@@ -27,7 +27,7 @@ Enabling and Using the Tool
 
 By default, the error reporting tool is disabled. You can enable it by
 inheriting the :ref:`ref-classes-report-error` class by adding the
-following statement to the end of your ``local.conf`` file in your
+following statement to the end of your :ref:`structure-build-conf-local.conf` file in your
 :term:`Build Directory`::
 
    INHERIT += "report-error"
@@ -35,7 +35,7 @@ following statement to the end of your ``local.conf`` file in your
 By default, the error reporting feature stores information in
 ``${``\ :term:`LOG_DIR`\ ``}/error-report``.
 However, you can specify a directory to use by adding the following to
-your ``local.conf`` file::
+your :ref:`structure-build-conf-local.conf` file::
 
    ERR_REPORT_DIR = "path"
 
@@ -69,7 +69,7 @@ Disabling the Tool
 ==================
 
 To disable the error reporting feature, simply remove or comment out the
-following statement from the end of your ``local.conf`` file in your
+following statement from the end of your :ref:`structure-build-conf-local.conf` file in your
 :term:`Build Directory`::
 
    INHERIT += "report-error"

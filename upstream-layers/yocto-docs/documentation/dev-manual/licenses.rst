@@ -134,7 +134,7 @@ In order for a component restricted by a
 :term:`LICENSE_FLAGS` definition to be enabled and included in an image, it
 needs to have a matching entry in the global
 :term:`LICENSE_FLAGS_ACCEPTED`
-variable, which is a variable typically defined in your ``local.conf``
+variable, which is a variable typically defined in your :ref:`structure-build-conf-local.conf`
 file. For example, to enable the
 ``meta/recipes-multimedia/gstreamer/gstreamer1.0-plugins-ugly`` package of
 :term:`OpenEmbedded-Core (OE-Core)`, you
@@ -251,7 +251,7 @@ defined in the
    COMMERCIAL_VIDEO_PLUGINS ?= ""
 
 If you want to enable these components, you can do so by making sure you have
-statements similar to the following in your ``local.conf`` configuration file::
+statements similar to the following in your :ref:`structure-build-conf-local.conf` configuration file::
 
    COMMERCIAL_AUDIO_PLUGINS = "gst-plugins-ugly-mad \
        gst-plugins-ugly-mpegaudioparse"
@@ -355,13 +355,11 @@ accidental release of proprietary software. The Yocto Project provides
 an :ref:`ref-classes-archiver` class to help avoid some of these concerns.
 
 Before you employ :term:`DL_DIR` or the :ref:`ref-classes-archiver` class, you
-need to decide how you choose to provide source. The source
-:ref:`ref-classes-archiver` class can generate tarballs and SRPMs and can
-create them with various levels of compliance in mind.
+need to decide how you choose to provide source.
 
 One way of doing this (but certainly not the only way) is to release
 just the source as a tarball. You can do this by adding the following to
-the ``local.conf`` file found in the :term:`Build Directory`::
+the :ref:`structure-build-conf-local.conf` file found in the :term:`Build Directory`::
 
    INHERIT += "archiver"
    ARCHIVER_MODE[src] = "original"
@@ -417,7 +415,8 @@ One requirement that is often overlooked is inclusion of license text.
 This requirement also needs to be dealt with prior to generating the
 final image. Some licenses require the license text to accompany the
 binary. You can achieve this by adding the following to your
-``local.conf`` file::
+:ref:`structure-build-conf-local.conf` file or distro :term:`configuration
+file`::
 
    COPY_LIC_MANIFEST = "1"
    COPY_LIC_DIRS = "1"
@@ -472,7 +471,7 @@ One thing a development organization might want to consider for end-user
 convenience is to provide its own version of the
 :oecore_path:`meta/conf/templates/default/bblayers.conf.sample` file to ensure that when
 the end user utilizes the released build system to build an image, the
-development organization's layers are included in the ``bblayers.conf`` file
+development organization's layers are included in the :ref:`structure-build-conf-bblayers.conf` file
 automatically::
 
    # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
