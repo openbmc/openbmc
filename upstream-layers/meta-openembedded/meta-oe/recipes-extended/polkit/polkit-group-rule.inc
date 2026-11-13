@@ -1,5 +1,7 @@
 HOMEPAGE = "https://www.yoctoproject.org/"
 
+S = "${UNPACKDIR}"
+
 # polkit must prepare polkitd group
 DEPENDS += "polkit"
 

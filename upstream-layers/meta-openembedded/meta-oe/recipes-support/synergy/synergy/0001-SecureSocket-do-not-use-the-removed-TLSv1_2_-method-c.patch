@@ -1,0 +1,113 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 10 Sep 2026 19:20:00 +0000
+Subject: [PATCH] SecureSocket: do not use the removed TLSv1_2_*_method calls
+
+The version specific TLSv1_2_server_method() and TLSv1_2_client_method()
+were deprecated in OpenSSL 1.1.0 and removed outright in OpenSSL 4.0, so
+do_compile fails:
+
+  SecureSocket.cpp:386:18: error: use of undeclared identifier 'TLSv1_2_server_method'; did you mean 'TLS_server_method'?
+  SecureSocket.cpp:389:18: error: use of undeclared identifier 'TLSv1_2_client_method'; did you mean 'TLS_client_method'?
+
+Pick the version flexible method instead and keep the TLS 1.2 floor the
+old code was after by excluding every earlier version through
+SSL_CTX_set_options(). Since TLS 1.3 can now be negotiated, the hardcoded
+"TLSv1.2" that was reported to the user is replaced with the version
+actually in use, which also retires k_tlsString.
+
+This is a backport of two upstream commits, neither of which is in the
+v1.10.1 SRCREV this recipe pins (they first shipped in v1.11.0):
+
+  4fea67e078479cc00afe6b1201c54c997a41fc70
+    "#6390 Updated OpenSSL For better security with TLS1.3"
+  4d3cf2c6 "Preventing older insecure version of TLS/SSL"
+
+Two deliberate differences from upstream:
+
+ - upstream's pre-1.1.0 fallback defines SSL_CLIENT_METHOD to
+   SSLv23_server_method, so a client would ask for a server method. That
+   typo is still present upstream; use SSLv23_client_method here. Only the
+   OPENSSL_VERSION_NUMBER > 0x10100000L branch is taken in this build, so
+   the difference is inert here, but there is no reason to copy the bug.
+
+ - upstream calls SSL_CTX_set_options() before checking SSL_CTX_new() for
+   NULL, which dereferences a NULL context on allocation failure. Check
+   first and return, then set the options.
+
+Upstream-Status: Backport [4fea67e078479cc00afe6b1201c54c997a41fc70 and
+4d3cf2c6, adapted to v1.10.1; the two differences above are not upstream]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+diff --git a/src/lib/net/SecureSocket.cpp b/src/lib/net/SecureSocket.cpp
+index 1111111..2222222 100644
+--- a/src/lib/net/SecureSocket.cpp
++++ b/src/lib/net/SecureSocket.cpp
+@@ -37,8 +37,16 @@
+ 
+ #define MAX_ERROR_SIZE 65535
+ 
++//Add the new function names in case older ones are deprecated
++#if OPENSSL_VERSION_NUMBER > 0x10100000L
++#define SSL_SERVER_METHOD TLS_server_method
++#define SSL_CLIENT_METHOD TLS_client_method
++#else
++#define SSL_SERVER_METHOD SSLv23_server_method
++#define SSL_CLIENT_METHOD SSLv23_client_method
++#endif
++
+ static const float s_retryDelay = 0.01f;
+-const char* k_tlsString = "TLSv1.2";
+ 
+ enum {
+     kMsgSize = 128
+@@ -376,26 +384,33 @@
+         showSecureLibInfo();
+     }
+ 
+-    // only use TLS 1.2 (latest as of 27 jul 18). previously we were using
+-    // the SSLv23_server_method and SSLv23_client_method functions with
++    // only use TLS 1.2 or newer. previously we were using the
++    // SSLv23_server_method and SSLv23_client_method functions with
+     // SSL_OP_NO_SSLv3, but not SSL_OP_NO_SSLv2, so there was a potential
+     // vulnerability where it could fall back to SSLv2 (not TLS). also,
+     // the SSLv23_*_method functions could fall back to TLS 1.0 and 1.1,
+-    // which are nolonger PCI compliant.
++    // which are nolonger PCI compliant. the version specific
++    // TLSv1_2_*_method functions were removed in OpenSSL 4.0, so pick the
++    // version flexible method and exclude everything below TLS 1.2 below.
+     if (server) {
+-        method = TLSv1_2_server_method();
++        method = SSL_SERVER_METHOD();
+     }
+     else {
+-        method = TLSv1_2_client_method();
++        method = SSL_CLIENT_METHOD();
+     }
+-    
++
+     // create new context from method
+     SSL_METHOD* m = const_cast<SSL_METHOD*>(method);
+     m_ssl->m_context = SSL_CTX_new(m);
+ 
+     if (m_ssl->m_context == NULL) {
+         showError();
++        return;
+     }
++
++    // prevent the use of every version prior to TLS 1.2, as they are known
++    // to be vulnerable
++    SSL_CTX_set_options(m_ssl->m_context, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1);
+ }
+ 
+ void
+@@ -848,9 +863,7 @@
+         LOG((CLOG_DEBUG "openssl cipher: %s", msg));
+ 
+         // show user a simpler version of the openssl cipher output
+-        if (std::string(msg).find(k_tlsString) != std::string::npos) {
+-            LOG((CLOG_INFO "network encryption protocol: %s", k_tlsString));
+-        }
++        LOG((CLOG_INFO "network encryption protocol: %s", SSL_CIPHER_get_version(cipher)));
+     }
+     else {
+         LOG((CLOG_ERR "could not get secure socket cipher"));

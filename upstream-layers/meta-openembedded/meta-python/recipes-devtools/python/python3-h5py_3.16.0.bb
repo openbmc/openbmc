@@ -14,13 +14,11 @@ BBCLASSEXTEND = "native"
 
 DEPENDS = "python3-pkgconfig-native \
            python3-numpy-native \
-           python3-six-native \
            hdf5-native \
            python3 \
            hdf5 \
           "
 
 RDEPENDS:${PN} = "python3-numpy \
-                  python3-six \
                   python3-json \
                  "

@@ -20,6 +20,5 @@ RDEPENDS:${PN} += " \
 
 RDEPENDS:${PN}-ptest += " \
     python3-attrs \
-    python3-six \
     python3-pyopenssl \
 "

@@ -12,6 +12,7 @@ SRC_URI[sha256sum] = "82fa839897b88e9c245b6265f3be26d3bc879cae4c7a8151fad4a307c3
 DEPENDS += "libcrypt-openssl-guess-perl-native openssl"
 
 RDEPENDS:${PN} = " \
+    libcrypt-openssl-bignum-perl \
     libcrypt-openssl-random-perl \
     perl-module-autoloader \
     perl-module-carp \
@@ -36,6 +37,7 @@ RDEPENDS:${PN}-ptest += " \
     perl-module-test \
     perl-module-test-more \
     perl-module-lib \
+    perl-module-mime-base64 \
     libcrypt-openssl-guess-perl \
     perl-module-english \
 "

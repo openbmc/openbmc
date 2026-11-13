@@ -26,6 +26,7 @@ CVE_VERSION_SUFFIX = "alphabetical"
 
 CVE_STATUS[CVE-2001-0027] = "fixed-version: version 1.2.0rc3 removed affected module"
 CVE_STATUS[CVE-2021-47865] = "upstream-wontfix: it is not a vulnerability but inproper configuration"
+CVE_STATUS[CVE-2026-53994] = "fixed-version: fixed since v1.3.9b"
 
 EXTRA_OECONF += "--enable-largefile INSTALL=install"
 

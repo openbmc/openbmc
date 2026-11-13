@@ -9,11 +9,11 @@ RDEPENDS:${PN} = "\
     python3-absl \
     python3-nltk \
     python3-numpy \
-    python3-six (>=1.14) \
 "
 
 inherit setuptools3 pypi
 
 PYPI_PACKAGE = "rouge_score"
 
+SRC_URI += "file://0001-drop-the-six-dependency.patch"
 SRC_URI[sha256sum] = "c7d4da2683e68c9abf0135ef915d63a46643666f848e558a1b9f7ead17ff0f04"

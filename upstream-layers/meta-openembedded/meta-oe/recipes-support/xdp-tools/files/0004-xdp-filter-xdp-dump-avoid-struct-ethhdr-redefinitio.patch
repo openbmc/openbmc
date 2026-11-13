@@ -1,0 +1,57 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] xdp-filter, xdp-dump: avoid struct ethhdr redefinition on
+ musl
+
+0003-lib-util-avoid-struct-ethhdr-redefinition-on-musl.patch made
+lib/util/params.h include musl's <netinet/if_ether.h> (rather than the
+raw <linux/if_ether.h> uapi header) so that struct ethhdr is only
+defined once. That only works if <netinet/if_ether.h> (or something
+that pulls it in) is processed before any raw <linux/if_ether.h>
+inclusion sets __UAPI_DEF_ETHHDR=1 as a side effect of defining its
+own struct ethhdr.
+
+Two translation units still get this backwards:
+
+- xdp-filter.c directly includes <linux/if_ether.h> before "params.h",
+  even though it doesn't use anything from that header itself (ETH_ALEN
+  already comes via params.h). Just drop the redundant include.
+
+- xdpdump.c includes <linux/ethtool.h> (which itself pulls in
+  <linux/if_ether.h> for struct ethhdr) before "params.h" is reached
+  further down the file. Include musl's <netinet/if_ether.h> ahead of
+  <linux/ethtool.h> so the guard is already set when ethtool.h's
+  transitive <linux/if_ether.h> is processed.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/xdp-dump/xdpdump.c b/xdp-dump/xdpdump.c
+index fa3aeb3..395226c 100644
+--- a/xdp-dump/xdpdump.c
++++ b/xdp-dump/xdpdump.c
+@@ -21,6 +21,11 @@
+ #include <bpf/libbpf.h>
+
+ #include <linux/err.h>
++/* <linux/ethtool.h> pulls in <linux/if_ether.h>, which defines its own
++ * struct ethhdr unless __UAPI_DEF_ETHHDR is already 0. Include musl's
++ * <netinet/if_ether.h> first (it defines struct ethhdr and sets that
++ * guard) so <linux/ethtool.h> doesn't try to define it a second time. */
++#include <netinet/if_ether.h>
+ #include <linux/ethtool.h>
+ #include <linux/perf_event.h>
+ #include <linux/sockios.h>
+diff --git a/xdp-filter/xdp-filter.c b/xdp-filter/xdp-filter.c
+index 8e9d344..89286fc 100644
+--- a/xdp-filter/xdp-filter.c
++++ b/xdp-filter/xdp-filter.c
+@@ -14,8 +14,6 @@
+ #include <xdp/libxdp.h>
+ #include <arpa/inet.h>
+
+-#include <linux/if_ether.h>
+-
+ #include "params.h"
+ #include "logging.h"
+ #include "util.h"

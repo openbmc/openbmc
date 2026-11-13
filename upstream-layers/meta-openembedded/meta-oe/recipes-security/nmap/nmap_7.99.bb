@@ -11,6 +11,8 @@ SRC_URI = "http://nmap.org/dist/${BP}.tar.bz2 \
            file://0002-Fix-building-with-libc.patch \
            file://0001-fix-racing-between-build-ncat-and-build-lua.patch \
            file://0004-libdnet-fix-PF_PACKET-conftest-nested-function.patch \
+           file://CVE-2026-58058.patch \
+           file://CVE-2026-72712.patch \
            "
 SRC_URI[sha256sum] = "df512492ffd108e53a27a06f26d8635bbe89e0e569455dc8ffef058c035d51b2"
 

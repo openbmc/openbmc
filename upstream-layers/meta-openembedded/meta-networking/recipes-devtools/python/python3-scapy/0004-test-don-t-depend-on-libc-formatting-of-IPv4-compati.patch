@@ -1,0 +1,37 @@
+From 7602260f82f54cf9b179549c5b03866ec16f68d5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 27 Sep 2026 15:54:57 -0700
+Subject: [PATCH 4/4] test: don't depend on libc formatting of IPv4-compatible
+ addresses
+
+The NetBSD read_routes6() test compares route prefixes such as
+::127.0.0.0 as strings, but scapy formats them with the libc's
+inet_ntop(). glibc prints IPv4-compatible addresses in dotted form,
+while musl only does so for IPv4-mapped (::ffff:a.b.c.d) addresses and
+prints ::7f00:0, ::e000:0 and ::ff00:0, so the test fails on musl.
+Both forms denote the same address; normalise the expected values with
+in6_ptop() so they match whatever the libc produces.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ test/regression.uts | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/test/regression.uts b/test/regression.uts
+index 4c972fa1..b6bb9d6e 100644
+--- a/test/regression.uts
++++ b/test/regression.uts
+@@ -3134,9 +3134,9 @@ assert routes == [
+     ('::', 104, '::1', 'lo0', ['::1'], 1),
+     ('::', 96, '::1', 'lo0', ['::1'], 1),
+     ('::1', 128, '::', 'lo0', ['::1'], 1),
+-    ('::127.0.0.0', 104, '::1', 'lo0', ['::1'], 1),
+-    ('::224.0.0.0', 100, '::1', 'lo0', ['::1'], 1),
+-    ('::255.0.0.0', 104, '::1', 'lo0', ['::1'], 1),
++    (in6_ptop('::127.0.0.0'), 104, '::1', 'lo0', ['::1'], 1),
++    (in6_ptop('::224.0.0.0'), 100, '::1', 'lo0', ['::1'], 1),
++    (in6_ptop('::255.0.0.0'), 104, '::1', 'lo0', ['::1'], 1),
+     ('::ffff:0.0.0.0', 96, '::1', 'lo0', ['::1'], 1),
+     ('2001:db8::', 32, '::1', 'lo0', ['::1'], 1),
+     ('2002::', 24, '::1', 'lo0', ['::1'], 1),

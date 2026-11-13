@@ -12,11 +12,10 @@ Rebase to 2.03.01
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  scripts/blk_availability_init_red_hat.in | 4 ++--
- scripts/cmirrord_init_red_hat.in         | 4 ++--
  scripts/lvm2_lvmpolld_init_red_hat.in    | 4 ++--
  scripts/lvm2_monitoring_init_red_hat.in  | 4 ++--
  scripts/lvm2_monitoring_init_rhel4       | 4 ++--
- 5 files changed, 10 insertions(+), 10 deletions(-)
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/blk_availability_init_red_hat.in b/scripts/blk_availability_init_red_hat.in
 index 347c39574..b2e9cf932 100644
@@ -35,24 +34,6 @@ index 347c39574..b2e9cf932 100644
 -	echo $"Usage: $0 {start|stop|status}"
 +	echo "Usage: $0 {start|stop|status}"
  	;;
- esac
-diff --git a/scripts/cmirrord_init_red_hat.in b/scripts/cmirrord_init_red_hat.in
-index c82f8f547..a3a321d9c 100755
---- a/scripts/cmirrord_init_red_hat.in
-+++ b/scripts/cmirrord_init_red_hat.in
-@@ -1,4 +1,4 @@
--#!/bin/bash
-+#!/bin/sh
- #
- # chkconfig: - 22 78
- # description: Starts and stops cmirrord
-@@ -103,7 +103,7 @@ case "$1" in
- 		;;
- 
- 	*)
--		echo $"Usage: $0 {start|stop|restart|status}"
-+		echo "Usage: $0 {start|stop|restart|status}"
- 		;;
  esac
  
 diff --git a/scripts/lvm2_lvmpolld_init_red_hat.in b/scripts/lvm2_lvmpolld_init_red_hat.in

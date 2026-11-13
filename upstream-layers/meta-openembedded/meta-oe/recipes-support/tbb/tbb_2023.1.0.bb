@@ -16,6 +16,8 @@ BRANCH = "onetbb_2023"
 SRCREV = "3046c8b0c29df995980003ea24f4d78c80ec0c8d"
 SRC_URI = "git://github.com/oneapi-src/oneTBB.git;protocol=https;branch=${BRANCH} \
            file://run-ptest \
+           file://0001-test-Skip-conformance_resumable_tasks-when-resumable.patch \
+           file://0002-test-malloc_overload-Only-use-glibc-malloc-extension.patch \
           "
 
 LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"

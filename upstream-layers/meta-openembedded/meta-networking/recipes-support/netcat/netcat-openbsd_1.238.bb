@@ -10,6 +10,7 @@ do_patch[depends] = "quilt-native:do_populate_sysroot"
 SRC_URI = "http://snapshot.debian.org/archive/debian/20260519T203124Z/pool/main/n/netcat-openbsd/netcat-openbsd_${PV}.orig.tar.gz;name=netcat \
            http://snapshot.debian.org/archive/debian/20260519T203124Z/pool/main/n/netcat-openbsd/netcat-openbsd_${PV}-1.debian.tar.xz;name=netcat-patch;subdir=${BP} \
            file://0001-bundle-own-base64-encode-decode-functions.patch \
+           file://0002-netcat-define-IPTOS_DSCP_VA-for-musl.patch \
            "
 
 SRC_URI[netcat.sha256sum] = "9f72a37d85dec1366309fdb0172be4e67e09ec26e89f13156315149e17c02479"

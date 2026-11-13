@@ -31,6 +31,8 @@ do_install:append() {
 
 FILES:${PN} += "${datadir}/licenses"
 
+RDEPENDS:${PN} += "libsdl3"
+
 RCONFLICTS:${PN} = "libsdl2"
 RPROVIDES:${PN} = "libsdl2"
 

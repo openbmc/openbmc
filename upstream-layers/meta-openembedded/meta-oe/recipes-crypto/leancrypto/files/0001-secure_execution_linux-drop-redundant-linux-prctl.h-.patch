@@ -1,0 +1,35 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] secure_execution_linux: drop redundant linux/prctl.h include
+
+<sys/prctl.h> alone already provides everything this file needs
+(PR_SET_SPECULATION_CTRL, the PR_SPEC_* constants, and struct
+prctl_mm_map on libcs that define it). Do not also include
+<linux/prctl.h>: musl's <sys/prctl.h> defines struct prctl_mm_map
+unconditionally, and <linux/prctl.h> defines the identical struct with
+no compatibility guard against it, so including both is a hard
+"redefinition of 'prctl_mm_map'" error.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/internal/src/secure_execution_linux.c b/internal/src/secure_execution_linux.c
+index 7264edf..df57a88 100644
+--- a/internal/src/secure_execution_linux.c
++++ b/internal/src/secure_execution_linux.c
+@@ -17,7 +17,14 @@
+  * DAMAGE.
+  */
+
+-#include <linux/prctl.h>
++/*
++ * <sys/prctl.h> alone already provides everything this file needs
++ * (PR_SET_SPECULATION_CTRL, the PR_SPEC_* constants, and on some libcs
++ * struct prctl_mm_map). Do not also include <linux/prctl.h>: musl's
++ * <sys/prctl.h> defines struct prctl_mm_map unconditionally, and
++ * <linux/prctl.h> defines the identical struct with no compatibility
++ * guard against it, so including both is a hard "redefinition" error.
++ */
+ #include <sys/prctl.h>
+
+ #include "ext_headers_internal.h"

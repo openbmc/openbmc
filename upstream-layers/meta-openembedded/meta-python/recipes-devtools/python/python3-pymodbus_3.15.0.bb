@@ -27,5 +27,4 @@ RDEPENDS:${PN} += " \
 
 RDEPENDS:${PN} += " \
     python3-pyserial \
-    python3-six \
 "

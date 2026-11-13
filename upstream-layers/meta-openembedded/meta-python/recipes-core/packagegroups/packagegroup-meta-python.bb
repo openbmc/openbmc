@@ -39,6 +39,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-asttokens \
     python3-async-timeout \
     python3-asyncio-glib \
+    python3-asyncvarlink \
     python3-attr \
     python3-autobahn \
     python3-automat \
@@ -278,6 +279,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pid \
     python3-pika \
     python3-pillow \
+    python3-ping3 \
     python3-pint \
     python3-pkcs11 \
     python3-pkgconfig \
@@ -439,6 +441,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-ujson \
     python3-unidiff \
     python3-uritemplate \
+    python3-varlink \
     python3-vcversioner \
     python3-versioneer \
     python3-versiontools \

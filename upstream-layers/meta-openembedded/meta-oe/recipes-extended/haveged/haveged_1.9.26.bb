@@ -21,3 +21,5 @@ EXTRA_OECONF = "\
 "
 
 MIPS_INSTRUCTION_SET = "mips"
+
+CVE_STATUS[CVE-2026-41054] = "fixed-version: fixed since v1.9.21"

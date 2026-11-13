@@ -5,7 +5,12 @@ LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=155db86cdbafa7532b41f390409283eb"
 BUGTRACKER = "https://github.com/polkit-org/polkit/issues"
 
-SRC_URI = "git://github.com/polkit-org/polkit.git;protocol=https;branch=main;tag=${PV}"
+SRC_URI = "\
+    git://github.com/polkit-org/polkit.git;protocol=https;branch=main;tag=${PV} \
+    file://CVE-2026-4897-01.patch \
+    file://CVE-2026-4897-02.patch \
+    file://CVE-2026-85498.patch \
+"
 
 SRCREV = "9e4894c969eecf26a3ba762f4f7a268aa0fb3e51"
 
@@ -35,14 +40,31 @@ PACKAGECONFIG[libs-only] = "-Dlibs-only=true,-Dlibs-only=false"
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 --shell /bin/nologin polkitd"
 
-SYSTEMD_SERVICE:${PN} = "${BPN}.service"
+# Package the systemd service into a separate package to be able
+# to exclude the polkit service in favor of alternative implementations
+SYSTEMD_PACKAGES += "${PN}-service"
+SYSTEMD_SERVICE:${PN}-service = "${BPN}.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
+PACKAGES =+ "${PN}-service"
+RDEPENDS:${PN}-service += "polkit"
+FILES:${PN}-service += " \
+    ${systemd_system_unitdir} \
+    ${sysconfdir}/systemd/system/polkit-virtual-provider.service \
+"
+
+# Package also the dbus configuration into a separate package
+PACKAGES =+ "${PN}-dbus"
+RDEPENDS:${PN}-dbus += "polkit"
+FILES:${PN}-dbus += "\
+    ${datadir}/dbus-1 \
+"
+
 do_install:append() {
-	#Fix up permissions on polkit rules.d to work with rpm4 constraints
+	# Match the ownership and mode set by polkit's own tmpfiles.d entry
 	if ${@bb.utils.contains('PACKAGECONFIG', 'libs-only', 'false', 'true', d)}; then
-		chmod 700 ${D}/${sysconfdir}/polkit-1/rules.d
-		chown polkitd:root ${D}/${sysconfdir}/polkit-1/rules.d
+		chmod 750 ${D}/${sysconfdir}/polkit-1/rules.d
+		chown root:polkitd ${D}/${sysconfdir}/polkit-1/rules.d
 	fi
 
 	# Polkit unconditionally installs a systemd service, remove it on SysVinit

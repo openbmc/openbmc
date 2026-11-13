@@ -1,0 +1,122 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 Sep 2026 06:00:00 +0000
+Subject: [PATCH] Drop the libcanberra-gtk3 dependency
+
+libcanberra-gtk3 links -lX11 and its gtk3 module is built only when
+X11 is enabled (configure.ac gates HAVE_GTK3 on `gdk-3.0 x11`), so it
+is unavailable on wayland-only distro configurations. That makes
+gnome-disk-utility's hard `dependency('libcanberra-gtk3', ...)` fail
+at meson configure time there:
+
+  Run-time dependency libcanberra-gtk3 found: NO (tried pkg-config)
+  ../gnome-disk-utility-46.1/meson.build:75:18: ERROR: Dependency
+  "libcanberra-gtk3" not found (tried pkg-config)
+
+Upstream reached the same conclusion and dropped libcanberra
+entirely ahead of the GTK4/libadwaita port (GNOME/gnome-disk-utility!
+efa67dc5, !ecdd9c37, !ec6d8018), disabling the three sound-effect call
+sites and removing the dependency; that work landed after 46.1, the
+last stable release, so backport the same, minimal change here rather
+than carrying libcanberra-gtk3 as a hard requirement.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gnome-disk-utility/-/commit/ec6d801899e440245319cdbb06555783b72808d1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build                                    |  1 -
+ src/disks/gducreatediskimagedialog.c           | 12 ++++--------
+ src/disks/gdurestorediskimagedialog.c          |  8 +++-----
+ src/disks/meson.build                          |  1 -
+ 4 files changed, 7 insertions(+), 15 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 1111111..2222222 100644
+--- a/meson.build
++++ b/meson.build
+@@ -72,7 +72,6 @@ dvdread_dep = dependency('dvdread', version: '>= 4.2.0')
+ gio_unix_dep = dependency('gio-unix-2.0', version: '>= 2.31.0')
+ gmodule_dep = dependency('gmodule-2.0')
+ gtk_dep = dependency('gtk+-3.0', version: '>= 3.16.0')
+-libcanberra_dep = dependency('libcanberra-gtk3', version: '>= 0.1')
+ # Keep the version here synchronised with subprojects/libhandy.wrap
+ libhandy_dep = dependency('libhandy-1', version: '>= 1.5.0', fallback: ['libhandy', 'libhandy_dep'])
+ liblzma_dep = dependency('liblzma', version: '>= 5.0.5')
+diff --git a/src/disks/gducreatediskimagedialog.c b/src/disks/gducreatediskimagedialog.c
+index 1111111..2222222 100644
+--- a/src/disks/gducreatediskimagedialog.c
++++ b/src/disks/gducreatediskimagedialog.c
+@@ -20,8 +20,6 @@
+ #include <sys/ioctl.h>
+ #include <linux/fs.h>
+
+-#include <canberra-gtk.h>
+-
+ #include "gduapplication.h"
+ #include "gduwindow.h"
+ #include "gducreatediskimagedialog.h"
+@@ -304,10 +302,9 @@ play_read_error_sound (DialogData *data)
+    * CA_PROP_EVENT_DESCRIPTION
+    */
+   sound_message = _("Disk image read error");
+-  ca_gtk_play_for_widget (GTK_WIDGET (data->window), 0,
+-                          CA_PROP_EVENT_ID, "dialog-warning",
+-                          CA_PROP_EVENT_DESCRIPTION, sound_message,
+-                          NULL);
++  /* libcanberra-gtk3 is X11-only and unavailable on wayland-only builds;
++   * disabled upstream too (GNOME!ec6d8018) ahead of the GTK4 port. */
++  (void) sound_message;
+ }
+
+ /* ---------------------------------------------------------------------------------------------------- */
+@@ -407,10 +404,9 @@ play_complete_sound (DialogData *data)
+
+   /* Translators: A descriptive string for the 'complete' sound, see CA_PROP_EVENT_DESCRIPTION */
+   sound_message = _("Disk image copying complete");
+-  ca_gtk_play_for_widget (GTK_WIDGET (data->window), 0,
+-                          CA_PROP_EVENT_ID, "complete",
+-                          CA_PROP_EVENT_DESCRIPTION, sound_message,
+-                          NULL);
++  /* libcanberra-gtk3 is X11-only and unavailable on wayland-only builds;
++   * disabled upstream too (GNOME!ec6d8018) ahead of the GTK4 port. */
++  (void) sound_message;
+ }
+
+ /* ---------------------------------------------------------------------------------------------------- */
+diff --git a/src/disks/gdurestorediskimagedialog.c b/src/disks/gdurestorediskimagedialog.c
+index 1111111..2222222 100644
+--- a/src/disks/gdurestorediskimagedialog.c
++++ b/src/disks/gdurestorediskimagedialog.c
+@@ -16,8 +16,6 @@
+ #include <sys/ioctl.h>
+ #include <linux/fs.h>
+
+-#include <canberra-gtk.h>
+-
+ #include "gduapplication.h"
+ #include "gduwindow.h"
+ #include "gdurestorediskimagedialog.h"
+@@ -610,10 +608,9 @@ play_complete_sound (DialogData *data)
+
+   /* Translators: A descriptive string for the 'complete' sound, see CA_PROP_EVENT_DESCRIPTION */
+   sound_message = _("Disk image copying complete");
+-  ca_gtk_play_for_widget (GTK_WIDGET (data->dialog), 0,
+-                          CA_PROP_EVENT_ID, "complete",
+-                          CA_PROP_EVENT_DESCRIPTION, sound_message,
+-                          NULL);
++  /* libcanberra-gtk3 is X11-only and unavailable on wayland-only builds;
++   * disabled upstream too (GNOME!ec6d8018) ahead of the GTK4 port. */
++  (void) sound_message;
+
+   if (data->inhibit_cookie > 0)
+     {
+diff --git a/src/disks/meson.build b/src/disks/meson.build
+index 1111111..2222222 100644
+--- a/src/disks/meson.build
++++ b/src/disks/meson.build
+@@ -83,7 +83,6 @@ deps = [
+   dvdread_dep,
+   gio_unix_dep,
+   gmodule_dep,
+-  libcanberra_dep,
+   libgdu_dep,
+   libhandy_dep,
+   liblzma_dep,

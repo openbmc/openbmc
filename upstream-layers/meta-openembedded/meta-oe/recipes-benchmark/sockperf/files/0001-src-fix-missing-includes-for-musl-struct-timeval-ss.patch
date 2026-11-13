@@ -1,0 +1,54 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:40:00 +0000
+Subject: [PATCH] src: fix missing includes for musl (struct timeval,
+ sscanf/sprintf)
+
+ticks.h's timeval2nsec() uses struct timeval, but the header only
+pulled in <sys/time.h> under __FreeBSD__ -- glibc's <time.h> happens
+to declare struct timeval as a side effect of other headers already
+included elsewhere in the build, but musl's does not, so building
+against musl fails:
+
+| ticks.h:115:30: error: member access into incomplete type 'const struct timeval'
+
+Always include <sys/time.h> instead of gating it on __FreeBSD__.
+
+vma-xlio-redirect.cpp uses sscanf()/sprintf() but never includes
+<cstdio>, relying on it being pulled in transitively. That doesn't
+happen on musl either:
+
+| vma-xlio-redirect.cpp:92:14: error: use of undeclared identifier 'sscanf'
+| vma-xlio-redirect.cpp:99:5: error: use of undeclared identifier 'sprintf'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/src/ticks.h b/src/ticks.h
+index 679f3d9..6e38095 100644
+--- a/src/ticks.h
++++ b/src/ticks.h
+@@ -99,9 +99,10 @@ with simple integral values. The following describes these calculations:
+ #include <stdint.h> // for int64_t
+ #include <stdlib.h> // for qsort
+
+-#ifdef __FreeBSD__
++/* struct timeval is used below (timeval2nsec()); <time.h> alone doesn't
++ * guarantee it, so always pull in <sys/time.h> rather than just on
++ * __FreeBSD__. */
+ #include <sys/time.h>
+-#endif
+
+ #include "ticks_os.h"
+
+diff --git a/src/vma-xlio-redirect.cpp b/src/vma-xlio-redirect.cpp
+index 5554d4a..a54a6c1 100644
+--- a/src/vma-xlio-redirect.cpp
++++ b/src/vma-xlio-redirect.cpp
+@@ -28,6 +28,7 @@
+  */
+
+ #include "vma-xlio-redirect.h"
++#include <cstdio> /* sscanf(), sprintf() */
+ #include <dlfcn.h>
+
+ socket_fptr_t fn_socket = NULL;

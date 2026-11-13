@@ -1,0 +1,20 @@
+SUMMARY = "JSON Web Token implementation in Python"
+DESCRIPTION = "A Python implementation of JSON Web Token draft 32.\
+ Original implementation was written by https://github.com/progrium"
+HOMEPAGE = "https://github.com/jpadilla/pyjwt"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=e4b56d2c9973d8cf54655555be06e551"
+
+SRC_URI[sha256sum] = "77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86"
+
+CVE_PRODUCT = "pyjwt"
+
+inherit pypi python_setuptools_build_meta
+
+RDEPENDS:${PN} = "\
+    python3-cryptography \
+    python3-json \
+"
+
+BBCLASSEXTEND = "native nativesdk"
+

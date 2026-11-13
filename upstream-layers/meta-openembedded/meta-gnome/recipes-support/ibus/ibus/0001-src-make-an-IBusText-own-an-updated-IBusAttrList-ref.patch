@@ -1,0 +1,99 @@
+From b69a9906acba1111bcb39c654fc885a079fd31f9 Mon Sep 17 00:00:00 2001
+From: Tianhao Chai <cth451@gmail.com>
+Date: Wed, 27 May 2026 13:11:28 +0900
+Subject: [PATCH 1/2] src: make an IBusText own an updated IBusAttrList
+ reference
+
+For all usages of IBusAttrList, the list is an owned reference within a
+IBusText struct. `ibus_panel_convert_text()` and
+`ibus_input_context_convert_text()` violate the invarient by assigning a
+**floating** IBusAttrList reference to anIBusText without sinking it.
+
+When GJS attempts to create a JS representation of an existing GObject,
+it unconditionally sinks the incoming reference.[1] For a non-floating
+reference this up-refs the object.
+
+For this floating IBusAttrLit, `g_object_ref_sink` converts it to a
+strong reference in-place leaving ref-count at 1. At this point the
+`IBusAttrList` is referenced by both the enclosing `IBusText` and the
+newly created GJS wrapper. When one of them is ref-downed the object
+is recycled, leaving the other reference dangling.
+
+To fix this we just need to maintain the list as a non-floating ref.
+We already have a `ibus_text_set_attributes()` that does the intended
+ref sinking, so just use that instead of manually assigning pointers.
+
+[1]: https://gitlab.gnome.org/GNOME/gjs/-/blob/db450465ab0161e131a92992c2509507aa6152aa/gi/object.cpp#L3597
+
+Closes: #2889
+
+Upstream-Status: Backport [https://github.com/ibus/ibus/commit/5bbe88a1936246185a65f76e58cc85871401e59a]
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/ibusinputcontext.c | 12 ++++--------
+ src/ibuspanelservice.c | 12 ++++--------
+ 2 files changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/src/ibusinputcontext.c b/src/ibusinputcontext.c
+index 68d12fb..bdfd166 100644
+--- a/src/ibusinputcontext.c
++++ b/src/ibusinputcontext.c
+@@ -569,10 +569,8 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -581,10 +579,8 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     default:
+         g_assert_not_reached ();
+diff --git a/src/ibuspanelservice.c b/src/ibuspanelservice.c
+index 1622982..f50cea1 100644
+--- a/src/ibuspanelservice.c
++++ b/src/ibuspanelservice.c
+@@ -1203,10 +1203,8 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -1215,10 +1213,8 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     default:
+         g_assert_not_reached ();
+-- 
+2.55.0
+

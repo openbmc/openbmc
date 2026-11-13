@@ -1,0 +1,58 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 12 Sep 2026 09:10:00 -0700
+Subject: [PATCH] src/Makefile: do not build the test modules from `all`
+
+`all` carries a module_tests prerequisite, which recurses into
+../tests/modules. That Makefile deliberately pins the compiler to the
+one found in PATH:
+
+  # This is a hack to override the default CC. When running with SANITIZER=memory
+  # tough we want to keep the compiler as clang as MSan is not supported for gcc
+  ifeq ($(uname_S),Linux)
+  ifneq ($(SANITIZER),memory)
+          LD = gcc
+          CC = gcc
+  endif
+  endif
+
+but it keeps taking CFLAGS/LDFLAGS from the environment. In a cross
+build that combination compiles and links the 47 test modules with the
+*build host* gcc while handing it the *target* compiler flags:
+
+  gcc -I../../src -O2 -g -fcanon-prefix-map \
+      -ffile-prefix-map=.../sources/redis-8.10.1=/usr/src/debug/redis/8.10.1 \
+      ... -fPIC -c commandfilter.c -o commandfilter.xo
+  gcc: error: unrecognized command-line option '-fcanon-prefix-map';
+       did you mean '-fmacro-prefix-map='?
+
+-fcanon-prefix-map only exists in GCC >= 13, and the target toolchain's
+support for it says nothing about the build host's, so the build breaks
+on any host with an older gcc.
+
+The modules are test-only artifacts: nothing links or installs them,
+and they are consumed solely by the tcl suite that `make test` drives
+from the build tree. Drop them from `all` (`test` keeps its own
+module_tests prerequisite) so no host compiler is involved in the
+cross build at all. This has to happen in the Makefile rather than by
+picking narrower goals in the caller, because `install: all` re-runs
+the phony module_tests target on its own.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 5cb4f67..4fb643b 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -410,7 +410,7 @@ REDIS_CHECK_RDB_NAME=redis-check-rdb$(PROG_SUFFIX)
+ REDIS_CHECK_AOF_NAME=redis-check-aof$(PROG_SUFFIX)
+ ALL_SOURCES=$(sort $(patsubst %.o,%.c,$(REDIS_SERVER_OBJ) $(REDIS_VEC_SETS_OBJ) $(REDIS_CLI_OBJ) $(REDIS_BENCHMARK_OBJ)))
+ 
+-all: $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME) $(TLS_MODULE) module_tests
++all: $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME) $(TLS_MODULE)
+ 	@echo ""
+ 	@echo "Hint: It's a good idea to run 'make test' ;)"
+ 	@echo ""

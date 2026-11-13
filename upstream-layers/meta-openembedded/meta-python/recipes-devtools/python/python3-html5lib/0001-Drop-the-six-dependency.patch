@@ -1,0 +1,397 @@
+From 2d62ee4926f2597839b59201504a6075651b2978 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 18 Sep 2026 11:22:50 +0200
+Subject: [PATCH] Drop the six dependency
+
+html5lib only runs on Python 3 nowadays, so the six shims can be replaced by
+their builtins: text_type/string_types by str, binary_type by bytes, unichr by
+chr, viewkeys by dict.keys, with_metaclass by the metaclass keyword and the
+six.moves imports by http.client, urllib.response and urllib.parse. The PY3
+branches collapse to their Python 3 half.
+
+Upstream-Status: Submitted [https://github.com/html5lib/html5lib-python/pull/581]
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ html5lib/_inputstream.py            |  8 ++++----
+ html5lib/_tokenizer.py              |  1 -
+ html5lib/_trie/py.py                |  3 +--
+ html5lib/_utils.py                  | 14 +++-----------
+ html5lib/filters/lint.py            | 29 ++++++++++++++---------------
+ html5lib/filters/sanitizer.py       |  2 +-
+ html5lib/html5parser.py             |  5 ++---
+ html5lib/serializer.py              |  5 ++---
+ html5lib/treebuilders/base.py       |  5 ++---
+ html5lib/treebuilders/etree.py      |  3 +--
+ html5lib/treebuilders/etree_lxml.py |  6 +-----
+ html5lib/treewalkers/etree.py       |  3 +--
+ html5lib/treewalkers/etree_lxml.py  |  3 +--
+ setup.py                            |  1 -
+ 14 files changed, 33 insertions(+), 55 deletions(-)
+
+diff --git a/html5lib/_inputstream.py b/html5lib/_inputstream.py
+index 0207dd2..5a2fc8c 100644
+--- a/html5lib/_inputstream.py
++++ b/html5lib/_inputstream.py
+@@ -1,7 +1,7 @@
+ from __future__ import absolute_import, division, unicode_literals
+ 
+-from six import text_type
+-from six.moves import http_client, urllib
++import http.client as http_client
++import urllib.response
+ 
+ import codecs
+ import re
+@@ -131,9 +131,9 @@ def HTMLInputStream(source, **kwargs):
+          isinstance(source.fp, http_client.HTTPResponse))):
+         isUnicode = False
+     elif hasattr(source, "read"):
+-        isUnicode = isinstance(source.read(0), text_type)
++        isUnicode = isinstance(source.read(0), str)
+     else:
+-        isUnicode = isinstance(source, text_type)
++        isUnicode = isinstance(source, str)
+ 
+     if isUnicode:
+         encodings = [x for x in kwargs if x.endswith("_encoding")]
+diff --git a/html5lib/_tokenizer.py b/html5lib/_tokenizer.py
+index 4748a19..5b20f49 100644
+--- a/html5lib/_tokenizer.py
++++ b/html5lib/_tokenizer.py
+@@ -1,6 +1,5 @@
+ from __future__ import absolute_import, division, unicode_literals
+ 
+-from six import unichr as chr
+ 
+ from collections import deque, OrderedDict
+ from sys import version_info
+diff --git a/html5lib/_trie/py.py b/html5lib/_trie/py.py
+index c2ba3da..cfe7513 100644
+--- a/html5lib/_trie/py.py
++++ b/html5lib/_trie/py.py
+@@ -1,5 +1,4 @@
+ from __future__ import absolute_import, division, unicode_literals
+-from six import text_type
+ 
+ from bisect import bisect_left
+ 
+@@ -8,7 +7,7 @@ from ._base import Trie as ABCTrie
+ 
+ class Trie(ABCTrie):
+     def __init__(self, data):
+-        if not all(isinstance(x, text_type) for x in data.keys()):
++        if not all(isinstance(x, str) for x in data.keys()):
+             raise TypeError("All keys must be strings")
+ 
+         self._data = data
+diff --git a/html5lib/_utils.py b/html5lib/_utils.py
+index 9ea5794..5bc56ec 100644
+--- a/html5lib/_utils.py
++++ b/html5lib/_utils.py
+@@ -7,15 +7,7 @@ try:
+ except ImportError:
+     from collections import Mapping
+ 
+-from six import text_type, PY3
+-
+-if PY3:
+-    import xml.etree.ElementTree as default_etree
+-else:
+-    try:
+-        import xml.etree.cElementTree as default_etree
+-    except ImportError:
+-        import xml.etree.ElementTree as default_etree
++import xml.etree.ElementTree as default_etree
+ 
+ 
+ __all__ = ["default_etree", "MethodDispatcher", "isSurrogatePair",
+@@ -31,10 +23,10 @@ __all__ = ["default_etree", "MethodDispatcher", "isSurrogatePair",
+ # escapes.
+ try:
+     _x = eval('"\\uD800"')  # pylint:disable=eval-used
+-    if not isinstance(_x, text_type):
++    if not isinstance(_x, str):
+         # We need this with u"" because of http://bugs.jython.org/issue2039
+         _x = eval('u"\\uD800"')  # pylint:disable=eval-used
+-        assert isinstance(_x, text_type)
++        assert isinstance(_x, str)
+ except Exception:
+     supports_lone_surrogates = False
+ else:
+diff --git a/html5lib/filters/lint.py b/html5lib/filters/lint.py
+index acd4d7a..e012fb8 100644
+--- a/html5lib/filters/lint.py
++++ b/html5lib/filters/lint.py
+@@ -1,6 +1,5 @@
+ from __future__ import absolute_import, division, unicode_literals
+ 
+-from six import text_type
+ 
+ from . import base
+ from ..constants import namespaces, voidElements
+@@ -33,9 +32,9 @@ class Filter(base.Filter):
+             if type in ("StartTag", "EmptyTag"):
+                 namespace = token["namespace"]
+                 name = token["name"]
+-                assert namespace is None or isinstance(namespace, text_type)
++                assert namespace is None or isinstance(namespace, str)
+                 assert namespace != ""
+-                assert isinstance(name, text_type)
++                assert isinstance(name, str)
+                 assert name != ""
+                 assert isinstance(token["data"], dict)
+                 if (not namespace or namespace == namespaces["html"]) and name in voidElements:
+@@ -45,18 +44,18 @@ class Filter(base.Filter):
+                 if type == "StartTag" and self.require_matching_tags:
+                     open_elements.append((namespace, name))
+                 for (namespace, name), value in token["data"].items():
+-                    assert namespace is None or isinstance(namespace, text_type)
++                    assert namespace is None or isinstance(namespace, str)
+                     assert namespace != ""
+-                    assert isinstance(name, text_type)
++                    assert isinstance(name, str)
+                     assert name != ""
+-                    assert isinstance(value, text_type)
++                    assert isinstance(value, str)
+ 
+             elif type == "EndTag":
+                 namespace = token["namespace"]
+                 name = token["name"]
+-                assert namespace is None or isinstance(namespace, text_type)
++                assert namespace is None or isinstance(namespace, str)
+                 assert namespace != ""
+-                assert isinstance(name, text_type)
++                assert isinstance(name, str)
+                 assert name != ""
+                 if (not namespace or namespace == namespaces["html"]) and name in voidElements:
+                     assert False, "Void element reported as EndTag token: %(tag)s" % {"tag": name}
+@@ -66,26 +65,26 @@ class Filter(base.Filter):
+ 
+             elif type == "Comment":
+                 data = token["data"]
+-                assert isinstance(data, text_type)
++                assert isinstance(data, str)
+ 
+             elif type in ("Characters", "SpaceCharacters"):
+                 data = token["data"]
+-                assert isinstance(data, text_type)
++                assert isinstance(data, str)
+                 assert data != ""
+                 if type == "SpaceCharacters":
+                     assert data.strip(spaceCharacters) == ""
+ 
+             elif type == "Doctype":
+                 name = token["name"]
+-                assert name is None or isinstance(name, text_type)
+-                assert token["publicId"] is None or isinstance(name, text_type)
+-                assert token["systemId"] is None or isinstance(name, text_type)
++                assert name is None or isinstance(name, str)
++                assert token["publicId"] is None or isinstance(name, str)
++                assert token["systemId"] is None or isinstance(name, str)
+ 
+             elif type == "Entity":
+-                assert isinstance(token["name"], text_type)
++                assert isinstance(token["name"], str)
+ 
+             elif type == "SerializerError":
+-                assert isinstance(token["data"], text_type)
++                assert isinstance(token["data"], str)
+ 
+             else:
+                 assert False, "Unknown token type: %(type)s" % {"type": type}
+diff --git a/html5lib/filters/sanitizer.py b/html5lib/filters/sanitizer.py
+index 70ef906..b949127 100644
+--- a/html5lib/filters/sanitizer.py
++++ b/html5lib/filters/sanitizer.py
+@@ -12,7 +12,7 @@ import re
+ import warnings
+ from xml.sax.saxutils import escape, unescape
+ 
+-from six.moves import urllib_parse as urlparse
++import urllib.parse as urlparse
+ 
+ from . import base
+ from ..constants import namespaces, prefixes
+diff --git a/html5lib/html5parser.py b/html5lib/html5parser.py
+index 74d829d..653f49a 100644
+--- a/html5lib/html5parser.py
++++ b/html5lib/html5parser.py
+@@ -1,5 +1,4 @@
+ from __future__ import absolute_import, division, unicode_literals
+-from six import with_metaclass, viewkeys
+ 
+ import types
+ 
+@@ -423,7 +422,7 @@ def getPhases(debug):
+             return type
+ 
+     # pylint:disable=unused-argument
+-    class Phase(with_metaclass(getMetaclass(debug, log))):
++    class Phase(metaclass=getMetaclass(debug, log)):
+         """Base class for helper object that implements each phase of processing
+         """
+         __slots__ = ("parser", "tree", "__startTagCache", "__endTagCache")
+@@ -2776,7 +2775,7 @@ def getPhases(debug):
+ 
+ 
+ def adjust_attributes(token, replacements):
+-    needs_adjustment = viewkeys(token['data']) & viewkeys(replacements)
++    needs_adjustment = token['data'].keys() & replacements.keys()
+     if needs_adjustment:
+         token['data'] = type(token['data'])((replacements.get(k, k), v)
+                                             for k, v in token['data'].items())
+diff --git a/html5lib/serializer.py b/html5lib/serializer.py
+index c66df68..e3b8ea5 100644
+--- a/html5lib/serializer.py
++++ b/html5lib/serializer.py
+@@ -1,5 +1,4 @@
+ from __future__ import absolute_import, division, unicode_literals
+-from six import text_type
+ 
+ import re
+ 
+@@ -222,14 +221,14 @@ class HTMLSerializer(object):
+         self.strict = False
+ 
+     def encode(self, string):
+-        assert(isinstance(string, text_type))
++        assert(isinstance(string, str))
+         if self.encoding:
+             return string.encode(self.encoding, "htmlentityreplace")
+         else:
+             return string
+ 
+     def encodeStrict(self, string):
+-        assert(isinstance(string, text_type))
++        assert(isinstance(string, str))
+         if self.encoding:
+             return string.encode(self.encoding, "strict")
+         else:
+diff --git a/html5lib/treebuilders/base.py b/html5lib/treebuilders/base.py
+index e4a3d71..24759e9 100644
+--- a/html5lib/treebuilders/base.py
++++ b/html5lib/treebuilders/base.py
+@@ -1,5 +1,4 @@
+ from __future__ import absolute_import, division, unicode_literals
+-from six import text_type
+ 
+ from ..constants import scopingElements, tableInsertModeElements, namespaces
+ 
+@@ -199,7 +198,7 @@ class TreeBuilder(object):
+         # match any node with that name
+         exactNode = hasattr(target, "nameTuple")
+         if not exactNode:
+-            if isinstance(target, text_type):
++            if isinstance(target, str):
+                 target = (namespaces["html"], target)
+             assert isinstance(target, tuple)
+ 
+@@ -322,7 +321,7 @@ class TreeBuilder(object):
+ 
+     def insertElementNormal(self, token):
+         name = token["name"]
+-        assert isinstance(name, text_type), "Element %s not unicode" % name
++        assert isinstance(name, str), "Element %s not unicode" % name
+         namespace = token.get("namespace", self.defaultNamespace)
+         element = self.elementClass(name, namespace)
+         element.attributes = token["data"]
+diff --git a/html5lib/treebuilders/etree.py b/html5lib/treebuilders/etree.py
+index 086bed4..eb1f026 100644
+--- a/html5lib/treebuilders/etree.py
++++ b/html5lib/treebuilders/etree.py
+@@ -1,7 +1,6 @@
+ from __future__ import absolute_import, division, unicode_literals
+ # pylint:disable=protected-access
+ 
+-from six import text_type
+ 
+ import re
+ 
+@@ -222,7 +221,7 @@ def getETreeBuilder(ElementTreeImplementation, fullTree=False):
+             elif element.tag == ElementTreeCommentType:
+                 rv.append("|%s<!-- %s -->" % (' ' * indent, element.text))
+             else:
+-                assert isinstance(element.tag, text_type), \
++                assert isinstance(element.tag, str), \
+                     "Expected unicode, got %s, %s" % (type(element.tag), element.tag)
+                 nsmatch = tag_regexp.match(element.tag)
+ 
+diff --git a/html5lib/treebuilders/etree_lxml.py b/html5lib/treebuilders/etree_lxml.py
+index e73de61..b13b23b 100644
+--- a/html5lib/treebuilders/etree_lxml.py
++++ b/html5lib/treebuilders/etree_lxml.py
+@@ -28,7 +28,6 @@ from . import etree as etree_builders
+ from .. import _ihatexml
+ 
+ import lxml.etree as etree
+-from six import PY3, binary_type
+ 
+ 
+ fullTree = True
+@@ -207,10 +206,7 @@ class TreeBuilder(base.TreeBuilder):
+                 return name
+ 
+             def __getitem__(self, key):
+-                value = self._element._element.attrib[self._coerceKey(key)]
+-                if not PY3 and isinstance(value, binary_type):
+-                    value = value.decode("ascii")
+-                return value
++                return self._element._element.attrib[self._coerceKey(key)]
+ 
+             def __setitem__(self, key, value):
+                 self._element._element.attrib[self._coerceKey(key)] = value
+diff --git a/html5lib/treewalkers/etree.py b/html5lib/treewalkers/etree.py
+index 4465337..0bfd81f 100644
+--- a/html5lib/treewalkers/etree.py
++++ b/html5lib/treewalkers/etree.py
+@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, unicode_literals
+ from collections import OrderedDict
+ import re
+ 
+-from six import string_types
+ 
+ from . import base
+ from .._utils import moduleFactoryFactory
+@@ -51,7 +50,7 @@ def getETreeBuilder(ElementTreeImplementation):
+                 return base.COMMENT, node.text
+ 
+             else:
+-                assert isinstance(node.tag, string_types), type(node.tag)
++                assert isinstance(node.tag, str), type(node.tag)
+                 # This is assumed to be an ordinary element
+                 match = tag_regexp.match(node.tag)
+                 if match:
+diff --git a/html5lib/treewalkers/etree_lxml.py b/html5lib/treewalkers/etree_lxml.py
+index a614ac5..9514f57 100644
+--- a/html5lib/treewalkers/etree_lxml.py
++++ b/html5lib/treewalkers/etree_lxml.py
+@@ -1,5 +1,4 @@
+ from __future__ import absolute_import, division, unicode_literals
+-from six import text_type
+ 
+ from collections import OrderedDict
+ 
+@@ -14,7 +13,7 @@ from .. import _ihatexml
+ def ensure_str(s):
+     if s is None:
+         return None
+-    elif isinstance(s, text_type):
++    elif isinstance(s, str):
+         return s
+     else:
+         return s.decode("ascii", "strict")
+diff --git a/setup.py b/setup.py
+index f84c128..b195d30 100644
+--- a/setup.py
++++ b/setup.py
+@@ -104,7 +104,6 @@ setup(name='html5lib',
+       maintainer_email='james@hoppipolla.co.uk',
+       packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+       install_requires=[
+-          'six>=1.9',
+           'webencodings',
+       ],
+       python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+-- 
+2.55.0
+

@@ -21,6 +21,7 @@ SRC_URI = "http://www.atoptool.nl/download/${BP}.tar.gz \
            ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'file://volatiles.atop.conf', 'file://volatiles.99_atop', d)} \
            file://fix-permissions.patch \
            file://sysvinit-implement-status.patch \
+           file://ncursesw-pkgconfig-cflags.patch \
            "
 SRC_URI[sha256sum] = "ea182f84c9f52ca922e5af4f17dff97ff424400a4f2f92393317a6af66e6a874"
 

@@ -1,0 +1,43 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] common/txring: fix struct ethhdr redefinition on musl
+
+This #if was gated on "__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1", which is
+false (and always has been) for any non-glibc libc, so musl always took
+the #else branch and included the raw kernel <linux/if_ether.h> uapi
+header. sendpacket.h already brings in musl's own <netinet/if_ether.h>
+earlier in the translation unit; musl's header defines struct ethhdr
+itself and only then defines __UAPI_DEF_ETHHDR as 0, so the *following*
+<linux/if_ether.h> checks that guard and skips its own definition. With
+the #else branch taken, <linux/if_ether.h> is included via this file
+without musl's guard ever being set, so struct ethhdr is defined twice
+and the build fails with a hard redefinition error.
+
+Widen the condition so any libc other than a pre-2.1 glibc uses the
+portable <net/ethernet.h> path (which both glibc and musl have always
+provided) instead of falling through to the raw uapi header.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/common/txring.h
++++ b/src/common/txring.h
+@@ -38,7 +38,17 @@
+
+ #ifdef HAVE_TX_RING
+
+-#if __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
++/* This block used to be conditioned on plain "__GLIBC__ >= 2 &&
++ * __GLIBC_MINOR__ >= 1" i.e. it always took the #else branch on non-glibc
++ * libcs such as musl. That branch's <linux/if_ether.h> then races with
++ * sendpacket.h's earlier <netinet/if_ether.h>: whichever of the two struct
++ * ethhdr definitions is seen first "wins" and the second is a hard error
++ * (musl's <netinet/if_ether.h> defines struct ethhdr unconditionally and
++ * only afterwards sets __UAPI_DEF_ETHHDR=0, so <linux/if_ether.h> must be
++ * included after it, not before). <net/ethernet.h> is the safe, universal
++ * choice here (glibc has always had it too) and avoids the raw uapi header
++ * entirely. */
++#if !defined(__GLIBC__) || (__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1)
+ #include <net/ethernet.h> /* the L2 protocols */
+ #include <linux/if_packet.h>
+ #else

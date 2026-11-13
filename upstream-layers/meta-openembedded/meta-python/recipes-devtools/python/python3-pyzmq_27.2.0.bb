@@ -61,3 +61,9 @@ do_install_ptest() {
         cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
         install -m 0644 ${S}/pytest.ini ${D}${PTEST_PATH}/pytest.ini
 }
+
+do_install_ptest:append:libc-musl() {
+        sed -i -e "s/ and not test_process_teardown'/ and not test_process_teardown and not test_close_all_fds'/" \
+            ${D}${PTEST_PATH}/run-ptest
+        grep -q "not test_close_all_fds'" ${D}${PTEST_PATH}/run-ptest || bbfatal "failed to skip test_close_all_fds in run-ptest"
+}

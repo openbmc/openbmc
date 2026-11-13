@@ -8,6 +8,9 @@ SRC_URI = "http://poppler.freedesktop.org/${BP}.tar.xz \
            file://basename-include.patch \
            file://0001-cmake-Do-not-use-isystem.patch \
            file://0001-workaround-build-racing.patch \
+           file://CVE-2026-102621.patch \
+           file://CVE-2026-102620-1.patch \
+           file://CVE-2026-102620-2.patch \
            "
 SRC_URI[sha256sum] = "dc906e68cea698109706ac6aa3d2c9d4512fcfcac42d90b8afcda486d1b9abd0"
 

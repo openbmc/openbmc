@@ -1,0 +1,34 @@
+SUMMARY = "Gnome system monitor"
+LICENSE = "GPL-2.0-only"
+LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
+
+DEPENDS = " \
+    catch2 \
+    libxml2-native \
+    glib-2.0-native \
+    glibmm-2.68 \
+    gtkmm4 \
+    gtk4 \
+    libadwaita \
+    libgtop \
+    librsvg \
+"
+
+inherit gnomebase gsettings gnome-help itstool gtk-icon-cache features_check gettext
+
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+REQUIRED_DISTRO_FEATURES = "opengl"
+
+SRC_URI[archive.sha256sum] = "8887b03427230ac0816d4b0c801ce6628ad1fc9139ed3072914e9faa881ba868"
+
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG[systemd] = "-Dsystemd=true, -Dsystemd=false, systemd"
+
+TARGET_LDFLAGS:append = " ${DEBUG_PREFIX_MAP}"
+
+RRECOMMENDS:${PN} = "adwaita-icon-theme"
+
+FILES:${PN} += " \
+    ${datadir}/dbus-1 \
+    ${datadir}/metainfo \
+"

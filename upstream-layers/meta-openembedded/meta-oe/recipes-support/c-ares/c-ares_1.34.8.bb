@@ -6,6 +6,14 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=d3e72a10e08191f2ca1be3f3228d78f3"
 
 SRC_URI = "https://github.com/c-ares/c-ares/releases/download/v${PV}/${BPN}-${PV}.tar.gz \
+           file://0001-ares_cancel-ares_destroy-detach-queries-before-callbacks.patch \
+           file://0002-Deliver-deferred-socket-server-state-notifications.patch \
+           file://0003-ares_qcache-hand-callbacks-their-own-copy.patch \
+           file://0004-Handle-connections-torn-down-by-application.patch \
+           file://0005-ares_process-only-accept-an-answer-on-the-right-connection.patch \
+           file://0006-ares_save_options-read-channel-config-under-lock.patch \
+           file://0007-ares_inet_pton-reject-a-prefix-length.patch \
+           file://0008-ares_conn_read-dont-drop-UDP-answers-from-server-port.patch \
            file://run-ptest"
 SRC_URI[sha256sum] = "c222b6d681096f9444d2c4863d2c1174019e27cacca0a4a5c114d36dd7d7bf78"
 

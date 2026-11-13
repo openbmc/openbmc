@@ -21,5 +21,4 @@ RDEPENDS:${PN} += "\
     python3-protobuf \
     python3-pytz \
     python3-requests \
-    python3-six \
 "

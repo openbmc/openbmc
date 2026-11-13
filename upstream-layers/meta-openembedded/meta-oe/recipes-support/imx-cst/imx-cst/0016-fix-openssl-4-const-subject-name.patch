@@ -1,0 +1,48 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Sep 2026 01:30:00 +0000
+Subject: Fix FTBFS with OpenSSL 4.0: const X509_get_subject_name()
+
+OpenSSL 4.0 changed X509_get_subject_name() to return a const X509_NAME *,
+so using its result as the destination of X509_NAME_add_entry_by_txt() no
+longer compiles:
+
+  src/tools/pki_tree/pki_helper.c:440:10: error: assigning to 'X509_NAME *'
+    from 'const X509_NAME *' discards qualifiers
+    [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+
+There is no mutable counterpart to the getter (unlike X509_getm_notAfter),
+so build the subject name as a standalone X509_NAME and install it with
+X509_set_subject_name(). Both setters copy the name, so it is freed once
+the issuer name has been set from it too.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/src/tools/pki_tree/pki_helper.c
++++ b/src/tools/pki_tree/pki_helper.c
+@@ -437,11 +437,15 @@
+     if (X509_set_pubkey(x509, pkey) != 1)
+         handle_errors();
+ 
+-    name = X509_get_subject_name(x509);
++    name = X509_NAME_new();
++    if (!name)
++        handle_errors();
+     if (X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC,
+                                    (const unsigned char *) subj, -1, -1,
+                                    0) != 1)
+         handle_errors();
++    if (X509_set_subject_name(x509, name) != 1)
++        handle_errors();
+     if (sign_cert)
+     {
+         if (X509_set_issuer_name(x509, X509_get_subject_name(sign_cert)) != 1)
+@@ -452,6 +456,7 @@
+         if (X509_set_issuer_name(x509, name) != 1)
+             handle_errors();
+     }
++    X509_NAME_free(name);
+ 
+     if (is_ca)
+     {

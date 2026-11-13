@@ -6,7 +6,9 @@ SECTION = "libs"
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=4fbd65380cdd255951079008b364516c"
 
-SRC_URI = "git://github.com/stephane/libmodbus;branch=master;protocol=https;tag=v${PV}"
+SRC_URI = "git://github.com/stephane/libmodbus;branch=master;protocol=https;tag=v${PV} \
+           file://0001-modbus-rtu-pull-in-TCGETS2-TCSETS2-from-asm-ioctls.h.patch \
+           "
 SRCREV = "a9b025d12289855490b10d77461c99e001abfc0f"
 
 

@@ -25,5 +25,4 @@ RDEPENDS:${PN} += " \
     python3-snappy \
     python3-pyopenssl \
     python3-txaio \
-    python3-six \
 "

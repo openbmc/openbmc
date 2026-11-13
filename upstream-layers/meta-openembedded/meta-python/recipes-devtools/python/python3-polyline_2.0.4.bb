@@ -7,7 +7,5 @@ SRC_URI[sha256sum] = "f05ade694522bf1720febebe1672f820f43a13c6a1664751e7769d47e8
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
-RDEPENDS:${PN} += "python3-six"
-
 BBCLASSEXTEND = "native nativesdk"
 

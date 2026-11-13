@@ -57,6 +57,17 @@ do_install() {
         install -m 0755 ${S}/testProgs/${i} ${D}${bindir}/
     done
     install -m 0755 ${S}/mediaServer/live555MediaServer ${D}${bindir}/
+
+    # Upstream ships no pkg-config file; provide one
+    install -d ${D}${libdir}/pkgconfig
+    cat > ${D}${libdir}/pkgconfig/live555.pc <<'EOF'
+Name: live555
+Description: ${DESCRIPTION}
+Version: ${PV}
+Requires: openssl
+Libs: -L${libdir} -lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment
+Cflags: -I${includedir}/liveMedia -I${includedir}/groupsock -I${includedir}/BasicUsageEnvironment -I${includedir}/UsageEnvironment
+EOF
 }
 
 RDEPENDS:${PN}-dev = ""

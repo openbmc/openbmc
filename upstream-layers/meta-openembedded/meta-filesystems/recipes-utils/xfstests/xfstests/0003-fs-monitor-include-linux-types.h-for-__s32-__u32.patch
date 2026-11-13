@@ -1,0 +1,24 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:03:26 +0000
+Subject: [PATCH] fs-monitor: include linux/types.h for __s32/__u32
+
+The local fallback definition of "struct fanotify_event_info_error"
+(used when the libc's <sys/fanotify.h> predates FAN_FS_ERROR) uses the
+kernel-style __s32/__u32 typedefs. glibc's headers happen to pull
+these in transitively via other system headers, but musl does not, so
+building against musl fails with "unknown type name '__s32'/'__u32'"
+unless <linux/types.h> is included directly.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/fs-monitor.c
++++ b/src/fs-monitor.c
+@@ -12,6 +12,7 @@
+ #include <sys/fanotify.h>
+ #include <sys/types.h>
+ #include <unistd.h>
++#include <linux/types.h>
+ 
+ #ifndef FAN_FS_ERROR
+ #define FAN_FS_ERROR		0x00008000

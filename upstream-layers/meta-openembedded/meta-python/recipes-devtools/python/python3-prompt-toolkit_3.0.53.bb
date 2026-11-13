@@ -11,7 +11,6 @@ PYPI_PACKAGE = "prompt_toolkit"
 
 RDEPENDS:${PN} += " \
     python3-core \
-    python3-six \
     python3-terminal \
     python3-threading \
     python3-wcwidth \

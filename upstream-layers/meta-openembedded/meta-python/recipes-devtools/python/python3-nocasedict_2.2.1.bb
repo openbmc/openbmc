@@ -13,7 +13,3 @@ DEPENDS += " \
     python3-setuptools-scm-native \
     python3-toml-native \
 "
-
-RDEPENDS:${PN} += " \
-    python3-six \
-"

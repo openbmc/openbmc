@@ -12,8 +12,4 @@ SRC_URI[sha256sum] = "3ecdbd8f2cc195f53ccada3a613538bb5f9ef6f6869129f13e03c30a67
 
 DEPENDS += "python3-setuptools-scm-native"
 
-RDEPENDS:${PN} += " \
-	python3-six \
-"
-
 BBCLASSEXTEND = "native nativesdk"

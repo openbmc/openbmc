@@ -28,6 +28,7 @@ SRC_URI = "${CPAN_MIRROR}/authors/id/C/CH/CHRISN/Net-SSLeay-${PV}.tar.gz \
            file://0001-Fix-SSLv3-in-OpenSSL-4.0.0.patch \
            file://0002-OpenSSL-4.0.0-remove-support-for-some-TLS-functions.patch \
            file://0003-Fix-Net-SSLeay-to-support-opaque-ASN1_STRING.patch \
+           file://0004-Update-tests-for-removal-of-SSLv2-Client-Hello-suppo.patch \
            "
 SRC_URI[sha256sum] = "ab213691685fb2a576c669cbc8d9266f8165a31563ad15b7c4030b94adfc0753"
 

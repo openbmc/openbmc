@@ -10,6 +10,8 @@ SRC_URI = "git://salsa.debian.org/parted-team/fatresize.git;protocol=https;branc
           "
 SRCREV = "7494fba0f14f706c17b9d89ae273efd113c944ca"
 
+UPSTREAM_CHECK_GITTAGREGEX = "debian/(?P<pver>\d+(.\d+)+-\d+)"
+
 DEPENDS = "parted"
 
 inherit autotools pkgconfig

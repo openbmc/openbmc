@@ -15,7 +15,6 @@ do_configure:prepend() {
 RDEPENDS:${PN} = "\
     python3-ctypes \
     python3-misc \
-    python3-six \
     python3-threading \
     python3-fcntl \
     libudev \

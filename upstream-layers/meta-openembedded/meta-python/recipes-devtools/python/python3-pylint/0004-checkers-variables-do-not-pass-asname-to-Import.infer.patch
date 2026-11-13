@@ -1,0 +1,39 @@
+From 554b1d1924342ce2e5b4d8f79dd62eab7cd67501 Mon Sep 17 00:00:00 2001
+From: Daniël van Noord <13665637+DanielNoord@users.noreply.github.com>
+Date: Sat, 4 Jul 2026 23:17:33 +0200
+Subject: [PATCH] checkers/variables: do not pass asname to Import.infer()
+
+astroid 4.2 removed the asname keyword argument from Import/ImportFrom
+inference (astroid commit fe29fb1f7e3e, "Remove `asname` kwarg from
+Import/ImportFrom `_infer`"). With astroid >= 4.2, pylint 4.0.8 then
+crashes on any module that imports a missing submodule of a package:
+
+  TypeError: NodeNG.infer() got an unexpected keyword argument 'asname'
+  ... (astroid-error)
+
+which breaks the fallback_import_enabled, import_error and
+no_name_in_module functional tests with the astroid 4.3.1 in meta-python.
+
+This is the pylint/ part of upstream commit 554b1d192434
+("Bump `astroid` to `4.2.0b4` (#11153)"); the astroid version pin
+changes in pyproject.toml and requirements_test_min.txt are left out.
+
+Upstream-Status: Backport [https://github.com/pylint-dev/pylint/commit/554b1d192434]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ pylint/checkers/variables.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pylint/checkers/variables.py b/pylint/checkers/variables.py
+index 3ce7dc63410..7e5f27b70ef 100644
+--- a/pylint/checkers/variables.py
++++ b/pylint/checkers/variables.py
+@@ -217,7 +217,7 @@ class C: ...
+ def _infer_name_module(node: nodes.Import, name: str) -> Generator[InferenceResult]:
+     context = astroid.context.InferenceContext()
+     context.lookupname = name
+-    return node.infer(context, asname=False)  # type: ignore[no-any-return]
++    return node.infer(context)  # type: ignore[no-any-return]
+ 
+ 
+ def _fix_dot_imports(

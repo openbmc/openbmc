@@ -12,7 +12,6 @@ RDEPENDS:${PN} += " \
     python3-json \
     python3-jsonschema \
     python3-requests \
-    python3-six \
     python3-deprecated \
     python3-wrapt \
 "

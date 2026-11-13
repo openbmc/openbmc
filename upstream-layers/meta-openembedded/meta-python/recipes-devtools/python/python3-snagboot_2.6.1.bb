@@ -13,7 +13,6 @@ RDEPENDS:${PN} += " \
     python3-pyusb \
     python3-pyyaml \
     python3-setuptools \
-    python3-six \
 "
 
 do_install:append() {

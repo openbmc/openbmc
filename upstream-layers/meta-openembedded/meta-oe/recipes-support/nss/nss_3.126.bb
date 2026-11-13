@@ -32,6 +32,8 @@ SRC_URI = "https://ftp.mozilla.org/pub/security/nss/releases/${VERSION_DIR}/src/
            file://0005-nss-does-not-build-on-mips-with-clang-because-wrong-.patch  \
            file://0006-Fix-nss-multilib-build-on-openSUSE-11.x-32bit.patch \
            file://0007-freebl-add-a-configure-option-to-disable-ARM-HW-cryp.patch \
+           file://0008-Bug-2083709-Remove-eMudhra-emSign-Root-CA-C1-and-emS.patch \
+           file://0009-Bug-2084101-Remove-eMudhra-emSign-Root-CA-G3-from-NS.patch \
            "
 SRC_URI[sha256sum] = "7aa07c758be1453d82d739240b249ffb7aef0041be488067e1c0f348e1f9e337"
 

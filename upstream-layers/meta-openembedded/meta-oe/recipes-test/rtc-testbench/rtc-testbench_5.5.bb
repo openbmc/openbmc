@@ -15,6 +15,7 @@ LIC_FILES_CHKSUM = " \
 SRC_URI = " \
     git://github.com/Linutronix/RTC-Testbench.git;tag=v${PV};nobranch=1;protocol=https \
     file://0001-CMakeLists.txt-make-BPF-clang-and-include-paths-conf.patch \
+    file://0002-Fix-build-with-musl.patch \
 "
 SRCREV = "b7541b4b93b4d9fe6f395bc53d3cb50401d406a4"
 

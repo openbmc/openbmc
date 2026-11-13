@@ -13,7 +13,6 @@ PTEST_PYTEST_DIR = "src/tests"
 
 RDEPENDS:${PN} += " \
 	python3-pprint \
-	python3-six \
 "
 
 CVE_STATUS[CVE-2023-26112] = "fixed-version: the current version (5.0.9) is already fixed"

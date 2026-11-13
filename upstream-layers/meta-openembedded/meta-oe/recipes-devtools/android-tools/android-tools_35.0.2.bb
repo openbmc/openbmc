@@ -57,6 +57,9 @@ SRC_URI = "https://deb.debian.org/debian/pool/main/a/android-platform-tools/andr
            file://0009-libbase-include-stdint.h-in-hex.cpp.patch \
            file://0010-adbd-make-systemd-sd_notify-conditional-on-HAVE_SYSTEMD.patch \
            file://0011-adb-drop-non-portable-is_standard_layout-assertion.patch \
+           file://0012-libbase-off64_t-extend-non-glibc-compat-typedef-to-musl.patch \
+           file://0013-adb-sysdeps-provide-pread64-pwrite64-lseek64-fallba.patch \
+           file://0014-daemon-auth-vendor-a-portable-b64_pton-for-non-glib.patch \
            "
 
 SRC_URI[orig.md5sum] = "352376965cdef7bd7505d8fefdd43d50"
@@ -81,12 +84,20 @@ SYSTEMD_PACKAGES = "${PN}-adbd"
 SYSTEMD_SERVICE:${PN}-adbd = "android-tools-adbd.service"
 
 CFLAGS:append = " -fPIC -std=gnu2x"
+# android-base/endian.h and threads.h already have an
+# ANDROID_HOST_MUSL-gated branch for building against musl (alongside their
+# __GLIBC__ one); upstream expects the build system to define this macro,
+# which the debian/ Makefile-based packaging used here doesn't do on its
+# own.  Without it those headers fall through to their Windows-only branch
+# and fail with "'winsock2.h' file not found".
+CFLAGS:append:libc-musl = " -DANDROID_HOST_MUSL"
 # The bundled fmtlib 10.2.0 validates FMT_STRING() inside a consteval
 # basic_format_string constructor whose parse path evaluates "it - begin()",
 # which current C++ frontends reject as a non-constant subexpression. Define
 # FMT_CONSTEVAL to empty so format-string checking falls back to fmt's runtime
 # path instead of the broken compile-time one.
 CXXFLAGS:append = " -fPIC -std=gnu++20 -D_Nonnull= -D_Nullable= -I${STAGING_INCDIR}/boringssl -DFMT_CONSTEVAL="
+CXXFLAGS:append:libc-musl = " -DANDROID_HOST_MUSL"
 LDFLAGS:append = " -fPIC -L${STAGING_LIBDIR}/android"
 
 
@@ -228,6 +239,7 @@ do_install:append:class-native() {
 PACKAGES =+ "${PN}-adbd"
 RDEPENDS:${PN}:class-target = "android-tools-conf-configfs 7zip android-libboringssl"
 RDEPENDS:${PN}-adbd += "${PN}"
+RRECOMMENDS:${PN}-adbd += "kernel-module-libcomposite kernel-module-usb-f-fs"
 PRIVATE_LIBS:${PN} = "liblog.so.0 libbase.so.0 libcutils.so.0"
 
 inherit useradd

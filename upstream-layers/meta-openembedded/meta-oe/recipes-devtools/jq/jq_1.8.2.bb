@@ -48,3 +48,7 @@ do_install_ptest() {
 RDEPENDS:${PN}-ptest += "tzdata"
 
 BBCLASSEXTEND = "native"
+
+CVE_STATUS_GROUPS += "CVE_STATUS_FIXED_ALREADY"
+CVE_STATUS_FIXED_ALREADY[status] = "fixed-version: The issue is fixed in v1.8.2"
+CVE_STATUS_FIXED_ALREADY = "CVE-2026-33948 CVE-2026-39979 CVE-2026-40164 CVE-2026-44777"

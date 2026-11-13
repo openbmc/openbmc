@@ -1,0 +1,35 @@
+From 2ef56c134de35938119105dd92ca5ae4842ab338 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 11 Sep 2026 07:46:11 -0700
+Subject: [PATCH] build: do not override Automake's own .INTERMEDIATE target
+
+Automake defines .INTERMEDIATE itself in distdir.am, so declaring it in
+Makefile.am makes automake complain, and since configure.ac uses
+AM_INIT_AUTOMAKE([-Wall -Werror]) the warning is fatal:
+
+  automake: warnings are treated as errors
+  Makefile.am:152: warning: user target '.INTERMEDIATE' defined here ...
+  .../automake-1.19/am/distdir.am: ... overrides Automake target '.INTERMEDIATE' defined here
+  autoreconf: error: automake failed with exit status: 1
+
+The declaration only asked make to remove the generated linux/Version.h
+again once the build is done, which is not worth breaking the build over.
+Drop it.
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 112e172..8110fae 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -149,7 +149,6 @@ man_MANS = docs/sedutil-cli.8
+ linux/Version.h:
+ 	$(srcdir)/Customizations/linux/CLI/GitVersion.sh > linux/Version.h
+ 
+-.INTERMEDIATE: linux/Version.h
+ 
+ maintainer-clean-local:
+ 	rm config.status configure config.log

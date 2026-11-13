@@ -1,0 +1,81 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] lib/util: avoid struct ethhdr redefinition on musl
+
+lib/util/params.h and lib/util/params.c only need ETH_ALEN from
+<linux/if_ether.h>, but including that raw kernel uapi header can
+collide with musl's own <netinet/if_ether.h>: musl only skips its own
+struct ethhdr (via __UAPI_DEF_ETHHDR) once its own header has already
+been processed, so pulling in <linux/if_ether.h> first, or from a
+translation unit that later also includes <net/ethernet.h>, defines
+struct ethhdr twice and fails to build. Switch both files to use
+<netinet/if_ether.h> directly instead of the uapi header.
+
+lib/util/xdpsock.c already includes <netinet/ether.h> (which pulls in
+musl's <netinet/if_ether.h>) after also including <linux/if_ether.h>
+earlier in the file, i.e. in the wrong order for musl's
+__UAPI_DEF_ETHHDR guard to take effect. Move the <linux/if_ether.h>
+include to after <netinet/ether.h> so the guard suppresses the uapi
+header's struct ethhdr as intended.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+diff --git a/lib/util/params.c b/lib/util/params.c
+index 5a5ee11..f4b143c 100644
+--- a/lib/util/params.c
++++ b/lib/util/params.c
+@@ -10,7 +10,9 @@
+ #include <errno.h>
+
+ #include <net/if.h>
+-#include <linux/if_ether.h>
++/* ETH_ALEN only; see params.h for why this uses the libc header instead of
++ * the raw <linux/if_ether.h> uapi one. */
++#include <netinet/if_ether.h>
+ #include <linux/if_link.h> /* XDP_FLAGS_* depend on kernel-headers installed */
+ #include <linux/if_xdp.h>
+ #include <arpa/inet.h>
+diff --git a/lib/util/params.h b/lib/util/params.h
+index ab0ee4a..b50c259 100644
+--- a/lib/util/params.h
++++ b/lib/util/params.h
+@@ -8,7 +8,12 @@
+ #include <stdlib.h>
+ #include <linux/in.h>
+ #include <linux/in6.h>
+-#include <linux/if_ether.h>
++/* Only ETH_ALEN is needed here; use the libc's own header (rather than the
++ * raw kernel uapi one) so we don't end up defining struct ethhdr twice when
++ * a translation unit also includes <net/ethernet.h>/<netinet/ether.h> (musl
++ * only suppresses <linux/if_ether.h>'s struct ethhdr via __UAPI_DEF_ETHHDR
++ * when its own netinet/if_ether.h was included first). */
++#include <netinet/if_ether.h>
+ #include <bpf/libbpf.h>
+
+ enum option_type {
+diff --git a/lib/util/xdpsock.c b/lib/util/xdpsock.c
+index a893728..46379dc 100644
+--- a/lib/util/xdpsock.c
++++ b/lib/util/xdpsock.c
+@@ -9,7 +9,6 @@
+ #include <linux/err.h>
+ #include <linux/if_link.h>
+ #include <linux/if_xdp.h>
+-#include <linux/if_ether.h>
+ #include <linux/ip.h>
+ #include <linux/limits.h>
+ #include <linux/udp.h>
+@@ -17,6 +16,12 @@
+ #include <arpa/inet.h>
+ #include <net/ethernet.h>
+ #include <netinet/ether.h>
++/* <linux/if_ether.h> must come after <netinet/ether.h> above: musl's
++ * <netinet/if_ether.h> (pulled in by netinet/ether.h) defines its own
++ * struct ethhdr and then sets __UAPI_DEF_ETHHDR=0, which this header
++ * checks before defining struct ethhdr itself. Included the other way
++ * around, both structs get defined and the second one is a hard error. */
++#include <linux/if_ether.h>
+ #include <net/if.h>
+ #include <poll.h>
+ #include <pthread.h>

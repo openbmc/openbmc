@@ -20,5 +20,4 @@ RDEPENDS:${PN}-ptest += " \
     python3-pyopenssl \
     python3-pyasn1-modules \
     python3-service-identity \
-    python3-six \
 "

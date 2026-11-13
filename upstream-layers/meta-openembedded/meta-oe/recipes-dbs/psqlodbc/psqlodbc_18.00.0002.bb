@@ -23,6 +23,7 @@ SRC_URI = "git://github.com/postgresql-interfaces/psqlodbc.git;protocol=https;br
            file://psqlodbc-remove-some-checks-for-cross-compiling.patch \
            file://psqlodbc-donot-use-the-hardcode-libdir.patch \
            file://psqlodbc-fix-for-ptest-support.patch \
+           file://CVE-2026-109448.patch \
            file://run-ptest \
            "
 

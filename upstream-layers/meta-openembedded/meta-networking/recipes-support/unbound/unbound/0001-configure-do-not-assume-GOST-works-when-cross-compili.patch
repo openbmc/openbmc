@@ -1,0 +1,31 @@
+From: Alper Ak <alperyasinak1@gmail.com>
+Date: Thu, 10 Sep 2026 00:10:00 +0300
+Subject: [PATCH] configure: do not assume GOST works when cross compiling
+
+The GOST check is a run test, so when cross compiling configure cannot
+execute it and falls back to "maybe", which enables GOST. The GOST code
+needs the OpenSSL ENGINE API, and OpenSSL 4.0 removed it, so the build
+then fails on implicit declarations of EVP_PKEY_asn1_find_str.
+
+We still cannot run the test, but we can check that the API the GOST
+code calls is present at all.
+
+Upstream-Status: Pending
+Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+---
+ configure.ac | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -1295,7 +1295,9 @@
+ [eval "ac_cv_c_gost_works=maybe"])
+ CFLAGS="$BAKCFLAGS"
+ else
+-eval "ac_cv_c_gost_works=maybe"
++AC_CHECK_FUNC([EVP_PKEY_asn1_find_str],
++	[eval "ac_cv_c_gost_works=maybe"],
++	[eval "ac_cv_c_gost_works=no"])
+ fi
+ AC_MSG_RESULT($ac_cv_c_gost_works)
+ ])dnl

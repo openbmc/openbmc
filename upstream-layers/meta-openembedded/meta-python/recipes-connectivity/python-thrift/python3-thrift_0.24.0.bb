@@ -14,7 +14,6 @@ PYPI_ARCHIVE_NAME_PREFIX = "python-"
 RDEPENDS:${PN} += "\
     python3-logging \
     python3-scons \
-    python3-six \
     python3-stringold \
     python3-threading \
 "

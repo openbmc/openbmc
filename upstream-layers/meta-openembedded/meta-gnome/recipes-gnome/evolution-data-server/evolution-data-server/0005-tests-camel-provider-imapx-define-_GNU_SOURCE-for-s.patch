@@ -1,0 +1,33 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:56:54 +0000
+Subject: [PATCH] tests: camel: provider-imapx: define _GNU_SOURCE for
+ strcasestr
+
+musl libc only declares strcasestr() in <string.h> when _GNU_SOURCE (or
+_BSD_SOURCE/_DEFAULT_SOURCE) is defined before the header is included,
+whereas glibc exposes this GNU extension unconditionally by default.
+Define _GNU_SOURCE as the first thing in the file, before any
+includes, so the prototype is visible on musl too.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/camel/tests/test-camel-provider-imapx.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/camel/tests/test-camel-provider-imapx.c b/src/camel/tests/test-camel-provider-imapx.c
+index 1111111..2222222 100644
+--- a/src/camel/tests/test-camel-provider-imapx.c
++++ b/src/camel/tests/test-camel-provider-imapx.c
+@@ -3,6 +3,11 @@
+  * SPDX-License-Identifier: LGPL-2.0-or-later
+  */
+
++/* Needed for strcasestr(), which musl only declares in <string.h>
++ * when a GNU/BSD feature-test macro is defined; glibc exposes it
++ * unconditionally by default. */
++#define _GNU_SOURCE
++
+ #include "evolution-data-server-config.h"
+
+ #include <string.h>

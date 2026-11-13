@@ -21,12 +21,24 @@ SRC_URI = "git://github.com/iovisor/bpftrace;branch=release/0.26.x;protocol=http
            file://0005-CMakeLists-Add-support-for-LLVM-23.patch \
            file://0001-tests-pass-C-linker-flags-and-sysroot-to-raw-compile.patch \
            file://0006-tests-do-not-embed-build-paths-in-split-DWARF-test-pr.patch \
+           file://0007-tests-testprogs-define-_GNU_SOURCE-for-pthread_setn.patch \
 "
 SRCREV = "1bac8a8daad6e0aa579980e877d0c9d5fc296593"
 
 inherit bash-completion cmake ptest pkgconfig
 
 export DEBUG_PREFIX_MAP
+
+# cmake/BuildBPF.cmake compiles the BPF data source with the plain gcc it finds
+# in PATH, i.e. the build host's compiler (see its own commentary for why it has
+# to be gcc), and 0001-cmake-BuildBPF.cmake-introduce-DEBUG_PREFIX_MAP.patch
+# hands it DEBUG_PREFIX_MAP so the embedded objects do not leak build paths.
+# -fcanon-prefix-map, which DEBUG_PREFIX_MAP_EXTRA adds for the gcc toolchain,
+# only exists in GCC >= 13: the target compiler always has it, the build host's
+# gcc may not, and then the build dies with
+#   gcc: error: unrecognized command-line option '-fcanon-prefix-map'
+# The -ffile-prefix-map= rewrites are all this needs, so drop the extra.
+DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
 
 PACKAGECONFIG ?= " \
         ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)} \

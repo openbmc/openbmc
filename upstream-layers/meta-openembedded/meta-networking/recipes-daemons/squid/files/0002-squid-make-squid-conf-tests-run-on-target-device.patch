@@ -1,4 +1,4 @@
-From cd8bf8a4bf881f84c23a5fc1f48bb716efa51512 Mon Sep 17 00:00:00 2001
+From 9f6eb086ee1d525cf404189893fccfb8a03235bb Mon Sep 17 00:00:00 2001
 From: Patrick Wicki <patrick.wicki@siemens.com>
 Date: Wed, 22 Nov 2023 15:35:44 +0100
 Subject: [PATCH] squid: make squid-conf-tests run on target device
@@ -20,7 +20,7 @@ Signed-off-by: Peter Marko <peter.marko@siemens.com>
  3 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/src/TestHeaders.am b/src/TestHeaders.am
-index 0ed5f56..d668876 100644
+index 4562d28..bc57e4c 100644
 --- a/src/TestHeaders.am
 +++ b/src/TestHeaders.am
 @@ -14,8 +14,8 @@ EXCLUDE_FROM_HDR_TESTING =
@@ -42,7 +42,7 @@ index 0ed5f56..d668876 100644
 +#TESTS += testHeaders
  CLEANFILES += testHeaders
 diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
-index 0da5844..0bc381a 100644
+index 1a7d91d..f51bf92 100644
 --- a/test-suite/Makefile.am
 +++ b/test-suite/Makefile.am
 @@ -11,7 +11,7 @@ include $(top_srcdir)/src/Common.am
@@ -105,7 +105,7 @@ index 0da5844..0bc381a 100644
 +	/var/log/squid-stderr.log.next \
 +	/var/log/squid-stderr.log.unmatched
 diff --git a/test-suite/test-squid-conf.sh b/test-suite/test-squid-conf.sh
-index 413a927..f678c5a 100755
+index 7d88ea5..bb5d76f 100755
 --- a/test-suite/test-squid-conf.sh
 +++ b/test-suite/test-squid-conf.sh
 @@ -76,7 +76,7 @@ expectMessages()
@@ -124,5 +124,5 @@ index 413a927..f678c5a 100755
 -errorLog="squid-stderr.log"
 +errorLog="/var/log/squid-stderr.log"
  
- $sbindir/squid -k parse -f $configFile 2> $errorLog
- result=$?
+ # Start `$sbindir/squid` from $configFile's directory, so that Squid can find files included by $configFile.
+ # If we decide to support relative `$sbindir` paths, we will add a portable realpath replacement.

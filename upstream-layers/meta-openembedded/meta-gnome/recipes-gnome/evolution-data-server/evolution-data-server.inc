@@ -4,12 +4,12 @@ BUGTRACKER = "https://bugzilla.gnome.org/"
 
 LICENSE = "LGPL-2.0-only AND LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6a6e689d19255cf0557f3fe7d7068212 \
-                    file://src/camel/camel.h;endline=24;md5=4150eec6c74e359401d8ed7f266984b9 \
-                    file://src/libedataserver/e-data-server-util.h;endline=20;md5=fa7fca32c1bf07f87a52094b414fe7a8 \
+                    file://src/camel/camel.h;endline=5;md5=fd00ddcc6fd84a9e7c8a3b1f760617da \
+                    file://src/libedataserver/e-data-server-util.h;endline=7;md5=48ebc221795bd4ff17dec7035065e865 \
                     "
 
 GNOMEBASEBUILDCLASS = "cmake"
 inherit gnomebase upstream-version-is-even
 
-SRC_URI[archive.sha256sum] = "2084dbdac396371b365d504c1ff45866ba8dca2f1252e5da1d3d9c33abdc1286"
-PV = "3.60.2"
+SRC_URI[archive.sha256sum] = "78be88e9a511f5afe7ff2e363eade84b622dd0282647fc576edb2d4ff2962cba"
+PV = "3.62.0"

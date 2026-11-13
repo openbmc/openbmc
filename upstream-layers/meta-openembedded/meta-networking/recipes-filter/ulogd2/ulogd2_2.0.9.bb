@@ -9,10 +9,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
 DEPENDS = "libnfnetlink"
 PROVIDES = "ulogd"
 
-SRC_URI = "git://git.netfilter.org/ulogd2;branch=master \
+SRC_URI = "git://git.netfilter.org/ulogd2;protocol=https;branch=master \
            file://ulogd.init \
            file://ulogd.service \
 "
+
+# See https://www.netfilter.org/mirrors.html#git
+PREMIRRORS:append = " git://git.netfilter.org/ulogd2 git://repo.or.cz/ulogd2.git"
 SRCREV = "1fe54ec39a071ea3b06e6883e542dfdcf40d2840"
 
 

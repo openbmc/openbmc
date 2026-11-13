@@ -1,4 +1,4 @@
-From 220b65291734b81a3c232877cf5fced20fe773e3 Mon Sep 17 00:00:00 2001
+From 89302f7b17f70504ca3613c08307ea16a722b388 Mon Sep 17 00:00:00 2001
 From: Manoj Saun <manojsingh.saun@windriver.com>
 Date: Wed, 22 Mar 2023 08:07:26 +0000
 Subject: [PATCH] postgresql: fix ptest failure of sysviews
@@ -15,17 +15,19 @@ Rebased on 18.4: context shifted (offset only, same single-line change).
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Manoj Saun <manojsingh.saun@windriver.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  src/test/regress/expected/sysviews.out | 2 +-
  src/test/regress/sql/sysviews.sql      | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/test/regress/expected/sysviews.out b/src/test/regress/expected/sysviews.out
+index 83228cf..c378012 100644
 --- a/src/test/regress/expected/sysviews.out
 +++ b/src/test/regress/expected/sysviews.out
-@@ -66,7 +66,7 @@
+@@ -66,7 +66,7 @@ and c1.path[c2.level] = c2.path[c2.level];
  (1 row)
-
+ 
  -- At introduction, pg_config had 23 entries; it may grow
 -select count(*) > 20 as ok from pg_config;
 +select count(*) > 13 as ok from pg_config;
@@ -33,16 +35,15 @@ diff --git a/src/test/regress/expected/sysviews.out b/src/test/regress/expected/
  ----
   t
 diff --git a/src/test/regress/sql/sysviews.sql b/src/test/regress/sql/sysviews.sql
+index 66179f0..0f15661 100644
 --- a/src/test/regress/sql/sysviews.sql
 +++ b/src/test/regress/sql/sysviews.sql
-@@ -43,7 +43,7 @@
+@@ -43,7 +43,7 @@ where c2.name = 'CacheMemoryContext'
  and c1.path[c2.level] = c2.path[c2.level];
-
+ 
  -- At introduction, pg_config had 23 entries; it may grow
 -select count(*) > 20 as ok from pg_config;
 +select count(*) > 13 as ok from pg_config;
-
+ 
  -- We expect no cursors in this test; see also portals.sql
  select count(*) = 0 as ok from pg_cursors;
---
-2.43.0

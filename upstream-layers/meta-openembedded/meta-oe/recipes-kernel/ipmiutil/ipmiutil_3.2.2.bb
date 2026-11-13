@@ -22,6 +22,7 @@ PARALLEL_MAKE = ""
 SRC_URI = "${SOURCEFORGE_MIRROR}/ipmiutil/ipmiutil-${PV}.tar.gz \
            file://fix_systemd_path.patch \
            file://0001-ihpm-Include-stdlib.h-for-malloc-free-atoi-functions.patch \
+           file://0002-configure-enable-SSL11-for-OpenSSL-4.patch \
           "
 SRC_URI[sha256sum] = "37f9bc8e6b18c1155e4d5ea38c87b83908b7acc7a44fbc5e3af493f26ef8b767"
 

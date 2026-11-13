@@ -1,0 +1,67 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Sep 2026 01:30:00 +0000
+Subject: Fix FTBFS with OpenSSL 4.0: ENGINE API removal
+
+OpenSSL 4.0 removed the ENGINE API. <openssl/engine.h> is still shipped,
+but only as a source-compatibility stub, so linking fails:
+
+  ld.lld: error: undefined symbol: ENGINE_free
+  ld.lld: error: undefined symbol: ENGINE_load_builtin_engines
+  ld.lld: error: undefined symbol: ENGINE_by_id
+  ld.lld: error: undefined symbol: ENGINE_init
+  ld.lld: error: undefined symbol: ENGINE_finish
+  ld.lld: error: undefined symbol: ENGINE_ctrl_cmd
+  ld.lld: error: undefined symbol: ENGINE_load_private_key
+
+Define OPENSSL_ENGINE_STUBS, which OpenSSL 4 offers exactly for this
+case: the ENGINE_* declarations become inline no-ops returning failure,
+so the file compiles and links unchanged. OPENSSL_SUPPRESS_DEPRECATED is
+already defined here, so the stubs' deprecation attributes do not trip
+-Werror either.
+
+That leaves ENGINE_by_id() returning NULL at runtime, which the existing
+code fed straight into ENGINE_init() - a NULL dereference that predates
+OpenSSL 4. Check the result and print what went wrong instead, noting the
+OpenSSL 4 situation so the failure is not mistaken for a missing module.
+
+Providers replace engines upstream, but nothing exposes an equivalent of
+the pkcs11 engine's LOAD_CERT_CTRL command yet, so PKCS#11 backed signing
+genuinely is unavailable with OpenSSL 4.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/src/lib/back_end/engine.c
++++ b/src/lib/back_end/engine.c
+@@ -4,6 +4,13 @@
+  */
+ 
+ #define OPENSSL_SUPPRESS_DEPRECATED
++/*
++ * OpenSSL 4.0 removed the ENGINE API.  <openssl/engine.h> still declares
++ * it for source compatibility, and defining OPENSSL_ENGINE_STUBS turns the
++ * declarations into inline no-ops so this file keeps linking.  The pkcs11
++ * engine simply does not exist there, which engine_ctx_init() reports.
++ */
++#define OPENSSL_ENGINE_STUBS
+ 
+ #include "engine.h"
+ #include "err.h"
+@@ -63,6 +70,16 @@
+ 
+ 	ctx->engine = ENGINE_by_id("pkcs11");
+ 
++	if (!ctx->engine) {
++		fprintf(stderr, "ERROR: cannot load the pkcs11 OpenSSL engine\n");
++#if OPENSSL_VERSION_MAJOR >= 4
++		fprintf(stderr,
++			"ERROR: OpenSSL 4.0 removed ENGINE support, so PKCS#11 "
++			"backed signing is unavailable\n");
++#endif
++		return 0;
++	}
++
+ #ifdef DEBUG
+ 	ENGINE_ctrl_cmd_string(ctx->engine, "VERBOSE", NULL, 0);
+ #endif

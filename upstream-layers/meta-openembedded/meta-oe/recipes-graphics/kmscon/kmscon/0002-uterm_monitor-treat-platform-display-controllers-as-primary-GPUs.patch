@@ -1,0 +1,84 @@
+From d321a1572a12d760ddade294f4e7eabe57d555d1 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sat, 26 Sep 2026 10:00:57 +0200
+Subject: [PATCH] uterm_monitor: treat platform display controllers as primary
+ GPUs
+
+A GPU only counted as primary when its PCI parent had boot_vga set.
+SoC display controllers such as vc4 on the Raspberry Pi are platform
+devices without a PCI parent, so with gpus=primary kmscon ignored the
+only display in the system and never showed a terminal.
+
+Treat DRM devices on the platform bus as primary, except for the
+simpledrm, efidrm, vesadrm and ofdrm firmware framebuffers that only
+stand in until the native driver has loaded.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5.5)
+---
+ src/uterm_monitor.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/src/uterm_monitor.c b/src/uterm_monitor.c
+index d89bfa1..25ec91f 100644
+--- a/src/uterm_monitor.c
++++ b/src/uterm_monitor.c
+@@ -234,10 +234,15 @@ out_close:
+ 	return flags;
+ }
+ 
+-static bool is_drm_primary(struct uterm_monitor *mon, struct udev_device *dev, const char *node)
++static char *get_drm_name(int fd);
++
++static bool is_drm_primary(struct uterm_monitor *mon, struct udev_device *dev, const char *node,
++			   int fd)
+ {
+ 	struct udev_device *pci;
+ 	const char *id;
++	char *name;
++	bool res;
+ 
+ 	pci = udev_device_get_parent_with_subsystem_devtype(dev, "pci", NULL);
+ 	if (pci) {
+@@ -246,9 +251,27 @@ static bool is_drm_primary(struct uterm_monitor *mon, struct udev_device *dev, c
+ 			log_debug("DRM device %s is primary PCI GPU", node);
+ 			return true;
+ 		}
++		return false;
+ 	}
+ 
+-	return false;
++	/*
++	 * SoC display controllers are platform devices without a boot_vga
++	 * attribute. Treat them as primary, except for the generic firmware
++	 * framebuffer drivers that only stand in until the real driver loads.
++	 */
++	if (!udev_device_get_parent_with_subsystem_devtype(dev, "platform", NULL))
++		return false;
++
++	name = get_drm_name(fd);
++	if (!name)
++		return false;
++
++	res = strcmp(name, "simpledrm") && strcmp(name, "efidrm") && strcmp(name, "vesadrm") &&
++	      strcmp(name, "ofdrm");
++	if (res)
++		log_debug("DRM device %s is primary platform GPU (%s)", node, name);
++	free(name);
++	return res;
+ }
+ 
+ /*
+@@ -334,7 +357,7 @@ static unsigned int get_drm_flags(struct uterm_monitor *mon, struct udev_device
+ 		return flags;
+ 	}
+ 
+-	if (is_drm_primary(mon, dev, node))
++	if (is_drm_primary(mon, dev, node, fd))
+ 		flags |= UTERM_MONITOR_PRIMARY;
+ 	if (is_drm_usb(mon, node, fd))
+ 		flags |= UTERM_MONITOR_AUX;
+-- 
+2.55.0
+

@@ -1,4 +1,4 @@
-From 736c190e0c8a1c5ce3dc84292d066292e969d81e Mon Sep 17 00:00:00 2001
+From b01a1303d4be1ef5fbfc355752146ce275f869a5 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 28 Dec 2020 16:38:21 +0800
 Subject: [PATCH] Improve reproducibility,
@@ -18,12 +18,13 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 update patch for v13.1
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  src/common/Makefile | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/src/common/Makefile b/src/common/Makefile
-index 3d83299..e14cda6 100644
+index 2c720ca..c3d889c 100644
 --- a/src/common/Makefile
 +++ b/src/common/Makefile
 @@ -31,9 +31,6 @@ include $(top_builddir)/src/Makefile.global

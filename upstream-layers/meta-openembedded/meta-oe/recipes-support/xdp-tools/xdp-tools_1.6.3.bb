@@ -16,6 +16,8 @@ SRC_URI = " \
     git://github.com/xdp-project/xdp-tools.git;tag=v${PV};nobranch=1;protocol=https \
     file://0001-configure-correctly-handle-CC-when-validating-requir.patch \
     file://0002-lib-libxdp-Makefile-use-cp-fRd-to-preserve-symlinks-.patch \
+    file://0003-lib-util-avoid-struct-ethhdr-redefinition-on-musl.patch \
+    file://0004-xdp-filter-xdp-dump-avoid-struct-ethhdr-redefinitio.patch \
 "
 SRCREV = "8fbad9f0af621a22aa87ff2520b3735915b1f0fd"
 

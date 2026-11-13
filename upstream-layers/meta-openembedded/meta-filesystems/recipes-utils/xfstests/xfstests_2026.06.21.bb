@@ -13,6 +13,8 @@ SRC_URI = "git://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git;branch=master;ta
            file://0002-Add-missing-STATX_ATTR_-defines-from-musl-sys-stat.h.patch \
            file://0001-bstat-use-uint32_t-instead-of-__uint32_t-to-fix-buil.patch \
            file://0001-locktest-do-not-tie-struct-delegation-to-the-F_GETDE.patch \
+           file://0003-fs-monitor-include-linux-types.h-for-__s32-__u32.patch \
+           file://0004-rw_hint-add-fallback-define-for-RWH_WRITE_LIFE_NOT_.patch \
            "
 
 

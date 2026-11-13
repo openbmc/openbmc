@@ -1,0 +1,58 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:36:00 +0000
+Subject: [PATCH] adb: sysdeps: provide pread64/pwrite64/lseek64 fallback for
+ musl
+
+adb_pread(), adb_pwrite() and adb_lseek() in sysdeps.h already special
+case __APPLE__ to call the plain (non-LFS64) pread/pwrite/lseek,
+because Mac OS never had the glibc LFS64 names. musl has the exact
+same situation -- like off64_t (see
+0012-libbase-off64_t-extend-non-glibc-compat-typedef-to-musl.patch),
+it never defines pread64/pwrite64/lseek64 since its off_t is already
+64-bit -- but these three call sites only checked for __APPLE__, so
+building against musl failed:
+
+| sysdeps.h:522:31: error: use of undeclared identifier 'pread64'
+| sysdeps.h:544:32: error: use of undeclared identifier 'pwrite64'
+| sysdeps.h:554:12: error: use of undeclared identifier 'lseek64'
+
+Extend the same non-glibc/non-bionic/non-Windows guard used by
+off64_t.h to these three functions.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/packages/modules/adb/sysdeps.h
++++ b/packages/modules/adb/sysdeps.h
+@@ -516,7 +516,10 @@ static inline int adb_getlogin_r(char* buf, size_t bufsize) {
+ }
+
+ static inline int adb_pread(borrowed_fd fd, void* buf, size_t len, off64_t offset) {
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || \
++    (!defined(__GLIBC__) && !defined(__BIONIC__) && !defined(_WIN32))
++    /* Mac OS and musl don't have the LFS64 pread64: their plain pread is
++     * already 64-bit (see android-base/off64_t.h). */
+     return TEMP_FAILURE_RETRY(pread(fd.get(), buf, len, offset));
+ #else
+     return TEMP_FAILURE_RETRY(pread64(fd.get(), buf, len, offset));
+@@ -538,7 +541,8 @@ static inline int unix_read_interruptible(borrowed_fd fd, void* buf, size_t le
+ }
+
+ static inline int adb_pwrite(int fd, const void* buf, size_t len, off64_t offset) {
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || \
++    (!defined(__GLIBC__) && !defined(__BIONIC__) && !defined(_WIN32))
+     return TEMP_FAILURE_RETRY(pwrite(fd, buf, len, offset));
+ #else
+     return TEMP_FAILURE_RETRY(pwrite64(fd, buf, len, offset));
+@@ -548,7 +552,8 @@ static inline int adb_pwrite(int fd, const void* buf, size_t len, off64_t offs
+ // (write and pwrite macros omitted: incompatible with GCC/abseil compat)
+
+ static inline int64_t adb_lseek(borrowed_fd fd, int64_t pos, int where) {
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || \
++    (!defined(__GLIBC__) && !defined(__BIONIC__) && !defined(_WIN32))
+     return lseek(fd.get(), pos, where);
+ #else
+     return lseek64(fd.get(), pos, where);

@@ -26,7 +26,7 @@ UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
 # Machine-specific as we examine MACHINE_FEATURES to decide whether to build the UEFI plugins
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit meson vala gobject-introspection systemd bash-completion pkgconfig gi-docgen ptest manpages
+inherit meson vala gobject-introspection systemd useradd bash-completion pkgconfig gi-docgen ptest manpages
 
 GIDOCGEN_MESON_OPTION = 'docs'
 GIDOCGEN_MESON_ENABLE_FLAG = 'enabled'
@@ -35,6 +35,9 @@ GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 
 EXTRA_OEMESON = "-Dvendor_ids_dir=${datadir}/hwdata"
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${localstatedir}/lib/fwupd --shell /sbin/nologin fwupd-refresh"
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \

@@ -1,0 +1,83 @@
+From 525c7c68109a235ec641a9604c8cb2cc0ee3817e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Sep 2026 13:27:38 -0700
+Subject: [PATCH] ssl: do not treat ssl.HAS_TLSv1_2 as authoritative with OpenSSL 4.0
+
+OpenSSL 4.0 removed the version specific SSLv3_method(), TLSv1_method(),
+TLSv1_1_method() and TLSv1_2_method() APIs. CPython adapted to that in
+gh-146207 by hardcoding ssl.HAS_SSLv3, ssl.HAS_TLSv1, ssl.HAS_TLSv1_1
+and ssl.HAS_TLSv1_2 to False whenever it is built against OpenSSL >= 4.0,
+even though TLS 1.2 is still fully supported there and still selectable
+via ssl.SSLContext.minimum_version.
+
+As a result setup.py refuses to build at all:
+
+  The `ssl` module does not advertise support for TLS 1.2.
+  Please make sure that your Python installation was compiled against an
+  OpenSSL version enabling these features (likely this requires the
+  OpenSSL version to be at least 1.0.1).
+
+and sslutil.supportedprotocols loses b'tls1.2', which makes
+`hg debuginstall` under-report the available protocols and makes
+devel.server-insecure-exact-protocol=tls1.2 abort.
+
+Only trust ssl.HAS_TLSv1_2 with OpenSSL < 4.0 and assume TLS 1.2 is
+available otherwise. TLS 1.0 and TLS 1.1 are deliberately not assumed:
+they are disabled in the default OpenSSL 4.0 configuration.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ mercurial/sslutil.py | 13 ++++++++++++-
+ setup.py             |  9 ++++++++-
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/mercurial/sslutil.py b/mercurial/sslutil.py
+index fd8333e..f278b26 100644
+--- a/mercurial/sslutil.py
++++ b/mercurial/sslutil.py
+@@ -50,12 +50,23 @@ hassni = getattr(ssl, 'HAS_SNI', False)
+ # (backported to the 3.7 branch), ssl.PROTOCOL_TLSv1_1 / ssl.PROTOCOL_TLSv1_2
+ # were defined only if compiled against a OpenSSL version with TLS 1.1 / 1.2
+ # support. At the mentioned commit, they were unconditionally defined.
++#
++# OpenSSL 4.0 removed the version specific SSLv3_method(), TLSv1_method(),
++# TLSv1_1_method() and TLSv1_2_method() APIs, so CPython hardcodes
++# ssl.HAS_SSLv3 / ssl.HAS_TLSv1 / ssl.HAS_TLSv1_1 / ssl.HAS_TLSv1_2 to False
++# when built against it (see CPython issue gh-146207). TLS 1.2 is still fully
++# supported by OpenSSL 4.0 and remains selectable through
++# ssl.SSLContext.minimum_version, so assume it is available there. TLS 1.0 and
++# TLS 1.1 are intentionally not assumed: they are disabled in the default
++# OpenSSL 4.0 configuration.
++_opensslv4 = ssl.OPENSSL_VERSION_INFO[0] >= 4
++
+ supportedprotocols = set()
+ if getattr(ssl, 'HAS_TLSv1', hasattr(ssl, 'PROTOCOL_TLSv1')):
+     supportedprotocols.add(b'tls1.0')
+ if getattr(ssl, 'HAS_TLSv1_1', hasattr(ssl, 'PROTOCOL_TLSv1_1')):
+     supportedprotocols.add(b'tls1.1')
+-if getattr(ssl, 'HAS_TLSv1_2', hasattr(ssl, 'PROTOCOL_TLSv1_2')):
++if getattr(ssl, 'HAS_TLSv1_2', hasattr(ssl, 'PROTOCOL_TLSv1_2')) or _opensslv4:
+     supportedprotocols.add(b'tls1.2')
+ if getattr(ssl, 'HAS_TLSv1_3', False):
+     supportedprotocols.add(b'tls1.3')
+diff --git a/setup.py b/setup.py
+index ca70bc0..18d958a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -12,7 +12,14 @@ import sys
+ import sysconfig
+ import tempfile
+
+-if not ssl.HAS_TLSv1_2:
++# OpenSSL 4.0 removed the version specific TLSv1_2_method() API, so CPython
++# reports ssl.HAS_TLSv1_2 as False when built against it (see CPython issue
++# gh-146207). TLS 1.2 itself is still fully supported there and remains
++# selectable through ssl.SSLContext.minimum_version, so the flag can only be
++# trusted with older OpenSSL releases.
++has_tlsv1_2 = ssl.HAS_TLSv1_2 or ssl.OPENSSL_VERSION_INFO[0] >= 4
++
++if not has_tlsv1_2:
+     error = """
+ The `ssl` module does not advertise support for TLS 1.2.
+ Please make sure that your Python installation was compiled against an OpenSSL

@@ -147,7 +147,6 @@ RDEPENDS:packagegroup-meta-oe-connectivity = "\
     libuv \
     libwebsockets \
     linuxptp \
-    loudmouth \
     modemmanager \
     mosh \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "obex-data-server", "", d)} \

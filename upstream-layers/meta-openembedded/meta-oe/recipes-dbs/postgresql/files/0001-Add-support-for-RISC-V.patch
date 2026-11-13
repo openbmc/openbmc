@@ -1,21 +1,22 @@
-From ba079b8d6a50796db41bb0ddf4c22bfe022ef898 Mon Sep 17 00:00:00 2001
+From b61d11e4cd29671b88f43d114c69306639135e2f Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sun, 20 Nov 2016 15:04:52 +0000
-Subject: [PATCH 1/5] Add support for RISC-V.
+Subject: [PATCH] Add support for RISC-V.
 
 The architecture is sufficiently similar to aarch64 that simply
 extending the existing aarch64 macro works.
 
 Upstream-Status: Pending
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  src/include/storage/s_lock.h | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/include/storage/s_lock.h b/src/include/storage/s_lock.h
-index c9fa84c..9b491e8 100644
+index 2f73f9f..04b0f8a 100644
 --- a/src/include/storage/s_lock.h
 +++ b/src/include/storage/s_lock.h
-@@ -252,11 +252,12 @@ spin_delay(void)
+@@ -243,11 +243,12 @@ spin_delay(void)
  
  /*
   * On ARM and ARM64, we use __sync_lock_test_and_set(int *, int) if available.
@@ -29,7 +30,7 @@ index c9fa84c..9b491e8 100644
  #ifdef HAVE_GCC__SYNC_INT32_TAS
  #define HAS_TEST_AND_SET
  
-@@ -290,7 +291,7 @@ spin_delay(void)
+@@ -287,7 +288,7 @@ spin_delay(void)
  
  #endif	 /* __aarch64__ */
  #endif	 /* HAVE_GCC__SYNC_INT32_TAS */
@@ -38,6 +39,3 @@ index c9fa84c..9b491e8 100644
  
  
  /* S/390 and S/390x Linux (32- and 64-bit zSeries) */
--- 
-2.25.1
-

@@ -52,14 +52,12 @@ PACKAGECONFIG ??= " \
 # We include curl because ostree can't (currently) be built without
 # soup or curl - https://github.com/ostreedev/ostree/issues/1897
 PACKAGECONFIG:class-native ??= " \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'selinux smack', d)} \
     builtin-grub2-mkconfig \
     gpgme \
     curl \
 "
 
 PACKAGECONFIG:class-nativesdk ??= " \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'selinux smack', d)} \
     builtin-grub2-mkconfig \
     gpgme \
     curl \

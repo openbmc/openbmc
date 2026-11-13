@@ -1,4 +1,4 @@
-From 8d93bb7c866f88dd7f2cac81d2acfcffae9d555d Mon Sep 17 00:00:00 2001
+From 28d49e6aef1598e8391730407280cf83fd3bb667 Mon Sep 17 00:00:00 2001
 From: Niko Mauno <niko.mauno@vaisala.com>
 Date: Sun, 29 Sep 2024 12:00:00 +0000
 Subject: [PATCH] lib: Do not use private makefile targets in CMakelists.txt
@@ -18,54 +18,19 @@ stemming from
   $(subst /yocto/upstream/build/tmp/work/cortexa57-poky-linux/fluentbit/3.1.9/git/,,$(abspath $<))
   ...
 
+Note: lib/cfl/CMakeLists.txt no longer defines __FILENAME__ and
+lib/cmetrics/CMakeLists.txt already uses __FILE__ unconditionally in
+this version, so only lib/ctraces and lib/monkey required this change.
+
 Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
 
 Upstream-Status: Submitted [https://github.com/fluent/fluent-bit/pull/9450]
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
- lib/cfl/CMakeLists.txt      | 8 ++------
- lib/cmetrics/CMakeLists.txt | 8 ++------
- lib/ctraces/CMakeLists.txt  | 8 ++------
- lib/monkey/CMakeLists.txt   | 4 +---
- 4 files changed, 7 insertions(+), 21 deletions(-)
+ lib/ctraces/CMakeLists.txt | 8 ++------
+ lib/monkey/CMakeLists.txt  | 4 +---
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/lib/cfl/CMakeLists.txt b/lib/cfl/CMakeLists.txt
-index 489570026..06d99cbbe 100644
---- a/lib/cfl/CMakeLists.txt
-+++ b/lib/cfl/CMakeLists.txt
-@@ -40,12 +40,8 @@ if(NOT MSVC)
-   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
- endif()
- 
--# Define __FILENAME__ consistently across Operating Systems
--if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
--  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath $$<))\"'")
--else()
--  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
--endif()
-+# Define __FILENAME__
-+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
- 
- 
- 
-diff --git a/lib/cmetrics/CMakeLists.txt b/lib/cmetrics/CMakeLists.txt
-index a3385a8ba..80170f8e7 100644
---- a/lib/cmetrics/CMakeLists.txt
-+++ b/lib/cmetrics/CMakeLists.txt
-@@ -60,12 +60,8 @@ if(NOT MSVC)
-   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
- endif()
- 
--# Define __CMT_FILENAME__ consistently across Operating Systems
--if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
--  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath $$<))\"'")
--else()
--  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
--endif()
-+# Define __CMT_FILENAME__
-+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
- 
- # Configuration options
- option(CMT_DEV                       "Enable development mode"                    No)
 diff --git a/lib/ctraces/CMakeLists.txt b/lib/ctraces/CMakeLists.txt
 index bb2c54fa6..7d59dd834 100644
 --- a/lib/ctraces/CMakeLists.txt
@@ -86,7 +51,7 @@ index bb2c54fa6..7d59dd834 100644
  # Configuration options
  option(CTR_DEV             "Enable development mode"                   No)
 diff --git a/lib/monkey/CMakeLists.txt b/lib/monkey/CMakeLists.txt
-index 3dc1ef28a..2d08fc5fd 100644
+index 45f96d797..cc227fdb0 100644
 --- a/lib/monkey/CMakeLists.txt
 +++ b/lib/monkey/CMakeLists.txt
 @@ -15,10 +15,8 @@ include(GNUInstallDirs)
@@ -101,3 +66,6 @@ index 3dc1ef28a..2d08fc5fd 100644
  
  # Monkey Version
  set(MK_VERSION_MAJOR  1)
+-- 
+2.43.0
+

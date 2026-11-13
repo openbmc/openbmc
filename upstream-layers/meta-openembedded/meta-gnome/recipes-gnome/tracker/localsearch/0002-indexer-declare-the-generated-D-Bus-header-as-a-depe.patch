@@ -1,0 +1,37 @@
+From 717698ec1be791092ff3ffb7791205eafbe6c75b Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 15 Sep 2026 11:24:59 +0200
+Subject: [PATCH] indexer: declare the generated D-Bus header as a dependency
+ source
+
+tracker_miner_dep only lists the generated enum types header in its
+sources, so targets that merely use the dependency - the localsearch-3
+executable among them - get no build order edge to the gdbus-codegen
+output. In a parallel build tracker-application.c can therefore be
+compiled before tracker-dbus-interface.h exists:
+
+  tracker-application.c:25:10: fatal error: tracker-dbus-interface.h:
+  No such file or directory
+
+Add the header to the declared sources.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ src/indexer/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/indexer/meson.build b/src/indexer/meson.build
+index 9ea9cff..cf9fbae 100644
+--- a/src/indexer/meson.build
++++ b/src/indexer/meson.build
+@@ -48,7 +48,7 @@ libtracker_miner_private = static_library(
+ )
+ 
+ tracker_miner_dep = declare_dependency(
+-    sources: miner_fs_enums[1],
++    sources: [miner_fs_enums[1], indexer_dbus_sources[1]],
+     link_with: libtracker_miner_private,
+     include_directories: include_directories('.')
+ )

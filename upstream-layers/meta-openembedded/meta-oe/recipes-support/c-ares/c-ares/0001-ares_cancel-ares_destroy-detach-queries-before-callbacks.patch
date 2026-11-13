@@ -1,0 +1,2603 @@
+From 7f408deb128fbdcce78122322734ffaa01cad9ae Mon Sep 17 00:00:00 2001
+From: Brad House <brad@brad-house.com>
+Date: Sun, 18 Oct 2026 18:15:41 -0400
+Subject: [PATCH] ares_cancel/ares_destroy: detach queries before running user
+ callbacks
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Backport of dd62bdfca52ba5c37e88a1469c0a4c5e4a568ccb to v1.34.  See that
+commit for the full description; it hardens reentrant teardown from
+callbacks (ares_cancel(), ares_destroy(), server reconfiguration, and
+socket/server state notifications).
+
+Conflicts were whitespace/alignment only (v1.34 predates the clang-format
+reformat in #1238) and were reformatted to v1.34's style.
+
+Also carries the test portion of #1334 that applies to the tests this
+introduces: dead-server tests use 127.0.0.1:53055/53056 instead of
+127.0.0.55/56, which only routes on Linux.
+
+Signed-off-by: Brad House <brad@brad-house.com>
+Upstream-Status: Backport [https://github.com/c-ares/c-ares/commit/7f408deb128fbdcce78122322734ffaa01cad9ae]
+GHSA: GHSA-wpr3-8q3r-4q8c, GHSA-97vq-4mxv-7vhm, GHSA-mw23-pfg6-2x9r, GHSA-rf6g-ww74-97qh, GHSA-v33j-65h4-4ch8, GHSA-pj7p-v3cw-hq66
+---
+ docs/ares_cancel.3                    |   17 +
+ docs/ares_destroy.3                   |    7 +
+ docs/ares_init_options.3              |   15 +
+ docs/ares_set_server_state_callback.3 |   31 +-
+ docs/ares_set_servers_csv.3           |   17 +
+ src/lib/ares_cancel.c                 |   25 +-
+ src/lib/ares_close_sockets.c          |   82 +-
+ src/lib/ares_conn.c                   |  217 ++++-
+ src/lib/ares_conn.h                   |   37 +-
+ src/lib/ares_destroy.c                |   85 +-
+ src/lib/ares_private.h                |  110 ++-
+ src/lib/ares_process.c                |  235 +++++-
+ src/lib/ares_send.c                   |   35 +
+ src/lib/ares_update_servers.c         |   42 +-
+ test/ares-test-mock.cc                | 1068 +++++++++++++++++++++++++
+ 15 files changed, 1959 insertions(+), 64 deletions(-)
+
+diff --git a/docs/ares_cancel.3 b/docs/ares_cancel.3
+index 967a946b49..069f226c10 100644
+--- a/docs/ares_cancel.3
++++ b/docs/ares_cancel.3
+@@ -21,6 +21,23 @@ These calls give the callbacks a chance to clean up any state which might have
+ been stored in their arguments. If such a callback invocation adds a new
+ request to the channel, that request will \fInot\fP be cancelled by the
+ current invocation of \fBares_cancel(3)\fP.
++.SH REENTRANCY
++A callback invoked by
++.BR ares_cancel (3)
++may call c-ares functions on the same channel. The channel lock is recursive,
++and each query is unlinked from the library's internal structures before its
++callback runs, so a reentrant call cannot encounter a query that is part-way
++through being torn down.
++
++This includes starting new lookups, as described above, and reconfiguring the
++server list with
++.BR ares_set_servers_csv (3)
++and related functions.
++
++.SH AVAILABILITY
++The reentrancy guarantee described above applies as of c-ares version 1.35.0,
++and c-ares version 1.34.9 on the 1.34 branch.
++
+ .SH SEE ALSO
+ .BR ares_init (3)
+ .BR ares_destroy (3)
+diff --git a/docs/ares_destroy.3 b/docs/ares_destroy.3
+index d1984b7cc9..0b6380e609 100644
+--- a/docs/ares_destroy.3
++++ b/docs/ares_destroy.3
+@@ -20,6 +20,13 @@ by the channel.
+ channel, passing a status of \fIARES_EDESTRUCTION\fP. These calls give the
+ callbacks a chance to clean up any state which might have been stored in their
+ arguments. A callback must not add new requests to a channel being destroyed.
++Such a request is refused: the request is not started, and its callback is
++invoked with a status of \fIARES_EDESTRUCTION\fP so that any state attached to
++its argument can be released. A request made from within that notification is
++refused without a further notification, so that a callback which responds to
++failure by retrying cannot recurse without bound; its argument is not handed
++back. This applies as of c-ares version 1.35.0, and c-ares version 1.34.9 on
++the 1.34 branch.
+ 
+ There is no ability to make this function thread-safe.  No additional calls
+ using this channel may be made once this function is called.
+diff --git a/docs/ares_init_options.3 b/docs/ares_init_options.3
+index 9b3b481535..e6f6ee8ba6 100644
+--- a/docs/ares_init_options.3
++++ b/docs/ares_init_options.3
+@@ -231,6 +231,21 @@ will be passed the socket whose state has changed;
+ will be set to true if the socket should listen for read events, and
+ .I writable
+ will be set to true if the socket should listen for write events.
++
++This callback may call c-ares functions on the same channel, including
++.BR ares_cancel (3)
++and the server configuration functions. Notifications are delivered once the
++library has finished the work that produced them rather than part-way through
++it, so a reentrant call cannot close a socket the library is still using. They
++arrive in the order the state changes occurred, and always before the
++outermost c-ares call returns. A call made from within a callback is not the
++outermost one, so notifications it produces arrive after it has returned.
++.BR ares_destroy (3)
++is no exception: the closure of every socket the channel still holds is
++reported before it returns, and the callback is never invoked afterwards.
++This applies as of c-ares version 1.35.0, and c-ares version 1.34.9 on the
++1.34 branch.
++
+ The value of
+ .I sock_state_cb_data
+ will be passed as the
+diff --git a/docs/ares_set_server_state_callback.3 b/docs/ares_set_server_state_callback.3
+index 04fbde4c7a..e95db327ce 100644
+--- a/docs/ares_set_server_state_callback.3
++++ b/docs/ares_set_server_state_callback.3
+@@ -47,6 +47,31 @@ the DNS servers used by an ares channel. For example, it can be used to track
+ metrics about the numbers and types of queries sent to each server or to
+ detect when a server is uncontactable or unhealthy.
+ 
++.SH REENTRANCY
++The server state callback may call c-ares functions on the same channel,
++including
++.BR ares_cancel (3)
++and the server configuration functions. The channel lock is recursive and the
++library holds no query, connection or server state across the callback.
++
++Notifications are queued and delivered once the library has finished the work
++that produced them, rather than part-way through it. A notification is
++therefore observed after the processing pass that generated it, not during.
++
++The callback and its
++.I user_data
++are read when the notification is delivered, not when it is queued. An
++application that replaces its callback between those two points will see the
++notification delivered to the new one; unregistering by passing a
++.B NULL
++callback discards any notification still queued.
++
++This applies to a replacement made from within a c-ares callback, where the
++channel lock is held.
++.BR ares_set_server_state_callback (3)
++does not take the channel lock, so replacing the callback from another thread
++while the channel is processing is not synchronized against delivery.
++
+ .SH FLAGS
+ .TP 5
+ .B ARES_SERV_STATE_UDP
+@@ -58,5 +83,9 @@ Indicates that the query was tried over TCP.
+ .SH AVAILABILITY
+ This function was first introduced in c-ares version 1.29.0.
+ 
++The reentrancy guarantee described above applies as of c-ares version 1.35.0,
++and c-ares version 1.34.9 on the 1.34 branch.
++
+ .SH SEE ALSO
+-.BR ares_get_servers_csv (3)
++.BR ares_get_servers_csv (3),
++.BR ares_cancel (3)
+diff --git a/docs/ares_set_servers_csv.3 b/docs/ares_set_servers_csv.3
+index f1435143f5..f9f5b82e28 100644
+--- a/docs/ares_set_servers_csv.3
++++ b/docs/ares_set_servers_csv.3
+@@ -126,6 +126,23 @@ are identical.  Prior versions would simply omit ports in \fBares_set_servers_cs
+ but due to the addition of link local interface support, this difference was
+ removed.
+ 
++.SH REENTRANCY
++These functions may be called from within a c-ares callback. Removing a server
++closes its connections, which ends the lookups that were using it and invokes
++their callbacks, so a reconfiguration can be requested from inside one.
++
++A nested call reconciles the whole server list, and the outer call leaves that
++result in place rather than deleting the servers the nested call installed.
++The consequence is that the outer call's own list does not survive, even
++though it returns
++.B ARES_SUCCESS:
++the last configuration applied is the one the channel keeps. An application
++that reconfigures from a callback should therefore not assume the list it
++passed to the outer call is in effect when that call returns.
++
++This applies as of c-ares version 1.35.0, and c-ares version 1.34.9 on the
++1.34 branch.
++
+ .SH EXAMPLE
+ .nf
+ 192.168.1.100,[fe80::1]:53%eth0,dns://192.168.1.1?tcpport=1153
+diff --git a/src/lib/ares_cancel.c b/src/lib/ares_cancel.c
+index 75600dea6b..aa167e4486 100644
+--- a/src/lib/ares_cancel.c
++++ b/src/lib/ares_cancel.c
+@@ -38,10 +38,10 @@ void ares_cancel(ares_channel_t *channel)
+   }
+ 
+   ares_channel_lock(channel);
++  ares_deferred_cb_enter(channel);
+ 
+   if (ares_llist_len(channel->all_queries) > 0) {
+     ares_llist_node_t *node = NULL;
+-    ares_llist_node_t *next = NULL;
+ 
+     /* Swap list heads, so that only those queries which were present on entry
+      * into this function are cancelled. New queries added by callbacks of
+@@ -57,21 +57,29 @@ void ares_cancel(ares_channel_t *channel)
+       goto done;                        /* LCOV_EXCL_LINE: OutOfMemory */
+     }
+ 
+-    node = ares_llist_node_first(list_copy);
+-    while (node != NULL) {
++    /* Re-read the head each iteration rather than caching the next node: a
++     * callback below may cause other queries in this same list to be ended
++     * and their nodes destroyed. */
++    while ((node = ares_llist_node_first(list_copy)) != NULL) {
+       ares_query_t *query;
+ 
+-      /* Cache next since this node is being deleted */
+-      next = ares_llist_node_next(node);
++      query = ares_llist_node_claim(node);
+ 
+-      query                   = ares_llist_node_claim(node);
++      /* Must come first: node_claim() already destroyed this node, so
++       * ares_detach_query() would otherwise destroy it a second time. */
+       query->node_all_queries = NULL;
+ 
++      /* Detach from queries_by_qid, the connection and the timeout list
++       * before running user code.  Otherwise a reentrant teardown from
++       * within the callback -- ares_set_servers_csv(), or a new query
++       * hitting a connection error -- still finds this query, ends it a
++       * second time and frees it, and the ares_free_query() below then
++       * double-frees. */
++      ares_detach_query(query);
++
+       /* NOTE: its possible this may enqueue new queries */
+       query->callback(query->arg, ARES_ECANCELLED, 0, NULL);
+       ares_free_query(query);
+-
+-      node = next;
+     }
+ 
+     ares_llist_destroy(list_copy);
+@@ -83,5 +91,6 @@ void ares_cancel(ares_channel_t *channel)
+   ares_queue_notify_empty(channel);
+ 
+ done:
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ }
+diff --git a/src/lib/ares_close_sockets.c b/src/lib/ares_close_sockets.c
+index 7bb72c31ec..6be662fdd3 100644
+--- a/src/lib/ares_close_sockets.c
++++ b/src/lib/ares_close_sockets.c
+@@ -41,12 +41,47 @@ static void ares_requeue_queries(ares_conn_t  *conn,
+   }
+ }
+ 
++/*! Release a connection's memory.  Split from the unlink below so that the
++ *  two can happen at different times: a caller further up the stack may still
++ *  hold this pointer, and reading a detached connection is safe where reading
++ *  a freed one is not. */
++void ares_conn_reap(ares_conn_t *conn)
++{
++  if (conn == NULL) {
++    return; /* LCOV_EXCL_LINE: DefensiveCoding */
++  }
++
++  ares_buf_destroy(conn->in_buf);
++  ares_buf_destroy(conn->out_buf);
++  ares_llist_destroy(conn->queries_to_conn);
++  ares_free(conn);
++}
++
+ void ares_close_connection(ares_conn_t *conn, ares_status_t requeue_status)
+ {
+-  ares_server_t  *server  = conn->server;
+-  ares_channel_t *channel = server->channel;
++  ares_server_t  *server;
++  ares_channel_t *channel;
++
++  if (conn == NULL) {
++    return; /* LCOV_EXCL_LINE: DefensiveCoding */
++  }
++
++  /* Already torn down and awaiting reclamation.  Reaching here twice is
++   * ordinary once a connection can outlive its teardown: a caller holding it
++   * from before -- handle_conn_error() after a failed write, say -- closes it
++   * again without knowing.  Doing the work twice would requeue queries that
++   * have already moved and would put this connection on the pending list a
++   * second time, which is a double free. */
++  if (conn->flags & ARES_CONN_FLAG_DEAD) {
++    return;
++  }
+ 
+-  /* Unlink */
++  server  = conn->server;
++  channel = server->channel;
++
++  /* Unlink from everything that can find this connection.  After this it is
++   * unreachable by lookup, which is what stops anything new from picking it
++   * up; anything that already holds it is handled by the deferral below. */
+   ares_llist_node_claim(
+     ares_htable_asvp_get_direct(channel->connnode_by_socket, conn->fd));
+   ares_htable_asvp_remove(channel->connnode_by_socket, conn->fd);
+@@ -55,19 +90,40 @@ void ares_close_connection(ares_conn_t *conn, ares_status_t requeue_status)
+     server->tcp_conn = NULL;
+   }
+ 
+-  ares_buf_destroy(conn->in_buf);
+-  ares_buf_destroy(conn->out_buf);
++  /* Marked dead as soon as it is unlinked, before anything below can run
++   * application code.  ares_requeue_queries() ends queries terminally once
++   * their retries are exhausted, which invokes the application's callback; if
++   * the flag were set after that, a second ares_close_connection() reaching
++   * this connection in the meantime would run the body again -- closing the
++   * descriptor twice and listing the connection for reclamation twice, which
++   * is a double free.  It also gives ares_close_sockets() its termination
++   * condition: dead implies unlinked, so its re-read-the-head loop cannot see
++   * a dead connection and spin. */
++  conn->flags |= ARES_CONN_FLAG_DEAD;
+ 
+   /* Requeue queries to other connections */
+   ares_requeue_queries(conn, requeue_status);
+ 
+-  ares_llist_destroy(conn->queries_to_conn);
+-
+-  ares_conn_sock_state_cb_update(conn, ARES_CONN_STATE_NONE);
+-
+-  ares_socket_close(channel, conn->fd);
++  /* Hands the descriptor to the queued notification when one is due, so the
++   * application is told to stop watching it before it is closed.  Otherwise
++   * nothing will carry it and we close it here. */
++  if (!ares_conn_sock_state_cb_close(conn)) {
++    ares_socket_close(channel, conn->fd);
++  }
++  conn->fd = ARES_SOCKET_BAD;
++
++  /* If a library call is in progress it may be holding this connection --
++   * read_answers() and ares_send_query_int() both do, across code that can
++   * reach here.  Keep it readable until that call unwinds.  The buffers and
++   * the query list are freed by ares_conn_reap(), so a stale holder sees an
++   * emptied connection rather than freed memory. */
++  if (channel->deferred_cb_depth > 0) {
++    conn->next_pending     = channel->pending_conns;
++    channel->pending_conns = conn;
++    return;
++  }
+ 
+-  ares_free(conn);
++  ares_conn_reap(conn);
+ }
+ 
+ void ares_close_sockets(ares_server_t *server)
+@@ -76,6 +132,10 @@ void ares_close_sockets(ares_server_t *server)
+ 
+   while ((node = ares_llist_node_first(server->connections)) != NULL) {
+     ares_conn_t *conn = ares_llist_node_val(node);
++    /* This loop re-reads the head each time and relies on the close below
++     * unlinking it.  A dead connection returns early without unlinking, so
++     * one on this list would spin forever holding the channel lock. */
++    assert(!(conn->flags & ARES_CONN_FLAG_DEAD));
+     ares_close_connection(conn, ARES_SUCCESS);
+   }
+ }
+diff --git a/src/lib/ares_conn.c b/src/lib/ares_conn.c
+index 6b315b0548..78f57e7d10 100644
+--- a/src/lib/ares_conn.c
++++ b/src/lib/ares_conn.c
+@@ -26,19 +26,210 @@
+  */
+ #include "ares_private.h"
+ 
+-void ares_conn_sock_state_cb_update(ares_conn_t            *conn,
+-                                    ares_conn_state_flags_t flags)
++/*! A queued socket-state notification.  Holds the descriptor and the state,
++ *  never the connection, so a queued entry cannot outlive what it refers to.
++ *
++ *  When \c owns_fd is set, this message carries the only remaining reference to
++ *  the descriptor: the connection is gone and the descriptor is deliberately
++ *  left open until after the application has been told to stop watching it.
++ *  Closing first would let the number be reused -- by application code running
++ *  from a deferred query callback, for instance -- before the notification
++ *  naming it is delivered. */
++typedef struct {
++  ares_socket_t fd;
++  ares_bool_t   readable;
++  ares_bool_t   writable;
++  ares_bool_t   owns_fd;
++} ares_sock_state_msg_t;
++
++static ares_bool_t ares_sock_state_queue(ares_channel_t              *channel,
++                                         const ares_sock_state_msg_t *msg)
+ {
+-  ares_channel_t *channel = conn->server->channel;
++  if (channel->sock_state_queue == NULL) {
++    channel->sock_state_queue = ares_array_create(sizeof(*msg), NULL);
++    if (channel->sock_state_queue == NULL) {
++      return ARES_FALSE; /* LCOV_EXCL_LINE: OutOfMemory */
++    }
++  }
++
++  if (ares_array_insertdata_last(channel->sock_state_queue, msg) !=
++      ARES_SUCCESS) {
++    return ARES_FALSE; /* LCOV_EXCL_LINE: OutOfMemory */
++  }
++
++  return ARES_TRUE;
++}
++
++/*! Deliver every socket-state notification the channel has queued.  Loops
++ *  rather than snapshotting: a callback is allowed to re-enter the library and
++ *  queue more, and those belong to this same delivery point. */
++static void ares_sock_state_dispatch(ares_channel_t *channel)
++{
++  while (ares_array_len(channel->sock_state_queue) > 0) {
++    ares_sock_state_msg_t msg;
++
++    if (ares_array_claim_at(&msg, sizeof(msg), channel->sock_state_queue, 0) !=
++        ARES_SUCCESS) {
++      break; /* LCOV_EXCL_LINE: DefensiveCoding */
++    }
+ 
+-  if ((conn->state_flags & ARES_CONN_STATE_CBFLAGS) != flags &&
+-      channel->sock_state_cb) {
+-    channel->sock_state_cb(channel->sock_state_cb_data, conn->fd,
+-                           flags & ARES_CONN_STATE_READ ? 1 : 0,
+-                           flags & ARES_CONN_STATE_WRITE ? 1 : 0);
++    if (channel->sock_state_cb != NULL) {
++      /* The public callback takes ints. */
++      channel->sock_state_cb(channel->sock_state_cb_data, msg.fd,
++                             msg.readable ? 1 : 0, msg.writable ? 1 : 0);
++    }
++
++    /* Told first, closed second -- the ordering the application depends on to
++     * keep its descriptor set honest. */
++    if (msg.owns_fd) {
++      ares_socket_close(channel, msg.fd);
++    }
++  }
++
++  ares_array_destroy(channel->sock_state_queue);
++  channel->sock_state_queue = NULL;
++}
++
++static void ares_deferred_cb_flush(ares_channel_t *channel)
++{
++  /* Only the outermost frame delivers: anything above us on the stack may
++   * still be holding the connection a reentrant call from one of these
++   * callbacks could free.
++   *
++   * The dispatch below counts as a nesting level of its own.  Without that, a
++   * callback that calls back into the library re-enters here through the
++   * enter/leave pair on that call, drains the rest of the queue and destroys
++   * it underneath the loop -- and hands the next notification to the
++   * application from inside the current one.  With the counter held, the
++   * nested leave returns immediately and whatever it queued is picked up by
++   * the loop that is already running. */
++  if (channel->deferred_cb_depth > 0) {
++    return;
++  }
++  channel->deferred_cb_depth++;
++
++  /* Both kinds of deferred notification share this one delivery point.  Loop
++   * rather than calling each once: a socket-state callback may put the library
++   * on a path that queues a server-state notification, and the reverse, and
++   * both belong to this delivery point rather than the next one. */
++  while (ares_array_len(channel->sock_state_queue) > 0 ||
++         ares_array_len(channel->server_state_queue) > 0) {
++    ares_sock_state_dispatch(channel);
++    ares_server_state_dispatch(channel);
++  }
++
++  /* The outermost call is unwinding and the callbacks above have run, so
++   * nothing can still be holding a server or connection that was unlinked
++   * during it.  Now they can be freed. */
++  ares_deferred_reclaim(channel);
++
++  channel->deferred_cb_depth--;
++}
++
++void ares_deferred_reclaim(ares_channel_t *channel)
++{
++  /* Connections first: a pending server's connection list is already empty,
++   * but this keeps the ordering obvious rather than incidental. */
++  while (channel->pending_conns != NULL) {
++    ares_conn_t *conn      = channel->pending_conns;
++    channel->pending_conns = conn->next_pending;
++    conn->next_pending     = NULL;
++    ares_conn_reap(conn);
++  }
++
++  while (channel->pending_servers != NULL) {
++    ares_server_t *server    = channel->pending_servers;
++    channel->pending_servers = server->next_pending;
++    server->next_pending     = NULL;
++    ares_server_reap(server);
++  }
++}
++
++void ares_deferred_cb_enter(ares_channel_t *channel)
++{
++  channel->deferred_cb_depth++;
++}
++
++void ares_deferred_cb_leave(ares_channel_t *channel)
++{
++  if (channel->deferred_cb_depth > 0) {
++    channel->deferred_cb_depth--;
++  }
++  ares_deferred_cb_flush(channel);
++}
++
++ares_bool_t ares_conn_sock_state_cb_close(ares_conn_t *conn)
++{
++  ares_channel_t       *channel = conn->server->channel;
++  ares_sock_state_msg_t msg;
++
++  /* No callback to run, so nothing will ever carry this descriptor: the
++   * caller closes it itself, exactly as before. */
++  if (channel->sock_state_cb == NULL) {
++    return ARES_FALSE;
++  }
++
++  /* Already reported as unwatched, so no notification is due and no message
++   * will be queued to hold the descriptor. */
++  if ((conn->state_flags & ARES_CONN_STATE_CBFLAGS) == ARES_CONN_STATE_NONE) {
++    return ARES_FALSE;
++  }
++
++  msg.fd       = conn->fd;
++  msg.readable = ARES_FALSE;
++  msg.writable = ARES_FALSE;
++  msg.owns_fd  = ARES_TRUE;
++
++  if (!ares_sock_state_queue(channel, &msg)) {
++    return ARES_FALSE; /* LCOV_EXCL_LINE: OutOfMemory */
+   }
+ 
+   conn->state_flags &= ~((unsigned int)ARES_CONN_STATE_CBFLAGS);
++
++  return ARES_TRUE;
++}
++
++void ares_conn_sock_state_cb_update(ares_conn_t            *conn,
++                                    ares_conn_state_flags_t flags)
++{
++  ares_channel_t       *channel = conn->server->channel;
++  ares_sock_state_msg_t msg;
++  ares_bool_t           changed = ARES_FALSE;
++
++  if ((conn->state_flags & ARES_CONN_STATE_CBFLAGS) != flags) {
++    changed = ARES_TRUE;
++  }
++
++  msg.fd       = conn->fd;
++  msg.readable = flags & ARES_CONN_STATE_READ ? ARES_TRUE : ARES_FALSE;
++  msg.writable = flags & ARES_CONN_STATE_WRITE ? ARES_TRUE : ARES_FALSE;
++  msg.owns_fd  = ARES_FALSE; /* the connection still owns it */
++
++  if (!changed || channel->sock_state_cb == NULL) {
++    conn->state_flags &= ~((unsigned int)ARES_CONN_STATE_CBFLAGS);
++    conn->state_flags |= flags;
++    return;
++  }
++
++  /* Queue rather than dispatch.  This runs in the middle of opening, writing
++   * to or closing a connection, and every caller keeps using that connection
++   * afterwards.  The callback is application code that may reentrantly call
++   * ares_cancel() or ares_set_servers_csv(), either of which frees the
++   * connection -- the first through the idle-connection sweep, the second by
++   * destroying the server that owns it.  Deliver once no frame still holds
++   * it.
++   *
++   * Only the descriptor and the state are captured, never the connection, and
++   * insertion order is preserved so the application observes the same
++   * sequence it would have seen inline. */
++  if (!ares_sock_state_queue(channel, &msg)) {
++    return; /* LCOV_EXCL_LINE: OutOfMemory */
++  }
++
++  /* Recorded as reported only now: on either failure above the connection
++   * stays eligible to notify again, rather than remembering a state the
++   * application was never told about. */
++  conn->state_flags &= ~((unsigned int)ARES_CONN_STATE_CBFLAGS);
+   conn->state_flags |= flags;
+ }
+ 
+@@ -435,6 +626,16 @@ ares_status_t ares_open_connection(ares_conn_t   **conn_out,
+     conn->flags |= ARES_CONN_FLAG_TFO_INITIAL;
+   }
+ 
++  /* The socket-configure and socket-create callbacks above are application
++   * code, and either may reconfigure the servers -- which destroys the ones
++   * the new configuration omits, including possibly this one.  Everything
++   * below dereferences it, starting with conn->server in
++   * ares_conn_set_self_ip(). */
++  if (!ares_server_in_channel(channel, server)) {
++    status = ARES_ECONNREFUSED;
++    goto done;
++  }
++
+   /* Need to store our own ip for DNS cookie support */
+   status = ares_conn_set_self_ip(conn, ARES_TRUE);
+   if (status != ARES_SUCCESS) {
+diff --git a/src/lib/ares_conn.h b/src/lib/ares_conn.h
+index c332de14b1..fc177b84f6 100644
+--- a/src/lib/ares_conn.h
++++ b/src/lib/ares_conn.h
+@@ -49,7 +49,14 @@ typedef enum {
+    *  it).  Its in-flight queries continue to drain and it is cleaned up once
+    *  idle.  This is a per-connection signal so that a transient failure does
+    *  not evict otherwise-healthy connections to the same server. */
+-  ARES_CONN_FLAG_NONEW = 1 << 3
++  ARES_CONN_FLAG_NONEW = 1 << 3,
++  /*! Connection has been torn down: unlinked from every lookup structure, its
++   *  descriptor closed or handed to a pending notification, and its queries
++   *  requeued.  It survives only so that a caller further up the stack which
++   *  captured it before the teardown can still read it; see
++   *  ares_deferred_reclaim().  Teardown is idempotent -- a second
++   *  ares_close_connection() on a dead connection does nothing. */
++  ARES_CONN_FLAG_DEAD = 1 << 4
+ } ares_conn_flags_t;
+ 
+ typedef enum {
+@@ -84,6 +91,10 @@ struct ares_conn {
+ 
+   /* list of outstanding queries to this connection */
+   ares_llist_t           *queries_to_conn;
++
++  /*! Next connection awaiting reclamation.  Set only while this connection is
++   *  on channel->pending_conns; see ares_deferred_reclaim(). */
++  ares_conn_t            *next_pending;
+ };
+ 
+ /*! Various buckets for grouping history */
+@@ -168,6 +179,10 @@ struct ares_server {
+ 
+   /* Link back to owning channel */
+   ares_channel_t       *channel;
++
++  /*! Next server awaiting reclamation.  Set only while this server is on
++   *  channel->pending_servers; see ares_deferred_reclaim(). */
++  ares_server_t        *next_pending;
+ };
+ 
+ void ares_close_connection(ares_conn_t *conn, ares_status_t requeue_status);
+@@ -185,8 +200,24 @@ ares_status_t   ares_conn_flush(ares_conn_t *conn);
+ ares_conn_err_t ares_conn_read(ares_conn_t *conn, void *data, size_t len,
+                                size_t *read_bytes);
+ ares_conn_t *ares_conn_from_fd(const ares_channel_t *channel, ares_socket_t fd);
+-void         ares_conn_sock_state_cb_update(ares_conn_t            *conn,
+-                                            ares_conn_state_flags_t flags);
++
++/*! Queue the "stop watching this descriptor" notification for a connection
++ *  being torn down, handing the descriptor to that queued message.
++ *
++ *  The application must be told to stop watching a descriptor while it is
++ *  still open -- close first and the number can be handed to something else,
++ *  including by application code running from a deferred query callback,
++ *  before the notification naming it is delivered.
++ *
++ *  \param[in] conn  Connection being closed.
++ *  \return ARES_TRUE if the queued notification took the descriptor, in which
++ *          case the caller must not close it; ARES_FALSE if no notification is
++ *          due, and the caller closes the descriptor itself.
++ */
++ares_bool_t     ares_conn_sock_state_cb_close(ares_conn_t *conn);
++
++void            ares_conn_sock_state_cb_update(ares_conn_t            *conn,
++                                               ares_conn_state_flags_t flags);
+ ares_conn_err_t ares_socket_recv(ares_channel_t *channel, ares_socket_t s,
+                                  ares_bool_t is_tcp, void *data,
+                                  size_t data_len, size_t *read_bytes);
+diff --git a/src/lib/ares_destroy.c b/src/lib/ares_destroy.c
+index 1e5706e0e0..e0534c800d 100644
+--- a/src/lib/ares_destroy.c
++++ b/src/lib/ares_destroy.c
+@@ -69,17 +69,31 @@ void ares_destroy(ares_channel_t *channel)
+    * callbacks need to hold a channel lock. */
+   ares_channel_lock(channel);
+ 
+-  /* Destroy all queries */
+-  node = ares_llist_node_first(channel->all_queries);
+-  while (node != NULL) {
+-    ares_llist_node_t *next  = ares_llist_node_next(node);
+-    ares_query_t      *query = ares_llist_node_claim(node);
+-
++  /* Destroy all queries.
++   *
++   * The queries are detached before their callbacks run.  Claiming the node
++   * only unlinks a query from all_queries; it stays in queries_by_qid, on
++   * conn->queries_to_conn and in queries_by_timeout.  A reentrant teardown
++   * from inside the callback -- ares_set_servers_csv(), or a new query
++   * hitting a connection error -- would otherwise still find the query, end
++   * it a second time (invoking the application callback twice for one
++   * lookup) and free it, and the ares_free_query() below would double-free.
++   *
++   * The loop re-reads the first node each iteration rather than caching the
++   * next one, since a callback can cause other queries in this same list to
++   * be ended and their nodes destroyed.  No list swap is needed: sys_up is
++   * already cleared above, so ares_send_nolock() refuses new queries and
++   * nothing can be added while we drain. */
++  while ((node = ares_llist_node_first(channel->all_queries)) != NULL) {
++    ares_query_t *query = ares_llist_node_claim(node);
++
++    /* Must come first: node_claim() already destroyed this node, so
++     * ares_detach_query() would otherwise destroy it a second time. */
+     query->node_all_queries = NULL;
++    ares_detach_query(query);
++
+     query->callback(query->arg, ARES_EDESTRUCTION, 0, NULL);
+     ares_free_query(query);
+-
+-    node = next;
+   }
+ 
+   ares_queue_notify_empty(channel);
+@@ -93,7 +107,28 @@ void ares_destroy(ares_channel_t *channel)
+   assert(ares_slist_len(channel->queries_by_timeout) == 0);
+ #endif
+ 
++  /* Tearing down the servers closes every remaining connection.  Applications
++   * rely on being told about those closures so they can drop the descriptors
++   * from their own event loop, so the notifications are still delivered here
++   * rather than discarded -- just after the teardown instead of during it. */
++  ares_deferred_cb_enter(channel);
+   ares_destroy_servers_state(channel);
++  ares_deferred_cb_leave(channel);
++
++  /* The leave above delivered and destroyed both queues and reclaimed
++   * everything the teardown unlinked, so these are normally no-ops.  They are
++   * not redundant: if the first insert into a freshly created queue fails,
++   * the array is left allocated and empty, the flush loop never runs because
++   * both queues are empty, and nothing else would ever free it. */
++  ares_array_destroy(channel->sock_state_queue);
++  channel->sock_state_queue = NULL;
++  ares_array_destroy(channel->server_state_queue);
++  channel->server_state_queue = NULL;
++
++#ifndef NDEBUG
++  assert(channel->pending_servers == NULL);
++  assert(channel->pending_conns == NULL);
++#endif
+ 
+ #ifndef NDEBUG
+   assert(ares_htable_asvp_num_keys(channel->connnode_by_socket) == 0);
+@@ -134,17 +169,47 @@ void ares_destroy(ares_channel_t *channel)
+   ares_free(channel);
+ }
+ 
+-void ares_destroy_server(ares_server_t *server)
++/*! Release a server's memory.  Split from ares_destroy_server() for the same
++ *  reason ares_conn_reap() is split out: a caller further up the stack may
++ *  still hold this pointer. */
++void ares_server_reap(ares_server_t *server)
+ {
+   if (server == NULL) {
+     return; /* LCOV_EXCL_LINE: DefensiveCoding */
+   }
+ 
+-  ares_close_sockets(server);
+   ares_llist_destroy(server->connections);
+   ares_free(server);
+ }
+ 
++void ares_destroy_server(ares_server_t *server)
++{
++  ares_channel_t *channel;
++
++  if (server == NULL) {
++    return; /* LCOV_EXCL_LINE: DefensiveCoding */
++  }
++
++  channel = server->channel;
++
++  /* Closes and unlinks every connection; each is deferred or reaped by
++   * ares_close_connection() on the same rule applied below. */
++  ares_close_sockets(server);
++
++  /* The caller has already unlinked this server from channel->servers, so it
++   * can no longer be found -- ares_server_in_channel() and
++   * ares_slist_node_find() both report it gone, which is what callers check
++   * before acting on one.  But a library call in progress may still be
++   * holding the pointer, so keep it readable until that call unwinds. */
++  if (channel != NULL && channel->deferred_cb_depth > 0) {
++    server->next_pending     = channel->pending_servers;
++    channel->pending_servers = server;
++    return;
++  }
++
++  ares_server_reap(server);
++}
++
+ void ares_destroy_servers_state(ares_channel_t *channel)
+ {
+   ares_slist_node_t *node;
+diff --git a/src/lib/ares_private.h b/src/lib/ares_private.h
+index 04d4576ed2..0a1029e0f8 100644
+--- a/src/lib/ares_private.h
++++ b/src/lib/ares_private.h
+@@ -147,7 +147,10 @@ typedef struct ares_query ares_query_t;
+ struct ares_query {
+   /* Query ID from qbuf, for faster lookup, and current timeout */
+   unsigned short       qid; /* host byte order */
+-  ares_timeval_t       ts;  /*!< Timestamp query was sent */
++  /*! Distinguishes this query from any later one handed the same qid.
++   *  Query ids are 16-bit and recycled; this counter is not. */
++  size_t               serial;
++  ares_timeval_t       ts; /*!< Timestamp query was sent */
+   ares_timeval_t       timeout;
+   ares_channel_t      *channel;
+ 
+@@ -227,6 +230,9 @@ struct ares_channeldata {
+   /* Server addresses and communications state. Sorted by least consecutive
+    * failures, followed by the configuration order if failures are equal. */
+   ares_slist_t        *servers;
++  /*! Bumped by each ares_servers_update().  Lets the stale-server removal loop
++   *  tell that a nested reconfiguration reconciled the list underneath it. */
++  size_t               servers_generation;
+ 
+   /* random state to use when generating new ids and generating retry penalties
+    */
+@@ -237,6 +243,10 @@ struct ares_channeldata {
+   /* Queries bucketed by qid, for quickly dispatching DNS responses: */
+   ares_htable_szvp_t  *queries_by_qid;
+ 
++  /*! Monotonic source for ares_query_t.serial.  Never reused for the life of
++   *  the channel, so a recycled query id cannot impersonate an older query. */
++  size_t               query_serial;
++
+   /* Queries bucketed by timeout, for quickly handling timeouts: */
+   ares_slist_t        *queries_by_timeout;
+ 
+@@ -248,6 +258,29 @@ struct ares_channeldata {
+ 
+   ares_sock_state_cb   sock_state_cb;
+   void                *sock_state_cb_data;
++  /*! Socket-state notifications queued during processing, delivered once the
++   *  library is no longer holding a connection a reentrant call could free.
++   *  Insertion order is preserved, so an application observes the same
++   *  sequence of state changes it would have seen inline. */
++  ares_array_t        *sock_state_queue;
++  /*! Depth of nested library entry points that may produce a deferred
++   *  application notification.  Queues are delivered as this returns to
++   *  zero.  Shared by every deferred callback kind rather than one counter
++   *  per kind, so the delivery rule exists in exactly one place. */
++  size_t               deferred_cb_depth;
++
++  /*! Servers and connections that have been unlinked from every lookup
++   *  structure but not yet freed, because a library call was in progress and
++   *  may still hold a pointer to them.  Drained by the same flush that
++   *  delivers deferred notifications, once no frame can still be holding one.
++   *
++   *  This is what makes a stale ares_server_t or ares_conn_t readable rather
++   *  than freed for the remainder of the call that captured it.  Callers
++   *  still revalidate before *acting* on one -- ares_server_in_channel() and
++   *  friends -- but a missed check is now "used a server that was removed"
++   *  rather than a use-after-free. */
++  ares_server_t       *pending_servers;
++  ares_conn_t         *pending_conns;
+ 
+   ares_sock_create_callback           sock_create_cb;
+   void                               *sock_create_cb_data;
+@@ -295,6 +328,10 @@ struct ares_channeldata {
+   /* Callback triggered when a server has a successful or failed response */
+   ares_server_state_callback          server_state_cb;
+   void                               *server_state_cb_data;
++  /*! Server-state notifications queued during processing, dispatched once the
++   *  library is no longer holding pointers a reentrant callback could free.
++   *  See ares_deferred_cb_leave(). */
++  ares_array_t                       *server_state_queue;
+ 
+   /* TRUE if a reinit is pending.  Reinit spawns a thread to read the system
+    * configuration and then apply the configuration since configuration
+@@ -308,6 +345,11 @@ struct ares_channeldata {
+    * system config changes might get triggered and we need a flag to make
+    * sure we don't take action. */
+   ares_bool_t                         sys_up;
++
++  /*! Set while ares_send_nolock() is running the refusal notification for a
++   *  channel being destroyed.  Bounds the recursion at one frame when the
++   *  application's callback responds by starting another lookup. */
++  ares_bool_t                         in_shutdown_refusal;
+ };
+ 
+ /* Does the domain end in ".onion" or ".onion."? Case-insensitive. */
+@@ -351,6 +393,16 @@ void         *ares_dnsrec_convert_arg(ares_callback callback, void *arg);
+ void ares_dnsrec_convert_cb(void *arg, ares_status_t status, size_t timeouts,
+                             const ares_dns_record_t *dnsrec);
+ 
++/*! Unlink a query from every list and table that tracks it.
++ *
++ *  Must be called before running application code that could reach the query
++ *  again, so a reentrant teardown cannot find it and end it a second time.
++ *
++ *  \param[in] query  Query to detach.  Safe to call more than once on the
++ *                    same query.
++ */
++void ares_detach_query(ares_query_t *query);
++
+ void ares_free_query(ares_query_t *query);
+ 
+ unsigned short ares_generate_new_id(ares_rand_state *state);
+@@ -390,7 +442,6 @@ ares_status_t ares_sysconfig_set_options(ares_sysconfig_t *sysconfig,
+ 
+ ares_status_t ares_init_by_environment(ares_sysconfig_t *sysconfig);
+ 
+-
+ typedef ares_status_t (*ares_sysconfig_line_cb_t)(const ares_channel_t *channel,
+                                                   ares_sysconfig_t     *sysconfig,
+                                                   ares_buf_t           *line);
+@@ -589,6 +640,60 @@ ares_status_t ares_dns_name_write(ares_buf_t *buf, ares_llist_t **list,
+  */
+ void          ares_queue_notify_empty(ares_channel_t *channel);
+ 
++/*! Is this server still installed on the channel?
++ *
++ *  Application callbacks may reconfigure the servers, which destroys any that
++ *  the new configuration omits.  A raw ares_server_t captured before such a
++ *  callback must be revalidated before it is used again.
++ *
++ *  \param[in] channel  Initialized ares channel.
++ *  \param[in] server   Server pointer captured earlier.
++ *  \return ARES_TRUE if still present.
++ */
++ares_bool_t   ares_server_in_channel(const ares_channel_t *channel,
++                                     const ares_server_t  *server);
++
++/*! Free everything awaiting reclamation on the channel.
++ *
++ *  Called only from the deferred-callback flush, at the point where the
++ *  outermost library call is unwinding and no frame can still hold a pointer
++ *  to an unlinked server or connection.
++ *
++ *  \param[in] channel  Initialized ares channel.
++ */
++void          ares_deferred_reclaim(ares_channel_t *channel);
++
++/*! Free one connection's memory.  Only for the deferred-reclaim path and the
++ *  immediate path in ares_close_connection(). */
++void          ares_conn_reap(ares_conn_t *conn);
++
++/*! Free one server's memory.  Only for the deferred-reclaim path and the
++ *  immediate path in ares_destroy_server(). */
++void          ares_server_reap(ares_server_t *server);
++
++/*! Enter a region that may produce application notifications the library is
++ *  not in a position to deliver yet -- socket-state and server-state changes.
++ *  Nesting is counted; queued notifications are delivered by the outermost
++ *  leave.
++ *
++ *  \param[in] channel  Initialized ares channel.
++ */
++void          ares_deferred_cb_enter(ares_channel_t *channel);
++
++/*! Leave such a region.  The outermost leave delivers the queues, at which
++ *  point the library holds no connection a reentrant call could free.
++ *
++ *  \param[in] channel  Initialized ares channel.
++ */
++void          ares_deferred_cb_leave(ares_channel_t *channel);
++
++/*! Deliver every server-state notification the channel has queued.  Called
++ *  only from the shared deferred-callback flush.
++ *
++ *  \param[in] channel  Initialized ares channel.
++ */
++void          ares_server_state_dispatch(ares_channel_t *channel);
++
+ #define ARES_CONFIG_CHECK(x)                                              \
+   (x && x->lookups && ares_slist_len(x->servers) > 0 && x->timeout > 0 && \
+    x->tries > 0)
+@@ -636,7 +741,6 @@ typedef struct ares_event_thread ares_event_thread_t;
+ void          ares_event_thread_destroy(ares_channel_t *channel);
+ ares_status_t ares_event_thread_init(ares_channel_t *channel);
+ 
+-
+ #ifdef _WIN32
+ #  define HOSTENT_ADDRTYPE_TYPE short
+ #  define HOSTENT_LENGTH_TYPE   short
+diff --git a/src/lib/ares_process.c b/src/lib/ares_process.c
+index b2316c4b33..82f53610fb 100644
+--- a/src/lib/ares_process.c
++++ b/src/lib/ares_process.c
+@@ -69,7 +69,6 @@ static ares_status_t ares_send_query_int(ares_server_t        *requested_server,
+                                          ares_query_t         *query,
+                                          const ares_timeval_t *now,
+                                          ares_array_t        **requeue);
+-static void          ares_detach_query(ares_query_t *query);
+ 
+ static void        ares_query_remove_from_conn(ares_query_t *query)
+ {
+@@ -81,14 +80,32 @@ static void        ares_query_remove_from_conn(ares_query_t *query)
+   query->conn                    = NULL;
+ }
+ 
++/*! A queued server-state notification.  Holds the formatted address rather
++ *  than the server, so it stays valid however the server list changes. */
++typedef struct {
++  char       *server_string;
++  ares_bool_t success;
++  int         flags;
++} ares_server_state_msg_t;
++
++static void ares_server_state_msg_free(void *arg)
++{
++  ares_server_state_msg_t *msg = arg;
++  if (msg == NULL) {
++    return; /* LCOV_EXCL_LINE: DefensiveCoding */
++  }
++  ares_free(msg->server_string);
++}
++
+ /* Invoke the server state callback after a success or failure */
+ static void invoke_server_state_cb(const ares_server_t *server,
+                                    ares_bool_t success, int flags)
+ {
+-  const ares_channel_t *channel = server->channel;
+-  ares_buf_t           *buf;
+-  ares_status_t         status;
+-  char                 *server_string;
++  ares_channel_t         *channel = server->channel;
++  ares_buf_t             *buf;
++  ares_status_t           status;
++  char                   *server_string;
++  ares_server_state_msg_t msg;
+ 
+   if (channel->server_state_cb == NULL) {
+     return;
+@@ -111,9 +128,57 @@ static void invoke_server_state_cb(const ares_server_t *server,
+     return; /* LCOV_EXCL_LINE: OutOfMemory */
+   }
+ 
+-  channel->server_state_cb(server_string, success, flags,
+-                           channel->server_state_cb_data);
+-  ares_free(server_string);
++  /* Queue rather than dispatch.  This runs in the middle of processing, and
++   * every caller keeps using its query / connection / server afterwards.  The
++   * callback is application code that may reentrantly call ares_cancel(),
++   * which frees those objects -- so dispatch once the library is no longer
++   * holding them.  Same philosophy as the deferred query-callback dispatch.
++   *
++   * Only the formatted address is captured, never the ares_server_t, so a
++   * queued entry cannot outlive anything it points at. */
++  if (channel->server_state_queue == NULL) {
++    channel->server_state_queue = ares_array_create(
++      sizeof(ares_server_state_msg_t), ares_server_state_msg_free);
++    if (channel->server_state_queue == NULL) {
++      /* LCOV_EXCL_START: OutOfMemory */
++      ares_free(server_string);
++      return;
++      /* LCOV_EXCL_STOP */
++    }
++  }
++
++  msg.server_string = server_string;
++  msg.success       = success;
++  msg.flags         = flags;
++
++  if (ares_array_insertdata_last(channel->server_state_queue, &msg) !=
++      ARES_SUCCESS) {
++    ares_free(server_string); /* LCOV_EXCL_LINE: OutOfMemory */
++  }
++}
++
++/*! Deliver every server-state notification the channel has queued.  Loops
++ *  rather than snapshotting: a callback is allowed to re-enter the library and
++ *  queue more, and those belong to this same delivery point. */
++void ares_server_state_dispatch(ares_channel_t *channel)
++{
++  while (ares_array_len(channel->server_state_queue) > 0) {
++    ares_server_state_msg_t msg;
++
++    if (ares_array_claim_at(&msg, sizeof(msg), channel->server_state_queue,
++                            0) != ARES_SUCCESS) {
++      break; /* LCOV_EXCL_LINE: DefensiveCoding */
++    }
++
++    if (channel->server_state_cb != NULL) {
++      channel->server_state_cb(msg.server_string, msg.success, msg.flags,
++                               channel->server_state_cb_data);
++    }
++    ares_free(msg.server_string);
++  }
++
++  ares_array_destroy(channel->server_state_queue);
++  channel->server_state_queue = NULL;
+ }
+ 
+ static void server_increment_failures(ares_server_t *server,
+@@ -204,6 +269,8 @@ static ares_status_t ares_process_fds_nolock(ares_channel_t         *channel,
+     return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */
+   }
+ 
++  ares_deferred_cb_enter(channel);
++
+   ares_tvnow(&now);
+ 
+   /* Process write events */
+@@ -244,6 +311,8 @@ static ares_status_t ares_process_fds_nolock(ares_channel_t         *channel,
+   }
+ 
+ done:
++  ares_deferred_cb_leave(channel);
++
+   if (status == ARES_ENOMEM) {
+     return ARES_ENOMEM;
+   }
+@@ -553,6 +622,8 @@ typedef enum {
+ typedef struct {
+   requeue_type_t     type;   /* type of entry, requeue or endquery */
+   unsigned short     qid;    /* query id */
++  size_t             serial; /* identifies the query the qid meant when
++                              * this entry was appended */
+   ares_server_t     *server; /* requeue only: optional */
+   ares_status_t      status; /* endquery only */
+   ares_dns_record_t *dnsrec; /* endquery only: optional */
+@@ -578,6 +649,7 @@ static ares_status_t ares_append_requeue_int(ares_array_t     **requeue,
+ 
+   entry.type   = type;
+   entry.qid    = query->qid;
++  entry.serial = query->serial;
+   entry.server = server;
+   entry.status = status;
+   entry.dnsrec = dnsrec;
+@@ -601,6 +673,53 @@ static ares_status_t ares_append_endqueue(ares_array_t     **requeue,
+     dnsrec);
+ }
+ 
++/*! Is the query the caller captured still the one holding \a qid?
++ *
++ *  A query id is a 16-bit wire value reissued as soon as the query holding it
++ *  is detached, so it names a slot rather than a query, and comparing the
++ *  pointer as well does not help: the replacement is often allocated at the
++ *  address the freed one had.  The serial is a channel-wide counter that is
++ *  never reused. */
++static ares_bool_t ares_query_is_live(const ares_channel_t *channel,
++                                      unsigned short qid, size_t serial)
++{
++  const ares_query_t *query =
++    ares_htable_szvp_get_direct(channel->queries_by_qid, qid);
++
++  if (query == NULL || query->serial != serial) {
++    return ARES_FALSE;
++  }
++
++  return ARES_TRUE;
++}
++
++/*! Is this exact server object still in the channel's server list?
++ *
++ *  Compares pointers only and never dereferences \a server.  Deferred
++ *  reclamation keeps an unlinked server readable for the rest of the call
++ *  that captured it, so reading through it is no longer a use-after-free --
++ *  but it has been removed from the configuration and must not be acted on,
++ *  which is what this reports.  A channel has a handful of servers, so the
++ *  linear scan does not matter. */
++ares_bool_t ares_server_in_channel(const ares_channel_t *channel,
++                                   const ares_server_t  *server)
++{
++  ares_slist_node_t *node;
++
++  if (server == NULL) {
++    return ARES_FALSE;
++  }
++
++  for (node = ares_slist_node_first(channel->servers); node != NULL;
++       node = ares_slist_node_next(node)) {
++    if (ares_slist_node_val(node) == server) {
++      return ARES_TRUE;
++    }
++  }
++
++  return ARES_FALSE;
++}
++
+ /* Drain the deferred requeue/endqueue list iteratively.  All flush sites
+  * (read_answers(), process_timeouts(), and ares_send_query()) funnel through
+  * here so that:
+@@ -636,11 +755,35 @@ static ares_status_t ares_flush_requeue(ares_channel_t       *channel,
+ 
+     query = ares_htable_szvp_get_direct(channel->queries_by_qid, entry.qid);
+ 
++    /* A query id is a 16-bit wire value and generate_unique_qid() only avoids
++     * ids that are live when it runs.  Within a single drain, a callback can
++     * cancel a query whose entry is still in this array -- releasing its id --
++     * and start a new lookup that is handed the same id.  The lookup above
++     * would then resolve this entry to a completely different query: an
++     * endquery entry would deliver one lookup's answer to another and free it,
++     * a requeue entry would put an in-flight query on the wire twice.  The
++     * serial is a channel-wide counter that is never reused, so it tells the
++     * two apart. */
++    if (query != NULL && query->serial != entry.serial) {
++      query = NULL;
++    }
++
+     if (entry.type == REQUEUE_REQUEUE) {
+       /* Query disappeared (e.g. a prior callback in this drain cancelled it) */
+       if (query == NULL) {
+         continue;
+       }
++      /* entry.server is a raw pointer captured before any callback in this
++       * drain ran.  A callback may legally re-enter the public API -- the
++       * channel lock is recursive -- and ares_set_servers*() destroys servers
++       * that are absent from the new configuration, so it may already be
++       * freed.  The query above is revalidated by qid for exactly this
++       * reason; do the same for the server, falling back to ordinary
++       * selection when it has gone. */
++      if (!ares_server_in_channel(channel, entry.server)) {
++        entry.server = NULL;
++      }
++
+       /* Re-dispatch via the internal entrypoint so any further requeues are
+        * appended back onto this same list and drained by the loop above,
+        * rather than recursing. */
+@@ -1377,6 +1520,7 @@ ares_status_t ares_send_query(ares_server_t *requested_server,
+   ares_channel_t *channel = query->channel;
+   ares_array_t   *requeue = NULL;
+   unsigned short  qid     = query->qid;
++  size_t          serial  = query->serial;
+   ares_status_t   status;
+ 
+   status = ares_send_query_int(requested_server, query, now, &requeue);
+@@ -1393,8 +1537,7 @@ ares_status_t ares_send_query(ares_server_t *requested_server,
+    * been freed.  Do not dereference 'query' here.  If it is no longer tracked
+    * it ended, so don't report success to the caller (which would, e.g., cause
+    * ares_send_nolock() to write to a now-freed *qid). */
+-  if (status == ARES_SUCCESS &&
+-      ares_htable_szvp_get_direct(channel->queries_by_qid, qid) == NULL) {
++  if (status == ARES_SUCCESS && !ares_query_is_live(channel, qid, serial)) {
+     status = ARES_ETIMEOUT;
+   }
+ 
+@@ -1412,6 +1555,9 @@ static ares_status_t ares_send_query_int(ares_server_t        *requested_server,
+   size_t          timeplus;
+   ares_status_t   status;
+   ares_bool_t     probe_downed_server = ARES_TRUE;
++  /* Captured before any application callback below, which may free the query */
++  unsigned short  qid    = query->qid;
++  size_t          serial = query->serial;
+ 
+   /* Choose the server to send the query to */
+   if (requested_server != NULL) {
+@@ -1443,6 +1589,32 @@ static ares_status_t ares_send_query_int(ares_server_t        *requested_server,
+   conn = ares_fetch_connection(channel, server, query);
+   if (conn == NULL) {
+     status = ares_open_connection(&conn, channel, server, query->using_tcp);
++
++    /* Opening a connection runs application code -- the socket-open function
++     * from ares_set_socket_functions_ex(), and the ares_set_socket_callback()
++     * and ares_set_socket_configure_callback() callbacks -- any of which may
++     * reentrantly call ares_cancel() and free this query.  Re-check liveness
++     * by the qid captured at entry rather than dereferencing a possibly-freed
++     * query. */
++    if (!ares_query_is_live(channel, qid, serial)) {
++      return ARES_ECANCELLED;
++    }
++
++    /* Those same callbacks may have reconfigured the servers, which frees the
++     * ones the new configuration omits.  'server' was captured before the
++     * open; everything below reads it, including server_increment_failures()
++     * on the failure paths of the switch.
++     *
++     * Requeue rather than return: every exit from this function must either
++     * enqueue the query or end it, and the query is still live here -- it has
++     * not been written, is not attached to a connection, and on a first send
++     * has no timeout node, so returning would strand it forever.
++     * query->conn is NULL, so this does not read through the freed server. */
++    if (!ares_server_in_channel(channel, server)) {
++      return ares_requeue_query(query, now, ARES_ECONNREFUSED, ARES_TRUE, NULL,
++                                requeue);
++    }
++
+     switch (status) {
+       /* Good result, continue on */
+       case ARES_SUCCESS:
+@@ -1464,6 +1636,14 @@ static ares_status_t ares_send_query_int(ares_server_t        *requested_server,
+ 
+   /* Write the query */
+   status = ares_conn_query_write(conn, query, now);
++
++  /* Writing runs application code too: ares_conn_query_write() reaches the
++   * send function installed by ares_set_socket_functions_ex(), which may
++   * reentrantly call ares_cancel() with the same hazard as above. */
++  if (!ares_query_is_live(channel, qid, serial)) {
++    return ARES_ECANCELLED;
++  }
++
+   switch (status) {
+     /* Good result, continue on */
+     case ARES_SUCCESS:
+@@ -1479,6 +1659,17 @@ static ares_status_t ares_send_query_int(ares_server_t        *requested_server,
+     case ARES_ECONNREFUSED:
+     case ARES_EBADFAMILY:
+       handle_conn_error(conn, ARES_TRUE, status);
++      /* handle_conn_error() -> ares_close_connection() ->
++       * ares_requeue_queries() walks conn->queries_to_conn and may terminally
++       * end other queries on this connection.  If one of their callbacks
++       * reentrantly calls ares_cancel(), this query is freed too -- it is still
++       * linked in all_queries, since it only joins conn->queries_to_conn on the
++       * success path below.  Re-check liveness by the qid captured at entry
++       * rather than dereferencing a possibly-freed query.  Mirrors the guard in
++       * ares_send_query(). */
++      if (!ares_query_is_live(channel, qid, serial)) {
++        return ARES_ECONNREFUSED;
++      }
+       status = ares_requeue_query(query, now, status, ARES_TRUE, NULL, requeue);
+       if (status == ARES_ETIMEOUT) {
+         status = ARES_ECONNREFUSED;
+@@ -1597,11 +1788,18 @@ static ares_bool_t same_questions(const ares_query_t      *query,
+   return rv;
+ }
+ 
+-static void ares_detach_query(ares_query_t *query)
++void ares_detach_query(ares_query_t *query)
+ {
+   /* Remove the query from all the lists in which it is linked */
+   ares_query_remove_from_conn(query);
+-  ares_htable_szvp_remove(query->channel->queries_by_qid, query->qid);
++  /* Only release the qid slot if it is still ours.  A query detached before
++   * its callback can have its qid reissued to a lookup started from within
++   * that callback, and the ares_free_query() that follows detaches a second
++   * time -- which would otherwise evict the new lookup instead. */
++  if (ares_htable_szvp_get_direct(query->channel->queries_by_qid, query->qid) ==
++      query) {
++    ares_htable_szvp_remove(query->channel->queries_by_qid, query->qid);
++  }
+   ares_llist_node_destroy(query->node_all_queries);
+   query->node_all_queries = NULL;
+ }
+@@ -1624,6 +1822,16 @@ static void end_query(ares_channel_t *channel, ares_server_t *server,
+     return;
+   }
+ 
++  /* Detach from all lookup lists before the callback, otherwise a reentrant
++   * ares_cancel() from within it would find this query still linked, free it,
++   * and the ares_free_query() below would double-free.  Mirrors
++   * ares_flush_requeue() for every synchronous path that reaches here with a
++   * NULL requeue: connection teardown via handle_conn_error(), and server
++   * removal via ares_servers_update() and ares_destroy_servers_state(), both
++   * of which reach ares_close_sockets().
++   * ares_detach_query() may safely run twice on the same query. */
++  ares_detach_query(query);
++
+   /* Invoke the callback. */
+   query->callback(query->arg, status, query->timeouts, dnsrec);
+   ares_free_query(query);
+@@ -1631,7 +1839,8 @@ static void end_query(ares_channel_t *channel, ares_server_t *server,
+   /* Check and notify if no other queries are enqueued on the channel.  This
+    * must come after the callback and freeing the query for 2 reasons.
+    *  1) The callback itself may enqueue a new query
+-   *  2) Technically the current query isn't detached until it is free()'d.
++   *  2) The current query is detached above, before the callback, so by this
++   *     point it is no longer tracked.
+    */
+   ares_queue_notify_empty(channel);
+ }
+diff --git a/src/lib/ares_send.c b/src/lib/ares_send.c
+index 6efa9580b2..2e0482bf19 100644
+--- a/src/lib/ares_send.c
++++ b/src/lib/ares_send.c
+@@ -117,6 +117,27 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+   unsigned short           id          = generate_unique_qid(channel);
+   const ares_dns_record_t *dnsrec_resp = NULL;
+ 
++  /* A channel being destroyed accepts no new queries.  ares_destroy(3)
++   * documents that a callback must not add new requests to a channel being
++   * destroyed.  Refuse it, but still notify: ARES_EDESTRUCTION is documented
++   * in ares_query(3), ares_send(3), ares_search(3) and ares_getaddrinfo(3) as
++   * a status delivered to the callback, and every caller frees its own
++   * context from there.
++   *
++   * Not notified if we are already inside such a notification: an application
++   * whose callback starts a replacement lookup on every invocation would
++   * otherwise re-enter here from within the callback without bound and
++   * exhaust the stack.  At that depth it is already past the contract
++   * ares_destroy(3) documents. */
++  if (!channel->sys_up) {
++    if (!channel->in_shutdown_refusal) {
++      channel->in_shutdown_refusal = ARES_TRUE;
++      callback(arg, ARES_EDESTRUCTION, 0, NULL);
++      channel->in_shutdown_refusal = ARES_FALSE;
++    }
++    return ARES_EDESTRUCTION;
++  }
++
+   ares_tvnow(&now);
+ 
+   if (ares_slist_len(channel->servers) == 0) {
+@@ -145,6 +166,7 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+ 
+   query->channel      = channel;
+   query->qid          = id;
++  query->serial       = ++channel->query_serial;
+   query->timeout.sec  = 0;
+   query->timeout.usec = 0;
+   query->using_tcp =
+@@ -209,6 +231,12 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+    */
+   if (!ares_htable_szvp_insert(channel->queries_by_qid, query->qid, query)) {
+     /* LCOV_EXCL_START: OutOfMemory */
++    /* The query is already chained into all_queries, so a reentrant
++     * ares_cancel() from the callback below would find it, run the
++     * application callback a second time for one lookup, and free it -- and
++     * the ares_free_query() here would then double-free.  Same ordering as
++     * ares_cancel() and ares_destroy(): unlink first, notify second. */
++    ares_detach_query(query);
+     callback(arg, ARES_ENOMEM, 0, NULL);
+     ares_free_query(query);
+     return ARES_ENOMEM;
+@@ -217,10 +245,17 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+ 
+   /* Perform the first query action. */
+ 
++  /* Sending opens and writes to connections and can mark a server down, both
++   * of which notify.  Deliver those once we are done with the connection and
++   * the server, not part-way through. */
++  ares_deferred_cb_enter(channel);
+   status = ares_send_query(server, query, &now);
++  ares_deferred_cb_leave(channel);
++
+   if (status == ARES_SUCCESS && qid) {
+     *qid = id;
+   }
++
+   return status;
+ }
+ 
+diff --git a/src/lib/ares_update_servers.c b/src/lib/ares_update_servers.c
+index f8d441accf..50a9c27925 100644
+--- a/src/lib/ares_update_servers.c
++++ b/src/lib/ares_update_servers.c
+@@ -740,17 +740,36 @@ static ares_bool_t ares_servers_remove_stale(ares_channel_t *channel,
+ {
+   ares_bool_t        stale_removed = ARES_FALSE;
+   ares_slist_node_t *snode         = ares_slist_node_first(channel->servers);
++  size_t             generation    = channel->servers_generation;
+ 
++  /* Re-read from the head each pass rather than caching the next node.
++   * ares_slist_node_destroy() below reaches application callbacks, by way of
++   * ares_destroy_server() -> ares_close_sockets() -> ares_requeue_queries(),
++   * and a nested reconfiguration from one of those destroys the remaining
++   * stale servers -- including whichever one a cached pointer referred to. */
+   while (snode != NULL) {
+-    ares_slist_node_t   *snext  = ares_slist_node_next(snode);
+     const ares_server_t *server = ares_slist_node_val(snode);
+-    if (!ares_server_in_newconfig(server, srvlist)) {
+-      /* This will clean up all server state via the destruction callback and
+-       * move any queries to new servers */
+-      ares_slist_node_destroy(snode);
+-      stale_removed = ARES_TRUE;
++
++    if (ares_server_in_newconfig(server, srvlist)) {
++      snode = ares_slist_node_next(snode);
++      continue;
+     }
+-    snode = snext;
++
++    /* This will clean up all server state via the destruction callback and
++     * move any queries to new servers */
++    ares_slist_node_destroy(snode);
++    stale_removed = ARES_TRUE;
++
++    /* A callback reached from the destroy above may have reconfigured the
++     * server list against a newer configuration.  That call has already
++     * reconciled the whole list, so whatever remains belongs to it and not to
++     * srvlist -- stop rather than deleting its servers. */
++    if (channel->servers_generation != generation) {
++      break;
++    }
++
++    /* The callbacks above may have removed further servers, so restart. */
++    snode = ares_slist_node_first(channel->servers);
+   }
+   return stale_removed;
+ }
+@@ -775,6 +794,14 @@ ares_status_t ares_servers_update(ares_channel_t *channel,
+     return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */
+   }
+ 
++  /* Removing servers closes their connections, which notifies.  Deliver
++   * once this call is done rather than from inside the teardown. */
++  ares_deferred_cb_enter(channel);
++
++  /* Bumped before anything below can reach an application callback, so a
++   * nested reconfiguration is distinguishable from our own work. */
++  channel->servers_generation++;
++
+   /* NOTE: a NULL or zero entry server list is considered valid due to
+    *       real-world people needing support for this for their test harnesses
+    */
+@@ -843,6 +870,7 @@ ares_status_t ares_servers_update(ares_channel_t *channel,
+   status = ARES_SUCCESS;
+ 
+ done:
++  ares_deferred_cb_leave(channel);
+   return status;
+ }
+ 
+diff --git a/test/ares-test-mock.cc b/test/ares-test-mock.cc
+index c0c0279abb..2158c5a913 100644
+--- a/test/ares-test-mock.cc
++++ b/test/ares-test-mock.cc
+@@ -31,6 +31,11 @@
+ #include <sys/stat.h>
+ #endif
+ 
++#ifndef _WIN32
++#  include <errno.h>
++#  include <fcntl.h>
++#endif
++
+ #include <sstream>
+ #include <vector>
+ 
+@@ -1914,6 +1919,7 @@ TEST_P(MockRetryDepthChannelTest, HighRetryNoStackOverflow) {
+ struct CancelInCbData {
+   ares_channel_t *channel;
+   bool            done;
++  size_t          cbs;
+ };
+ 
+ static void CancelChannelCallback(void *arg, ares_status_t status,
+@@ -1925,10 +1931,1071 @@ static void CancelChannelCallback(void *arg, ares_status_t status,
+   (void)timeouts;
+   (void)dnsrec;
+   data->done = true;
++  data->cbs++;
+   /* Reentrant cancel from within the callback.  Must not double-free. */
+   ares_cancel(data->channel);
+ }
+ 
++// ares_destroy() notifies each still-running query that the channel is going
++// away, and holds a pointer to the next one in its list while doing so.  A
++// reentrant ares_cancel() from one of those callbacks frees every remaining
++// query -- including that cached next, which ares_destroy() then follows.
++//
++// ares_cancel() is immune to the same pattern because it swaps the list head
++// before walking it; ares_destroy() did not.  Two queries are required: with
++// only one in flight there is no next to cache and nothing goes wrong.
++// tries=1 so a teardown ends the query outright instead of retrying it, which
++// is the precondition this family of bugs shares.
++class MockUDPSingleTryTest : public MockChannelOptsTest,
++                             public ::testing::WithParamInterface<int> {
++public:
++  MockUDPSingleTryTest()
++    : MockChannelOptsTest(1, GetParam(), false, false, FillOptions(&opts_),
++                          ARES_OPT_TRIES)
++  {
++  }
++
++  static struct ares_options *FillOptions(struct ares_options *opts)
++  {
++    memset(opts, 0, sizeof(struct ares_options));
++    opts->tries = 1;
++    return opts;
++  }
++
++private:
++  struct ares_options opts_;
++};
++
++// ares_cancel() and ares_destroy() free a query themselves rather than going
++// through end_query().  Both used to invoke the application callback while the
++// query was still in queries_by_qid, on conn->queries_to_conn and in
++// queries_by_timeout -- only all_queries was unlinked first.  A reentrant
++// teardown from within that callback therefore still found the query, ended it
++// a second time, and freed it; the ares_free_query() that followed then
++// double-freed.  One query in flight is enough.
++static void ReconfigureServersCallback(void *arg, ares_status_t status,
++                                       size_t                   timeouts,
++                                       const ares_dns_record_t *dnsrec) {
++  CancelInCbData *data = static_cast<CancelInCbData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  data->done = true;
++  data->cbs++;
++  /* Frees every server absent from the new configuration, closing their
++   * connections -- which still hold the queries being torn down. */
++  ares_set_servers_csv(data->channel, "127.0.0.1:53055");
++}
++
++// Reconfiguring the server list from a cancellation callback.
++TEST_P(MockUDPSingleTryTest, ReconfigureInCancelCallbackNoDoubleFree) {
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++
++  QueryResult result;
++  /* Left unanswered, so both stay attached to the connection. */
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, ReconfigureServersCallback,
++                              &data, NULL));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.example.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, QueryCallback, &result, NULL));
++
++  ares_cancel(channel_);
++  EXPECT_TRUE(data.done);
++  EXPECT_TRUE(result.done_);
++  /* Each lookup must be notified exactly once, not twice. */
++  EXPECT_EQ((size_t)1, data.cbs);
++}
++
++/* The replacement lookup's result outlives the callback that starts it. */
++static QueryResult g_replacement_result;
++
++static void NewQueryOnFailingWriteCallback(void *arg, ares_status_t status,
++                                           size_t                   timeouts,
++                                           const ares_dns_record_t *dnsrec) {
++  /* ares_set_socket_functions() stores the pointer rather than copying it, so
++   * this must outlive the call. */
++  static ares_socket_functions sock_funcs;
++  CancelInCbData              *data = static_cast<CancelInCbData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++
++  data->cbs++;
++
++  /* Only the first cancellation callback starts a replacement lookup. */
++  if (data->done) {
++    return;
++  }
++  data->done = true;
++
++  memset(&sock_funcs, 0, sizeof(sock_funcs));
++  sock_funcs.asendv = LibraryTest::ares_sendv_fail;
++  ares_set_socket_functions(data->channel, &sock_funcs, NULL);
++  LibraryTest::SetFailSend();
++
++  ares_query_dnsrec(data->channel, "www.probe.com", ARES_CLASS_IN,
++                    ARES_REC_TYPE_A, QueryCallback, &g_replacement_result,
++                    NULL);
++}
++
++// No reconfiguration at all: the cancellation callback simply starts a
++// replacement lookup -- an ordinary retry pattern -- and that lookup's write
++// fails.  ares_close_connection() then walks conn->queries_to_conn, which
++// still holds the queries ares_cancel() is in the middle of.  Wider than the
++// case above: it needs nothing more than a connection error.
++TEST_P(MockUDPSingleTryTest, NewQueryInCancelCallbackConnErrorNoDoubleFree) {
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++
++  g_replacement_result.done_ = false;
++
++  QueryResult result;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, NewQueryOnFailingWriteCallback,
++                              &data, NULL));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.example.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, QueryCallback, &result, NULL));
++
++  ares_cancel(channel_);
++  EXPECT_TRUE(data.done);
++  EXPECT_TRUE(result.done_);
++  /* Each lookup must be notified exactly once, not twice. */
++  EXPECT_EQ((size_t)1, data.cbs);
++  /* Pins that the replacement lookup ran and its write failed, which is what
++   * drives the connection teardown this test is about. */
++  EXPECT_TRUE(g_replacement_result.done_);
++}
++
++// The same shape through ares_destroy() rather than ares_cancel().  Swapping
++// the all_queries head does not help here: the reentrant teardown reaches the
++// query through the connection, not through all_queries.
++TEST_P(MockUDPSingleTryTest, ReconfigureInDestroyCallbackNoDoubleFree) {
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++
++  QueryResult result;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, ReconfigureServersCallback,
++                              &data, NULL));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.example.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, QueryCallback, &result, NULL));
++
++  ares_destroy(channel_);
++  channel_ = nullptr; /* destroyed here, don't let the fixture repeat it */
++
++  EXPECT_TRUE(data.done);
++  EXPECT_TRUE(result.done_);
++  /* Each lookup must be notified exactly once, not twice. */
++  EXPECT_EQ((size_t)1, data.cbs);
++}
++
++// Once ares_destroy() has begun, a lookup started from a destruction callback
++// is refused rather than allocated into a channel being torn down -- and the
++// refusal still runs the caller's callback with ARES_EDESTRUCTION, so context
++// attached to `arg` can be reclaimed.  ares_cancel() leaves sys_up true, so a
++// destruction callback is the only way to reach this.
++struct DestroyReentryData {
++  ares_channel_t *channel;
++  size_t          outer_cbs;
++  size_t          replacement_cbs;
++  ares_status_t   replacement_status;
++};
++
++static void DestroyReplacementCallback(void *arg, ares_status_t status,
++                                       size_t                   timeouts,
++                                       const ares_dns_record_t *dnsrec) {
++  DestroyReentryData *data = static_cast<DestroyReentryData *>(arg);
++  (void)timeouts;
++  (void)dnsrec;
++  data->replacement_cbs++;
++  data->replacement_status = status;
++}
++
++static void DestroyReentryCallback(void *arg, ares_status_t status,
++                                   size_t                   timeouts,
++                                   const ares_dns_record_t *dnsrec) {
++  DestroyReentryData *data = static_cast<DestroyReentryData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  data->outer_cbs++;
++  ares_query_dnsrec(data->channel, "www.example.com", ARES_CLASS_IN,
++                    ARES_REC_TYPE_A, DestroyReplacementCallback, data, NULL);
++}
++
++TEST_F(LibraryTest, NewQueryInDestroyCallbackIsRefusedAndNotified) {
++  ares_channel_t     *channel = nullptr;
++  struct ares_options opts;
++  int                 optmask = 0;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.tries  = 1;
++  optmask    |= ARES_OPT_TRIES;
++  opts.flags  = ARES_FLAG_NOSEARCH;
++  optmask    |= ARES_OPT_FLAGS;
++
++  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel, &opts, optmask));
++  // Nothing listens here; no traffic is needed.
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel, "127.0.0.1:53055"));
++
++  DestroyReentryData data;
++  data.channel            = channel;
++  data.outer_cbs          = 0;
++  data.replacement_cbs    = 0;
++  data.replacement_status = ARES_SUCCESS;
++
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, DestroyReentryCallback, &data,
++                              NULL));
++
++  ares_destroy(channel);
++
++  EXPECT_EQ((size_t)1, data.outer_cbs);
++  // Refused -- but notified, so the caller can release whatever it attached.
++  EXPECT_EQ((size_t)1, data.replacement_cbs);
++  EXPECT_EQ(ARES_EDESTRUCTION, data.replacement_status);
++}
++
++INSTANTIATE_TEST_SUITE_P(AddressFamilies, MockUDPSingleTryTest,
++                         ::testing::ValuesIn(ares::test::families),
++                         PrintFamily);
++
++TEST_P(MockUDPChannelTest, CancelInDestroyCallbackNoUseAfterFree) {
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++
++  /* Left unanswered, so both are still pending when the channel goes down. */
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, CancelChannelCallback, &data,
++                              NULL));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.example.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, CancelChannelCallback, &data,
++                              NULL));
++  /* Without this the test can pass vacuously if a query failed to start. */
++  EXPECT_EQ(2, ares_queue_active_queries(channel_));
++
++  ares_destroy(channel_);
++  channel_ = nullptr; /* destroyed here, don't let the fixture repeat it */
++
++  EXPECT_TRUE(data.done);
++  /* Every query must be notified exactly once. */
++  EXPECT_EQ((size_t)2, data.cbs);
++}
++
++// Fixture with tries=1 so the first failure ends the query outright instead of
++// retrying it -- that is what drives execution into end_query()'s synchronous
++// (requeue==NULL) branch.
++// The tests below use the MockUDPSingleTryTest fixture defined above: tries=1,
++// so the first failure ends the query outright instead of retrying it, which
++// is what drives execution into end_query()'s synchronous (requeue==NULL)
++// branch.
++//
++
++// Connection-teardown route into the synchronous branch.  A malformed reply
++// makes process_answer() return EBADRESP, so handle_conn_error() tears the
++// connection down and ares_close_connection() requeues its queries with a NULL
++// requeue; with tries=1 the query is ended right there.  CVE-2026-33630 fixed
++// the deferred flush path only, so this one still double-freed.
++TEST_P(MockUDPSingleTryTest, CancelInCallbackConnTeardownNoDoubleFree) {
++  /* Too short to be a DNS header, so it fails to parse. */
++  std::vector<byte> malformed = {0x00, 0x00, 0x00, 0x00};
++  ON_CALL(server_, OnRequest("www.google.com", T_A))
++    .WillByDefault(SetReplyData(&server_, malformed));
++
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    CancelChannelCallback, &data, NULL);
++  Process();
++  EXPECT_TRUE(data.done);
++}
++
++// Server-removal route into the same synchronous branch, which the
++// connection-teardown test above does not cover.  Reconfiguring the server list
++// destroys the servers that are gone, and ares_close_sockets() closes their
++// connections with a NULL requeue -- a second way to reach end_query() with the
++// query still linked.  No Process() call is needed: the query is attached to a
++// connection by ares_query_dnsrec() itself, and nothing has replied to it.
++TEST_P(MockUDPSingleTryTest, CancelInCallbackServerRemovalNoDoubleFree) {
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    CancelChannelCallback, &data, NULL);
++
++  /* Drops the server the in-flight query is attached to. */
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel_, "127.0.0.1:53055"));
++  EXPECT_TRUE(data.done);
++}
++
++// ares_send_query_int() calls handle_conn_error() on a retryable write failure
++// and then keeps using its own query.  That teardown requeues the *other*
++// queries on the connection, and with tries=1 they are ended outright; if one
++// of their callbacks reentrantly cancels the channel, this query is freed too
++// -- it is still linked in all_queries, having only joined
++// conn->queries_to_conn on the success path further down.  Using it afterwards
++// is a use-after-free.
++//
++// The first query is left unanswered so it stays on the connection, then the
++// next write is made to fail with ECONNREFUSED so the second query takes the
++// error path while the first is still attached.
++//
++// Note this is masked on code that has not fixed the end_query() double-free:
++// that aborts inside handle_conn_error() before control returns here.
++TEST_P(MockUDPSingleTryTest, CancelInSiblingCallbackConnErrorNoUseAfterFree) {
++  CancelInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.cbs     = 0;
++
++  /* No reply configured for this one, so it stays attached to the connection. */
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    CancelChannelCallback, &data, NULL);
++
++  ares_socket_functions sock_funcs;
++  memset(&sock_funcs, 0, sizeof(sock_funcs));
++  sock_funcs.asendv = ares_sendv_fail;
++  ares_set_socket_functions(channel_, &sock_funcs, NULL);
++  LibraryTest::SetFailSend();
++
++  QueryResult result;
++  ares_query_dnsrec(channel_, "www.example.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QueryCallback, &result, NULL);
++
++  /* The write failure above tears the connection down, which ends the first
++   * query, whose callback cancels the channel and frees this one. */
++  EXPECT_TRUE(data.done);
++  /* The sibling is cancelled from the first query's callback rather than
++   * requeued; pin that rather than leaving it unstated. */
++  EXPECT_TRUE(result.done_);
++  EXPECT_EQ(ARES_ECANCELLED, result.status_);
++}
++
++// The socket-state callback -- registered with ARES_OPT_SOCK_STATE_CB, the
++// usual way c-ares is driven from an event loop -- used to be dispatched from
++// the middle of opening a connection, and ares_open_connection() keeps using
++// that connection afterwards.  A reentrant ares_cancel() from the callback
++// frees both the connection (through the idle sweep) and the in-flight query,
++// leaving the library using either.
++struct SockStateCancelData {
++  ares_channel_t *channel;
++  size_t          calls;
++};
++
++static void SockStateCancelCallback(void *data, ares_socket_t socket_fd,
++                                    int readable, int writable)
++{
++  SockStateCancelData *d = static_cast<SockStateCancelData *>(data);
++  (void)socket_fd;
++  (void)readable;
++  (void)writable;
++  d->calls++;
++  // Reentrant cancel from the socket-state notification.
++  if (d->channel != nullptr) {
++    ares_cancel(d->channel);
++  }
++}
++
++TEST_F(LibraryTest, CancelInSockStateCallbackNoUseAfterFree) {
++  SockStateCancelData data;
++  ares_channel_t     *chan = nullptr;
++  struct ares_options opts;
++  int                 optmask = 0;
++
++  data.channel = nullptr;
++  data.calls   = 0;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.sock_state_cb      = SockStateCancelCallback;
++  opts.sock_state_cb_data = &data;
++  optmask                 = ARES_OPT_SOCK_STATE_CB;
++
++  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&chan, &opts, optmask));
++  ASSERT_NE(nullptr, chan);
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(chan, "127.0.0.1:53055"));
++
++  /* Armed only now, so channel setup itself does not cancel. */
++  data.channel = chan;
++
++  QueryResult result;
++  ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QueryCallback, &result, NULL);
++
++  /* Opening the connection notifies, the notification cancels, and the
++   * library must still be able to finish -- and the lookup must actually be
++   * cancelled rather than the cancel quietly doing nothing. */
++  EXPECT_GT(data.calls, (size_t)0);
++  EXPECT_TRUE(result.done_);
++  EXPECT_EQ(ARES_ECANCELLED, result.status_);
++
++  data.channel = nullptr; /* don't cancel from teardown notifications */
++  ares_destroy(chan);
++}
++
++// Deferring the notification must not reorder it past the close of the
++// descriptor it names.  An event loop is told "stop watching fd N"; if fd N is
++// already closed by then, the number can have been handed to something else --
++// including to application code running from a deferred query callback -- and
++// the application ends up setting and clearing interest in a descriptor it now
++// owns for another purpose.
++//
++// The invariant is checked directly: while the callback naming the descriptor
++// runs, that descriptor must still be open.
++#ifndef _WIN32
++struct SockStateCloseOrderData {
++  size_t closes_seen;
++  size_t closed_while_already_shut;
++};
++
++static void SockStateCloseOrderCallback(void *data, ares_socket_t socket_fd,
++                                        int readable, int writable)
++{
++  SockStateCloseOrderData *d = static_cast<SockStateCloseOrderData *>(data);
++  if (readable || writable) {
++    return;
++  }
++  d->closes_seen++;
++  // F_GETFD on a closed descriptor fails with EBADF.  c-ares must not have
++  // closed it yet at this point.
++  if (fcntl(static_cast<int>(socket_fd), F_GETFD) == -1 && errno == EBADF) {
++    d->closed_while_already_shut++;
++  }
++}
++
++TEST_F(LibraryTest, SockStateCloseIsReportedBeforeDescriptorCloses) {
++  SockStateCloseOrderData data;
++  ares_channel_t         *chan = nullptr;
++  struct ares_options     opts;
++
++  data.closes_seen               = 0;
++  data.closed_while_already_shut = 0;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.sock_state_cb      = SockStateCloseOrderCallback;
++  opts.sock_state_cb_data = &data;
++
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_init_options(&chan, &opts, ARES_OPT_SOCK_STATE_CB));
++  ASSERT_NE(nullptr, chan);
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(chan, "127.0.0.1:53055"));
++
++  QueryResult result;
++  ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QueryCallback, &result, NULL);
++  ares_destroy(chan);
++
++  EXPECT_GT(data.closes_seen, (size_t)0);
++  EXPECT_EQ((size_t)0, data.closed_while_already_shut)
++    << "the application was told to stop watching a descriptor c-ares had "
++       "already closed";
++}
++#endif
++
++// Reconfiguring the servers from an I/O hook frees the server and its
++// connection while the library is still holding both.  Deferred reclamation is
++// what makes these safe: the objects are unlinked from every lookup structure
++// immediately, so nothing can find them, but their memory survives until the
++// outermost call unwinds.  Without it these are heap-use-after-free in
++// ares_conn_connect() and handle_conn_error() respectively.
++//
++// This is the class behind CVE-2025-31498 and CVE-2025-62408 -- a connection
++// cleaned up while a caller further up the stack still held it.
++struct ReconfigureFromHookData {
++  ares_channel_t *channel;
++  bool            done;
++  int             status;
++};
++
++static int ReconfigureConfigureCallback(ares_socket_t fd, int type, void *data)
++{
++  ReconfigureFromHookData *d = static_cast<ReconfigureFromHookData *>(data);
++  (void)fd;
++  (void)type;
++  // Frees the server this connection is being opened for.
++  ares_set_servers_csv(d->channel, "127.0.0.1:53056");
++  return 0;
++}
++
++static void ReconfigureFromHookCallback(void *arg, ares_status_t status,
++                                        size_t                   timeouts,
++                                        const ares_dns_record_t *dnsrec)
++{
++  ReconfigureFromHookData *d = static_cast<ReconfigureFromHookData *>(arg);
++  (void)timeouts;
++  (void)dnsrec;
++  d->done   = true;
++  d->status = static_cast<int>(status);
++}
++
++TEST_F(LibraryTest, ReconfigureInConfigureHookNoUseAfterFree) {
++  ares_channel_t         *chan = nullptr;
++  struct ares_options     opts;
++  int                     optmask = 0;
++  ReconfigureFromHookData data;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.tries  = 1;
++  optmask    |= ARES_OPT_TRIES;
++  opts.flags  = ARES_FLAG_NOSEARCH;
++  optmask    |= ARES_OPT_FLAGS;
++
++  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&chan, &opts, optmask));
++  ASSERT_NE(nullptr, chan);
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(chan, "127.0.0.1:53055"));
++
++  data.channel = chan;
++  data.done    = false;
++  data.status  = ARES_SUCCESS;
++  ares_set_socket_configure_callback(chan, ReconfigureConfigureCallback, &data);
++
++  ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    ReconfigureFromHookCallback, &data, NULL);
++
++  // Must complete rather than be stranded -- every exit from the send path
++  // either enqueues the query or ends it.
++  EXPECT_TRUE(data.done);
++  EXPECT_EQ((size_t)0, ares_queue_active_queries(chan));
++  ares_destroy(chan);
++}
++
++// The second route to the same freed connection, and the one that drove the
++// change from suppressing the idle sweep to deferring the notification:
++// reconfiguring the servers from the socket-state callback destroys the server
++// and with it the connection ares_open_connection() is still using.  Nothing
++// covered this route, so a regression in it would have gone unnoticed.
++struct SockStateReconfigureData {
++  ares_channel_t *channel;
++  size_t          calls;
++};
++
++static void SockStateReconfigureCallback(void *data, ares_socket_t socket_fd,
++                                         int readable, int writable)
++{
++  SockStateReconfigureData *d =
++    static_cast<SockStateReconfigureData *>(data);
++  (void)socket_fd;
++  (void)readable;
++  (void)writable;
++  d->calls++;
++  if (d->channel != nullptr) {
++    // Destroys the server, and with it the connection being opened.
++    ares_set_servers_csv(d->channel, "127.0.0.1:53056");
++  }
++}
++
++TEST_F(LibraryTest, ReconfigureInSockStateCallbackNoUseAfterFree) {
++  SockStateReconfigureData data;
++  ares_channel_t          *chan = nullptr;
++  struct ares_options      opts;
++
++  data.channel = nullptr;
++  data.calls   = 0;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.sock_state_cb      = SockStateReconfigureCallback;
++  opts.sock_state_cb_data = &data;
++
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_init_options(&chan, &opts, ARES_OPT_SOCK_STATE_CB));
++  ASSERT_NE(nullptr, chan);
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(chan, "127.0.0.1:53055"));
++
++  /* Armed only now, so channel setup itself does not reconfigure. */
++  data.channel = chan;
++
++  QueryResult result;
++  ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QueryCallback, &result, NULL);
++
++  EXPECT_GT(data.calls, (size_t)0);
++
++  data.channel = nullptr; /* don't reconfigure from teardown notifications */
++  ares_destroy(chan);
++}
++
++// Deferring the notifications must not lose them: every public entry point
++// that closes a socket still has to tell the application about it before it
++// returns, or an event loop is left polling a descriptor that c-ares closed.
++struct SockStateRecordData {
++  std::vector<std::pair<ares_socket_t, bool>> events; /* fd, still-armed */
++};
++
++static void SockStateRecordCallback(void *data, ares_socket_t socket_fd,
++                                    int readable, int writable)
++{
++  SockStateRecordData *d = static_cast<SockStateRecordData *>(data);
++  d->events.push_back(std::make_pair(socket_fd, readable || writable));
++}
++
++static bool SawClose(const SockStateRecordData &d)
++{
++  for (size_t i = 0; i < d.events.size(); i++) {
++    if (!d.events[i].second) {
++      return true;
++    }
++  }
++  return false;
++}
++
++class SockStateDeliveryTest : public LibraryTest {
++protected:
++  void OpenConnection(ares_channel_t **chan, SockStateRecordData *data,
++                      QueryResult *result)
++  {
++    struct ares_options opts;
++    memset(&opts, 0, sizeof(opts));
++    opts.sock_state_cb      = SockStateRecordCallback;
++    opts.sock_state_cb_data = data;
++
++    ASSERT_EQ(ARES_SUCCESS,
++              ares_init_options(chan, &opts, ARES_OPT_SOCK_STATE_CB));
++    ASSERT_NE(nullptr, *chan);
++    /* TEST-NET-1, guaranteed not to answer, so the socket is still open when
++     * the call under test runs. */
++    ASSERT_EQ(ARES_SUCCESS, ares_set_servers_csv(*chan, "192.0.2.1:53"));
++
++    ares_query_dnsrec(*chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                      QueryCallback, result, NULL);
++    ASSERT_FALSE(result->done_);
++    ASSERT_FALSE(data->events.empty());
++    ASSERT_TRUE(data->events.back().second); /* opened, armed for read */
++    data->events.clear();
++  }
++};
++
++TEST_F(SockStateDeliveryTest, CancelReportsSocketClose) {
++  ares_channel_t     *chan = nullptr;
++  SockStateRecordData data;
++  QueryResult         result;
++
++  OpenConnection(&chan, &data, &result);
++  ares_cancel(chan);
++  EXPECT_TRUE(SawClose(data)) << "ares_cancel() closed the socket without "
++                                 "telling the application";
++  ares_destroy(chan);
++}
++
++TEST_F(SockStateDeliveryTest, SetServersReportsSocketClose) {
++  ares_channel_t     *chan = nullptr;
++  SockStateRecordData data;
++  QueryResult         result;
++
++  OpenConnection(&chan, &data, &result);
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(chan, "198.51.100.1:53"));
++  EXPECT_TRUE(SawClose(data)) << "ares_set_servers_csv() closed the socket "
++                                 "without telling the application";
++  ares_destroy(chan);
++}
++
++TEST_F(SockStateDeliveryTest, DestroyReportsSocketClose) {
++  ares_channel_t     *chan = nullptr;
++  SockStateRecordData data;
++  QueryResult         result;
++
++  OpenConnection(&chan, &data, &result);
++  ares_destroy(chan);
++  EXPECT_TRUE(SawClose(data)) << "ares_destroy() closed the socket without "
++                                 "telling the application";
++}
++
++// The server-state callback is dispatched from the middle of processing, and
++// every caller keeps using its query afterwards.  Nothing documents the
++// callback as non-reentrant, and the channel lock is recursive precisely so
++// API calls from callbacks are allowed -- so an application that cancels from
++// it left the library using a freed query.
++//
++// No hostile input is needed: an ordinary timeout reaches the same place.  A
++// SERVFAIL is used here because it is deterministic in the harness.
++struct ServerStateCancelData {
++  ares_channel_t *channel;
++  int             server_cb_calls;
++  bool            query_done;
++};
++
++static void ServerStateCancelCallback(const char *server_string,
++                                      ares_bool_t success, int flags,
++                                      void *data) {
++  ServerStateCancelData *d = static_cast<ServerStateCancelData *>(data);
++  (void)server_string;
++  (void)success;
++  (void)flags;
++  d->server_cb_calls++;
++  // Reentrant cancel from the notification.
++  ares_cancel(d->channel);
++}
++
++static void ServerStateQueryCallback(void *arg, ares_status_t status,
++                                     size_t timeouts,
++                                     const ares_dns_record_t *dnsrec) {
++  ServerStateCancelData *d = static_cast<ServerStateCancelData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  d->query_done = true;
++}
++
++// The advisory's headline claim is that no hostile input is needed, because an
++// ordinary timeout reaches the same place.  The SERVFAIL test below does not
++// show that; this one does.
++class ServerStateTimeoutCancelTest
++  : public MockChannelOptsTest,
++    public ::testing::WithParamInterface<int> {
++ public:
++  ServerStateTimeoutCancelTest()
++    : MockChannelOptsTest(1, GetParam(), false, false, FillOptions(&opts_),
++                          ARES_OPT_TIMEOUTMS | ARES_OPT_TRIES) {}
++  static struct ares_options *FillOptions(struct ares_options *opts) {
++    memset(opts, 0, sizeof(struct ares_options));
++    opts->timeout = 100;
++    opts->tries   = 3;
++    return opts;
++  }
++
++ private:
++  struct ares_options opts_;
++};
++
++TEST_P(ServerStateTimeoutCancelTest, CancelInServerStateCallbackOnTimeout) {
++  ServerStateCancelData data;
++  data.channel         = channel_;
++  data.server_cb_calls = 0;
++  data.query_done      = false;
++
++  ares_set_server_state_callback(channel_, ServerStateCancelCallback, &data);
++
++  // No reply configured, so the query times out and the notification comes
++  // from process_timeouts() rather than from a response.
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, ServerStateQueryCallback, &data,
++                              NULL));
++  Process();
++
++  EXPECT_GT(data.server_cb_calls, 0);
++  EXPECT_TRUE(data.query_done);
++}
++
++INSTANTIATE_TEST_SUITE_P(AddressFamilies, ServerStateTimeoutCancelTest,
++                         ::testing::ValuesIn(ares::test::families),
++                         PrintFamily);
++
++// Unregistering with a NULL callback discards whatever is still queued -- the
++// documented behaviour of deferring delivery, and the only way an application
++// can opt back out once notifications are in flight.
++struct ServerStateUnregisterData {
++  ares_channel_t *channel;
++  size_t          server_cb_calls;
++  bool            query_done;
++};
++
++static void ServerStateUnregisterCallback(const char *server_string,
++                                          ares_bool_t success,
++                                          int flags, void *user_data)
++{
++  ServerStateUnregisterData *d =
++    static_cast<ServerStateUnregisterData *>(user_data);
++  (void)server_string;
++  (void)success;
++  (void)flags;
++  d->server_cb_calls++;
++  // Clear ourselves from inside the first notification.  Any notification
++  // still queued behind this one must be dropped rather than delivered.
++  ares_set_server_state_callback(d->channel, NULL, NULL);
++}
++
++static void ServerStateUnregisterQueryCallback(void *arg, ares_status_t status,
++                                               size_t timeouts,
++                                               const ares_dns_record_t *dnsrec)
++{
++  ServerStateUnregisterData *d =
++    static_cast<ServerStateUnregisterData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  d->query_done = true;
++}
++
++TEST_P(ServerStateTimeoutCancelTest, UnregisterInCallbackDiscardsQueued) {
++  ServerStateUnregisterData data;
++  data.channel         = channel_;
++  data.server_cb_calls = 0;
++  data.query_done      = false;
++
++  ares_set_server_state_callback(channel_, ServerStateUnregisterCallback,
++                                 &data);
++
++  // No reply configured: the query times out on every try, so more than one
++  // notification is queued before the flush point is reached.
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A,
++                              ServerStateUnregisterQueryCallback, &data, NULL));
++  Process();
++
++  EXPECT_EQ((size_t)1, data.server_cb_calls);
++  EXPECT_TRUE(data.query_done);
++}
++
++TEST_P(MockUDPChannelTest, CancelInServerStateCallbackNoUseAfterFree) {
++  DNSPacket servfail;
++  servfail.set_response().set_aa().set_rcode(SERVFAIL)
++    .add_question(new DNSQuestion("www.google.com", T_A));
++  ON_CALL(server_, OnRequest("www.google.com", T_A))
++    .WillByDefault(SetReply(&server_, &servfail));
++
++  ServerStateCancelData data;
++  data.channel         = channel_;
++  data.server_cb_calls = 0;
++  data.query_done      = false;
++
++  ares_set_server_state_callback(channel_, ServerStateCancelCallback, &data);
++
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    ServerStateQueryCallback, &data, NULL);
++  Process();
++
++  EXPECT_GT(data.server_cb_calls, 0);
++  EXPECT_TRUE(data.query_done);
++}
++
++// The deferred requeue list records the target server as a raw pointer, and
++// the drain never revalidated it -- although it does revalidate the query, by
++// qid, for exactly the same reason.  Application callbacks run from inside that
++// drain, and a callback may legally reconfigure the servers, which frees the
++// ones no longer in the list.  A later entry in the same drain then dispatches
++// through a freed ares_server_t.
++//
++// Two replies must be read in one batch: an ordinary answer whose callback
++// reconfigures, and a FORMERR carrying no OPT record, which is what makes
++// process_answer() queue a retry *to the same server* (the EDNS fallback --
++// the only site that records a server pointer at all).
++struct ReconfigureInCbData {
++  ares_channel_t *channel;
++  bool            done;
++};
++
++static void ReconfigureChannelCallback(void *arg, ares_status_t status,
++                                       size_t timeouts,
++                                       const ares_dns_record_t *dnsrec) {
++  ReconfigureInCbData *data = static_cast<ReconfigureInCbData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  data->done = true;
++  /* Frees every server absent from the new configuration. */
++  ares_set_servers_csv(data->channel, "127.0.0.1:53055");
++}
++
++TEST_P(MockUDPChannelTest, ReconfigureInCallbackStaleRequeueServer) {
++  DNSPacket okrsp;
++  okrsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {1, 2, 3, 4}));
++  ON_CALL(server_, OnRequest("www.google.com", T_A))
++    .WillByDefault(SetReply(&server_, &okrsp));
++
++  /* FORMERR with no OPT record: the server looks like it does not understand
++   * EDNS, so the query is queued for retry to this same server. */
++  DNSPacket formerr;
++  formerr.set_response().set_aa().set_rcode(FORMERR)
++    .add_question(new DNSQuestion("www.example.com", T_A));
++  ON_CALL(server_, OnRequest("www.example.com", T_A))
++    .WillByDefault(SetReply(&server_, &formerr));
++
++  ReconfigureInCbData data;
++  data.channel = channel_;
++  data.done    = false;
++
++  QueryResult second;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    ReconfigureChannelCallback, &data, NULL);
++  ares_query_dnsrec(channel_, "www.example.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QueryCallback, &second, NULL);
++
++  /* Both replies have to be consumed in a single pass so they share one
++   * deferred-requeue scope -- that is what puts the ENDQUERY entry whose
++   * callback reconfigures ahead of the REQUEUE entry holding a server
++   * pointer.  The usual Process() loop lets c-ares read between the two, so
++   * they never share a batch; answer both first, then read once. */
++  for (int i = 0; i < 4; i++) {
++    std::set<ares_socket_t> server_fds = fds();
++    fd_set                  r;
++    struct timeval          tv   = {0, 20000};
++    int                     nfds = 0;
++    FD_ZERO(&r);
++    for (ares_socket_t fd : server_fds) {
++      FD_SET(fd, &r);
++      if ((int)fd >= nfds) {
++        nfds = (int)fd + 1;
++      }
++    }
++    if (select(nfds, &r, nullptr, nullptr, &tv) <= 0) {
++      break;
++    }
++    for (ares_socket_t fd : server_fds) {
++      if (FD_ISSET(fd, &r)) {
++        ProcessFD(fd);
++      }
++    }
++  }
++  {
++    fd_set         readers;
++    fd_set         writers;
++    struct timeval tv = {0, 0};
++    int            nfds;
++    FD_ZERO(&readers);
++    FD_ZERO(&writers);
++    nfds = ares_fds(channel_, &readers, &writers);
++    select(nfds, &readers, &writers, nullptr, &tv);
++    ares_process(channel_, &readers, &writers);
++  }
++
++  EXPECT_TRUE(data.done);
++
++  /* With the fix the FORMERR query is correctly re-dispatched (to the newly
++   * configured, unreachable server) rather than going through a freed one, so
++   * it is still outstanding here.  Cancel it so its callback runs while its
++   * result object is still in scope. */
++  ares_cancel(channel_);
++  EXPECT_TRUE(second.done_);
++}
++
++// ares_servers_remove_stale() destroys each stale server in turn, and that
++// reaches application callbacks (ares_destroy_server() -> ares_close_sockets()
++// -> ares_requeue_queries() -> end_query()).  A callback that reconfigures the
++// servers again destroys the servers the outer loop has not visited yet, so a
++// cached "next" node points at freed memory.
++struct NestedReconfigureData {
++  ares_channel_t *channel;
++  bool            nested;
++};
++
++static void NestedReconfigureCallback(void *arg, ares_status_t status,
++                                      size_t                   timeouts,
++                                      const ares_dns_record_t *dnsrec) {
++  NestedReconfigureData *data = static_cast<NestedReconfigureData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  if (data->nested) {
++    return;
++  }
++  data->nested = true;
++  // Destroys the stale servers the outer removal loop has not reached yet.
++  ares_set_servers_csv(data->channel, "");
++}
++
++TEST_F(LibraryTest, NestedReconfigureInCallbackRemoveStale) {
++  ares_channel_t     *channel = nullptr;
++  struct ares_options opts;
++  int                 optmask = 0;
++
++  memset(&opts, 0, sizeof(opts));
++  /* One try per server, so tearing them down exhausts the query's retries and
++   * runs its callback from inside the removal loop. */
++  opts.tries  = 1;
++  optmask    |= ARES_OPT_TRIES;
++  opts.flags  = ARES_FLAG_NOSEARCH;
++  optmask    |= ARES_OPT_FLAGS;
++
++  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel, &opts, optmask));
++  /* Three servers, so the loop still has entries after destroying the first.
++   * Nothing listens on these ports; no traffic is needed. */
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_set_servers_csv(channel, "127.0.0.1:53101,127.0.0.1:53102,"
++                                          "127.0.0.1:53103"));
++
++  NestedReconfigureData data;
++  data.channel = channel;
++  data.nested  = false;
++
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel, "www.example.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, NestedReconfigureCallback,
++                              &data, NULL));
++
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel, ""));
++  EXPECT_TRUE(data.nested);
++
++  ares_destroy(channel);
++}
++
++// The same nesting, but the nested reconfiguration *installs* a server rather
++// than clearing the list.  Restarting the removal walk from the head then
++// re-judges that server against the outer call's list, decides it is stale and
++// deletes it -- so ares_set_servers_csv() returns success and leaves the
++// channel with no servers at all.  Memory-safe and still wrong.
++static void NestedReplaceCallback(void *arg, ares_status_t status,
++                                  size_t                   timeouts,
++                                  const ares_dns_record_t *dnsrec) {
++  NestedReconfigureData *data = static_cast<NestedReconfigureData *>(arg);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  if (data->nested) {
++    return;
++  }
++  data->nested = true;
++  // Installs a server the outer loop has never seen.
++  ares_set_servers_csv(data->channel, "127.0.0.1:53201");
++}
++
++TEST_F(LibraryTest, NestedReconfigureInCallbackKeepsNestedServers) {
++  ares_channel_t     *channel = nullptr;
++  struct ares_options opts;
++  int                 optmask = 0;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.tries  = 1;
++  optmask    |= ARES_OPT_TRIES;
++  opts.flags  = ARES_FLAG_NOSEARCH;
++  optmask    |= ARES_OPT_FLAGS;
++
++  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel, &opts, optmask));
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel, "127.0.0.1:53101"));
++
++  NestedReconfigureData data;
++  data.channel = channel;
++  data.nested  = false;
++
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(channel, "www.example.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, NestedReplaceCallback, &data,
++                              NULL));
++
++  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel, "127.0.0.1:53301"));
++  EXPECT_TRUE(data.nested);
++
++  // The nested call reconciled the whole list; what it installed must survive.
++  char *csv = ares_get_servers_csv(channel);
++  ASSERT_NE(nullptr, csv);
++  EXPECT_STREQ("127.0.0.1:53201", csv);
++  ares_free_string(csv);
++
++  ares_destroy(channel);
++}
++
+ TEST_P(MockUDPChannelTest, CancelInCallbackNoDoubleFree) {
+   DNSPacket reply;
+   reply.set_response().set_aa()
+@@ -1940,6 +3007,7 @@ TEST_P(MockUDPChannelTest, CancelInCallbackNoDoubleFree) {
+   CancelInCbData data;
+   data.channel = channel_;
+   data.done    = false;
++  data.cbs     = 0;
+   ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
+                     CancelChannelCallback, &data, NULL);
+   Process();

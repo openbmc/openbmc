@@ -12,7 +12,6 @@ RDEPENDS:${PN} += " \
     python3-io \
     python3-linux-procfs \
     python3-logging \
-    python3-six \
     "
 
 inherit python_setuptools_build_meta

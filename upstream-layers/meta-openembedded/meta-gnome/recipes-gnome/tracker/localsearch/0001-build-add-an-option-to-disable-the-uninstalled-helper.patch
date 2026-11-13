@@ -1,6 +1,6 @@
-From 673ee0734c5aec9afbe24dc50a7436f67e42b7aa Mon Sep 17 00:00:00 2001
+From de9c9544076bfaff637869610a79a74e86183332 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
-Date: Sun, 6 Sep 2026 11:18:10 +0200
+Date: Tue, 15 Sep 2026 07:52:03 +0200
 Subject: [PATCH] build: add an option to disable the uninstalled helper paths
 
 The daemons and the command line tool compare their working directory
@@ -33,10 +33,10 @@ AI-Generated: Uses Claude Code (Claude Fable 5.1)
  11 files changed, 48 insertions(+), 13 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 7a311d4..fd29c73 100644
+index a7fbced..3e5fb4b 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -355,6 +355,18 @@ srcinc = include_directories('src/')
+@@ -356,6 +356,18 @@ srcinc = include_directories('src/')
  
  build_root = meson.current_build_dir()
  
@@ -56,10 +56,10 @@ index 7a311d4..fd29c73 100644
  # directory, following the existing convention in that directory.
  tracker_api_versioned_name = 'localsearch-@0@'.format(tracker_api_version)
 diff --git a/meson_options.txt b/meson_options.txt
-index 70e764a..621d7ce 100644
+index ac90fd0..77f304e 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -99,3 +99,5 @@ option('tests_tap_protocol', type: 'boolean', value: false,
+@@ -101,3 +101,5 @@ option('tests_tap_protocol', type: 'boolean', value: false,
         description: 'Whether to enable TAP protocol on tests')
  option('test_utils_dir', type: 'string', value: '',
         description: 'Directory to install trackertestutils Python package (or empty to use the default)')
@@ -83,10 +83,10 @@ index dd6177d..851ce05 100644
          '-DBINDIR="@0@"'.format(join_paths(get_option('prefix'), get_option('bindir'))),
      ],
 diff --git a/src/cli/tracker-cli-utils.c b/src/cli/tracker-cli-utils.c
-index 735bb4b..a941921 100644
+index 721b5cc..3399dc8 100644
 --- a/src/cli/tracker-cli-utils.c
 +++ b/src/cli/tracker-cli-utils.c
-@@ -199,6 +199,7 @@ tracker_cli_print_errors (GList    *keyfiles,
+@@ -209,6 +209,7 @@ tracker_cli_print_errors (GList    *keyfiles,
  gboolean
  tracker_cli_check_inside_build_tree (const gchar* argv0)
  {
@@ -94,7 +94,7 @@ index 735bb4b..a941921 100644
  	g_autoptr (GFile) build_root = NULL;
  	g_autoptr (GFile) path = NULL;
  
-@@ -206,4 +207,7 @@ tracker_cli_check_inside_build_tree (const gchar* argv0)
+@@ -216,6 +217,9 @@ tracker_cli_check_inside_build_tree (const gchar* argv0)
  	path = g_file_new_for_path (argv0);
  
  	return g_file_has_prefix (path, build_root);
@@ -102,6 +102,8 @@ index 735bb4b..a941921 100644
 +	return FALSE;
 +#endif
  }
+ 
+ TrackerSparqlConnection *
 diff --git a/src/cli/tracker-extract.c b/src/cli/tracker-extract.c
 index 7342b24..cb74e9b 100644
 --- a/src/cli/tracker-extract.c
@@ -122,10 +124,10 @@ index 7342b24..cb74e9b 100644
  	}
  
 diff --git a/src/cli/tracker-info.c b/src/cli/tracker-info.c
-index 6b46f1f..18fadbd 100644
+index 4d9bf19..3190016 100644
 --- a/src/cli/tracker-info.c
 +++ b/src/cli/tracker-info.c
-@@ -311,10 +311,13 @@ output_eligible_status_for_file (gchar   *path,
+@@ -313,10 +313,13 @@ output_eligible_status_for_file (gchar   *path,
  {
  	g_autofree char *tracker_miner_fs_path = NULL;
  
@@ -141,10 +143,10 @@ index 6b46f1f..18fadbd 100644
  	}
  
 diff --git a/src/common/meson.build b/src/common/meson.build
-index 93da66e..73b7388 100644
+index 483fb74..f99b163 100644
 --- a/src/common/meson.build
 +++ b/src/common/meson.build
-@@ -52,13 +52,11 @@ endif
+@@ -37,13 +37,11 @@ endif
  libtracker_miners_common = static_library('tracker-miners-common',
    tracker_miners_common_sources,
    dependencies: tracker_miners_common_dependencies + tracker_miners_common_private_dependencies,
@@ -189,10 +191,10 @@ index a3f3905..3f136a3 100644
  	/* Add user cache for readonly databases */
  #ifdef MINER_FS_CACHE_LOCATION
 diff --git a/src/indexer/meson.build b/src/indexer/meson.build
-index 55ff6ab..0879e41 100644
+index 9470018..9ea9cff 100644
 --- a/src/indexer/meson.build
 +++ b/src/indexer/meson.build
-@@ -84,6 +84,15 @@ executable('localsearch-endpoint-@0@'.format(tracker_api_major),
+@@ -81,6 +81,15 @@ executable('localsearch-endpoint-@0@'.format(tracker_api_major),
      install_rpath: tracker_internal_libs_dir,
  )
  
@@ -208,7 +210,7 @@ index 55ff6ab..0879e41 100644
  executable('localsearch-@0@'.format(tracker_api_major),
      sources,
      miner_fs_resources[0], miner_fs_resources[1],
-@@ -91,9 +100,8 @@ executable('localsearch-@0@'.format(tracker_api_major),
+@@ -88,9 +97,8 @@ executable('localsearch-@0@'.format(tracker_api_major),
      dependencies: tracker_miner_fs_deps,
      c_args: [
          tracker_c_args,
@@ -221,10 +223,10 @@ index 55ff6ab..0879e41 100644
      ],
      install: true,
 diff --git a/src/indexer/tracker-application.c b/src/indexer/tracker-application.c
-index d3caf3d..c00ffaa 100644
+index 3c73450..6bb5565 100644
 --- a/src/indexer/tracker-application.c
 +++ b/src/indexer/tracker-application.c
-@@ -270,7 +270,7 @@ open_connection (TrackerApplication  *app,
+@@ -265,7 +265,7 @@ open_connection (TrackerApplication  *app,
  		g_autoptr (GSocket) socket = NULL;
  		g_autoptr (GIOStream) stream = NULL;
  		g_autoptr (GFile) location = NULL;
@@ -233,7 +235,7 @@ index d3caf3d..c00ffaa 100644
  		const char *helper_path;
  
  		g_assert (instance->root);
-@@ -298,11 +298,13 @@ open_connection (TrackerApplication  *app,
+@@ -293,11 +293,13 @@ open_connection (TrackerApplication  *app,
  
  		guid = g_dbus_generate_guid ();
  
@@ -248,10 +250,10 @@ index d3caf3d..c00ffaa 100644
  
  		location = g_file_get_child (instance->root, ".localsearch3");
 diff --git a/src/indexer/tracker-extract-watchdog.c b/src/indexer/tracker-extract-watchdog.c
-index 27f6b49..37da365 100644
+index d203952..315059e 100644
 --- a/src/indexer/tracker-extract-watchdog.c
 +++ b/src/indexer/tracker-extract-watchdog.c
-@@ -488,7 +488,7 @@ void
+@@ -496,7 +496,7 @@ void
  tracker_extract_watchdog_ensure_started (TrackerExtractWatchdog *watchdog)
  {
  	g_autoptr (GError) error = NULL;
@@ -260,7 +262,7 @@ index 27f6b49..37da365 100644
  	g_autoptr (GStrvBuilder) strv_builder = NULL;
  	g_auto (GStrv) arguments = NULL;
  	const gchar *extract_path;
-@@ -516,11 +516,13 @@ tracker_extract_watchdog_ensure_started (TrackerExtractWatchdog *watchdog)
+@@ -524,11 +524,13 @@ tracker_extract_watchdog_ensure_started (TrackerExtractWatchdog *watchdog)
  		return;
  	}
  
@@ -274,6 +276,3 @@ index 27f6b49..37da365 100644
  		extract_path = LIBEXECDIR "/" EXECUTABLE_NAME;
  
  	strv_builder = g_strv_builder_new ();
--- 
-2.55.0
-

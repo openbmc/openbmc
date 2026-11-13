@@ -1,0 +1,31 @@
+From e3c1a60242c551fd7db266b9d0db6b3710d057fd Mon Sep 17 00:00:00 2001
+From: Ankur Tyagi <ankur.tyagi85@gmail.com>
+Date: Mon, 28 Sep 2026 14:20:30 +1300
+Subject: [PATCH] time: include threads.h for c11_thrd__yield
+
+time_sleep() calls c11_thrd__yield() when PK_ENABLE_THREADS is set,
+but time.c does not include pocketpy/common/threads.h. This only
+builds with the CMake Unity build, where an earlier translation unit
+pulls in the header. With PK_BUILD_WITH_UNITY=OFF it fails with:
+
+  error: implicit declaration of function 'c11_thrd__yield'
+
+Upstream-Status: Submitted [https://github.com/pocketpy/pocketpy/pull/546]
+Assisted-by: GitHub Copilot:claude-opus-5.5
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ src/modules/time.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/modules/time.c b/src/modules/time.c
+index fd16a57..ac18037 100644
+--- a/src/modules/time.c
++++ b/src/modules/time.c
+@@ -10,6 +10,7 @@
+ #endif
+ 
+ #include "pocketpy/pocketpy.h"
++#include "pocketpy/common/threads.h"
+ #include <assert.h>
+ 
+ #define NANOS_PER_SEC 1000000000

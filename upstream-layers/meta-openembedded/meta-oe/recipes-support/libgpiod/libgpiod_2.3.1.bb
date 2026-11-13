@@ -2,17 +2,30 @@ require libgpiod.inc
 
 inherit meson systemd update-rc.d useradd gobject-introspection
 
-LICENSE = "CC-BY-SA-4.0 AND GPL-2.0-or-later AND LGPL-2.1-or-later"
+LICENSE = "CC-BY-SA-4.0 AND CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.1-or-later"
+LICENSE:${PN} = "LGPL-2.1-or-later"
+LICENSE:${PN}-cli = "GPL-2.0-or-later"
+LICENSE:${PN}-gpiosim = "LGPL-2.1-or-later"
+LICENSE:${PN}-glib = "LGPL-2.1-or-later"
+LICENSE:${PN}-manager = "GPL-2.0-or-later"
+LICENSE:${PN}-manager-cfg = "CC-BY-SA-4.0 AND CC0-1.0"
+LICENSE:${PN}-tools = "GPL-2.0-or-later"
+LICENSE:libgpiodbus = "LGPL-2.1-or-later"
+LICENSE:libgpiodcxx = "LGPL-2.1-or-later"
+LICENSE:libgpiotools = "LGPL-2.1-or-later"
+
 LIC_FILES_CHKSUM = " \
     file://LICENSES/GPL-2.0-or-later.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
     file://LICENSES/LGPL-2.1-or-later.txt;md5=4b54a1fd55a448865a0b32d41598759d \
     file://LICENSES/CC-BY-SA-4.0.txt;md5=fba3b94d88bfb9b81369b869a1e9a20f \
+    file://LICENSES/CC0-1.0.txt;md5=65d3616852dbf7b1a6d4b53b00626032 \
 "
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}-2.x:"
 
 SRC_URI += " \
     file://gpio-manager.init \
+    file://fix_gpiodbus_license.patch \
 "
 
 SRC_URI[sha256sum] = "e3a358a90a9204ff16f92b6f4028ed91460b1926f10589eb54b3566484650a30"

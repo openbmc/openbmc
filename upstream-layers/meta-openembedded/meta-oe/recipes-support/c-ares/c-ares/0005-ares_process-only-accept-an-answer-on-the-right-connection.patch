@@ -1,0 +1,575 @@
+From c8bd9ab53329f66ec0c395a11002a5696669b147 Mon Sep 17 00:00:00 2001
+From: Brad House <brad@brad-house.com>
+Date: Mon, 19 Oct 2026 11:53:54 -0400
+Subject: [PATCH] [Backport v1.34] ares_process: only accept an answer on the
+ connection its query was sent on (#1361)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Backport of b6f8a9b47e17c681e092a74d05d73bbb35c89a39 to `v1.34`. See
+that commit for the full description.
+
+**Conflicts:** `src/lib/ares_socket.h` only — v1.34 aligns the
+neighbouring prototypes differently. Resolved by taking the new doc
+comments and the `ares_sockaddr_addr_port_eq()` prototype, then
+re-running clang-format for the v1.34 alignment (which also re-wraps the
+new `SendData()` declaration in `test/ares-test.h`). All other files
+applied unchanged; the `test/` diffs match main exactly.
+
+**Tests (local, macOS, Debug, Ninja):**
+- ASAN+UBSAN and `-DCARES_WERROR=ON` builds: `arestest -4
+--gtest_filter='-*Live*'` — 693/693 passed in both.
+- With the `src/` changes reverted, the 4 new test instances fail
+(`UDPAnswerFromWrongPortDropped`, `AnswerOnOtherServerConnectionDropped`
+UDP/TCP, `CookielessAnswerOnOtherServerDropped`); they pass with them.
+- `git clang-format --diff upstream/v1.34` clean. Also tested together
+with the other two v1.34 backports (both orders apply cleanly): 699/699
+passed under ASAN+UBSAN and `-Werror`.
+
+Signed-off-by: Brad House <brad@brad-house.com>
+Upstream-Status: Backport [https://github.com/c-ares/c-ares/commit/c8bd9ab53329f66ec0c395a11002a5696669b147]
+GHSA: GHSA-fqh5-3x7m-wp44
+---
+ src/lib/ares_conn.c    |  11 ++-
+ src/lib/ares_process.c |  18 ++++
+ src/lib/ares_socket.c  |  24 +++++
+ src/lib/ares_socket.h  |  21 ++++
+ test/ares-test-mock.cc | 218 +++++++++++++++++++++++++++++++++++++++++
+ test/ares-test.cc      |  86 +++++++++-------
+ test/ares-test.h       |  12 +++
+ 7 files changed, 355 insertions(+), 35 deletions(-)
+
+diff --git a/src/lib/ares_conn.c b/src/lib/ares_conn.c
+index 5e0827fbdf..b868053e62 100644
+--- a/src/lib/ares_conn.c
++++ b/src/lib/ares_conn.c
+@@ -252,9 +252,16 @@ ares_conn_err_t ares_conn_read(ares_conn_t *conn, void *data, size_t len,
+                            (struct sockaddr *)&sa_storage, &salen, read_bytes);
+ 
+ #ifdef HAVE_RECVFROM
++    /* The socket is connect()ed, so the kernel normally drops datagrams from
++     * any other address or port already.  Application-provided socket
++     * functions might not filter on connect, so also check here that the
++     * datagram came from the server's address and UDP port.  RFC 5452
++     * section 9.1 only requires the address to match; matching the port too
++     * keeps one server from answering for another on the same address. */
+     if (err == ARES_CONN_ERR_SUCCESS &&
+-        !ares_sockaddr_addr_eq((struct sockaddr *)&sa_storage,
+-                               &conn->server->addr)) {
++        !ares_sockaddr_addr_port_eq((struct sockaddr *)&sa_storage,
++                                    &conn->server->addr,
++                                    conn->server->udp_port)) {
+       err = ARES_CONN_ERR_WOULDBLOCK;
+     }
+ #endif
+diff --git a/src/lib/ares_process.c b/src/lib/ares_process.c
+index 5686b077a6..06d0ca507c 100644
+--- a/src/lib/ares_process.c
++++ b/src/lib/ares_process.c
+@@ -1117,6 +1117,24 @@ static ares_status_t process_answer(ares_channel_t      *channel,
+     goto cleanup;
+   }
+ 
++  /* RFC 5452 section 9.1: only accept a response that arrives on the
++   * connection the query was sent on, and so from the server it was sent to.
++   * For UDP, ares_conn_read() also drops a datagram whose source address or
++   * port is not the server's; matching the port is hardening beyond RFC 5452
++   * section 9.1, which only requires the address to match.  Otherwise any
++   * server we hold a connection to could answer, and get cached, a query that
++   * was only ever sent to some other server, and the cookie check below would
++   * run against the wrong server's cookie state.  Treat it like an unknown
++   * query id, before anything acts on it (cookies, server health, the cache).
++   * Our caller has already consumed the message from the connection's buffer,
++   * so TCP framing stays in sync.  A query not attached to any connection
++   * (query->conn == NULL) never matches.  This also drops a late answer from
++   * a server tried before a retry. */
++  if (query->conn != conn) {
++    status = ARES_SUCCESS;
++    goto cleanup;
++  }
++
+   /* Validate DNS cookie in response. This function may need to requeue the
+    * query. */
+   if (ares_cookie_validate(query, rdnsrec, conn, now, requeue)
+diff --git a/src/lib/ares_socket.c b/src/lib/ares_socket.c
+index 4ad3034021..0a12935ab7 100644
+--- a/src/lib/ares_socket.c
++++ b/src/lib/ares_socket.c
+@@ -127,6 +127,30 @@ ares_bool_t ares_sockaddr_addr_eq(const struct sockaddr  *sa,
+   return ARES_FALSE; /* different */
+ }
+ 
++ares_bool_t ares_sockaddr_addr_port_eq(const struct sockaddr  *sa,
++                                       const struct ares_addr *aa,
++                                       unsigned short          port)
++{
++  unsigned short sa_port;
++
++  if (!ares_sockaddr_addr_eq(sa, aa)) {
++    return ARES_FALSE;
++  }
++
++  /* ares_sockaddr_addr_eq() only matches AF_INET and AF_INET6 */
++  if (sa->sa_family == AF_INET) {
++    sa_port = (CARES_INADDR_CAST(const struct sockaddr_in *, sa))->sin_port;
++  } else {
++    sa_port = (CARES_INADDR_CAST(const struct sockaddr_in6 *, sa))->sin6_port;
++  }
++
++  if (ntohs(sa_port) != port) {
++    return ARES_FALSE;
++  }
++
++  return ARES_TRUE;
++}
++
+ ares_conn_err_t ares_socket_write(ares_channel_t *channel, ares_socket_t fd,
+                                   const void *data, size_t len, size_t *written,
+                                   const struct sockaddr *sa,
+diff --git a/src/lib/ares_socket.h b/src/lib/ares_socket.h
+index 24a99ab331..f7128e3493 100644
+--- a/src/lib/ares_socket.h
++++ b/src/lib/ares_socket.h
+@@ -139,8 +139,29 @@ typedef enum {
+   ARES_CONN_ERR_FAILURE      = 99  /*!< Generic failure */
+ } ares_conn_err_t;
+ 
++/*! Compare the IP address of a socket address with an ares_addr.  The port
++ *  in the socket address is ignored.
++ *
++ *  \param[in] sa  Socket address (AF_INET or AF_INET6)
++ *  \param[in] aa  Address to compare against
++ *  \return ARES_TRUE if the address families and IP addresses are equal,
++ *          ARES_FALSE otherwise
++ */
+ ares_bool_t     ares_sockaddr_addr_eq(const struct sockaddr  *sa,
+                                       const struct ares_addr *aa);
++
++/*! Compare the IP address and port of a socket address with an ares_addr and
++ *  port.
++ *
++ *  \param[in] sa    Socket address (AF_INET or AF_INET6)
++ *  \param[in] aa    Address to compare against
++ *  \param[in] port  Port to compare against, in host byte order
++ *  \return ARES_TRUE if the address families, IP addresses and ports are
++ *          equal, ARES_FALSE otherwise
++ */
++ares_bool_t     ares_sockaddr_addr_port_eq(const struct sockaddr  *sa,
++                                           const struct ares_addr *aa,
++                                           unsigned short          port);
+ ares_status_t   ares_socket_configure(ares_channel_t *channel, int family,
+                                       ares_bool_t is_tcp, ares_socket_t fd);
+ ares_conn_err_t ares_socket_enable_tfo(const ares_channel_t *channel,
+diff --git a/test/ares-test-mock.cc b/test/ares-test-mock.cc
+index d233f9070f..058dc93001 100644
+--- a/test/ares-test-mock.cc
++++ b/test/ares-test-mock.cc
+@@ -3363,6 +3363,7 @@ struct FakeSockData {
+   unsigned char      query[512];
+   size_t             query_len;
+   struct sockaddr_in peer;
++  unsigned short     recv_port; /* network order; 0 reports the peer's port */
+   size_t             recv_calls;
+   size_t             bad_fd_calls;
+   size_t             sock_state_bad;
+@@ -3471,6 +3472,9 @@ static ares_ssize_t FakeSockRecvfrom(ares_socket_t sock, void *buffer,
+   if (address != NULL && address_len != NULL &&
+       *address_len >= (ares_socklen_t)sizeof(d->peer)) {
+     memcpy(address, &d->peer, sizeof(d->peer));
++    if (d->recv_port != 0) {
++      reinterpret_cast<struct sockaddr_in *>(address)->sin_port = d->recv_port;
++    }
+     *address_len = sizeof(d->peer);
+   }
+   return static_cast<ares_ssize_t>(d->query_len);
+@@ -3710,6 +3714,42 @@ TEST_F(LibraryTest, ReconfigureInRecvDropsBufferedAnswer) {
+   ares_destroy(chan);
+ }
+ 
++// Socket functions need not filter on connect(), so ares_conn_read() checks
++// a UDP datagram's source itself.  An answer reported from the server's
++// address but another port (here 127.0.0.1:53 for a server at
++// 127.0.0.1:53055) must be dropped, so that one server cannot answer for
++// another on the same address.  The same answer from the right port is then
++// accepted.
++TEST_F(LibraryTest, UDPAnswerFromWrongPortDropped) {
++  ares_channel_t *chan = nullptr;
++  FakeSockData    data;
++
++  memset(&data, 0, sizeof(data));
++  FakeSockInit(&chan, &data, 0, ARES_SOCKFUNC_FLAG_NONBLOCKING);
++
++  ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    FakeSockQueryCallback, &data, NULL);
++  ASSERT_NE((size_t)0, data.query_len);
++  ASSERT_EQ(htons(53055), data.peer.sin_port);
++
++  data.recv_port   = htons(53);
++  data.recv_answer = true;
++  ares_process_fd(chan, 100, ARES_SOCKET_BAD);
++  EXPECT_FALSE(data.recv_answer);
++  EXPECT_FALSE(data.done);
++  EXPECT_EQ((size_t)1, ares_queue_active_queries(chan));
++
++  data.recv_port   = 0;
++  data.recv_answer = true;
++  ares_process_fd(chan, 100, ARES_SOCKET_BAD);
++  EXPECT_FALSE(data.recv_answer);
++  EXPECT_TRUE(data.done);
++  // The fake answer carries no records.
++  EXPECT_EQ(ARES_ENODATA, data.status);
++  EXPECT_EQ((size_t)0, ares_queue_active_queries(chan));
++  ares_destroy(chan);
++}
++
+ // The close function is application code too.  With no socket-state callback
+ // to carry the descriptor, it runs inline while ares_check_cleanup_conns()
+ // walks the server list and each server's connections, closing idle ones.
+@@ -5530,5 +5570,183 @@ INSTANTIATE_TEST_SUITE_P(TransportModes, ServerRecoveryMultiMockTest, ::testing:
+ 
+ INSTANTIATE_TEST_SUITE_P(TransportModes, ServerRecoveryNoProbeMultiMockTest, ::testing::ValuesIn(ares::test::families_modes), PrintFamilyMode);
+ 
++// An answer is only accepted on the connection its query was sent on
++// (RFC 5452 section 9.1).  Two servers: #0 is demoted by a SERVFAIL so a later
++// query goes only to #1, while #0's connection stays open (STAYOPEN).  Server
++// #0 then answers that query on its own connection.  The answer must be
++// dropped without side effects, and the query must then complete normally.
++class ReplyConnMultiMockTest
++  : public MockChannelOptsTest,
++    public ::testing::WithParamInterface< std::pair<int, bool> > {
++ public:
++  ReplyConnMultiMockTest()
++    : MockChannelOptsTest(2, GetParam().first, GetParam().second, false,
++                          FillOptions(&opts_),
++                          ARES_OPT_FLAGS | ARES_OPT_TRIES |
++                          ARES_OPT_SERVER_FAILOVER | ARES_OPT_NOROTATE) {}
++
++  static struct ares_options* FillOptions(struct ares_options *opts) {
++    memset(opts, 0, sizeof(struct ares_options));
++    /* Keep the demoted server's connection open; no DNS 0x20 so the replies
++     * built here match the question exactly */
++    opts->flags = ARES_FLAG_STAYOPEN | ARES_FLAG_EDNS;
++    /* One try per server: the query goes to #1, then on timeout to #0 */
++    opts->tries = 1;
++    /* Never probe the demoted server, so the query is sent only to #1 */
++    opts->server_failover_opts.retry_chance = 0;
++    opts->server_failover_opts.retry_delay  = 10000;
++    return opts;
++  }
++ private:
++  struct ares_options opts_;
++};
++
++static std::string ReplyConnFirstA(const QueryResult &result)
++{
++  const ares_dns_rr_t *rr;
++  char                 addr[64];
++
++  if (result.dnsrec_.dnsrec_ == nullptr ||
++      ares_dns_record_rr_cnt(result.dnsrec_.dnsrec_, ARES_SECTION_ANSWER) == 0) {
++    return "";
++  }
++  rr = ares_dns_record_rr_get_const(result.dnsrec_.dnsrec_,
++                                    ARES_SECTION_ANSWER, 0);
++  if (ares_dns_rr_get_type(rr) != ARES_REC_TYPE_A ||
++      ares_inet_ntop(AF_INET, ares_dns_rr_get_addr(rr, ARES_RR_A_ADDR), addr,
++                     sizeof(addr)) == nullptr) {
++    return "";
++  }
++  return addr;
++}
++
++TEST_P(ReplyConnMultiMockTest, AnswerOnOtherServerConnectionDropped) {
++  DNSPacket warm_servfail;
++  warm_servfail.set_response().set_aa().set_rcode(SERVFAIL)
++    .add_question(new DNSQuestion("warmup.example", T_A));
++  DNSPacket warm_ok;
++  warm_ok.set_response().set_aa()
++    .add_question(new DNSQuestion("warmup.example", T_A))
++    .add_answer(new DNSARR("warmup.example", 100, {1, 1, 1, 1}));
++  DNSPacket forged;
++  forged.set_response().set_aa()
++    .add_question(new DNSQuestion("victim.example", T_A))
++    .add_answer(new DNSARR("victim.example", 100, {6, 6, 6, 6}));
++  DNSPacket genuine;
++  genuine.set_response().set_aa()
++    .add_question(new DNSQuestion("victim.example", T_A))
++    .add_answer(new DNSARR("victim.example", 100, {1, 2, 3, 4}));
++  unsigned short qid = 0;
++
++  /* Demote #0, leaving a connection to it open */
++  EXPECT_CALL(*servers_[0], OnRequest("warmup.example", T_A))
++    .WillOnce(SetReply(servers_[0].get(), &warm_servfail));
++  EXPECT_CALL(*servers_[1], OnRequest("warmup.example", T_A))
++    .WillOnce(SetReply(servers_[1].get(), &warm_ok));
++  QueryResult warm;
++  ares_query_dnsrec(channel_, "warmup.example", ARES_CLASS_IN,
++                    ARES_REC_TYPE_A, QueryCallback, &warm, NULL);
++  Process();
++  ASSERT_TRUE(warm.done_);
++  ASSERT_EQ(ARES_SUCCESS, warm.status_);
++
++  /* The query goes only to #1, which does not answer.  Meanwhile #0 answers
++   * it on #0's own connection.  That answer must be dropped, so the query
++   * times out on #1 and is retried on #0, whose genuine answer is accepted on
++   * the same (still in sync, for TCP) connection. */
++  EXPECT_CALL(*servers_[1], OnRequest("victim.example", T_A))
++    .WillOnce(InvokeWithoutArgs([&]() {
++      servers_[0]->SendUnsolicited(&forged, qid);
++      servers_[1]->SetReplyData(std::vector<byte>());
++    }));
++  EXPECT_CALL(*servers_[0], OnRequest("victim.example", T_A))
++    .WillOnce(SetReply(servers_[0].get(), &genuine));
++  QueryResult result;
++  ares_query_dnsrec(channel_, "victim.example", ARES_CLASS_IN,
++                    ARES_REC_TYPE_A, QueryCallback, &result, &qid);
++  Process();
++  ASSERT_TRUE(result.done_);
++  EXPECT_EQ(ARES_SUCCESS, result.status_);
++  EXPECT_EQ("1.2.3.4", ReplyConnFirstA(result));
++  EXPECT_EQ(1, (int)result.timeouts_);
++}
++
++// DNS cookies (RFC 7873) are per-server state, validated against the server
++// the query was sent to.  #1 supports cookies, #0 does not.  A cookie-less
++// answer arriving on #0's connection for a query sent only to #1 must not be
++// accepted: it would otherwise be checked against #0's cookie state and pass.
++class ReplyConnCookieMultiMockTest
++  : public MockChannelOptsTest,
++    public ::testing::WithParamInterface<int> {
++ public:
++  ReplyConnCookieMultiMockTest()
++    : MockChannelOptsTest(2, GetParam(), false, false,
++                          ReplyConnMultiMockTest::FillOptions(&opts_),
++                          ARES_OPT_FLAGS | ARES_OPT_TRIES |
++                          ARES_OPT_SERVER_FAILOVER | ARES_OPT_NOROTATE) {}
++ private:
++  struct ares_options opts_;
++};
++
++TEST_P(ReplyConnCookieMultiMockTest, CookielessAnswerOnOtherServerDropped) {
++  std::vector<byte> server_cookie = { 1, 2, 3, 4, 5, 6, 7, 8 };
++  DNSPacket warm_servfail;
++  warm_servfail.set_response().set_aa().set_rcode(SERVFAIL)
++    .add_question(new DNSQuestion("warmup.example", T_A));
++  DNSPacket warm_ok;
++  warm_ok.set_response().set_aa()
++    .add_question(new DNSQuestion("warmup.example", T_A))
++    .add_answer(new DNSARR("warmup.example", 100, {1, 1, 1, 1}))
++    .add_additional(new DNSOptRR(0, 0, 0, 1280, { }, server_cookie, false));
++  DNSPacket forged;
++  forged.set_response().set_aa()
++    .add_question(new DNSQuestion("victim.example", T_A))
++    .add_answer(new DNSARR("victim.example", 100, {6, 6, 6, 6}));
++  DNSPacket genuine;
++  genuine.set_response().set_aa()
++    .add_question(new DNSQuestion("victim.example", T_A))
++    .add_answer(new DNSARR("victim.example", 100, {1, 2, 3, 4}));
++  unsigned short qid = 0;
++
++  /* #0 answers without a cookie (and is demoted); #1 answers with one, so
++   * #1's cookie state becomes SUPPORTED */
++  EXPECT_CALL(*servers_[0], OnRequest("warmup.example", T_A))
++    .WillOnce(SetReply(servers_[0].get(), &warm_servfail));
++  EXPECT_CALL(*servers_[1], OnRequest("warmup.example", T_A))
++    .WillOnce(SetReply(servers_[1].get(), &warm_ok));
++  QueryResult warm;
++  ares_query_dnsrec(channel_, "warmup.example", ARES_CLASS_IN,
++                    ARES_REC_TYPE_A, QueryCallback, &warm, NULL);
++  Process();
++  ASSERT_TRUE(warm.done_);
++  ASSERT_EQ(ARES_SUCCESS, warm.status_);
++  size_t cookie_len = 0;
++  fetch_server_cookie(warm.dnsrec_.dnsrec_, &cookie_len);
++  ASSERT_EQ(server_cookie.size(), cookie_len);
++
++  /* The cookie-protected query goes only to #1; a cookie-less answer for it
++   * arrives on #0's connection and must be dropped.  The retry to #0 is then
++   * legitimately answered by #0, which does not use cookies. */
++  EXPECT_CALL(*servers_[1], OnRequest("victim.example", T_A))
++    .WillOnce(InvokeWithoutArgs([&]() {
++      servers_[0]->SendUnsolicited(&forged, qid);
++      servers_[1]->SetReplyData(std::vector<byte>());
++    }));
++  EXPECT_CALL(*servers_[0], OnRequest("victim.example", T_A))
++    .WillOnce(SetReply(servers_[0].get(), &genuine));
++  QueryResult result;
++  ares_query_dnsrec(channel_, "victim.example", ARES_CLASS_IN,
++                    ARES_REC_TYPE_A, QueryCallback, &result, &qid);
++  Process();
++  ASSERT_TRUE(result.done_);
++  EXPECT_EQ(ARES_SUCCESS, result.status_);
++  EXPECT_EQ("1.2.3.4", ReplyConnFirstA(result));
++  EXPECT_EQ(1, (int)result.timeouts_);
++}
++
++INSTANTIATE_TEST_SUITE_P(TransportModes, ReplyConnMultiMockTest, ::testing::ValuesIn(ares::test::families_modes), PrintFamilyMode);
++
++INSTANTIATE_TEST_SUITE_P(AddressFamilies, ReplyConnCookieMultiMockTest, ::testing::ValuesIn(ares::test::families), PrintFamily);
++
+ }  // namespace test
+ }  // namespace ares
+diff --git a/test/ares-test.cc b/test/ares-test.cc
+index d333ee9419..0b3ac12c09 100644
+--- a/test/ares-test.cc
++++ b/test/ares-test.cc
+@@ -448,6 +448,9 @@ MockServer::MockServer(int family, unsigned short port)
+   // Create a TCP socket to receive data on.
+   tcp_data_ = NULL;
+   tcp_data_len_ = 0;
++  last_fd_ = ARES_SOCKET_BAD;
++  memset(&last_addr_, 0, sizeof(last_addr_));
++  last_addrlen_ = 0;
+   tcpfd_ = socket(family, SOCK_STREAM, 0);
+   EXPECT_NE(ARES_SOCKET_BAD, tcpfd_);
+   int optval = 1;
+@@ -710,6 +713,50 @@ std::set<ares_socket_t> MockServer::fds() const {
+   return result;
+ }
+ 
++void MockServer::SendData(ares_socket_t fd, struct sockaddr_storage *addr,
++                          ares_socklen_t addrlen, int qid,
++                          std::vector<byte> reply) {
++  int flags = 0;
++
++  if (reply.size() >=  2) {
++    // Overwrite the query ID if space to do so.
++    reply[0] = (byte)((qid >> 8) & 0xff);
++    reply[1] = (byte)(qid & 0xff);
++  }
++  if (verbose) {
++    std::cerr << "sending reply " << PacketToString(reply)
++              << " on port " << ((fd == udpfd_) ? udpport_ : tcpport_)
++              << ":" << getaddrport(addr) << std::endl;
++  }
++
++  // Prefix with 2-byte length if TCP.
++  if (fd != udpfd_) {
++    int len = (int)reply.size();
++    std::vector<byte> vlen = {(byte)((len & 0xFF00) >> 8), (byte)(len & 0xFF)};
++    reply.insert(reply.begin(), vlen.begin(), vlen.end());
++    // Also, don't bother with the destination address.
++    addr = nullptr;
++    addrlen = 0;
++  }
++
++#ifdef MSG_NOSIGNAL
++  flags |= MSG_NOSIGNAL;
++#endif
++
++  ares_ssize_t rc = (ares_ssize_t)sendto(fd, BYTE_CAST reply.data(), (SEND_TYPE_ARG3)reply.size(), flags,
++                                         (struct sockaddr *)addr, addrlen);
++  if (rc < static_cast<ares_ssize_t>(reply.size())) {
++    std::cerr << "Failed to send full reply, rc=" << rc << std::endl;
++  }
++}
++
++void MockServer::SendUnsolicited(const DNSPacket *reply, unsigned short qid) {
++  ASSERT_NE(ARES_SOCKET_BAD, last_fd_);
++  ASSERT_TRUE(last_fd_ == udpfd_ || connfds_.count(last_fd_) != 0)
++    << "the most recent requester's connection has closed";
++  SendData(last_fd_, &last_addr_, last_addrlen_, qid, reply->data());
++}
++
+ void MockServer::ProcessRequest(ares_socket_t fd, struct sockaddr_storage* addr,
+                                 ares_socklen_t addrlen, const std::vector<byte> &req,
+                                 const std::string &reqstr,
+@@ -717,10 +764,14 @@ void MockServer::ProcessRequest(ares_socket_t fd, struct sockaddr_storage* addr,
+ 
+   /* DNS 0x20 will mix case, do case-insensitive matching of name in request */
+   char lower_name[256];
+-  int flags = 0;
+ 
+   arestest_strtolower(lower_name, name, sizeof(lower_name));
+ 
++  // Remember the requester so SendUnsolicited() can reach it.
++  last_fd_ = fd;
++  memcpy(&last_addr_, addr, sizeof(last_addr_));
++  last_addrlen_ = addrlen;
++
+   // Before processing, let gMock know the request is happening.
+   OnRequest(lower_name, rrtype);
+ 
+@@ -747,43 +798,12 @@ void MockServer::ProcessRequest(ares_socket_t fd, struct sockaddr_storage* addr,
+     return;
+   }
+ 
+-  // Make a local copy of the current pending reply.
+-  std::vector<byte> reply = exact_reply_;
+-
+   if (qid_ >= 0) {
+     // Use the explicitly specified query ID.
+     qid = qid_;
+   }
+-  if (reply.size() >=  2) {
+-    // Overwrite the query ID if space to do so.
+-    reply[0] = (byte)((qid >> 8) & 0xff);
+-    reply[1] = (byte)(qid & 0xff);
+-  }
+-  if (verbose) {
+-    std::cerr << "sending reply " << PacketToString(reply)
+-              << " on port " << ((fd == udpfd_) ? udpport_ : tcpport_)
+-              << ":" << getaddrport(addr) << std::endl;
+-  }
+-
+-  // Prefix with 2-byte length if TCP.
+-  if (fd != udpfd_) {
+-    int len = (int)reply.size();
+-    std::vector<byte> vlen = {(byte)((len & 0xFF00) >> 8), (byte)(len & 0xFF)};
+-    reply.insert(reply.begin(), vlen.begin(), vlen.end());
+-    // Also, don't bother with the destination address.
+-    addr = nullptr;
+-    addrlen = 0;
+-  }
+ 
+-#ifdef MSG_NOSIGNAL
+-  flags |= MSG_NOSIGNAL;
+-#endif
+-
+-  ares_ssize_t rc = (ares_ssize_t)sendto(fd, BYTE_CAST reply.data(), (SEND_TYPE_ARG3)reply.size(), flags,
+-                                         (struct sockaddr *)addr, addrlen);
+-  if (rc < static_cast<ares_ssize_t>(reply.size())) {
+-    std::cerr << "Failed to send full reply, rc=" << rc << std::endl;
+-  }
++  SendData(fd, addr, addrlen, qid, exact_reply_);
+ 
+   if (disconnect_after_reply_ && fd != udpfd_) {
+     disconnect_after_reply_ = false;
+diff --git a/test/ares-test.h b/test/ares-test.h
+index 2b973c3982..170c284f26 100644
+--- a/test/ares-test.h
++++ b/test/ares-test.h
+@@ -303,6 +303,12 @@ class MockServer {
+     disconnect_after_reply_ = true;
+   }
+ 
++  // Send reply, with the given query ID, to the client of the most recent
++  // request this server received, on the socket that request arrived on.  The
++  // client did not send this server a request with that query ID: this models
++  // a server answering a query that was only sent to some other server.
++  void SendUnsolicited(const DNSPacket *reply, unsigned short qid);
++
+   // The set of file descriptors that the server handles.
+   std::set<ares_socket_t> fds() const;
+ 
+@@ -327,6 +333,8 @@ class MockServer {
+                                 int rrtype);
+   void           ProcessPacket(ares_socket_t fd, struct sockaddr_storage *addr,
+                                ares_socklen_t addrlen, byte *data, int len);
++  void SendData(ares_socket_t fd, struct sockaddr_storage *addr,
++                ares_socklen_t addrlen, int qid, std::vector<byte> reply);
+   unsigned short udpport_;
+   unsigned short tcpport_;
+   ares_socket_t  udpfd_;
+@@ -339,6 +347,10 @@ class MockServer {
+   bool                    disconnect_after_reply_;
+   unsigned char          *tcp_data_;
+   size_t                  tcp_data_len_;
++  // Where the most recent request came from, for SendUnsolicited().
++  ares_socket_t           last_fd_;
++  struct sockaddr_storage last_addr_;
++  ares_socklen_t          last_addrlen_;
+ };
+ 
+ // Test fixture that uses a mock DNS server.

@@ -1,0 +1,30 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:54:51 +0000
+Subject: [PATCH] SystemUserLookup.h: include sys/types.h for uid_t/pid_t
+
+SystemUserLookup.h uses uid_t and pid_t but never includes
+<sys/types.h> itself. On glibc, <string> (or other headers pulled in
+transitively by the C++ runtime) end up exposing these POSIX types,
+but that is not guaranteed. musl's libc++ headers do not provide
+this transitive declaration, so the header fails to parse with
+"unknown type name 'uid_t'"/"'pid_t'". Include <sys/types.h>
+directly so the header is self-contained regardless of libc.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/SystemUserLookup.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/SystemUserLookup.h b/src/SystemUserLookup.h
+index 1111111..2222222 100644
+--- a/src/SystemUserLookup.h
++++ b/src/SystemUserLookup.h
+@@ -1,5 +1,7 @@
+ #pragma once
+
++#include <sys/types.h>
++
+ #include <string>
+
+ struct group;

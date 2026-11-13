@@ -1,0 +1,35 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:54:51 +0000
+Subject: [PATCH] StreamCallback.h: add missing <cstdint> include for
+ int64_t
+
+StreamCallback.h uses int64_t in ReadWriteResult and in the
+InputStreamCallback/OutputStreamCallback std::function aliases, but
+never includes <cstdint> itself. On glibc/libstdc++ this happens to
+compile because some other transitively-included standard header
+provides int64_t first, but musl's libc++ headers do not provide
+this transitive declaration, so the header fails to parse with
+"unknown type name 'int64_t'" (which then cascades into std::function
+template errors). This is the same class of issue already fixed for
+LibWrapper.h and RepositoryMetricsSource.h by
+0001-Fix-build-with-gcc-16.patch; StreamCallback.h needs the same
+treatment.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ minifi-api/include/minifi-cpp/io/StreamCallback.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/minifi-api/include/minifi-cpp/io/StreamCallback.h b/minifi-api/include/minifi-cpp/io/StreamCallback.h
+index 1111111..2222222 100644
+--- a/minifi-api/include/minifi-cpp/io/StreamCallback.h
++++ b/minifi-api/include/minifi-cpp/io/StreamCallback.h
+@@ -16,6 +16,7 @@
+  */
+ #pragma once
+
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ #include <optional>

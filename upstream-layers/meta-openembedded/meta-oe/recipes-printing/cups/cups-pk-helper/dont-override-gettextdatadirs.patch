@@ -1,0 +1,28 @@
+meson: don't override GETTEXTDATADIRS for the policy file
+
+The translatable strings of a polkit policy file are described by ITS
+rules that polkit installs as gettext data, so msgfmt only finds them
+when GETTEXTDATADIRS points at the directory holding polkit.its. In a
+cross build that directory lives in the target sysroot, and
+gettext.bbclass exports GETTEXTDATADIRS accordingly.
+
+meson passes the data_dirs argument of i18n.merge_file() to its
+msgfmthelper script, which replaces GETTEXTDATADIRS instead of
+extending it. cups-pk-helper ships no ITS rules of its own, so the
+argument only serves to hide polkit.its from msgfmt and make the merge
+fail. Drop it and rely on the environment.
+
+Upstream-Status: Pending
+AI-Generated: Uses Claude Code (Claude Opus 5)
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -77,7 +77,6 @@
+   input: 'org.opensuse.cupspkhelper.mechanism.policy.in',
+   output: 'org.opensuse.cupspkhelper.mechanism.policy',
+   type: 'xml',
+-  data_dirs: join_paths (meson.source_root (), 'src'),
+   po_dir: join_paths (meson.source_root (), 'po'),
+   install: true,
+   install_dir: join_paths (prefix, datadir, 'polkit-1', 'actions')

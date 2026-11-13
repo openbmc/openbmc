@@ -10,6 +10,8 @@ SRCREV = "fbb0baf6af9c4324f0f1591734c78b0089b599d4"
 SRC_URI = " \
     git://github.com/warmcat/libwebsockets.git;protocol=https;branch=v4.5-stable;tag=v${PV} \
     file://CVE-2026-10650.patch \
+    file://CVE-2026-19773.patch \
+    file://CVE-2026-78161.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://github.com/warmcat/${BPN}/releases"

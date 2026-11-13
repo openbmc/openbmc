@@ -4,7 +4,7 @@ HOMEPAGE = "https://www.wxpython.org"
 LICENSE = "BSD-2-Clause AND LGPL-2.0-only AND LGPL-2.0-or-later WITH WxWindows-exception-3.1"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=102f37a0d23aa258e59e4cc8b5380b35"
 
-DEPENDS = "python3-attrdict3-native python3-six-native wxwidgets-native \
+DEPENDS = "wxwidgets-native \
            python3-requests-native wxwidgets \
            "
 
@@ -42,7 +42,6 @@ RDEPENDS:${PN} = "\
     python3-pip \
     python3-pprint \
     python3-pycairo \
-    python3-six \
     python3-xml \
     python3-cairocffi \
 "

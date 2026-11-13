@@ -10,7 +10,6 @@ inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
     python3-logging \
-    python3-six \
     python3-json \
     python3-core \
     python3-netclient \

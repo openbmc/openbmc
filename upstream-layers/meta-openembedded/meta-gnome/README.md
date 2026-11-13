@@ -3,14 +3,14 @@ Dependencies
 This layer depends on:
 
 URI: git://git.openembedded.org/openembedded-core
-branch: master
+branch: blacksail
 
 URI: git://git.openembedded.org/meta-openembedded
-branch: master
+branch: blacksail
 
-Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-gnome]' in the subject'
+Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-gnome][blacksail]' in the subject'
 
 When sending single patches, please use something like:
-git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix='meta-gnome][PATCH'
+git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix='meta-gnome][blacksail][PATCH'
 
-Layer maintainer: Khem Raj <raj.khem@gmail.com>
+Layer maintainer: Ankur Tyagi <ankur.tyagi85@gmail.com>

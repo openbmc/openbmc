@@ -8,16 +8,18 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lcms/lcms2-${PV}.tar.gz \
            "
 SRC_URI[sha256sum] = "bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8"
 
-DEPENDS = "tiff"
-
-BBCLASSEXTEND = "native nativesdk"
-
 S = "${UNPACKDIR}/lcms2-${PV}"
 
-inherit autotools sourceforge-releases ptest
+inherit meson pkgconfig sourceforge-releases lib_package ptest
+
+PACKAGECONFIG ??= "jpeg tiff"
+PACKAGECONFIG[jpeg] = "-Djpeg=enabled,-Djpeg=disabled,jpeg"
+PACKAGECONFIG[tiff] = "-Dtiff=enabled,-Dtiff=disabled,tiff"
+
+EXTRA_OEMESON = "-Dutils=true"
 
 do_compile_ptest() {
-    oe_runmake -C ${B}/testbed testcms
+    ninja --verbose ${PARALLEL_MAKE} testbed/testcms
 }
 
 do_install_ptest() {
@@ -26,6 +28,6 @@ do_install_ptest() {
     install -m 0644 ${S}/testbed/*.icc ${D}${PTEST_PATH}/
 }
 
-RDEPENDS:${PN}-ptest += "bash"
-
 CVE_PRODUCT += "littlecms:little_cms_color_engine"
+
+BBCLASSEXTEND = "native nativesdk"

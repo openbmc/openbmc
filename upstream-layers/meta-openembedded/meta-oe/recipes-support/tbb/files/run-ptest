@@ -1,3 +1,10 @@
 #!/bin/sh
 
-ctest | sed -u 's/\*\*\*/   /g' | awk '/Test +#/{gsub(/Passed/,"PASS"); gsub(/Failed/,"FAIL"); gsub(/Skipped/,"SKIP"); print $6": "$4; fflush();}'
+# ctest result lines look like: "  1/142 Test   #1: test_tick_count .....   Passed    0.01 sec"
+# anything other than Passed/Skipped/Disabled (Failed, Timeout, Exception, Not Run) is a FAIL
+ctest | awk '/Test +#[0-9]+:/ {
+    if ($0 ~ /Passed/) res = "PASS"
+    else if ($0 ~ /Skipped|Disabled/) res = "SKIP"
+    else res = "FAIL"
+    print res ": " $4; fflush()
+}'

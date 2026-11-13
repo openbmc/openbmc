@@ -17,7 +17,7 @@ SYSTEMD_SERVICE:${PN} = "nvmet.service"
 
 SYSTEMD_AUTO_ENABLE ?= "disable"
 
-RDEPENDS:${PN} += "python3 python3-six python3-pyparsing python3-configshell-fb"
+RDEPENDS:${PN} += "python3 python3-pyparsing python3-configshell-fb"
 
 SRCREV = "d323d5a3091af490502c5d025ec7361a3a2cfbd9"
 SRC_URI = "git://git.infradead.org/users/hch/nvmetcli.git;branch=master"

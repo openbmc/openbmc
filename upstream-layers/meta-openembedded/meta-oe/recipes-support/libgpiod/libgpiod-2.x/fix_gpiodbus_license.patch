@@ -1,0 +1,26 @@
+dbus: fix the license of gpiodbus.h
+
+The libgpiodbus library - which is entirely automatically generated with
+gdbus-codegen - was meant to be available under LGPLv2.1 like all the
+other shared libraries in this project. Change the SPDX tag in that
+file to LGPL-2.1-or-later.
+
+Fixes: a5ab76da1e0a ("dbus: add the D-Bus daemon, command-line client and tests")
+Link: https://patch.msgid.link/20260925-libgpiodbus-license-v1-1-d7ddafca8872@oss.qualcomm.com
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/commit/?id=668a0efe918f9a763406239615175f759a6835f9]
+---
+ dbus/lib/gpiodbus.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus/lib/gpiodbus.h b/dbus/lib/gpiodbus.h
+index 025c9c8586818051719078ba9d240f6d8b39e016..7557a576a5e9c6703ef78054ddc62a8b270de422 100644
+--- a/dbus/lib/gpiodbus.h
++++ b/dbus/lib/gpiodbus.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /* SPDX-FileCopyrightText: 2023 Bartosz Golaszewski <bartosz.golaszewski@linaro.org> */
+
+ #ifndef __GPIODBUS_H__

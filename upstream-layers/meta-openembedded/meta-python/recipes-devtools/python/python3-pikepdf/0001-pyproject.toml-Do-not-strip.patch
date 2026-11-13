@@ -1,4 +1,4 @@
-From 22020dc444aaf3f98dc40f38c0a8aad48476db8f Mon Sep 17 00:00:00 2001
+From 1b326de10bee40f497386921072dd80e2d7ecbde Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
 Date: Wed, 8 Jul 2026 11:45:11 +0000
 Subject: [PATCH] pyproject.toml: Do not strip
@@ -19,7 +19,7 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index 06ccfbb..475af59 100644
+index 9e991c3..d7cee23 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -7,7 +7,8 @@ build-backend = "scikit_build_core.build"
@@ -30,8 +30,5 @@ index 06ccfbb..475af59 100644
 +cmake.build-type = "RelWithDebInfo"
 +install.strip = false
  wheel.py-api = "cp314"
- 
- [project]
--- 
-2.47.3
-
+ # The wheel-building CI jobs download qpdf's source into ./qpdf to compile
+ # libqpdf before building. Without this exclusion scikit-build-core sweeps that

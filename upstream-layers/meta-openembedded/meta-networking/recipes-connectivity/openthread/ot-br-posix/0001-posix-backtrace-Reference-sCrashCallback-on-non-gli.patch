@@ -1,0 +1,34 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:57:51 +0000
+Subject: [PATCH] posix/backtrace: Reference sCrashCallback on non-glibc,
+ non-Android builds
+
+sCrashCallback is set unconditionally by otSysRegisterCrashCallback()
+whenever OPENTHREAD_POSIX_CONFIG_BACKTRACE_ENABLE is set, but it is
+only read from signalCritical(), which is compiled solely under the
+`OPENTHREAD_POSIX_CONFIG_ANDROID_ENABLE || defined(__GLIBC__)` branch.
+On musl (neither Android nor glibc) that branch is replaced by an
+empty platformBacktraceInit() stub, so the variable is set but never
+used, which clang's -Wunused-but-set-global (promoted to -Werror)
+turns into a hard build failure. Use the existing OT_UNUSED_VARIABLE()
+idiom already used elsewhere in this file (e.g. in signalCritical())
+to acknowledge the variable on this code path too.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/posix/platform/backtrace.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/posix/platform/backtrace.cpp b/src/posix/platform/backtrace.cpp
+index 1111111..2222222 100644
+--- a/src/posix/platform/backtrace.cpp
++++ b/src/posix/platform/backtrace.cpp
+@@ -185,6 +185,6 @@ void platformBacktraceInit(void)
+     }
+ }
+ #else  // OPENTHREAD_POSIX_CONFIG_ANDROID_ENABLE || defined(__GLIBC__)
+-void platformBacktraceInit(void) {}
++void platformBacktraceInit(void) { OT_UNUSED_VARIABLE(sCrashCallback); }
+ #endif // OPENTHREAD_POSIX_CONFIG_ANDROID_ENABLE || defined(__GLIBC__)
+ #endif // OPENTHREAD_POSIX_CONFIG_BACKTRACE_ENABLE

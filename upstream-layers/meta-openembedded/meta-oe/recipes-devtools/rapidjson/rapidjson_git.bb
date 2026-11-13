@@ -21,3 +21,5 @@ EXTRA_OECMAKE += "-DLIB_INSTALL_DIR=${libdir}"
 ALLOW_EMPTY:${PN} = "1"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2024-38517] = "fixed-version: fixed in the current v1.1.0"

@@ -1,0 +1,50 @@
+From 7b96cb4998714bbb338adecafad8614484feb8cd Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 12:56:53 -0700
+Subject: [PATCH] device: Use the C library's ioctl request type for
+ BLKGETSIZE64
+
+The type of ioctl()'s request argument differs between C libraries:
+glibc declares it as unsigned long, musl and bionic as int. BLKGETSIZE64
+is an unsigned long constant, so with -Wconversion -Wsign-conversion
+-Werror passing it directly fails on musl, while casting it to int fails
+on glibc:
+
+  device.cpp:163:50: error: unsigned conversion from 'int' to 'long unsigned int' changes value from '-2146954638' to '18446744071562596978' [-Werror=sign-conversion]
+
+Deduce the request type from the ioctl() declaration and convert the
+request code to it explicitly, which builds on both.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/device.cpp | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/device.cpp b/src/device.cpp
+index 2c06c84..d1fa995 100644
+--- a/src/device.cpp
++++ b/src/device.cpp
+@@ -151,6 +151,13 @@ int openTargetDevice(const std::string& device) {
+     return fd;
+ }
+ 
++// The type of ioctl()'s request argument depends on the C library: glibc
++// uses unsigned long, musl and bionic use int. Deduce it from the
++// declaration so request codes can be converted explicitly on all of them.
++template <typename Request>
++static Request ioctlRequestType(int (*)(int, Request, ...));
++using ioctl_request_t = decltype(ioctlRequestType(&::ioctl));
++
+ // Capacity of the target in bytes, or 0 when it cannot be determined (a
+ // regular file which simply grows as needed).
+ uint64_t getDeviceSize(int fd) {
+@@ -160,7 +167,7 @@ uint64_t getDeviceSize(int fd) {
+     if (::fstat(fd, &statbuf) != 0) {
+         return 0;
+     }
+-    if (S_ISBLK(statbuf.st_mode) && (::ioctl(fd, BLKGETSIZE64, &size) != 0)) {
++    if (S_ISBLK(statbuf.st_mode) && (::ioctl(fd, static_cast<ioctl_request_t>(BLKGETSIZE64), &size) != 0)) {
+         return 0;
+     }
+ 

@@ -1,0 +1,393 @@
+From f944c4718fd672c9c0befd65a340abb2ccfc1a31 Mon Sep 17 00:00:00 2001
+From: Brad House <brad@brad-house.com>
+Date: Sun, 18 Oct 2026 20:28:11 -0400
+Subject: [PATCH] Deliver deferred socket/server-state notifications only from
+ the outermost public call (#1340)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Backport of f023a52a (#1340) to v1.34.
+
+The recent change that queues socket-state and server-state
+notifications delivers them, and runs the deferred cleanup, only from
+the outermost `ares_deferred_cb_leave()`. `ares_send_nolock()` brackets
+`ares_send_query()` itself, but most public lookup functions never
+opened a region of their own. When reached from `ares_getaddrinfo()`,
+`ares_query_dnsrec()` and similar, the bracket inside
+`ares_send_nolock()` was therefore the outermost one. Notifications were
+then delivered from inside an internal call while the library was still
+in the middle of the public call, and its callers were still using their
+lookup state (the host query, the query id out-pointer, ...). A
+server-state callback that reconfigures the servers, which
+`ares_set_server_state_callback(3)` documents as allowed, could end that
+lookup before the caller was done with it.
+
+This is a regression in unreleased code. No released version is
+affected.
+
+The outermost region is now opened by the public entry points
+themselves, under the channel lock:
+
+- `ares_send_dnsrec()` (also used by `ares_send()`)
+- `ares_query_dnsrec()` (also used by `ares_query()`)
+- `ares_search()`, `ares_search_dnsrec()`
+- `ares_getaddrinfo()` (also used by `ares_gethostbyname()`)
+- `ares_gethostbyaddr()`, `ares_getnameinfo()`
+- `ares_process_pending_write()`: a failed flush closes the connection
+and fails its queries over, and this function had no bracket at all.
+
+`ares_process_fds()` (and through it
+`ares_process()`/`ares_process_fd()`), `ares_cancel()`, `ares_destroy()`
+and the server configuration functions already had their own. The nested
+bracket in `ares_send_nolock()` stays, because it keeps connections and
+servers unlinked during the send readable until the send returns.
+Internal sends made from query callbacks (search next domain,
+getaddrinfo next lookup, requeue, server probes) already run inside the
+processing bracket.
+
+The comments on `ares_deferred_cb_enter()` and the flush now state the
+rule: the outermost region belongs to the public entry point, never to
+an internal helper.
+
+The documented behaviour (notifications arrive before the outermost
+c-ares call returns) does not change, so no man page changes.
+
+Two new `LibraryTest` cases in `test/ares-test-mock.cc`. The IPv6 server
+cannot get a socket, so the first send fails over to the IPv4 server,
+and a server-state callback then reconfigures the servers:
+
+- `ServerFailoverDuringGetAddrInfo`: the lookup completes cleanly. It
+fails under ASAN without this change.
+- `ServerFailoverDuringQuery`: the query id from `ares_query_dnsrec()`
+is already reported by the time the query callback runs. It fails
+without this change.
+
+The full non-live suite passes under ASAN/UBSAN and with
+`-DCARES_WERROR=ON`.
+
+Signed-off-by: Brad House <brad@brad-house.com>
+Upstream-Status: Backport [https://github.com/c-ares/c-ares/commit/f944c4718fd672c9c0befd65a340abb2ccfc1a31]
+GHSA: GHSA-wpr3-8q3r-4q8c, GHSA-97vq-4mxv-7vhm, GHSA-mw23-pfg6-2x9r, GHSA-rf6g-ww74-97qh, GHSA-v33j-65h4-4ch8, GHSA-pj7p-v3cw-hq66
+---
+ src/lib/ares_conn.c          |   4 +-
+ src/lib/ares_getaddrinfo.c   |   5 ++
+ src/lib/ares_gethostbyaddr.c |   5 ++
+ src/lib/ares_getnameinfo.c   |   5 ++
+ src/lib/ares_private.h       |  10 ++++
+ src/lib/ares_process.c       |   6 ++
+ src/lib/ares_query.c         |   5 ++
+ src/lib/ares_search.c        |  10 ++++
+ src/lib/ares_send.c          |  13 ++++-
+ test/ares-test-mock.cc       | 106 +++++++++++++++++++++++++++++++++++
+ 10 files changed, 166 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib/ares_conn.c b/src/lib/ares_conn.c
+index 78f57e7d10..4cc0d1871d 100644
+--- a/src/lib/ares_conn.c
++++ b/src/lib/ares_conn.c
+@@ -94,7 +94,9 @@ static void ares_deferred_cb_flush(ares_channel_t *channel)
+ {
+   /* Only the outermost frame delivers: anything above us on the stack may
+    * still be holding the connection a reentrant call from one of these
+-   * callbacks could free.
++   * callbacks could free, or lookup state of its own that a callback could
++   * end.  That is why the outermost frame belongs to the public entry point
++   * and never to an internal helper; see ares_deferred_cb_enter().
+    *
+    * The dispatch below counts as a nesting level of its own.  Without that, a
+    * callback that calls back into the library re-enters here through the
+diff --git a/src/lib/ares_getaddrinfo.c b/src/lib/ares_getaddrinfo.c
+index 6d9e21af4b..5d9ddb311e 100644
+--- a/src/lib/ares_getaddrinfo.c
++++ b/src/lib/ares_getaddrinfo.c
+@@ -762,7 +762,12 @@ void ares_getaddrinfo(ares_channel_t *channel, const char *name,
+     return;
+   }
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+   ares_getaddrinfo_int(channel, name, service, hints, callback, arg);
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ }
+ 
+diff --git a/src/lib/ares_gethostbyaddr.c b/src/lib/ares_gethostbyaddr.c
+index 69c509ab11..b314359331 100644
+--- a/src/lib/ares_gethostbyaddr.c
++++ b/src/lib/ares_gethostbyaddr.c
+@@ -112,7 +112,12 @@ void ares_gethostbyaddr(ares_channel_t *channel, const void *addr, int addrlen,
+     return;
+   }
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+   ares_gethostbyaddr_nolock(channel, addr, addrlen, family, callback, arg);
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ }
+ 
+diff --git a/src/lib/ares_getnameinfo.c b/src/lib/ares_getnameinfo.c
+index 0159354530..7365e9ed82 100644
+--- a/src/lib/ares_getnameinfo.c
++++ b/src/lib/ares_getnameinfo.c
+@@ -194,7 +194,12 @@ void ares_getnameinfo(ares_channel_t *channel, const struct sockaddr *sa,
+   }
+ 
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+   ares_getnameinfo_int(channel, sa, salen, flags_int, callback, arg);
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ }
+ 
+diff --git a/src/lib/ares_private.h b/src/lib/ares_private.h
+index 0a1029e0f8..9610ba7dab 100644
+--- a/src/lib/ares_private.h
++++ b/src/lib/ares_private.h
+@@ -676,6 +676,16 @@ void          ares_server_reap(ares_server_t *server);
+  *  Nesting is counted; queued notifications are delivered by the outermost
+  *  leave.
+  *
++ *  The outermost region must be opened by the public entry point itself
++ *  (ares_send_dnsrec(), ares_query_dnsrec(), ares_search(), ares_getaddrinfo(),
++ *  ares_process_fds(), ares_set_servers_*(), ...), with the channel lock
++ *  held, around everything it does.  Internal helpers such as
++ *  ares_send_nolock() open nested regions of their own, but their callers
++ *  often keep using lookup state afterwards -- a host or search query, a
++ *  query id out-pointer -- that a callback reentering the library may end
++ *  and free.  If such a helper were the outermost region, its leave would
++ *  run the callbacks while that state is still in use.
++ *
+  *  \param[in] channel  Initialized ares channel.
+  */
+ void          ares_deferred_cb_enter(ares_channel_t *channel);
+diff --git a/src/lib/ares_process.c b/src/lib/ares_process.c
+index 82f53610fb..1569408b1b 100644
+--- a/src/lib/ares_process.c
++++ b/src/lib/ares_process.c
+@@ -490,6 +490,11 @@ void ares_process_pending_write(ares_channel_t *channel)
+     return;
+   }
+ 
++  /* A failed flush closes the connection and fails its queries over, which
++   * notifies.  Deliver once we are done walking the servers, and keep
++   * anything unlinked meanwhile readable until then. */
++  ares_deferred_cb_enter(channel);
++
+   /* Set as untriggerd before calling into ares_conn_flush(), this is
+    * because its possible ares_conn_flush() might cause additional data to
+    * be enqueued if there is some form of exception so it will need to recurse.
+@@ -513,6 +518,7 @@ void ares_process_pending_write(ares_channel_t *channel)
+     }
+   }
+ 
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ }
+ 
+diff --git a/src/lib/ares_query.c b/src/lib/ares_query.c
+index ca3b6a9b73..0cf7f70760 100644
+--- a/src/lib/ares_query.c
++++ b/src/lib/ares_query.c
+@@ -125,7 +125,12 @@ ares_status_t ares_query_dnsrec(ares_channel_t *channel, const char *name,
+   }
+ 
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+   status = ares_query_nolock(channel, name, dnsclass, type, callback, arg, qid);
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+   return status;
+ }
+diff --git a/src/lib/ares_search.c b/src/lib/ares_search.c
+index c605caf42c..ebc3d91e20 100644
+--- a/src/lib/ares_search.c
++++ b/src/lib/ares_search.c
+@@ -463,7 +463,12 @@ void ares_search(ares_channel_t *channel, const char *name, int dnsclass,
+   }
+ 
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+   ares_search_int(channel, dnsrec, ares_dnsrec_convert_cb, carg);
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ 
+   ares_dns_record_destroy(dnsrec);
+@@ -481,7 +486,12 @@ ares_status_t ares_search_dnsrec(ares_channel_t          *channel,
+   }
+ 
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+   status = ares_search_int(channel, dnsrec, callback, arg);
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ 
+   return status;
+diff --git a/src/lib/ares_send.c b/src/lib/ares_send.c
+index 2e0482bf19..dd4a28544b 100644
+--- a/src/lib/ares_send.c
++++ b/src/lib/ares_send.c
+@@ -246,8 +246,12 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+   /* Perform the first query action. */
+ 
+   /* Sending opens and writes to connections and can mark a server down, both
+-   * of which notify.  Deliver those once we are done with the connection and
+-   * the server, not part-way through. */
++   * of which notify.  This bracket keeps any connection or server unlinked
++   * during the send readable until it returns.  It is never the outermost
++   * one: every public entry point that can get here, and query processing,
++   * holds its own, so delivery waits until the caller -- which may still be
++   * holding its own lookup state, as ares_getaddrinfo() does -- has unwound
++   * too. */
+   ares_deferred_cb_enter(channel);
+   status = ares_send_query(server, query, &now);
+   ares_deferred_cb_leave(channel);
+@@ -271,9 +275,14 @@ ares_status_t ares_send_dnsrec(ares_channel_t          *channel,
+   }
+ 
+   ares_channel_lock(channel);
++  /* Notifications raised along the way are delivered once this whole call
++   * has unwound, not from inside the internals it runs.  See
++   * ares_deferred_cb_enter(). */
++  ares_deferred_cb_enter(channel);
+ 
+   status = ares_send_nolock(channel, NULL, 0, dnsrec, callback, arg, qid);
+ 
++  ares_deferred_cb_leave(channel);
+   ares_channel_unlock(channel);
+ 
+   return status;
+diff --git a/test/ares-test-mock.cc b/test/ares-test-mock.cc
+index 2158c5a913..b848c02434 100644
+--- a/test/ares-test-mock.cc
++++ b/test/ares-test-mock.cc
+@@ -2533,6 +2533,112 @@ TEST_F(LibraryTest, ReconfigureInSockStateCallbackNoUseAfterFree) {
+   data.channel = nullptr; /* don't reconfigure from teardown notifications */
+   ares_destroy(chan);
+ }
++// Server-state notifications raised while a public call is issuing its first
++// request must not be delivered until that whole call has unwound.  A
++// failover handler that reconfigures the servers ends the in-flight request,
++// and with it the state the issuing call still has to finish with.  The IPv6
++// server cannot get a socket, so the first send fails over to the IPv4 one
++// and queues a failure notification for the handler below.
++static ares_socket_t FailoverNoIPv6Socket(int af, int type, int protocol,
++                                          void *user_data)
++{
++  (void)user_data;
++  if (af == AF_INET6) {
++    return ARES_SOCKET_BAD;
++  }
++  return socket(af, type, protocol);
++}
++
++static void FailoverOnServerDown(const char *server_string, ares_bool_t success,
++                                 int flags, void *data)
++{
++  (void)server_string;
++  (void)flags;
++  if (!success) {
++    ares_set_servers_csv(static_cast<ares_channel_t *>(data),
++                         "127.0.0.1:53063");
++  }
++}
++
++static ares_channel_t *FailoverChannel(ares_socket_functions *funcs)
++{
++  ares_channel_t     *chan = nullptr;
++  struct ares_options opts;
++
++  memset(&opts, 0, sizeof(opts));
++  opts.tries = 1;
++  opts.flags = ARES_FLAG_NOSEARCH;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_init_options(&chan, &opts, ARES_OPT_TRIES | ARES_OPT_FLAGS));
++  if (chan == nullptr) {
++    return nullptr;
++  }
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_set_servers_csv(chan, "[::1]:53061,127.0.0.1:53062"));
++  ares_set_server_state_callback(chan, FailoverOnServerDown, chan);
++
++  memset(funcs, 0, sizeof(*funcs));
++  funcs->asocket = FailoverNoIPv6Socket;
++  ares_set_socket_functions(chan, funcs, NULL);
++  return chan;
++}
++
++TEST_F(LibraryTest, ServerFailoverDuringGetAddrInfo) {
++  ares_socket_functions      funcs;
++  struct ares_addrinfo_hints hints;
++  AddrInfoResult             result;
++  ares_channel_t            *chan = FailoverChannel(&funcs);
++  ASSERT_NE(nullptr, chan);
++
++  memset(&hints, 0, sizeof(hints));
++  hints.ai_family = AF_INET;
++  ares_getaddrinfo(chan, "www.google.com", NULL, &hints, AddrInfoCallback,
++                   &result);
++
++  ares_cancel(chan);
++  EXPECT_TRUE(result.done_);
++  ares_destroy(chan);
++}
++
++// Same, through ares_query_dnsrec(): the query id must already have been
++// reported to the caller by the time the query can complete.
++struct FailoverQueryData {
++  unsigned short qid;
++  unsigned short qid_at_callback;
++  bool           done;
++};
++
++static void FailoverQueryCallback(void *data, ares_status_t status,
++                                  size_t                   timeouts,
++                                  const ares_dns_record_t *dnsrec)
++{
++  FailoverQueryData *d = static_cast<FailoverQueryData *>(data);
++  (void)status;
++  (void)timeouts;
++  (void)dnsrec;
++  d->qid_at_callback = d->qid;
++  d->done            = true;
++}
++
++TEST_F(LibraryTest, ServerFailoverDuringQuery) {
++  ares_socket_functions funcs;
++  FailoverQueryData     data;
++  ares_channel_t       *chan = FailoverChannel(&funcs);
++  ASSERT_NE(nullptr, chan);
++
++  data.qid             = 0;
++  data.qid_at_callback = 0;
++  data.done            = false;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN,
++                              ARES_REC_TYPE_A, FailoverQueryCallback, &data,
++                              &data.qid));
++
++  EXPECT_TRUE(data.done);
++  EXPECT_EQ(data.qid, data.qid_at_callback);
++  ares_destroy(chan);
++}
++
+ 
+ // Deferring the notifications must not lose them: every public entry point
+ // that closes a socket still has to tell the application about it before it

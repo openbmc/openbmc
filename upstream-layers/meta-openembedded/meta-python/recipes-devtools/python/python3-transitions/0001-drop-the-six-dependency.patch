@@ -1,0 +1,237 @@
+From 28d8f0047b18afc5b9a9822c548fb20cc676b97b Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:06:58 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim. string_types, iteritems and
+add_metaclass have direct Python 3 equivalents, so the state machine
+keeps its behaviour without the dependency.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ requirements.txt                        | 1 -
+ setup.py                                | 3 +--
+ transitions/core.py                     | 5 ++---
+ transitions/extensions/diagrams_base.py | 4 +---
+ transitions/extensions/factory.py       | 3 +--
+ transitions/extensions/markup.py        | 7 +++----
+ transitions/extensions/nesting.py       | 19 +++++++++----------
+ 7 files changed, 17 insertions(+), 25 deletions(-)
+
+diff --git a/requirements.txt b/requirements.txt
+index ffe2fce..e69de29 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1 +0,0 @@
+-six
+diff --git a/setup.py b/setup.py
+index 680e12a..2c9932a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -43,8 +43,7 @@ setup(
+         "transitions.tests": ["data/*"],
+     },
+     include_package_data=True,
+-    install_requires=["six"],
+-    extras_require=extras_require,
++        extras_require=extras_require,
+     tests_require=tests_require,
+     license="MIT",
+     download_url="https://github.com/pytransitions/transitions/archive/%s.tar.gz"
+diff --git a/transitions/core.py b/transitions/core.py
+index 8eaa3dc..42f3c1a 100644
+--- a/transitions/core.py
++++ b/transitions/core.py
+@@ -31,7 +31,6 @@ import warnings
+ 
+ from collections import OrderedDict, defaultdict, deque
+ from functools import partial
+-from six import string_types
+ 
+ _LOGGER = logging.getLogger(__name__)
+ _LOGGER.addHandler(logging.NullHandler())
+@@ -838,7 +837,7 @@ class Machine(object):
+         states = listify(states)
+ 
+         for state in states:
+-            if isinstance(state, (string_types, Enum)):
++            if isinstance(state, (str, Enum)):
+                 state = self._create_state(
+                     state, on_enter=on_enter, on_exit=on_exit,
+                     ignore_invalid_triggers=ignore, **kwargs)
+@@ -1205,7 +1204,7 @@ class Machine(object):
+         Returns:
+             callable function resolved from string or func
+         """
+-        if isinstance(func, string_types):
++        if isinstance(func, str):
+             try:
+                 func = getattr(event_data.model, func)
+                 if not callable(func):  # if a property or some other not callable attribute was passed
+diff --git a/transitions/extensions/diagrams_base.py b/transitions/extensions/diagrams_base.py
+index e97bd06..6ead5c6 100644
+--- a/transitions/extensions/diagrams_base.py
++++ b/transitions/extensions/diagrams_base.py
+@@ -8,14 +8,12 @@
+ import copy
+ import abc
+ import logging
+-import six
+ 
+ _LOGGER = logging.getLogger(__name__)
+ _LOGGER.addHandler(logging.NullHandler())
+ 
+ 
+-@six.add_metaclass(abc.ABCMeta)
+-class BaseGraph(object):
++class BaseGraph(object, metaclass=abc.ABCMeta):
+     """Provides the common foundation for graphs generated either with pygraphviz or graphviz. This abstract class
+     should not be instantiated directly. Use .(py)graphviz.(Nested)Graph instead.
+     Attributes:
+diff --git a/transitions/extensions/factory.py b/transitions/extensions/factory.py
+index e56541c..83b2f19 100644
+--- a/transitions/extensions/factory.py
++++ b/transitions/extensions/factory.py
+@@ -9,7 +9,6 @@
+ 
+ from functools import partial
+ import itertools
+-from six import iteritems
+ 
+ from ..core import Machine, Transition
+ 
+@@ -78,7 +77,7 @@ class LockedGraphMachine(GraphMachine, LockedMachine):
+                 ", ".join(itertools.chain(
+                     (str(_) for _ in func.args[1:]),
+                     ("%s=%s" % (key, value)
+-                     for key, value in iteritems(func.keywords if func.keywords else {})))))
++                     for key, value in (func.keywords if func.keywords else {}).items()))))
+         return GraphMachine.format_references(func)
+ 
+ 
+diff --git a/transitions/extensions/markup.py b/transitions/extensions/markup.py
+index 6961826..f974589 100644
+--- a/transitions/extensions/markup.py
++++ b/transitions/extensions/markup.py
+@@ -12,7 +12,6 @@ import importlib
+ import itertools
+ import numbers
+ 
+-from six import string_types, iteritems
+ 
+ try:
+     # Enums are supported for Python 3.4+ and Python 2.7 with enum34 package installed
+@@ -143,7 +142,7 @@ class MarkupMachine(Machine):
+                 ", ".join(itertools.chain(
+                     (str(_) for _ in func.args),
+                     ("%s=%s" % (key, value)
+-                     for key, value in iteritems(func.keywords if func.keywords else {})))))
++                     for key, value in (func.keywords if func.keywords else {}).items()))))
+         return str(func)
+ 
+     def _convert_states_and_transitions(self, root):
+@@ -236,7 +235,7 @@ class HierarchicalMarkupMachine(MarkupMachine, HierarchicalMachine):
+ 
+ def rep(func, format_references=None):
+     """Return a string representation for `func`."""
+-    if isinstance(func, string_types):
++    if isinstance(func, str):
+         return func
+     if isinstance(func, numbers.Number):
+         return str(func)
+@@ -249,7 +248,7 @@ def _convert(obj, attributes, format_references):
+         val = getattr(obj, key, False)
+         if not val:
+             continue
+-        if isinstance(val, string_types):
++        if isinstance(val, str):
+             definition[key] = val
+         elif val is True:
+             definition[key] = True
+diff --git a/transitions/extensions/nesting.py b/transitions/extensions/nesting.py
+index b115363..4566cb0 100644
+--- a/transitions/extensions/nesting.py
++++ b/transitions/extensions/nesting.py
+@@ -24,7 +24,6 @@ except ImportError:  # pragma: no cover
+     class EnumMeta:  # type: ignore
+         """This is just an EnumMeta stub for Python 2 and Python 3.3 and before without Enum support."""
+ 
+-from six import string_types
+ 
+ from ..core import State, Machine, Transition, Event, listify, MachineError, EventData
+ 
+@@ -417,7 +416,7 @@ class HierarchicalMachine(Machine):
+         )
+ 
+     def __call__(self, to_scope=None):
+-        if isinstance(to_scope, string_types):
++        if isinstance(to_scope, str):
+             state_name = to_scope.split(self.state_cls.separator)[0]
+             state = self.states[state_name]
+             to_scope = (state, state.states, state.events, self.prefix_path + [state_name])
+@@ -451,7 +450,7 @@ class HierarchicalMachine(Machine):
+         if hasattr(initial_name, 'name'):
+             initial_name = initial_name.name
+         # initial states set by add_model or machine might contain initial states themselves.
+-        if isinstance(initial_name, string_types):
++        if isinstance(initial_name, str):
+             initial_states = self._resolve_initial(models, initial_name.split(self.state_cls.separator))
+         # when initial is set to a (parallel) state, we accept it as it is
+         else:
+@@ -516,7 +515,7 @@ class HierarchicalMachine(Machine):
+                     state = {'name': state, 'children': state.value}
+                 elif isinstance(state.value, dict):
+                     state = dict(name=state, **state.value)
+-            if isinstance(state, string_types):
++            if isinstance(state, str):
+                 self._add_string_state(state, on_enter, on_exit, ignore, remap, **kwargs)
+             elif isinstance(state, Enum):
+                 self._add_enum_state(state, on_enter, on_exit, ignore, remap, **kwargs)
+@@ -643,7 +642,7 @@ class HierarchicalMachine(Machine):
+         """
+         if isinstance(state, Enum):
+             state = self._get_enum_path(state)
+-        elif isinstance(state, string_types):
++        elif isinstance(state, str):
+             state = state.split(self.state_cls.separator)
+         if not hint:
+             state = copy.copy(state)
+@@ -695,11 +694,11 @@ class HierarchicalMachine(Machine):
+         """
+         with self():
+             source_path = [] if source == "*" \
+-                else source.split(self.state_cls.separator) if isinstance(source, string_types) \
++                else source.split(self.state_cls.separator) if isinstance(source, str) \
+                 else self._get_enum_path(source) if isinstance(source, Enum) \
+                 else self._get_state_path(source)
+             dest_path = [] if dest == "*" \
+-                else dest.split(self.state_cls.separator) if isinstance(dest, string_types) \
++                else dest.split(self.state_cls.separator) if isinstance(dest, str) \
+                 else self._get_enum_path(dest) if isinstance(dest, Enum) \
+                 else self._get_state_path(dest)
+             matches = self.get_nested_transitions(trigger, source_path, dest_path)
+@@ -745,11 +744,11 @@ class HierarchicalMachine(Machine):
+         """
+         with self():
+             source_path = [] if source == "*" \
+-                else source.split(self.state_cls.separator) if isinstance(source, string_types) \
++                else source.split(self.state_cls.separator) if isinstance(source, str) \
+                 else self._get_enum_path(source) if isinstance(source, Enum) \
+                 else self._get_state_path(source)
+             dest_path = [] if dest == "*" \
+-                else dest.split(self.state_cls.separator) if isinstance(dest, string_types) \
++                else dest.split(self.state_cls.separator) if isinstance(dest, str) \
+                 else self._get_enum_path(dest) if isinstance(dest, Enum) \
+                 else self._get_state_path(dest)
+             self._remove_nested_transitions(trigger, source_path, dest_path)
+@@ -1169,7 +1168,7 @@ class HierarchicalMachine(Machine):
+                 self._init_state(substate)
+ 
+     def _recursive_initial(self, value):
+-        if isinstance(value, string_types):
++        if isinstance(value, str):
+             path = value.split(self.state_cls.separator, 1)
+             if len(path) > 1:
+                 state_name, suffix = path

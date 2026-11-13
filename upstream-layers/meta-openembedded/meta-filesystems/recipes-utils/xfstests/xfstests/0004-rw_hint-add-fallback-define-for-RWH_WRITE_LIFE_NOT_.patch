@@ -1,0 +1,29 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:03:26 +0000
+Subject: [PATCH] rw_hint: add fallback define for RWH_WRITE_LIFE_NOT_SET
+
+The musl <fcntl.h> shipped in this toolchain mistakenly names the
+"not set" write-hint constant RWF_WRITE_LIFE_NOT_SET instead of the
+kernel uapi's RWH_WRITE_LIFE_NOT_SET (the other RWH_WRITE_LIFE_*
+values are spelled correctly), while glibc's <bits/fcntl-linux.h>
+defines RWH_WRITE_LIFE_NOT_SET as expected. Guard a local fallback
+definition so the test builds against either libc, without needing to
+pull in <linux/fcntl.h> and risk clashing with musl's own F_*_RW_HINT
+macro values.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/rw_hint.c
++++ b/src/rw_hint.c
+@@ -7,6 +7,10 @@
+ #include <string.h>
+ #include <fcntl.h>
+ 
++#ifndef RWH_WRITE_LIFE_NOT_SET
++#define RWH_WRITE_LIFE_NOT_SET	0
++#endif
++
+ int main(int argc, char **argv)
+ {
+ 	uint64_t hint = -1;

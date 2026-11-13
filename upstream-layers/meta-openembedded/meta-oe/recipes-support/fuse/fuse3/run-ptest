@@ -1,3 +1,23 @@
 #!/bin/sh
 
-pytest -o log_cli=true -o log_cli_level=INFO | sed -e 's/\[...%\]//g'| sed -e 's/PASSED/PASS/g'| sed -e 's/FAILED/FAIL/g'|sed -e 's/SKIPPED/SKIP/g'| awk '{if ($NF=="PASS" || $NF=="FAIL" || $NF=="SKIP" || $NF=="XFAIL" || $NF=="XPASS"){printf "%s: %s\n", $NF, $0}else{print}}'| awk '{if ($NF=="PASS" || $NF=="FAIL" || $NF=="SKIP" || $NF=="XFAIL" || $NF=="XPASS") {$NF="";print $0}else{print}}'
+# Run the libfuse test suite. The ptest directory mirrors the meson build
+# tree (example/, test/, util/, fuse_config.h) that test/run-tests.py expects.
+# Each finished test is reported as
+#   +   1.234s PASS  notify/prune                       0.12s
+# so print it as is and add the ptest result line after it.
+cd "$(dirname "$0")"
+
+# Some test filesystems mirror the real tree but cannot follow symlinks, so
+# keep the run directory off paths like /var/tmp, which is a symlink to
+# volatile/tmp. run-tests.py creates the directory and removes it when done.
+run_dir="$(readlink -f /tmp)/fuse-tests-$$"
+
+python3 test/run-tests.py --build-dir "$(pwd)" --run-dir "$run_dir" 2>&1 | awk '
+{ print }
+/^\+ *[0-9.]+s +(PASS|FAIL|SKIP) / {
+	line = $0
+	sub(/^\+ *[0-9.]+s +/, "", line)
+	split(line, f, " ")
+	printf "%s: %s\n", f[1], f[2]
+	fflush()
+}'

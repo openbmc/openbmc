@@ -1,0 +1,364 @@
+From 7e65b381c0b915aa5671ddc713080c87e15fc42f Mon Sep 17 00:00:00 2001
+From: Brad House <brad@brad-house.com>
+Date: Mon, 19 Oct 2026 12:24:52 -0400
+Subject: [PATCH] [Backport v1.34] ares_inet_pton: reject a prefix length,
+ always write the full address (#1363)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Backport of 7b4ef8e555b611be6af39d913aa280cd1a348102 to `v1.34`. See
+that commit for the full description.
+
+**Conflicts:** `test/ares-test-mock-ai.cc` only — the neighbouring
+`FamilyV6IgnoresARecords` test (added on main by an unrelated change)
+does not exist on v1.34. Resolved by adding only the new
+`NumericHostRejectsPrefixLength` test at the same position. Other files
+applied unchanged.
+
+**Also includes** the comment spelling fix from #1364
+(ead5557d1301328536c3920bd01759a1bff5ca9a): "unparseable" ->
+"unparsable" in `src/lib/inet_net_pton.c` and
+`test/ares-test-internal.cc`, so Codespell passes and the text matches
+main.
+
+**Tests (local, macOS, Debug, Ninja):**
+- ASAN+UBSAN and `-DCARES_WERROR=ON` builds: `arestest -4
+--gtest_filter='-*Live*'` — 693/693 passed in both.
+- With the `src/` changes reverted, the 4 new test instances fail
+(`InetNetPtoNPrefixZeroFills`, `InetPtoNRejectsPrefixLength`,
+`NumericHostRejectsPrefixLength` UDP/TCP); they pass with them.
+- `git clang-format --diff upstream/v1.34` clean. Also tested together
+with the other two v1.34 backports (both orders apply cleanly): 699/699
+passed under ASAN+UBSAN and `-Werror`.
+
+Signed-off-by: Brad House <brad@brad-house.com>
+Upstream-Status: Backport [https://github.com/c-ares/c-ares/commit/7e65b381c0b915aa5671ddc713080c87e15fc42f]
+GHSA: GHSA-cfcv-8v2j-qj6r
+---
+ docs/ares_inet_pton.3        | 18 ++++++++--
+ src/lib/ares_inet_net_pton.h | 28 ++++++++++++++++
+ src/lib/inet_net_pton.c      | 65 ++++++++++++++++++++----------------
+ test/ares-test-internal.cc   | 54 ++++++++++++++++++++++++++++++
+ test/ares-test-mock-ai.cc    | 23 +++++++++++++
+ 5 files changed, 157 insertions(+), 31 deletions(-)
+
+diff --git a/docs/ares_inet_pton.3 b/docs/ares_inet_pton.3
+index 34b2df063c..19c5fdfda3 100644
+--- a/docs/ares_inet_pton.3
++++ b/docs/ares_inet_pton.3
+@@ -12,8 +12,9 @@ ares_inet_pton \- convert an IPv4 or IPv6 address from text to binary form
+ int ares_inet_pton(int \fIaf\fP, const char *\fIsrc\fP, void *\fIdst\fP);
+ .fi
+ .SH DESCRIPTION
+-This is a portable version with the identical functionality of the commonly
+-available \fIinet_pton\fP.
++This is a portable version of the commonly available \fIinet_pton\fP.  It
++behaves the same for AF_INET6, and for AF_INET it additionally accepts the
++legacy forms described below.
+ 
+ The ares_inet_pton() function converts the address in its standard text
+ presentation form into its numeric binary form. The \fBaf\fP argument shall
+@@ -23,9 +24,20 @@ in. The \fBdst\fP argument points to a buffer into which the function stores
+ the numeric address; this shall be large enough to hold the numeric address
+ (32 bits for AF_INET, 128 bits for AF_INET6).
+ 
++The \fBsrc\fP argument must be an address, not a network: a "/bits" prefix
++length suffix (CIDR notation) is not accepted and the function returns 0 for
++such input.  On success, the whole address (4 bytes for AF_INET, 16 bytes for
++AF_INET6) is always written to \fBdst\fP.  Versions of c-ares before 1.34.9
++accepted a prefix length here.
++
++Unlike POSIX \fIinet_pton\fP, AF_INET also accepts shortened forms such as
++"10.1" and hexadecimal forms such as "0x0a000001".  Octets that are not given
++are set to zero, so "10.1" is 10.1.0.0.
++
+ It returns 1 if the address was valid for the specified address family, or 0
+ if the address was not parseable in the specified address family, or -1 if
+-some system error occurred (in which case errno will have been set).
++the address family is not supported (in which case errno will have been set
++to EAFNOSUPPORT).
+ 
+ .SH SEE ALSO
+ .BR ares_init (3),
+diff --git a/src/lib/ares_inet_net_pton.h b/src/lib/ares_inet_net_pton.h
+index e3ed83a3cb..e1a6f2d71e 100644
+--- a/src/lib/ares_inet_net_pton.h
++++ b/src/lib/ares_inet_net_pton.h
+@@ -26,6 +26,34 @@
+ #ifndef HEADER_CARES_INET_NET_PTON_H
+ #define HEADER_CARES_INET_NET_PTON_H
+ 
++/*! Parse a network (an address with an optional "/bits" prefix length) from
++ *  its text form.  This is not an address parser: for an address use
++ *  ares_inet_pton(), which rejects a prefix length and always writes the
++ *  whole address.
++ *
++ *  How it differs from ares_inet_pton():
++ *   - A "/bits" prefix length is accepted (0-32 for IPv4, 0-128 for IPv6).
++ *   - The return value is the prefix length, not 1.  Without "/bits", IPv6
++ *     returns 128 and IPv4 infers it from the address class, widened to
++ *     cover every octet given ("10" is 8, "130.155" is 16, "1.2.3.4" is 32,
++ *     and a lone "224" is 4).  0 is a valid result ("::1/0").
++ *   - What is written to dst differs by family.  On success all size bytes
++ *     are zeroed first.  IPv4 then writes every octet given, including bits
++ *     beyond the prefix ("1.2.3.4/8" writes 1.2.3.4).  IPv6 writes only the
++ *     (bits+7)/8 bytes covering the prefix ("2001:db8::1/64" writes
++ *     2001:db8::).
++ *
++ *  \param[in]  af    AF_INET or AF_INET6.
++ *  \param[in]  src   NUL-terminated network in text form.
++ *  \param[out] dst   Buffer to receive the network, in network byte order.
++ *  \param[in]  size  Size of dst in bytes.
++ *  \return Prefix length in bits on success.  -1 on failure, with SOCKERRNO
++ *          set to ENOENT if src is not a valid network, or EMSGSIZE if it
++ *          does not fit in size bytes or (IPv6) src is too long to be a
++ *          network.  On Windows these are the WSA equivalents.  An
++ *          unsupported af returns -1 without setting SOCKERRNO.  On failure
++ *          dst may be partially written.
++ */
+ int ares_inet_net_pton(int af, const char *src, void *dst, size_t size);
+ 
+ #endif /* HEADER_CARES_INET_NET_PTON_H */
+diff --git a/src/lib/inet_net_pton.c b/src/lib/inet_net_pton.c
+index e1f76ef834..f60823023b 100644
+--- a/src/lib/inet_net_pton.c
++++ b/src/lib/inet_net_pton.c
+@@ -51,14 +51,15 @@ const struct ares_in6_addr ares_in6addr_any = { { { 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 
+ /*
+  * static int
+- * inet_net_pton_ipv4(src, dst, size)
++ * inet_net_pton_ipv4(src, dst, size, allow_cidr)
+  *      convert IPv4 network number from presentation to network format.
+- *      accepts hex octets, hex strings, decimal octets, and /CIDR.
+- *      "size" is in bytes and describes "dst".
++ *      accepts hex octets, hex strings, decimal octets, and, if
++ *      "allow_cidr" is true, /CIDR.  "size" is in bytes and describes "dst".
+  * return:
+  *      number of bits, either imputed classfully or specified with /CIDR,
+  *      or -1 if some failure occurred (check errno).  ENOENT means it was
+- *      not an IPv4 network specification.
++ *      not an IPv4 network specification (including a /CIDR suffix when
++ *      "allow_cidr" is false).
+  * note:
+  *      network byte order assumed.  this means 192.5.5.240/28 has
+  *      0b11110000 in its fourth octet.
+@@ -71,7 +72,7 @@ const struct ares_in6_addr ares_in6addr_any = { { { 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  *      Paul Vixie (ISC), June 1996
+  */
+ static int ares_inet_net_pton_ipv4(const char *src, unsigned char *dst,
+-                                   size_t size)
++                                   size_t size, ares_bool_t allow_cidr)
+ {
+   static const char    xdigits[] = "0123456789abcdef";
+   static const char    digits[]  = "0123456789";
+@@ -147,7 +148,8 @@ static int ares_inet_net_pton_ipv4(const char *src, unsigned char *dst,
+   }
+ 
+   bits = -1;
+-  if (ch == '/' && ares_isascii(src[0]) && ares_isdigit(src[0]) && dst > odst) {
++  if (allow_cidr && ch == '/' && ares_isascii(src[0]) && ares_isdigit(src[0]) &&
++      dst > odst) {
+     /* CIDR width specifier.  Nothing can follow it. */
+     ch   = *src++; /* Skip over the /. */
+     bits = 0;
+@@ -317,7 +319,7 @@ static int ares_inet_pton6(const char *src, unsigned char *dst)
+       continue;
+     }
+     if (ch == '.' && ((tp + NS_INADDRSZ) <= endp) &&
+-        ares_inet_net_pton_ipv4(curtok, tp, NS_INADDRSZ) > 0) {
++        ares_inet_net_pton_ipv4(curtok, tp, NS_INADDRSZ, ARES_FALSE) > 0) {
+       tp         += NS_INADDRSZ;
+       saw_xdigit  = 0;
+       break; /* '\0' was seen by inet_pton4(). */
+@@ -400,29 +402,23 @@ static int ares_inet_net_pton_ipv6(const char *src, unsigned char *dst,
+     SET_SOCKERRNO(EMSGSIZE);
+     return -1;
+   }
++  /* Only the first (bits+7)/8 bytes carry the network, zero the remainder of
++   * the caller's buffer so it never holds uninitialized data. */
++  memset(dst, 0, size);
+   memcpy(dst, &in6, bytes);
+   return (int)bits;
+ }
+ 
+-/*
+- * int
+- * inet_net_pton(af, src, dst, size)
+- *      convert network number from presentation to network format.
+- *      accepts hex octets, hex strings, decimal octets, and /CIDR.
+- *      "size" is in bytes and describes "dst".
+- * return:
+- *      number of bits, either imputed classfully or specified with /CIDR,
+- *      or -1 if some failure occurred (check errno).  ENOENT means it was
+- *      not a valid network specification.
++/* Parse a network, not an address.  See ares_inet_net_pton.h for the
++ * contract and how it differs from ares_inet_pton().
+  * author:
+  *      Paul Vixie (ISC), June 1996
+- *
+  */
+ int ares_inet_net_pton(int af, const char *src, void *dst, size_t size)
+ {
+   switch (af) {
+     case AF_INET:
+-      return ares_inet_net_pton_ipv4(src, dst, size);
++      return ares_inet_net_pton_ipv4(src, dst, size, ARES_TRUE);
+     case AF_INET6:
+       return ares_inet_net_pton_ipv6(src, dst, size);
+     default:
+@@ -430,22 +426,35 @@ int ares_inet_net_pton(int af, const char *src, void *dst, size_t size)
+   }
+ }
+ 
++/*
++ * int
++ * inet_pton(af, src, dst)
++ *      convert an address (not a network) from presentation to network
++ *      format, like POSIX inet_pton().  A "/bits" prefix length denotes a
++ *      prefix, not an address (RFC 4291 Section 2.3 vs. the address text
++ *      forms of Section 2.2), and is rejected; dst is always fully written
++ *      on success (4 bytes for AF_INET, 16 bytes for AF_INET6).
++ *      For a network with a prefix length, use ares_inet_net_pton().
++ * return:
++ *      1 on success, 0 if src is not a valid address for af (as POSIX
++ *      inet_pton() does for any unparsable input), or -1 with errno set to
++ *      EAFNOSUPPORT if af is not supported.
++ */
+ int ares_inet_pton(int af, const char *src, void *dst)
+ {
+-  int    result;
+-  size_t size;
++  int result;
+ 
+   if (af == AF_INET) {
+-    size = sizeof(struct in_addr);
++    result =
++      ares_inet_net_pton_ipv4(src, dst, sizeof(struct in_addr), ARES_FALSE);
+   } else if (af == AF_INET6) {
+-    size = sizeof(struct ares_in6_addr);
++    result = ares_inet_pton6(src, dst);
+   } else {
+     SET_SOCKERRNO(EAFNOSUPPORT);
+     return -1;
+   }
+-  result = ares_inet_net_pton(af, src, dst, size);
+-  if (result == -1 && SOCKERRNO == ENOENT) {
+-    return 0;
+-  }
+-  return (result > -1) ? 1 : -1;
++  /* Neither parser can fail for a system reason: any failure (ENOENT, or
++   * EMSGSIZE for too many IPv4 octets as in "1.2.3.4.5") means src is not a
++   * valid address. */
++  return (result > -1) ? 1 : 0;
+ }
+diff --git a/test/ares-test-internal.cc b/test/ares-test-internal.cc
+index bf06a74605..294e3f4555 100644
+--- a/test/ares-test-internal.cc
++++ b/test/ares-test-internal.cc
+@@ -274,6 +274,23 @@ TEST_F(LibraryTest, InetNetPtoN) {
+   EXPECT_EQ(-1, ares_inet_net_pton(AF_INET, "253", &a4, sizeof(a4) - 1));
+ }
+ 
++// An IPv6 network with a prefix length only carries (bits+7)/8 bytes; the
++// rest of the destination must be zeroed rather than left as it was.
++TEST_F(LibraryTest, InetNetPtoNPrefixZeroFills) {
++  unsigned char a6[16];
++
++  memset(a6, 0x41, sizeof(a6));
++  EXPECT_EQ(0, ares_inet_net_pton(AF_INET6, "::1/0", a6, sizeof(a6)));
++  EXPECT_EQ("0000:0000:0000:0000:0000:0000:0000:0000",
++            AddressToString(a6, 16));
++
++  memset(a6, 0x41, sizeof(a6));
++  EXPECT_EQ(64, ares_inet_net_pton(AF_INET6, "2001:db8:1:2:3:4:5:6/64", a6,
++                                   sizeof(a6)));
++  EXPECT_EQ("2001:0db8:0001:0002:0000:0000:0000:0000",
++            AddressToString(a6, 16));
++}
++
+ TEST_F(LibraryTest, FreeLongChain) {
+   struct ares_addr_node *data = nullptr;
+   for (int ii = 0; ii < 100000; ii++) {
+@@ -600,9 +617,46 @@ TEST_F(LibraryTest, InetPtoN) {
+   EXPECT_EQ(1, ares_inet_pton(AF_INET6, "12:34::ff", &a6));
+   EXPECT_EQ(1, ares_inet_pton(AF_INET6, "12:34::ffff:1.2.3.4", &a6));
+   EXPECT_EQ(0, ares_inet_pton(AF_INET, "xyzzy", &a4));
++  // Too many octets is unparsable input, not a system error.
++  EXPECT_EQ(0, ares_inet_pton(AF_INET, "1.2.3.4.5", &a4));
++  EXPECT_EQ(0, ares_inet_pton(AF_INET, "0x0102030405", &a4));
+   EXPECT_EQ(-1, ares_inet_pton(AF_INET+AF_INET6, "1.2.3.4", &a4));
+ }
+ 
++// ares_inet_pton() parses addresses, not networks: like inet_pton(3) it must
++// reject a "/bits" prefix length.  It used to accept one and, for IPv6, write
++// only (bits+7)/8 bytes of dst while still returning 1.
++TEST_F(LibraryTest, InetPtoNRejectsPrefixLength) {
++  const char *cases6[] = { "::1/0", "ffff::1/16", "2001:db8::1/64",
++                           "2001:db8::1/128", "::ffff:1.2.3.4/8",
++                           "::ffff:1.2.3.4/32" };
++  const char *cases4[] = { "1.2.3.4/8", "1.2.3.4/0", "1.2.3.4/32", "10/8",
++                           "0x0a000000/8" };
++  unsigned char a4[4];
++  unsigned char a6[16];
++  size_t        i;
++
++  for (i = 0; i < sizeof(cases6) / sizeof(*cases6); i++) {
++    EXPECT_EQ(0, ares_inet_pton(AF_INET6, cases6[i], a6)) << cases6[i];
++  }
++  for (i = 0; i < sizeof(cases4) / sizeof(*cases4); i++) {
++    EXPECT_EQ(0, ares_inet_pton(AF_INET, cases4[i], a4)) << cases4[i];
++  }
++
++  // Without a prefix length, the whole destination is written.
++  memset(a6, 0x41, sizeof(a6));
++  EXPECT_EQ(1, ares_inet_pton(AF_INET6, "ffff::1", a6));
++  EXPECT_EQ("ffff:0000:0000:0000:0000:0000:0000:0001",
++            AddressToString(a6, 16));
++  memset(a6, 0x41, sizeof(a6));
++  EXPECT_EQ(1, ares_inet_pton(AF_INET6, "::ffff:1.2.3.4", a6));
++  EXPECT_EQ("0000:0000:0000:0000:0000:ffff:0102:0304",
++            AddressToString(a6, 16));
++  memset(a4, 0x41, sizeof(a4));
++  EXPECT_EQ(1, ares_inet_pton(AF_INET, "1.2.3.4", a4));
++  EXPECT_EQ("1.2.3.4", AddressToString(a4, 4));
++}
++
+ TEST_F(LibraryTest, FreeCorruptData) {
+   // ares_free_data(p) expects that there is a type field and a marker
+   // field in the memory before p.  Feed it incorrect versions of each.
+diff --git a/test/ares-test-mock-ai.cc b/test/ares-test-mock-ai.cc
+index ae45c45527..43d0b89175 100644
+--- a/test/ares-test-mock-ai.cc
++++ b/test/ares-test-mock-ai.cc
+@@ -617,6 +617,29 @@ TEST_P(MockChannelTestAI, FamilyV6) {
+   EXPECT_THAT(result.ai_, IncludesV6Address("2121:0000:0000:0000:0000:0000:0000:0303"));
+ }
+ 
++// A numeric host with a "/bits" prefix length is a network, not an address.
++// It used to be accepted, returning uninitialized stack memory as the address.
++TEST_P(MockChannelTestAI, NumericHostRejectsPrefixLength) {
++  struct ares_addrinfo_hints hints = {0, 0, 0, 0};
++  hints.ai_family = AF_INET6;
++  hints.ai_flags  = ARES_AI_NUMERICHOST;
++
++  AddrInfoResult result;
++  ares_getaddrinfo(channel_, "::1/0", NULL, &hints, AddrInfoCallback, &result);
++  Process();
++  EXPECT_TRUE(result.done_);
++  EXPECT_NE(ARES_SUCCESS, result.status_);
++
++  AddrInfoResult result2;
++  ares_getaddrinfo(channel_, "::1", NULL, &hints, AddrInfoCallback, &result2);
++  Process();
++  EXPECT_TRUE(result2.done_);
++  EXPECT_EQ(ARES_SUCCESS, result2.status_);
++  EXPECT_THAT(result2.ai_, IncludesNumAddresses(1));
++  EXPECT_THAT(result2.ai_,
++              IncludesV6Address("0000:0000:0000:0000:0000:0000:0000:0001"));
++}
++
+ // Test case for Issue #662
+ TEST_P(MockChannelTestAI, PartialQueryCancel) {
+   std::vector<byte> nothing;

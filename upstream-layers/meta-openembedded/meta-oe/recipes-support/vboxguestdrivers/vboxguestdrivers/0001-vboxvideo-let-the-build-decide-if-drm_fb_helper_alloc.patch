@@ -32,15 +32,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  vboxvideo/vbox_fb.c | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/vboxvideo/vbox_fb.c b/vboxvideo/vbox_fb.c
-index 063be63..7163780 100644
 --- a/vboxvideo/vbox_fb.c
 +++ b/vboxvideo/vbox_fb.c
-@@ -330,7 +330,14 @@ int vboxfb_create(struct drm_fb_helper *helper,
+@@ -329,8 +329,14 @@ int vboxfb_create(struct drm_fb_helper *
+ 		DRM_ERROR("failed to kmap fbcon\n");
  		return ret;
  	}
- 
--#if RTLNX_VER_MIN(6,19,0) || RTLNX_RHEL_RANGE(9,9, 9,99)
+-
+-#if RTLNX_VER_MIN(6,19,0) || RTLNX_VER_RANGE(6,12,103, 6,13,0) || RTLNX_RHEL_RANGE(9,9, 9,99)
 +	/*
 +	 * Since Linux 6.19 the DRM core allocates the struct fb_info instance
 +	 * before it calls into this callback, and drm_fb_helper_alloc_info() is
@@ -48,7 +47,7 @@ index 063be63..7163780 100644
 +	 * that, because the change was backported into the middle of the 6.6,
 +	 * 6.12 and 6.18 stable series, so let the build system tell us as well.
 +	 */
-+#if RTLNX_VER_MIN(6,19,0) || RTLNX_RHEL_RANGE(9,9, 9,99) || defined(VBOX_NO_DRM_FB_HELPER_ALLOC_INFO)
++#if RTLNX_VER_MIN(6,19,0) || RTLNX_VER_RANGE(6,12,103, 6,13,0) || RTLNX_RHEL_RANGE(9,9, 9,99) || defined(VBOX_NO_DRM_FB_HELPER_ALLOC_INFO)
  	info = helper->info;
  #elif RTLNX_VER_MIN(6,2,0) || RTLNX_RHEL_RANGE(8,9, 8,99) || RTLNX_RHEL_RANGE(9,3, 9,99)
  	info = drm_fb_helper_alloc_info(helper);

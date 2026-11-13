@@ -14,7 +14,6 @@ RDEPENDS:${PN} += " \
     python3-io \
     python3-logging \
     python3-netaddr \
-    python3-six \
 "
 
 CVE_PRODUCT = "pyrad"

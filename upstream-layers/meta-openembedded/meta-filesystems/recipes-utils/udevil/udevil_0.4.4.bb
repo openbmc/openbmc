@@ -19,6 +19,9 @@ SRC_URI = "https://github.com/IgnorantGuru/udevil/raw/pkg/${PV}/udevil-${PV}.tar
     file://Fix-build-with-gcc15.patch \
 "
 
+UPSTREAM_CHECK_URI = "https://github.com/IgnorantGuru/udevil/tags"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+
 SRC_URI[md5sum] = "dc1c489b603a0500a04dc7e1805ac1d9"
 SRC_URI[sha256sum] = "ce8c51fd4d589cda7be56e75b42188deeb258c66fc911a9b3a70a3945c157739"
 

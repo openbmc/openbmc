@@ -1,4 +1,4 @@
-From a6638a007a42917fea4b03e5c30d9b7208c634c4 Mon Sep 17 00:00:00 2001
+From 9c3718bce43146f219dec3c3cd47e57a6b418a19 Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Thu, 7 Nov 2024 22:04:40 +0100
 Subject: [PATCH] libltdl: remove reference to nonexisting directory
@@ -50,6 +50,3 @@ index 9929557..c77df2e 100644
  AUTOMAKE_OPTIONS = foreign
  
  # -I$(srcdir) is needed for user that built libltdl with a sub-Automake
--- 
-2.30.2
-

@@ -57,7 +57,6 @@ RDEPENDS:packagegroup-meta-networking-connectivity = "\
     networkmanager-openvpn \
     networkmanager \
     openconnect \
-    python3-networkmanager \
     rdate \
     rdist \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \

@@ -23,6 +23,9 @@ PACKAGECONFIG[idn] = "-Didn=true,-Didn=false"
 
 CFLAGS:append:libc-musl = " -D__UAPI_DEF_ETHHDR=0 "
 
+# Enable systemd's in-tree musl support (mirrors oe-core's systemd recipe).
+EXTRA_OEMESON += "-Dlibc=${TCLIBC}"
+
 EXTRA_OEMESON += "-Dstatic-libsystemd=pic"
 
 

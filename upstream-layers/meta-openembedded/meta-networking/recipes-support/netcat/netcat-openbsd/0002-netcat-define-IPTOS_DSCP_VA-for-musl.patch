@@ -1,0 +1,34 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:14:39 +0000
+Subject: [PATCH] netcat: define IPTOS_DSCP_VA for musl
+
+netcat.c uses IPTOS_DSCP_VA (the RFC 5865 Voice-Admit DSCP codepoint)
+as one of the recognized --tos names. glibc's <netinet/ip.h> defines
+IPTOS_DSCP_VA as 0xb0, but musl's <netinet/ip.h> does not define it at
+all, so the build fails with "use of undeclared identifier
+'IPTOS_DSCP_VA'".
+
+Add the same fallback definition already used here for the other
+IPTOS_DSCP_* codepoints missing on musl (see the neighboring
+IPTOS_DSCP_EF block). 0xb0 is DSCP value 44 (decimal) shifted into the
+TOS byte's DSCP field, i.e. (44 << 2), matching glibc's value.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/netcat.c
++++ b/netcat.c
+@@ -89,6 +89,13 @@
+ # define	IPTOS_DSCP_EF		0xb8
+ #endif /* IPTOS_DSCP_EF */
+
++/* Voice-Admit DSCP codepoint (RFC 5865): decimal 44 shifted into the TOS
++ * byte's DSCP field, i.e. (44 << 2). glibc's netinet/ip.h defines this as
++ * 0xb0; musl's does not carry it at all yet. */
++#ifndef IPTOS_DSCP_VA
++# define	IPTOS_DSCP_VA		0xb0
++#endif /* IPTOS_DSCP_VA */
++
+
+ #include <ctype.h>
+ #include <err.h>

@@ -1,0 +1,64 @@
+From c63a880187db708b50d25c37b6fc1e24ed68492a Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 18 Sep 2026 21:52:35 +0200
+Subject: [PATCH] terminal: open the pty only once a display is attached
+
+The session type handed to the child (TERM_SESSION_TYPE=kms or fb) is
+decided in terminal_open() from the displays attached at that moment.
+On a real VT the first session is activated as soon as the seat wakes
+up, which happens before the DRM display has finished probing, so the
+login is spawned with TERM_SESSION_TYPE=fb even though the terminal
+ends up on a KMS display a few hundred milliseconds later.
+
+Session managers such as uwsm rely on that variable to decide whether
+they have to ask kmscon to release the display before starting a
+compositor. With the wrong type the request is never sent, kmscon
+keeps DRM master, and the compositor fails to open the device until it
+gives up.
+
+Defer opening the pty until the first display has been added to the
+terminal, and open it from terminal_add_display() when the terminal is
+already awake at that point.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/kmscon_terminal.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/kmscon_terminal.c b/src/kmscon_terminal.c
+index 15b00b4..42b6cd9 100644
+--- a/src/kmscon_terminal.c
++++ b/src/kmscon_terminal.c
+@@ -107,6 +107,7 @@ struct kmscon_terminal {
+ #define BLINK_TIMER_NS (500 * 1000 * 1000)
+ 
+ static int font_set(struct kmscon_terminal *term);
++static int terminal_open(struct kmscon_terminal *term);
+ 
+ static void coord_to_cell(struct kmscon_terminal *term, int32_t x, int32_t y, unsigned int *posx,
+ 			  unsigned int *posy)
+@@ -726,6 +727,9 @@ int terminal_add_display(struct kmscon_terminal *term, struct display *disp)
+ 	update_pointer_max_all(term);
+ 	display_ref(scr->disp);
+ 	do_redraw_screen(scr);
++
++	if (term->awake && !term->opened)
++		terminal_open(term);
+ 	return 0;
+ 
+ err_text:
+@@ -1124,7 +1128,7 @@ void terminal_activate(struct kmscon_terminal *term)
+ {
+ 	term->awake = true;
+ 	ev_timer_enable(term->blink_timer);
+-	if (!term->opened)
++	if (!term->opened && !shl_dlist_empty(&term->screens))
+ 		terminal_open(term);
+ 	if (term->pointer.visible)
+ 		hw_cursor_show(term, term->pointer.x, term->pointer.y);
+-- 
+2.55.0
+

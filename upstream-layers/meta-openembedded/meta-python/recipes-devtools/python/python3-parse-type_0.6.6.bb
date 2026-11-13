@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2e469278ace89c246d52505acc39c3da"
 SRC_URI[sha256sum] = "513a3784104839770d690e04339a8b4d33439fcd5dd99f2e4580f9fc1097bfb2"
 SRC_URI += " \
     file://run-ptest \
+    file://0001-drop-the-six-dependency.patch \
 "
 
 PYPI_PACKAGE = "parse_type"
@@ -24,6 +25,5 @@ do_install_ptest() {
 RDEPENDS:${PN} += "python3-parse"
 RDEPENDS:${PN}-ptest += " \
     python3-pytest \
-    python3-six \
     python3-unittest-automake-output \
 "

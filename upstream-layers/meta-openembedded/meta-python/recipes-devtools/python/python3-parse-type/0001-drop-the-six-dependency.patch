@@ -1,0 +1,107 @@
+From acd176d3ada46ced050ed401c9d3f38a1ef7836d Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:24:27 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim and parse_type does not need it on
+Python 3: six.string_types is str.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ parse_type/cardinality_field.py | 3 +--
+ parse_type/parse_util.py        | 3 +--
+ py.requirements/basic.txt       | 1 -
+ pyproject.toml                  | 1 -
+ setup.py                        | 1 -
+ tasks/py.requirements.txt       | 1 -
+ 6 files changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/parse_type/cardinality_field.py b/parse_type/cardinality_field.py
+index 4e892ed..8ae89bf 100644
+--- a/parse_type/cardinality_field.py
++++ b/parse_type/cardinality_field.py
+@@ -9,7 +9,6 @@ A cardinality field is a type suffix for parse format expression, ala:
+ """
+ 
+ from __future__ import absolute_import
+-import six
+ from parse_type.cardinality import Cardinality, TypeBuilder
+ 
+ 
+@@ -115,7 +114,7 @@ class CardinalityFieldTypeBuilder(object):
+         :raises: ValueError, if type_name does not end with CardinalityField
+         :raises: MissingTypeError, if type_converter is missing in type_dict
+         """
+-        assert isinstance(type_name, six.string_types)
++        assert isinstance(type_name, str)
+         if not CardinalityField.matches_type(type_name):
+             message = "type_name='%s' has no CardinalityField" % type_name
+             raise ValueError(message)
+diff --git a/parse_type/parse_util.py b/parse_type/parse_util.py
+index 0e5ee73..73190c6 100644
+--- a/parse_type/parse_util.py
++++ b/parse_type/parse_util.py
+@@ -7,7 +7,6 @@ Provides generic utility classes for the :class:`parse.Parser` class.
+ from __future__ import absolute_import
+ from collections import namedtuple
+ import parse
+-import six
+ 
+ 
+ # -- HELPER-CLASS: For format part in a Field.
+@@ -66,7 +65,7 @@ class Field(object):
+             format1 = self.format or ""
+             format2 = other.format or ""
+             return (self.name == other.name) and (format1 == format2)
+-        elif isinstance(other, six.string_types):
++        elif isinstance(other, str):
+             return str(self) == other
+         else:
+             raise ValueError(other)
+diff --git a/py.requirements/basic.txt b/py.requirements/basic.txt
+index b9735ab..c3c52ee 100644
+--- a/py.requirements/basic.txt
++++ b/py.requirements/basic.txt
+@@ -11,4 +11,3 @@
+ parse >= 1.18.0; python_version >= '3.0'
+ parse >= 1.13.1; python_version <= '2.7'
+ enum34; python_version < '3.4'
+-six >= 1.15
+diff --git a/pyproject.toml b/pyproject.toml
+index 7ca4407..e377bf0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -52,7 +52,6 @@ dependencies = [
+     "parse >= 1.18.0; python_version >= '3.0'",
+     "parse >= 1.13.1; python_version <= '2.7'",
+     "enum34; python_version < '3.4'",
+-    "six >= 1.15",
+ ]
+ 
+ 
+diff --git a/setup.py b/setup.py
+index 02ef727..9ea9ab4 100644
+--- a/setup.py
++++ b/setup.py
+@@ -101,7 +101,6 @@ setup(
+         "parse >= 1.18.0; python_version >= '3.0'",
+         "parse >= 1.13.1; python_version <= '2.7'",
+         "enum34; python_version < '3.4'",
+-        "six >= 1.15",
+     ],
+     tests_require=[
+         "pytest <  5.0; python_version <  '3.0'", # >= 4.2
+diff --git a/tasks/py.requirements.txt b/tasks/py.requirements.txt
+index e063e44..fb95307 100644
+--- a/tasks/py.requirements.txt
++++ b/tasks/py.requirements.txt
+@@ -11,7 +11,6 @@
+ invoke >=1.7.0,<2.0; python_version <  '3.6'
+ invoke >=1.7.0;      python_version >= '3.6'
+ pycmd
+-six >= 1.15.0
+ 
+ # -- HINT, was RENAMED: path.py => path (for python3)
+ path.py >=11.5.0,<13.0; python_version <  '3.5'

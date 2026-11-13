@@ -1,0 +1,120 @@
+From a9c89af52127b6c718395e6cd8439e8c92c471b1 Mon Sep 17 00:00:00 2001
+From: Sebastian Keller <skeller@gnome.org>
+Date: Thu, 27 Aug 2026 21:07:58 +0200
+Subject: [PATCH 2/2] src: Fix IBusAttrList leak when converting text
+
+After 5bbe88a1 the attribute list set on the text was getting leaked
+when the list passed to `ibus_attr_list_copy_format_to_*()` had a length
+of 0. In that case the list is already non-floating before the copy
+function adds a ref and returns it. This then is passed to
+`ibus_text_set_attributes()` which calls `g_object_ref_sink()`. Since
+the list is not floating, this adds another ref that would not be added
+in the length > 0 case. This surplus ref is causing the list to be
+leaked.
+
+To fix this leak we need to unref the list after calling
+`ibus_text_set_attributes()`.
+
+However in the length > 0 case the new list returned by
+`ibus_attr_list_copy_format_to_*()` is floating, so this would drop the
+refcount to 0. To avoid this we need to ensure that if the list is floating the
+floating ref is sunk before calling `ibus_text_set_attributes()`, so the
+call to `g_object_ref_sink()` in there adds a ref, such that we can
+safely unref this after the call to `ibus_text_set_attributes()`.
+
+This also keeps the guarantee that the list is not floating anymore
+after converting text to not regress the issue fixed by 5bbe88a1.
+
+Fixes: https://github.com/ibus/ibus/commit/5bbe88a1
+Closes: https://github.com/ibus/ibus/issues/2941
+
+Upstream-Status: Backport [https://github.com/ibus/ibus/commit/1a331e695d84fc6bae8f2d11c52d4776df49647b]
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/ibusinputcontext.c | 20 ++++++++++++++++++--
+ src/ibuspanelservice.c | 20 ++++++++++++++++++--
+ 2 files changed, 36 insertions(+), 4 deletions(-)
+
+diff --git a/src/ibusinputcontext.c b/src/ibusinputcontext.c
+index bdfd166..d0e162f 100644
+--- a/src/ibusinputcontext.c
++++ b/src/ibusinputcontext.c
+@@ -569,8 +569,16 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs)
++        if (new_attrs) {
++#if GLIB_CHECK_VERSION (2, 70, 0)
++            g_object_take_ref (new_attrs);
++#else
++            if (g_object_is_floating (new_attrs)
++                g_object_ref_sink (new_attrs);
++#endif
+             ibus_text_set_attributes (text, new_attrs);
++            g_object_unref (new_attrs);
++        }
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -579,8 +587,16 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs)
++        if (new_attrs) {
++#if GLIB_CHECK_VERSION (2, 70, 0)
++            g_object_take_ref (new_attrs);
++#else
++            if (g_object_is_floating (new_attrs)
++                g_object_ref_sink (new_attrs);
++#endif
+             ibus_text_set_attributes (text, new_attrs);
++            g_object_unref (new_attrs);
++        }
+         break;
+     default:
+         g_assert_not_reached ();
+diff --git a/src/ibuspanelservice.c b/src/ibuspanelservice.c
+index f50cea1..3d59a21 100644
+--- a/src/ibuspanelservice.c
++++ b/src/ibuspanelservice.c
+@@ -1203,8 +1203,16 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs)
++        if (new_attrs) {
++#if GLIB_CHECK_VERSION (2, 70, 0)
++            g_object_take_ref (new_attrs);
++#else
++            if (g_object_is_floating (new_attrs)
++                g_object_ref_sink (new_attrs);
++#endif
+             ibus_text_set_attributes (text, new_attrs);
++            g_object_unref (new_attrs);
++        }
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -1213,8 +1221,16 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs)
++        if (new_attrs) {
++#if GLIB_CHECK_VERSION (2, 70, 0)
++            g_object_take_ref (new_attrs);
++#else
++            if (g_object_is_floating (new_attrs)
++                g_object_ref_sink (new_attrs);
++#endif
+             ibus_text_set_attributes (text, new_attrs);
++            g_object_unref (new_attrs);
++        }
+         break;
+     default:
+         g_assert_not_reached ();
+-- 
+2.55.0
+

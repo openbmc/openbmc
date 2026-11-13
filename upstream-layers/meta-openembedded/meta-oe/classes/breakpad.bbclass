@@ -2,7 +2,7 @@
 # Apart from inheriting this class, you need to set BREAKPAD_BIN in
 # your recipe, and make sure that you link against libbreakpad_client.a.
 
-DEPENDS += "breakpad breakpad-native"
+DEPENDS += "breakpad breakpad-native util-linux-native"
 
 CFLAGS += "-I${STAGING_DIR_TARGET}${includedir}/breakpad "
 CXXFLAGS += "-I${STAGING_DIR_TARGET}${includedir}/breakpad "

@@ -17,7 +17,9 @@ DEPENDS = "libsocketcan"
 
 PV .= "+git"
 
-SRC_URI = "git://github.com/CANopenTerm/CANvenient.git;protocol=https;branch=main"
+SRC_URI = "git://github.com/CANopenTerm/CANvenient.git;protocol=https;branch=main \
+           file://0001-CANvenient_SocketCAN-include-sys-time.h-for-struct-.patch \
+           "
 
 SRCREV  = "23408935f230f59632eafd56056824f8e91cd896"
 

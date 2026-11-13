@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 12 Sep 2026 00:00:00 -0700
+Subject: [PATCH] parser: avoid undefined double to long conversion in
+ float_as_int_without_noise
+
+float_as_int_without_noise() returns early when the floored value fits
+in a long:
+
+    if (floor_val == static_cast<long>(floor_val))
+
+For values outside the range of long (e.g. 3.453e21) the conversion is
+undefined behavior. clang (-O2) takes advantage of that and folds the
+round trip into "floor_val is integral", which is always true, so the
+denoising is skipped and try_real(3.453e21, denoise=True) returns
+3452999999999999737856 instead of 3453000000000000000000:
+
+  tests/test_fastnumbers_examples.py::test_try_real FAILED
+  tests/test_fastnumbers_examples.py::test_try_forceint FAILED
+
+Only do the conversion when the value is within the range of long.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/cpp/parser.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+--- a/src/cpp/parser.cpp
++++ b/src/cpp/parser.cpp
+@@ -92,8 +92,14 @@
+ 
+     // If the given float can fit a C long without loss then no need
+     // to go through the below rounding steps.
++    // Converting a double that is outside the range of long is undefined
++    // behavior, and clang uses that to fold this check into "floor_val is
++    // integral", which is always true and skips the denoising below for large
++    // values. Make sure the value is in range before converting.
+     const double floor_val = std::floor(val);
+-    if (floor_val == static_cast<long>(floor_val)) {
++    constexpr double long_limit = -static_cast<double>(std::numeric_limits<long>::min());
++    if (floor_val >= -long_limit && floor_val < long_limit
++        && floor_val == static_cast<long>(floor_val)) {
+         return val_int;
+     }
+ 

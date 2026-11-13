@@ -18,6 +18,10 @@ SRC_URI = "https://support.hdfgroup.org/releases/hdf5/v2_0/v2_0_0/downloads/${BP
            file://0001-cmake-remove-build-flags.patch \
            file://CVE-2026-26199.patch \
            file://CVE-2026-26197.patch \
+           file://CVE-2026-17572.patch \
+           file://CVE-2026-17573.patch \
+           file://CVE-2026-17574.patch \
+           file://CVE-2026-19025.patch \
            "
 SRC_URI[sha256sum] = "f4c2edc5668fb846627182708dbe1e16c60c467e63177a75b0b9f12c19d7efed"
 

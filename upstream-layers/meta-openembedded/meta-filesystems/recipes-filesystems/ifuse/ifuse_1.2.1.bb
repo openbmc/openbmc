@@ -7,6 +7,9 @@ DEPENDS = "fuse3 libimobiledevice"
 
 SRC_URI = "https://github.com/libimobiledevice/ifuse/releases/download/${PV}/ifuse-${PV}.tar.bz2"
 
+UPSTREAM_CHECK_URI = "https://github.com/libimobiledevice/ifuse/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+
 SRC_URI[sha256sum] = "9d490470ba6553f8052b385bb5330462e46fbe82131ebe65be47a1cc1c70e857"
 
 inherit autotools pkgconfig

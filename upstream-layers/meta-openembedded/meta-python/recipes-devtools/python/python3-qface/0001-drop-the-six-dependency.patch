@@ -1,0 +1,27 @@
+From 306a9a40b6056c9d07037282bec645ca393ed4b2 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Sep 2026 13:31:21 +0200
+Subject: [PATCH] drop the six dependency
+
+six is a Python 2 compatibility shim; qface declares it in
+install_requires but no longer imports it anywhere.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Opus 5)
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 3dca1d3..d2734d3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -51,7 +51,6 @@ setup(
+         'jinja2>=2.10.3',
+         'pyyaml>=5.1',
+         'watchdog>=1.0',
+-        'six>=1.11.0',
+         'coloredlogs>=10.0',
+     ],
+     extras_require={

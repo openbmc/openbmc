@@ -1,0 +1,178 @@
+From c7fa9ebcb0c0086730c53bf03191c03f03706246 Mon Sep 17 00:00:00 2001
+From: "c-ares-backport-gha[bot]"
+ <299594594+c-ares-backport-gha[bot]@users.noreply.github.com>
+Date: Tue, 20 Oct 2026 02:25:59 +0000
+Subject: [PATCH] [Backport v1.34] ares_conn_read: don't drop UDP answers whose
+ source port isn't reported (#1371)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+# Description
+Backport of #1370 to `v1.34`.
+
+Signed-off-by: Brad House <brad@brad-house.com>
+Co-authored-by: Brad House <brad@brad-house.com>
+Upstream-Status: Backport [https://github.com/c-ares/c-ares/commit/c7fa9ebcb0c0086730c53bf03191c03f03706246]
+GHSA: GHSA-fqh5-3x7m-wp44
+---
+ docs/ares_set_socket_functions.3 | 20 ++++++++++++++++++++
+ src/lib/ares_conn.c              |  9 ++++++++-
+ src/lib/ares_socket.c            |  4 +++-
+ src/lib/ares_socket.h            |  8 +++++---
+ test/ares-test-mock.cc           | 32 +++++++++++++++++++++++++++++++-
+ 5 files changed, 67 insertions(+), 6 deletions(-)
+
+diff --git a/docs/ares_set_socket_functions.3 b/docs/ares_set_socket_functions.3
+index 605beb26ef..75c621cb48 100644
+--- a/docs/ares_set_socket_functions.3
++++ b/docs/ares_set_socket_functions.3
+@@ -149,6 +149,20 @@ a socket. Additional flags controlling behavior are in
+ address, the callback should fill this in. The \fIflags\fP parameter is
+ currently unused. See \fBrecvfrom(2)\fP.
+ 
++For UDP, the callback must fill in the full source address, including the
++source port, exactly as \fBrecvfrom(2)\fP does. c-ares discards a datagram
++whose source address does not match the server it queried, or whose source
++port does not match that server's port.
++
++\fBSecurity:\fP for compatibility with older callbacks, a reported source port
++of 0 is treated as unknown and only the address is checked. A callback that
++does not fill in the source port is therefore insecure: c-ares will accept
++answers sent from any port on the server's address, for example from another
++DNS server or any other service or user able to send UDP from that host, and
++those answers are cached and returned to the application. Such an
++implementation is non-compliant and should be fixed to report the real source
++port.
++
+ .TP 8
+ .B ares_ssize_t (*\fIasendto\fP)(ares_socket_t \fIfd\fP, const void * \fIbuffer\fP, size_t \fIlength\fP, int \fIflags\fP, const struct sockaddr * \fIaddress\fP, ares_socklen_t \fIaddress_len\fP, void * \fIuser_data\fP)
+ .br
+@@ -305,6 +319,12 @@ Receives data from remote socket endpoint, if available. If the \fIaddr\fP
+ parameter is not NULL and the connection protocol provides the source address,
+ the callback should fill this in. See \fBrecvfrom(2)\fP
+ 
++For UDP, the callback must fill in the full source address, including the
++source port, as described above for \fIarecvfrom\fP in
++\fBares_set_socket_functions_ex\fP. \fBSecurity:\fP a callback that
++does not fill in the source port is insecure, and c-ares will accept answers
++sent from any port on the server's address.
++
+ .TP 8
+ .B ares_ssize_t (*\fIasendv\fP)(ares_socket_t \fIfd\fP, const struct iovec * \fIdata\fP, int \fIlen\fP, void * \fIuser_data\fP)
+ .br
+diff --git a/src/lib/ares_conn.c b/src/lib/ares_conn.c
+index b868053e62..7711d8649e 100644
+--- a/src/lib/ares_conn.c
++++ b/src/lib/ares_conn.c
+@@ -257,7 +257,14 @@ ares_conn_err_t ares_conn_read(ares_conn_t *conn, void *data, size_t len,
+      * functions might not filter on connect, so also check here that the
+      * datagram came from the server's address and UDP port.  RFC 5452
+      * section 9.1 only requires the address to match; matching the port too
+-     * keeps one server from answering for another on the same address. */
++     * keeps one server from answering for another on the same address.
++     * Socket functions that fill in the source address but leave the port 0
++     * predate the port check, so for those only the address is checked.  A
++     * sender cannot use this to skip the port check: the default socket
++     * functions connect() the socket, so the kernel drops a datagram from
++     * port 0, and an unprivileged process on the server's host cannot send
++     * from port 0, while an off-path attacker able to forge port 0 can forge
++     * the server's real port just as easily. */
+     if (err == ARES_CONN_ERR_SUCCESS &&
+         !ares_sockaddr_addr_port_eq((struct sockaddr *)&sa_storage,
+                                     &conn->server->addr,
+diff --git a/src/lib/ares_socket.c b/src/lib/ares_socket.c
+index 0a12935ab7..29d595e1a9 100644
+--- a/src/lib/ares_socket.c
++++ b/src/lib/ares_socket.c
+@@ -144,7 +144,9 @@ ares_bool_t ares_sockaddr_addr_port_eq(const struct sockaddr  *sa,
+     sa_port = (CARES_INADDR_CAST(const struct sockaddr_in6 *, sa))->sin6_port;
+   }
+ 
+-  if (ntohs(sa_port) != port) {
++  /* A port of 0 means the source port was not reported, so only the address
++   * can be checked. */
++  if (sa_port != 0 && ntohs(sa_port) != port) {
+     return ARES_FALSE;
+   }
+ 
+diff --git a/src/lib/ares_socket.h b/src/lib/ares_socket.h
+index f7128e3493..1ede6987ee 100644
+--- a/src/lib/ares_socket.h
++++ b/src/lib/ares_socket.h
+@@ -151,13 +151,15 @@ ares_bool_t     ares_sockaddr_addr_eq(const struct sockaddr  *sa,
+                                       const struct ares_addr *aa);
+ 
+ /*! Compare the IP address and port of a socket address with an ares_addr and
+- *  port.
++ *  port.  A port of 0 in the socket address means the port is unknown, so it
++ *  matches any port.
+  *
+  *  \param[in] sa    Socket address (AF_INET or AF_INET6)
+  *  \param[in] aa    Address to compare against
+  *  \param[in] port  Port to compare against, in host byte order
+- *  \return ARES_TRUE if the address families, IP addresses and ports are
+- *          equal, ARES_FALSE otherwise
++ *  \return ARES_TRUE if the address families and IP addresses are equal and
++ *          the ports are equal or the socket address port is 0, ARES_FALSE
++ *          otherwise
+  */
+ ares_bool_t     ares_sockaddr_addr_port_eq(const struct sockaddr  *sa,
+                                            const struct ares_addr *aa,
+diff --git a/test/ares-test-mock.cc b/test/ares-test-mock.cc
+index 058dc93001..cc5e6482f2 100644
+--- a/test/ares-test-mock.cc
++++ b/test/ares-test-mock.cc
+@@ -3364,6 +3364,7 @@ struct FakeSockData {
+   size_t             query_len;
+   struct sockaddr_in peer;
+   unsigned short     recv_port; /* network order; 0 reports the peer's port */
++  bool               recv_no_port; /* report the peer's address with port 0 */
+   size_t             recv_calls;
+   size_t             bad_fd_calls;
+   size_t             sock_state_bad;
+@@ -3472,7 +3473,9 @@ static ares_ssize_t FakeSockRecvfrom(ares_socket_t sock, void *buffer,
+   if (address != NULL && address_len != NULL &&
+       *address_len >= (ares_socklen_t)sizeof(d->peer)) {
+     memcpy(address, &d->peer, sizeof(d->peer));
+-    if (d->recv_port != 0) {
++    if (d->recv_no_port) {
++      reinterpret_cast<struct sockaddr_in *>(address)->sin_port = 0;
++    } else if (d->recv_port != 0) {
+       reinterpret_cast<struct sockaddr_in *>(address)->sin_port = d->recv_port;
+     }
+     *address_len = sizeof(d->peer);
+@@ -3750,6 +3753,33 @@ TEST_F(LibraryTest, UDPAnswerFromWrongPortDropped) {
+   ares_destroy(chan);
+ }
+ 
++// Socket functions written before the port check may fill in the source
++// address but leave the port 0.  The address is still checked, but the answer
++// must not be dropped for its port.
++TEST_F(LibraryTest, UDPAnswerWithoutPortAccepted)
++{
++  ares_channel_t *chan = nullptr;
++  FakeSockData    data;
++
++  memset(&data, 0, sizeof(data));
++  FakeSockInit(&chan, &data, 0, ARES_SOCKFUNC_FLAG_NONBLOCKING);
++
++  ares_query_dnsrec(chan, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    FakeSockQueryCallback, &data, NULL);
++  ASSERT_NE((size_t)0, data.query_len);
++  ASSERT_EQ(htons(53055), data.peer.sin_port);
++
++  data.recv_no_port = true;
++  data.recv_answer  = true;
++  ares_process_fd(chan, 100, ARES_SOCKET_BAD);
++  EXPECT_FALSE(data.recv_answer);
++  EXPECT_TRUE(data.done);
++  // The fake answer carries no records.
++  EXPECT_EQ(ARES_ENODATA, data.status);
++  EXPECT_EQ((size_t)0, ares_queue_active_queries(chan));
++  ares_destroy(chan);
++}
++
+ // The close function is application code too.  With no socket-state callback
+ // to carry the descriptor, it runs inline while ares_check_cleanup_conns()
+ // walks the server list and each server's connections, closing idle ones.

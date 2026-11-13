@@ -46,7 +46,7 @@ PACKAGECONFIG ??= " \
     native-backend \
     egl \
     gles2 \
-    opengl \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', '', d)} \
     fonts \
     bash-completion \
     gnome-desktop \

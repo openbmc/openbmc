@@ -23,7 +23,6 @@ do_install:prepend() {
 }
 
 RDEPENDS:${PN} = "\
-    python3-six \
     python3-cffi \
     libsodium \
 "

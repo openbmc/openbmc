@@ -1,0 +1,25 @@
+From: Alper Ak <alperyasinak1@gmail.com>
+Date: Wed, 9 Sep 2026 23:00:00 +0300
+Subject: [PATCH] configure: enable SSL11 for OpenSSL 4
+
+OpenSSL 4 keeps EVP_CIPHER_CTX opaque, so it cannot go on the stack.
+The heap path behind SSL11 is already there, configure just does not
+turn it on for major version 4.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/ipmiutil/feature-requests/13/]
+Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -443,7 +443,7 @@
+ 		MD2_CFLAGS="-DSKIP_MD2 -DSSL11"
+ 		sslnew=1
+ 	fi
+-	if test "$sslrel" = "3"; then
++	if test "$sslrel" = "3" -o "$sslrel" = "4"; then
+ 		echo "Detected openssl-$sslver" 
+ 		MD2_CFLAGS="-DSKIP_MD2 -DSSL11"
+ 		sslnew=1

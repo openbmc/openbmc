@@ -29,6 +29,14 @@ QB_MEM = "-m 1024"
 # If a particular ptest needs more memory, it can be customized:
 #QB_MEM:virtclass-mcextend-<pn> = "-m 4096"
 QB_MEM:virtclass-mcextend-tbb = "-m 2048"
+# coredump:coredump_socket_test streams cores of a 128-thread process (~1GB of
+# stacks) into a tmpfs, which is sized at half of RAM
+QB_MEM:virtclass-mcextend-kernel-selftest = "-m 4096"
+
+# run_kselftest.sh -s prints nothing while a test runs, and some kselftests
+# legitimately run for a long time (rseq:run_param_test.sh ~700s, net/mptcp
+# allows up to 1800s), so raise the ptest-runner no-output timeout
+PTEST_RUNNER_TIMEOUT:virtclass-mcextend-kernel-selftest = "2400"
 
 TEST_SUITES = "ping ssh parselogs ptest"
 

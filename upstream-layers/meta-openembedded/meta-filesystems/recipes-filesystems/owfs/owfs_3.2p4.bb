@@ -16,6 +16,7 @@ SRC_URI = "git://github.com/owfs/owfs;branch=master;protocol=https;tag=v${PV} \
            file://owserver \
            "
 
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+p\d+)"
 
 inherit autotools-brokensep update-rc.d pkgconfig systemd
 

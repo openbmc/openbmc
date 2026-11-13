@@ -1,0 +1,28 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 01:56:02 +0000
+Subject: [PATCH] tests/testprogs: define _GNU_SOURCE for pthread_setname_np
+
+glibc exposes GNU/BSD extensions such as pthread_setname_np() by default
+in its headers unless the build is put into a strict ISO mode, whereas
+musl only exposes these extensions when _GNU_SOURCE is explicitly defined
+before <pthread.h> is included. Without it, musl's <pthread.h> does not
+declare pthread_setname_np(), causing an implicit-declaration error under
+clang's -Werror=implicit-function-declaration (mandatory in C99 and
+later). Define _GNU_SOURCE before the first include so the declaration is
+visible on musl too.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/testprogs/multi_threads.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/testprogs/multi_threads.c b/tests/testprogs/multi_threads.c
+index 1111111..2222222 100644
+--- a/tests/testprogs/multi_threads.c
++++ b/tests/testprogs/multi_threads.c
+@@ -1,3 +1,4 @@
++#define _GNU_SOURCE
+ #include <pthread.h>
+ #include <stdlib.h>
+ #include <stdio.h>

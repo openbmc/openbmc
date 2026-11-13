@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 12 Sep 2026 00:00:00 -0700
+Subject: [PATCH] tests: skip DDR tests when the resolvers do not answer DDR
+
+test_basic_ddr_sync and test_basic_ddr_async only check that the
+Internet is reachable. On networks that intercept port 53 with a
+transparent DNS proxy, 1.1.1.1 and 8.8.8.8 still answer ordinary
+queries but return NXDOMAIN for _dns.resolver.arpa SVCB, so try_ddr()
+cannot upgrade the nameservers and the tests fail:
+
+  assert isinstance('1.1.1.1', dns.nameserver.Nameserver)
+
+Skip the tests unless both resolvers return DDR SVCB records.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/test_ddr.py | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
+
+--- a/tests/test_ddr.py
++++ b/tests/test_ddr.py
+@@ -6,13 +6,36 @@
+ 
+ import dns.asyncbackend
+ import dns.asyncresolver
++import dns.message
+ import dns.nameserver
++import dns.query
++import dns.rdatatype
+ import dns.resolver
+ import tests.util
+ 
+ 
++def _ddr_available():
++    """Check that the public resolvers answer the DDR SVCB query.
++
++    Networks that intercept port 53 (e.g. a transparent DNS proxy) answer
++    _dns.resolver.arpa with NXDOMAIN, so DDR cannot work there even though
++    the Internet is reachable.
++    """
++    if not tests.util.is_internet_reachable():
++        return False
++    for nameserver in ["1.1.1.1", "8.8.8.8"]:
++        q = dns.message.make_query("_dns.resolver.arpa", dns.rdatatype.SVCB)
++        try:
++            r = dns.query.udp(q, nameserver, timeout=5)
++        except Exception:
++            return False
++        if not r.answer:
++            return False
++    return True
++
++
+ @pytest.mark.skipif(
+-    not tests.util.is_internet_reachable(), reason="Internet not reachable"
++    not _ddr_available(), reason="Internet not reachable or DDR not available"
+ )
+ @tests.util.retry_on_timeout
+ def test_basic_ddr_sync():
+@@ -26,7 +49,7 @@
+ 
+ 
+ @pytest.mark.skipif(
+-    not tests.util.is_internet_reachable(), reason="Internet not reachable"
++    not _ddr_available(), reason="Internet not reachable or DDR not available"
+ )
+ @tests.util.retry_on_timeout
+ def test_basic_ddr_async():

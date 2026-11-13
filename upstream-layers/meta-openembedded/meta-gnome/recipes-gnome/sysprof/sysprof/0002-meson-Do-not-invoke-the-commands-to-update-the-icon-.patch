@@ -15,12 +15,12 @@ Signed-off-by: Carlos Alberto Lopez Perez <clopez@igalia.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 783f558..8775fe6 100644
+index 339b1c3..bd5bda6 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -276,7 +276,7 @@ configure_file(
-   configuration: config_h
- )
+@@ -280,7 +280,7 @@ if get_option('docs')
+   subdir('doc')
+ endif
  
 -if get_option('gtk') and gnome.found()
 +if get_option('gtk') and gnome.found() and not meson.is_cross_build()

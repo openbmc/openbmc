@@ -46,6 +46,7 @@ UPSTREAM_CHECK_REGEX = "samba\-(?P<pver>\d+\.\d+(\.\d+)+).tar.gz"
 inherit systemd waf-samba cpan-base perlnative update-rc.d perl-version pkgconfig
 
 CVE_STATUS[CVE-2011-2411] = "not-applicable-platform: vulnerable only on HP NonStop Servers"
+CVE_STATUS[CVE-2026-2340] = "fixed-version: fixed since v4.23.8"
 
 # remove default added RDEPENDS on perl
 RDEPENDS:${PN}:remove = "perl"

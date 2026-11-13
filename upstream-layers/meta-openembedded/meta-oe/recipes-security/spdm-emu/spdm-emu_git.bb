@@ -6,9 +6,11 @@ HOMEPAGE = "https://github.com/DMTF/spdm-emu"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ed4cfe4688e1ac2cc2e6748766571949"
 
-SRC_URI = "gitsm://github.com/DMTF/spdm-emu;protocol=https;branch=main"
+SRC_URI = "gitsm://github.com/DMTF/spdm-emu;protocol=https;branch=main \
+           file://0001-spdm_emu_mctp_kernel-provide-AF_MCTP-fallback-for-mu.patch \
+           "
 
-SRCREV = "5fca359b15e4edd4f070ca83c9da02799b6f78ae"
+SRCREV = "ea77f25410cc01098320c0b44b3e150192ec4d5e"
 # Upstream release tags are "X.Y.Z" (newest 3.8.0).
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 # PV is "git" (AUTOINC recipe with no numeric PV), so the resolved tag (3.8.0)
@@ -16,9 +18,14 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 UPSTREAM_VERSION_UNKNOWN = "1"
 inherit cmake pkgconfig systemd
 
-DEPENDS = "openssl"
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+# Use mbedtls until openssl build is fixed.
+# see https://github.com/DMTF/libspdm/issues/3752
+
+PACKAGECONFIG ??= "mbedtls ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "-DENABLE_SYSTEMD=ON,-DENABLE_SYSTEMD=OFF,systemd"
+PACKAGECONFIG[openssl] = "-DCRYPTO=openssl -DENABLE_BINARY_BUILD=1,,openssl,,,mbedtls"
+# ENABLE_BINARY_BUILD=0 makes libspdm compile its own bundled mbedtls
+PACKAGECONFIG[mbedtls] = "-DCRYPTO=mbedtls -DENABLE_BINARY_BUILD=0,,,,,openssl"
 
 SYSTEMD_SERVICE:${PN} = "spdm-responder-emu.service"
 
@@ -45,8 +52,6 @@ EXTRA_OECMAKE += "\
     -DARCH=${@get_spdm_multiarch(d)} \
     -DTOOLCHAIN=NONE \
     -DTARGET=Release \
-    -DCRYPTO=openssl \
-    -DENABLE_BINARY_BUILD=1 \
     -DCOMPILED_LIBCRYPTO_PATH=${libdir} \
     -DCOMPILED_LIBSSL_PATH=${libdir} \
 "

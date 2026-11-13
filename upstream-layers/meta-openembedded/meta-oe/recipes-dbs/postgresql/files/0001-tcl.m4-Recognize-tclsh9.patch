@@ -1,4 +1,4 @@
-From ab23817b4f4a02de21f63800adc30d6236c15c8b Mon Sep 17 00:00:00 2001
+From 015a37e2e0bbf4e404e921e804ac5a5ca4343180 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 3 Nov 2024 15:50:50 -0800
 Subject: [PATCH] tcl.m4: Recognize tclsh9
@@ -7,6 +7,7 @@ Add missing support to recognize tclsh9 as supported
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  config/tcl.m4 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

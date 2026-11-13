@@ -1,3 +1,6 @@
+From cc4874a304379aaf372955a3ecd83ae825fd5ed3 Mon Sep 17 00:00:00 2001
+From: Liu Yiding <liuyd.fnst@fujitsu.com>
+Date: Wed, 9 Sep 2026 11:09:16 +0300
 Subject: [PATCH] cmake: disable filesystem gitclone
 
 In Yocto we don't download filesystem, it is satisfied from source dir.
@@ -9,29 +12,58 @@ Fix error log as following:
 | CMake Error at bit7z/4.0.11/build/_deps/ghc_filesystem-subbuild/ghc_filesystem-populate-prefix/tmp/ghc_filesystem-populate-gitclone.cmake:50 (message):
 |   Failed to clone repository: 'https://github.com/rikyoz/filesystem.git'
 
+
+Apply the same approach for bit7z-test-data in tests/CMakeLists.txt
+to fix error log as following:
+
+|   Failed to clone repository:
+|
+|     'https://github.com/rikyoz/bit7z-test-data.git'
+
 Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  cmake/Dependencies.cmake | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tests/CMakeLists.txt     | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
-index 110d9c2b..dc1dead8 100644
+index 1e787070..03dfa3d9 100644
 --- a/cmake/Dependencies.cmake
 +++ b/cmake/Dependencies.cmake
-@@ -39,10 +39,9 @@ if( NOT USE_STANDARD_FILESYSTEM OR NOT STANDARD_FILESYSTEM_COMPILES OR BIT7Z_BUI
-     CPMAddPackage( NAME ghc_filesystem
-                    GITHUB_REPOSITORY rikyoz/filesystem
-                    GIT_TAG b99c2aebd5ddd6fb2f190731ba80b949fc3842b5
--                   DOWNLOAD_ONLY YES )
-+                   SOURCE_DIR "${CPM_SOURCE_CACHE}/ghc_filesystem" )
+@@ -84,7 +84,7 @@ if( NOT USE_STANDARD_FILESYSTEM OR BIT7Z_BUILD_TESTS )
+         GITHUB_REPOSITORY rikyoz/filesystem
+         GIT_TAG b99c2aebd5ddd6fb2f190731ba80b949fc3842b5
+         GIT_PROGRESS ON
+-        DOWNLOAD_ONLY YES
++        SOURCE_DIR "${CPM_SOURCE_CACHE}/ghc_filesystem"
+     )
+ 
+     # Normalize to a plain "ghc_filesystem" target that the rest of the build and the tests link,
+@@ -92,7 +92,6 @@ if( NOT USE_STANDARD_FILESYSTEM OR BIT7Z_BUILD_TESTS )
      if( ghc_filesystem_ADDED )
+         # Downloaded sources: expose the header-only library straight from its source tree.
          message( STATUS "ghc::filesystem source code available at ${ghc_filesystem_SOURCE_DIR}" )
 -        add_library( ghc_filesystem INTERFACE IMPORTED )
          target_include_directories( ghc_filesystem SYSTEM INTERFACE ${ghc_filesystem_SOURCE_DIR}/include )
-     endif()
- endif()
--- 
+         if( BIT7Z_USE_PCH AND CMAKE_VERSION VERSION_GREATER_EQUAL "3.16.0" )
+             target_precompile_headers(
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 5f5c8c62..ddfd735a 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -72,8 +72,8 @@ if( BIT7Z_TESTS_FILESYSTEM )
+             NAME bit7z_test_data
+             GITHUB_REPOSITORY "rikyoz/bit7z-test-data"
+             VERSION 1.18.2
+-            DOWNLOAD_ONLY YES
+             GIT_PROGRESS ON
++            SOURCE_DIR "${CPM_SOURCE_CACHE}/bit7z_test_data"
+         )
+         if( bit7z_test_data_ADDED )
+             set( BIT7Z_TESTS_DATA_DIR ${bit7z_test_data_SOURCE_DIR} )
+--
 2.43.0
 

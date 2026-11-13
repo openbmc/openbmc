@@ -14,6 +14,5 @@ PYPI_PACKAGE = "websocket_client"
 inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} = "\
-    python3-six \
     python3-logging \
 "

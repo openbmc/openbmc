@@ -22,7 +22,6 @@ RDEPENDS:${PN} += "\
     python3-misc \
     python3-multiprocessing \
     python3-numbers \
-    python3-six \
     libevent \
 "
 

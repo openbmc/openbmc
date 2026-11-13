@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 25 Sep 2026 00:00:00 +0000
+Subject: [PATCH] libsushi: guard the X11 Window field when
+ GDK_WINDOWING_X11 is unset
+
+ExternalWindow unconditionally declares an Xlib "Window xid" struct
+member, but GTK4 only exposes the Window typedef (via gdk/x11/gdkx.h)
+when it was itself built with the X11 backend. On a Wayland-only GTK4
+build (GDK_WINDOWING_X11 undefined in gdkconfig.h), this field fails
+to compile even though sushi's own X11 handle parsing in
+create_external_window_from_handle() still needs an integer member to
+track x11: handles received over the window handle protocol.
+
+Fall back to gulong, the same underlying type as Xlib's Window, when
+GDK_WINDOWING_X11 is not defined.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libsushi/externalwindow.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/libsushi/externalwindow.c b/src/libsushi/externalwindow.c
+index 1111111..2222222 100644
+--- a/src/libsushi/externalwindow.c
++++ b/src/libsushi/externalwindow.c
+@@ -38,7 +38,11 @@ struct _ExternalWindow
+
+   GdkDisplay *display;
+   char *wayland_str;
++#ifdef GDK_WINDOWING_X11
+   Window xid;
++#else
++  gulong xid;
++#endif
+ };
+
+ G_DEFINE_FINAL_TYPE (ExternalWindow, external_window, G_TYPE_OBJECT)
+--
+2.43.0

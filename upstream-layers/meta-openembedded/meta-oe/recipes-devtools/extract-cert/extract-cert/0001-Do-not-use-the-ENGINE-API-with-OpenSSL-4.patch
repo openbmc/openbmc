@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Sep 2026 01:30:00 +0000
+Subject: [PATCH] Do not use the ENGINE API with OpenSSL 4
+
+OpenSSL 4.0 removed the ENGINE API.  <openssl/engine.h> still exists, but
+only as a source-compatibility stub, so both binaries now fail to link:
+
+  ld.lld: error: undefined symbol: ENGINE_load_builtin_engines
+  ld.lld: error: undefined symbol: ENGINE_by_id
+  ld.lld: error: undefined symbol: ENGINE_init
+  ld.lld: error: undefined symbol: ENGINE_ctrl_cmd_string
+  ld.lld: error: undefined symbol: ENGINE_load_public_key
+
+The ENGINE use is confined to the "pkcs11:" input branch of each tool, so
+compile that branch out on OpenSSL 4 and diagnose the unsupported input
+instead.  Reading certificates and public keys from PEM files - which is
+what the kernel build and most other users actually do - is unaffected.
+
+Providers supersede engines, but no provider exposes an equivalent of the
+pkcs11 engine's LOAD_CERT_CTRL command, so there is nothing to port to
+yet; pkcs11-provider based support would be a separate feature.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/extract-cert.c
++++ b/extract-cert.c
+@@ -21,7 +21,9 @@
+ #include <openssl/bio.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
++#if OPENSSL_VERSION_MAJOR < 4
+ #include <openssl/engine.h>
++#endif
+ 
+ #define PKEY_ID_PKCS7 2
+ 
+@@ -112,6 +114,16 @@
+ 		fclose(f);
+ 		exit(0);
+ 	} else if (!strncmp(cert_src, "pkcs11:", 7)) {
++#if OPENSSL_VERSION_MAJOR >= 4
++		/*
++		 * OpenSSL 4.0 removed the ENGINE API, and with it the pkcs11
++		 * engine that was used here to pull an object off a token.  No
++		 * provider based replacement for the engine's LOAD_CERT_CTRL
++		 * command exists, so fail loudly rather than quietly emitting
++		 * nothing.
++		 */
++		ERR(1, "PKCS#11 URIs require OpenSSL < 4.0 (ENGINE API removed)");
++#else
+ 		ENGINE *e;
+ 		struct {
+ 			const char *cert_id;
+@@ -134,6 +146,7 @@
+ 		ENGINE_ctrl_cmd(e, "LOAD_CERT_CTRL", 0, &parms, NULL, 1);
+ 		ERR(!parms.cert, "Get X.509 from PKCS#11");
+ 		write_cert(parms.cert);
++#endif
+ 	} else {
+ 		BIO *b;
+ 		X509 *x509;
+--- a/spki-hash.c
++++ b/spki-hash.c
+@@ -23,7 +23,9 @@
+ #include <openssl/bio.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
++#if OPENSSL_VERSION_MAJOR < 4
+ #include <openssl/engine.h>
++#endif
+ 
+ #define PKEY_ID_PKCS7 2
+ 
+@@ -110,6 +112,14 @@
+ 	src = argv[1];
+ 
+ 	if (!strncmp(src, "pkcs11:", 7)) {
++#if OPENSSL_VERSION_MAJOR >= 4
++		/*
++		 * OpenSSL 4.0 removed the ENGINE API, and with it the pkcs11
++		 * engine that was used here to load a public key off a token.
++		 * Fail loudly rather than quietly hashing nothing.
++		 */
++		ERR(1, "PKCS#11 URIs require OpenSSL < 4.0 (ENGINE API removed)");
++#else
+ 		ENGINE *e;
+ 		ENGINE_load_builtin_engines();
+ 		drain_openssl_errors();
+@@ -124,6 +134,7 @@
+ 
+ 		key = ENGINE_load_public_key(e, src, NULL, NULL);
+ 		ERR(!key, "ENGINE_load_public_key");
++#endif
+ 	} else {
+ 		BIO *b;
+ 

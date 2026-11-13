@@ -14,7 +14,7 @@ SRC_URI = "\
     git://github.com/lvgl/lvgl;protocol=https;branch=release/v9.5;tag=v9.5.0;name=lvgl;subdir=${BB_GIT_DEFAULT_DESTSUFFIX}/lvgl \
 "
 
-SRCREV_demo = "045137cf0fa1781483cb796261a11b5eb21e99d9"
+SRCREV_demo = "b0aeee00922fdd8f2c5e3409ce464a8f714cf919"
 SRCREV_lvgl = "85aa60d18b3d5e5588d7b247abf90198f07c8a63"
 SRCREV_FORMAT = "demo_lvgl"
 # The version check runs against the first SRC_URI (the demo repo), whose tags

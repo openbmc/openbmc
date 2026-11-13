@@ -8,6 +8,7 @@ SRC_URI += "git://github.com/pylint-dev/pylint;branch=main;protocol=https;tag=v$
            file://0001-Adjust-test-expectations-for-ptest.patch \
            file://0002-pyproject.toml-Keep-tool.setuptools.license-files.patch \
            file://0003-astroid-4.1.2-endlineno.patch \
+           file://0004-checkers-variables-do-not-pass-asname-to-Import.infer.patch \
            file://run-ptest \
            "
 

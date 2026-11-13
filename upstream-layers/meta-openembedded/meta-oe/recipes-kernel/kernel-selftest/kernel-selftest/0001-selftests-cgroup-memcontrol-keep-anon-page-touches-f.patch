@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 12 Sep 2026 00:00:00 -0700
+Subject: [PATCH] selftests/cgroup: memcontrol: keep anon page touches from
+ being optimized away
+
+alloc_and_populate_anon() writes one byte per page so that the memory
+is faulted in and charged to the cgroup. alloc_anon() inlines it and
+frees the buffer right away without reading it, so GCC 16 at -O2 treats
+the page writes as dead stores and drops them, leaving an empty loop.
+The memory is then never charged and the tests expecting reclaim or
+OOM fail:
+
+  not ok 3 test_memcg_min
+  not ok 4 test_memcg_low
+  not ok 7 test_memcg_max
+  not ok 9 test_memcg_oom_events
+  not ok 12 test_memcg_oom_group_leaf_events
+  not ok 13 test_memcg_oom_group_parent_events
+  not ok 14 test_memcg_oom_group_score_events
+
+Write through a volatile pointer so the stores are kept.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tools/testing/selftests/cgroup/test_memcontrol.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/cgroup/test_memcontrol.c b/tools/testing/selftests/cgroup/test_memcontrol.c
+--- a/tools/testing/selftests/cgroup/test_memcontrol.c
++++ b/tools/testing/selftests/cgroup/test_memcontrol.c
+@@ -67,7 +67,7 @@
+ 	}
+ 
+ 	for (ptr = buf; ptr < buf + size; ptr += page_size)
+-		*ptr = 0;
++		*(volatile char *)ptr = 0;
+ 
+ 	return buf;
+ }

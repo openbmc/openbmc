@@ -1,0 +1,39 @@
+From: Alper Ak <alperyasinak1@gmail.com>
+Date: Wed, 9 Sep 2026 23:30:00 +0300
+Subject: [PATCH] ntp_crypto: use the ASN1_STRING accessors
+
+ASN1_STRING is opaque in OpenSSL 4, so asn1time->length and data->data
+no longer compile. The accessors have been available since OpenSSL
+1.1.0, which this file already requires.
+
+Upstream-Status: Pending
+Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+---
+ ntpd/ntp_crypto.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--- a/ntpd/ntp_crypto.c
++++ b/ntpd/ntp_crypto.c
+@@ -2032,9 +2032,9 @@
+ 	 * Also note that two-digit years less than 50 map to years greater than
+ 	 * 100. Dontcha love ASN.1? Better than MIL-188.
+ 	 */
+-	len = asn1time->length;
++	len = ASN1_STRING_length(asn1time);
+ 	REQUIRE(len < sizeof(v));
+-	(void)strncpy(v, (char *)(asn1time->data), len);
++	(void)strncpy(v, (const char *)ASN1_STRING_get0_data(asn1time), len);
+ 	REQUIRE(len >= 13);
+ 	temp = strtoul(v+len-3, NULL, 10);
+ 	pjd->second = temp;
+@@ -3551,8 +3551,8 @@
+ 		 */
+ 		case NID_subject_key_identifier:
+ 			data = X509_EXTENSION_get_data(ext);
+-			ret->grpkey = BN_bin2bn(&data->data[2],
+-			    data->length - 2, NULL);
++			ret->grpkey = BN_bin2bn(ASN1_STRING_get0_data(data) + 2,
++			    ASN1_STRING_length(data) - 2, NULL);
+ 			/* fall through */
+ 		default:
+ 			DPRINTF(1, ("cert_parse: %s\n",

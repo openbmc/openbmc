@@ -1,0 +1,85 @@
+From e63a11dedcdece8b9b285485a86405fd258b37d8 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 29 Sep 2026 17:29:52 +0200
+Subject: [PATCH] Honour ImageSize for the last block
+
+bmaptool records the exact image size in ImageSize, and the last block
+of an image whose size is not a multiple of BlockSize is only partly
+filled. Writing and verifying used (endBlock + 1) * BlockSize as the end
+of every range, so the range containing that block asked for more bytes
+than the image has and the write failed with "Image ended before the
+block map did". Read ImageSize and clamp the end of each range to it.
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+Upstream-Status: Pending
+---
+ src/bmap.cpp         | 5 +++++
+ src/bmap.h           | 1 +
+ src/image_writer.cpp | 2 +-
+ src/main.cpp         | 2 +-
+ 4 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/bmap.cpp b/src/bmap.cpp
+index fabf2c2..0162ac0 100644
+--- a/src/bmap.cpp
++++ b/src/bmap.cpp
+@@ -135,6 +135,7 @@ int parseBMap(const std::string &filename, bmap_t& bmapData) {
+         bmapData.bmapVersion = (version != nullptr) ? trimWhitespace(version) : "unknown";
+ 
+         // Parse image information
++        bmapData.imageSize = requireChildUnsigned(p_root, "ImageSize");
+         bmapData.blocksTotal = requireChildUnsigned(p_root, "BlocksCount");
+         bmapData.blocksMapped = requireChildUnsigned(p_root, "MappedBlocksCount");
+         bmapData.blockSize = requireChildUnsigned(p_root, "BlockSize");
+@@ -200,6 +201,10 @@ int validateBmap(const bmap_t& bmap, uint64_t deviceSize) {
+         if (bmap.blocksTotal == 0) {
+             throw BmapError("BMAP: BlocksCount must not be zero");
+         }
++        if (bmap.imageSize > bmap.blocksTotal * bmap.blockSize ||
++            bmap.imageSize <= (bmap.blocksTotal - 1) * bmap.blockSize) {
++            throw BmapError("BMAP: ImageSize does not match BlocksCount and BlockSize");
++        }
+         if (bmap.blocksMapped > bmap.blocksTotal) {
+             throw BmapError("BMAP: MappedBlocksCount exceeds BlocksCount");
+         }
+diff --git a/src/bmap.h b/src/bmap.h
+index cf6ff9d..98cb969 100644
+--- a/src/bmap.h
++++ b/src/bmap.h
+@@ -38,6 +38,7 @@ struct bmap_t {
+     std::string checksumType;
+     size_t blockSize = 0;
+     size_t blocksTotal = 0;
++    size_t imageSize = 0;
+     size_t blocksMapped = 0;
+     std::string bmapVersion;
+     std::string bmapChecksum;
+diff --git a/src/image_writer.cpp b/src/image_writer.cpp
+index bb802ea..f864151 100644
+--- a/src/image_writer.cpp
++++ b/src/image_writer.cpp
+@@ -177,7 +177,7 @@ int BmapWriteImage(int fd, const bmap_t &bmap, int dev_fd, const std::string &de
+         for (const auto &range : bmap.ranges) {
+             // validateBmap() has already proven that none of this can overflow.
+             const size_t outStart = range.startBlock * bmap.blockSize;
+-            const size_t outEnd = (range.endBlock + 1) * bmap.blockSize;
++            const size_t outEnd = std::min((range.endBlock + 1) * bmap.blockSize, bmap.imageSize);
+             const size_t rangeSize = outEnd - outStart;
+             const off_t writeOffset = static_cast<off_t>(outStart);
+             size_t writtenSize = 0;
+diff --git a/src/main.cpp b/src/main.cpp
+index ca42c12..b8cbbc5 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
+     FdGuard imageGuard(image_fd);
+ 
+     std::cout << "BMAP format version: " << bmap.bmapVersion << std::endl;
+-    std::cout << "Image size: " << (bmap.blocksTotal * bmap.blockSize) << " bytes" << std::endl;
++    std::cout << "Image size: " << bmap.imageSize << " bytes" << std::endl;
+     std::cout << "Block size: " << bmap.blockSize << " bytes" << std::endl;
+     std::cout << "Mapped blocks: " << bmap.blocksMapped << " out of " << bmap.blocksTotal
+               << " (" << std::fixed << std::setprecision(1)
+-- 
+2.55.0
+

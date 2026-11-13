@@ -1,0 +1,42 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:01:07 +0000
+Subject: [PATCH] libbase: extend the off64_t compat typedef to musl
+
+android-base/off64_t.h already works around Apple's libc not
+providing the glibc LFS64 off64_t name by typedef'ing it to off_t.
+musl has the exact same situation -- it never defines the LFS64
+names because its off_t is already 64-bit -- but the guard only
+checked for __APPLE__, so building against musl failed:
+
+| system/libbase/mapped_file.cpp:47:67: error: unknown type name 'off64_t'; did you mean 'off_t'?
+| system/libbase/include/android-base/file.h:105:71: error: unknown type name 'off64_t'; did you mean 'off_t'?
+| system/libbase/include/android-base/mapped_file.h:50:61: error: unknown type name 'off64_t'; did you mean 'off_t'?
+
+Both file.h and mapped_file.h (and every .cpp that includes them)
+already pull in android-base/off64_t.h, so extending its guard to
+any non-glibc, non-bionic, non-Windows libc (i.e. musl) fixes all of
+these call sites in a single place.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ system/libbase/include/android-base/off64_t.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/system/libbase/include/android-base/off64_t.h b/system/libbase/include/android-base/off64_t.h
+index a4b7715..857ff29 100644
+--- a/system/libbase/include/android-base/off64_t.h
++++ b/system/libbase/include/android-base/off64_t.h
+@@ -16,7 +16,10 @@
+
+ #pragma once
+
+-#if defined(__APPLE__)
+-/** Mac OS has always had a 64-bit off_t, so it doesn't have off64_t. */
++#if defined(__APPLE__) || \
++    (!defined(__GLIBC__) && !defined(__BIONIC__) && !defined(_WIN32))
++/** Mac OS has always had a 64-bit off_t, so it doesn't have off64_t.
++ *  musl doesn't provide the glibc LFS64 off64_t name either, but its off_t
++ *  is already 64-bit, so the same typedef works there too. */
+ typedef off_t off64_t;
+ #endif

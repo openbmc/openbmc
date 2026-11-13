@@ -7,7 +7,6 @@ SECTION = "gnome"
 DEPENDS = " \
     desktop-file-utils-native \
     gtk+3 \
-    libcanberra \
     libdvdread \
     libnotify \
     libsecret \
@@ -27,6 +26,10 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
 # As soon as elogind is of interest this needs rework: meson option is combo
 PACKAGECONFIG[systemd] = "-Dlogind=libsystemd,-Dlogind=none,systemd"
+
+SRC_URI += "file://0001-Drop-the-libcanberra-gtk3-dependency.patch \
+            file://0002-disks-drop-the-unused-gdk-gdkx.h-include.patch \
+"
 
 SRC_URI[archive.sha256sum] = "c24e9439a04d70bcfae349ca134c7005435fe2b6f452114df878bff0b89bbffe"
 

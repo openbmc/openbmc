@@ -1,0 +1,131 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 29 Sep 2026 02:47:00 +0000
+Subject: [PATCH] daemon/auth: vendor a portable b64_pton() for non-glibc,
+ non-bionic libcs
+
+adbd's daemon/auth.cpp calls b64_pton() from <resolv.h> to decode a
+client's base64-encoded public key. Android.bp gets this on the Linux
+host build by linking -lresolv ("b64_pton" comment at host_ldlibs),
+and bionic (the Android target libc) provides its own. musl has
+neither the symbol nor a libresolv to link against, so building
+against musl failed:
+
+| daemon/auth.cpp:119:13: error: use of undeclared identifier 'b64_pton'
+| daemon/auth.cpp:166:13: error: use of undeclared identifier 'b64_pton'
+
+Vendor the standard BSD base64 decoder (the same implementation
+glibc's own resolv/base64.c is derived from) as a local static
+function, gated to only be used where the libc doesn't already
+provide it, rather than adding a new libresolv-equivalent dependency
+just for this one call site.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/packages/modules/adb/daemon/auth.cpp
++++ b/packages/modules/adb/daemon/auth.cpp
+@@ -22,6 +22,10 @@
+ #include <stdio.h>
+ #include <string.h>
+
++#if !defined(__GLIBC__) && !defined(__BIONIC__)
++#include <cctype>
++#endif
++
+ #include <algorithm>
+ #include <chrono>
+ #include <iomanip>
+@@ -49,6 +53,93 @@
+ #include "transport.h"
+ #include "types.h"
+
++#if !defined(__GLIBC__) && !defined(__BIONIC__)
++/*
++ * musl doesn't provide libresolv's b64_pton(): glibc gets it by linking
++ * -lresolv (see Android.bp's host_ldlibs) and bionic has its own, but musl
++ * has neither the symbol nor a libresolv to link. This is the standard BSD
++ * base64 decoder (the same one glibc's own resolv/base64.c is derived
++ * from), vendored here so this one call site doesn't need a new
++ * dependency.
++ */
++static int b64_pton(const char* src, uint8_t* target, size_t targsize) {
++    static const char Base64[] =
++        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
++    static const char Pad64 = '=';
++    int tarindex, state, ch;
++    const char* pos;
++
++    state = 0;
++    tarindex = 0;
++
++    while ((ch = *src++) != '\0') {
++        if (isspace(static_cast<unsigned char>(ch))) continue;
++
++        if (ch == Pad64) break;
++
++        pos = strchr(Base64, ch);
++        if (pos == nullptr) return -1;
++
++        switch (state) {
++            case 0:
++                if (target) {
++                    if (static_cast<size_t>(tarindex) >= targsize) return -1;
++                    target[tarindex] = (pos - Base64) << 2;
++                }
++                state = 1;
++                break;
++            case 1:
++                if (target) {
++                    if (static_cast<size_t>(tarindex) + 1 >= targsize) return -1;
++                    target[tarindex] |= (pos - Base64) >> 4;
++                    target[tarindex + 1] = ((pos - Base64) & 0x0f) << 4;
++                }
++                tarindex++;
++                state = 2;
++                break;
++            case 2:
++                if (target) {
++                    if (static_cast<size_t>(tarindex) + 1 >= targsize) return -1;
++                    target[tarindex] |= (pos - Base64) >> 2;
++                    target[tarindex + 1] = ((pos - Base64) & 0x03) << 6;
++                }
++                tarindex++;
++                state = 3;
++                break;
++            case 3:
++                if (target) {
++                    if (static_cast<size_t>(tarindex) >= targsize) return -1;
++                    target[tarindex] |= (pos - Base64);
++                }
++                tarindex++;
++                state = 0;
++                break;
++        }
++    }
++
++    if (ch == Pad64) {
++        if (state != 2 && state != 3) return -1;
++
++        if (state == 2) {
++            for ((void)(ch = *src++); isspace(static_cast<unsigned char>(ch));
++                 (void)(ch = *src++))
++                continue;
++            if (ch != Pad64) return -1;
++            (void)(ch = *src++);
++        }
++
++        while ((ch = *src++) != '\0') {
++            if (!isspace(static_cast<unsigned char>(ch))) break;
++        }
++        if (ch != '\0') return -1;
++    } else {
++        if (state != 0) return -1;
++    }
++
++    return tarindex;
++}
++#endif
++
+ using namespace adb::crypto;
+ using namespace adb::tls;
+ using namespace std::chrono_literals;

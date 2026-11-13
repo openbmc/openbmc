@@ -1,0 +1,121 @@
+From: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH] Fix build with musl
+
+- bind() and sendto() take a struct sockaddr pointer. glibc accepts other
+  sockaddr types in C via a transparent union, musl does not:
+
+    net.c:417:25: error: incompatible pointer types passing 'struct sockaddr_in *' to parameter of type 'const struct sockaddr *' [-Wincompatible-pointer-types]
+
+  Cast to struct sockaddr * instead.
+
+- pthread_attr_setaffinity_np() is a glibc extension musl does not have:
+
+    thread.c:67:8: error: call to undeclared function 'pthread_attr_setaffinity_np'
+
+  Without it, pin the thread with pthread_setaffinity_np() right after
+  creating it.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+diff --git a/src/log_json.c b/src/log_json.c
+index 5ac7e87..e13b1fe 100644
+--- a/src/log_json.c
++++ b/src/log_json.c
+@@ -44,11 +44,11 @@ static void log_json_add_traffic_class(struct log_json_thread_context *ctx,
+ 	switch (ctx->dest.ss_family) {
+ 	case AF_INET:
+ 		ret = sendto(ctx->socket, stat_message, strlen(stat_message), 0,
+-			     (struct sockaddr_in *)&ctx->dest, sizeof(struct sockaddr_in));
++			     (struct sockaddr *)&ctx->dest, sizeof(struct sockaddr_in));
+ 		break;
+ 	case AF_INET6:
+ 		ret = sendto(ctx->socket, stat_message, strlen(stat_message), 0,
+-			     (struct sockaddr_in6 *)&ctx->dest, sizeof(struct sockaddr_in6));
++			     (struct sockaddr *)&ctx->dest, sizeof(struct sockaddr_in6));
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+diff --git a/src/net.c b/src/net.c
+index 408920b..14d1e29 100644
+--- a/src/net.c
++++ b/src/net.c
+@@ -414,10 +414,10 @@ int create_udp_socket(const char *udp_destination, const char *udp_source, const
+ 
+ 	switch (source.ss_family) {
+ 	case AF_INET:
+-		ret = bind(socket_fd, (struct sockaddr_in *)&source, sizeof(struct sockaddr_in));
++		ret = bind(socket_fd, (struct sockaddr *)&source, sizeof(struct sockaddr_in));
+ 		break;
+ 	case AF_INET6:
+-		ret = bind(socket_fd, (struct sockaddr_in6 *)&source, sizeof(struct sockaddr_in6));
++		ret = bind(socket_fd, (struct sockaddr *)&source, sizeof(struct sockaddr_in6));
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+diff --git a/src/thread.c b/src/thread.c
+index a679164..635dda7 100644
+--- a/src/thread.c
++++ b/src/thread.c
+@@ -64,11 +64,13 @@ int create_rt_thread(pthread_t *task_id, int thread_priority, int cpu_core,
+ 
+ 	CPU_ZERO(&cpus);
+ 	CPU_SET(cpu_core, &cpus);
++#ifdef __GLIBC__
+ 	ret = pthread_attr_setaffinity_np(&attr, sizeof(cpus), &cpus);
+ 	if (ret) {
+ 		pthread_error(ret, "pthread_attr_setaffinity_np() failed");
+ 		goto err;
+ 	}
++#endif
+ 
+ 	ret = pthread_create(task_id, &attr, thread_routine, data);
+ 	if (ret) {
+@@ -76,6 +78,15 @@ int create_rt_thread(pthread_t *task_id, int thread_priority, int cpu_core,
+ 		goto err;
+ 	}
+ 
++#ifndef __GLIBC__
++	/* No pthread_attr_setaffinity_np() e.g. on musl, pin the new thread instead. */
++	ret = pthread_setaffinity_np(*task_id, sizeof(cpus), &cpus);
++	if (ret) {
++		pthread_error(ret, "pthread_setaffinity_np() failed");
++		goto err;
++	}
++#endif
++
+ 	ret = pthread_setname_np(*task_id, thread_name);
+ 	if (ret) {
+ 		pthread_error(ret, "pthread_setname_np() failed");
+diff --git a/src/udp_thread.c b/src/udp_thread.c
+index bcdd000..ffbeba9 100644
+--- a/src/udp_thread.c
++++ b/src/udp_thread.c
+@@ -68,11 +68,11 @@ static void udp_send_frame(struct thread_context *thread_context, const unsigned
+ 	switch (destination->ss_family) {
+ 	case AF_INET:
+ 		ret = sendto(socket_fd, frame_data, frame_length, 0,
+-			     (struct sockaddr_in *)destination, sizeof(struct sockaddr_in));
++			     (struct sockaddr *)destination, sizeof(struct sockaddr_in));
+ 		break;
+ 	case AF_INET6:
+ 		ret = sendto(socket_fd, frame_data, frame_length, 0,
+-			     (struct sockaddr_in6 *)destination, sizeof(struct sockaddr_in6));
++			     (struct sockaddr *)destination, sizeof(struct sockaddr_in6));
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -107,11 +107,11 @@ static void udp_gen_and_send_frame(struct thread_context *thread_context, unsign
+ 	switch (destination->ss_family) {
+ 	case AF_INET:
+ 		ret = sendto(socket_fd, frame_data, frame_length, 0,
+-			     (struct sockaddr_in *)destination, sizeof(struct sockaddr_in));
++			     (struct sockaddr *)destination, sizeof(struct sockaddr_in));
+ 		break;
+ 	case AF_INET6:
+ 		ret = sendto(socket_fd, frame_data, frame_length, 0,
+-			     (struct sockaddr_in6 *)destination, sizeof(struct sockaddr_in6));
++			     (struct sockaddr *)destination, sizeof(struct sockaddr_in6));
+ 		break;
+ 	default:
+ 		ret = -EINVAL;

@@ -1,0 +1,42 @@
+From c7072f4dd8cf7d8d19103d5c5709610ce1b932c1 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Thu, 24 Sep 2026 11:57:34 +1000
+Subject: [PATCH] qcow: Fix infinite loop
+
+The loop over l2_cache_counts increments `j`, but runs checks against
+`i`, meaning that the loop never breaks.
+
+This was caught by clang: error: variable 'i' used in loop
+condition not modified in loop body [-Werror,-Wfor-loop-analysis]
+
+Upstream-Status: Submitted [https://github.com/open-iscsi/tcmu-runner/pull/714]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ qcow.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/qcow.c b/qcow.c
+index 56f16e9..9c123a8 100644
+--- a/qcow.c
++++ b/qcow.c
+@@ -728,7 +728,7 @@ static uint64_t *l2_cache_lookup(struct qcow_state *s, uint64_t l2_offset)
+ 	for (i = 0; i < L2_CACHE_SIZE; i++) {
+ 		if (l2_offset == s->l2_cache_offsets[i]) {
+ 			if (++s->l2_cache_counts[i] == INT_MAX) {
+-				for (j = 0; i < L2_CACHE_SIZE; j++) {
++				for (j = 0; j < L2_CACHE_SIZE; j++) {
+ 					s->l2_cache_counts[j] >>= 1;
+ 				}
+ 			}
+@@ -872,7 +872,7 @@ static void *rc_cache_lookup(struct qcow_state *s, uint64_t rc_offset)
+ 	for (i = 0; i < RC_CACHE_SIZE; i++) {
+ 		if (rc_offset == s->rc_cache_offsets[i]) {
+ 			if (++s->rc_cache_counts[i] == INT_MAX) {
+-				for (j = 0; i < RC_CACHE_SIZE; j++) {
++				for (j = 0; j < RC_CACHE_SIZE; j++) {
+ 					s->rc_cache_counts[j] >>= 1;
+ 				}
+ 			}
+-- 
+2.55.0
+

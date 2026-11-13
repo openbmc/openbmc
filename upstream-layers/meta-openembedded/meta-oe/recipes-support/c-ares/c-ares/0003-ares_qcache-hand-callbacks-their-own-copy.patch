@@ -1,0 +1,1054 @@
+From a21160045f9d7039225fa285be7cb1b02173a3a5 Mon Sep 17 00:00:00 2001
+From: Brad House <brad@brad-house.com>
+Date: Sun, 18 Oct 2026 22:12:09 -0400
+Subject: [PATCH] [Backport v1.34] ares_qcache: hand callbacks their own copy
+ of a cached answer (#1339)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Backport of 31e2f51e8715d418fa8272a6c3a1ee651917fec5 (`ares_qcache: hand
+callbacks their own copy of a cached answer`) to `v1.34`. See that
+commit for the full description.
+
+**Conflicts:**
+- `ares_private.h`: alignment only; formatted with `v1.34`'s
+`.clang-format`.
+- `test/ares-test-internal.cc`: context only — on `main` the new
+`QcacheKeyDistinguishesQuestions` test follows the IDNA/punycode tests
+(#1031), which are not on `v1.34`, so it is placed after the URI test
+instead.
+
+**Test fixes from #1334:** carries the part of #1334 that applies to the
+tests this introduces — `ReentrantFlushInCallbackNoUseAfterFree`
+reconfigures to `127.0.0.1:53055` instead of `127.0.0.55` (only routable
+on Linux), and `UnknownQueryTypesDoNotShareCacheEntries` drops
+`static_cast<ns_type>`, which does not compile on OpenBSD.
+
+Test file contents match `main`. Independent of the dd62bdfc backport
+(#1338); applies cleanly with or without it.
+
+The full non-live suite passes 650/650 under ASAN+UBSAN and with
+`-DCARES_WERROR=ON` on macOS. `ReentrantFlushInCallbackNoUseAfterFree`
+is a heap-use-after-free in `ares_dns_record_rr_cnt()` on `v1.34`
+without this change, and passes with it.
+
+Signed-off-by: Brad House <brad@brad-house.com>
+Upstream-Status: Backport [https://github.com/c-ares/c-ares/commit/a21160045f9d7039225fa285be7cb1b02173a3a5]
+GHSA: GHSA-grv7-fq5q-9vfc, GHSA-wrgc-prmw-27xh
+---
+ docs/ares_init_options.3   |  11 +-
+ src/lib/ares_private.h     |  44 +++-
+ src/lib/ares_process.c     |   1 +
+ src/lib/ares_qcache.c      | 212 ++++++++++++++++---
+ src/lib/ares_send.c        |  47 ++++-
+ test/ares-test-internal.cc |  54 +++++
+ test/ares-test-mock.cc     | 419 +++++++++++++++++++++++++++++++++++++
+ 7 files changed, 743 insertions(+), 45 deletions(-)
+
+diff --git a/docs/ares_init_options.3 b/docs/ares_init_options.3
+index e6f6ee8ba6..1ce7fb8e30 100644
+--- a/docs/ares_init_options.3
++++ b/docs/ares_init_options.3
+@@ -324,7 +324,16 @@ with the maximum number of seconds a query result may be cached which will
+ override a larger TTL in the response message. This must be a non-zero value
+ otherwise the cache will be disabled. Choose a reasonable value for your
+ application such as 300 (5 minutes) or 3600 (1 hour).  The query cache is
+-automatically flushed if a server configuration change is made.
++automatically flushed if a server configuration change is made.  As of c-ares
++1.35.0, and c-ares 1.34.9 on the 1.34 branch, a cached answer reports its
++remaining time to live rather than the
++original value received from the server, so TTLs returned on a cache hit
++decrease as the entry ages.  Two lookups share a cached answer only if their
++EDNS state matches: the version, the flag bits including DNSSEC OK, and every
++EDNS option other than the DNS cookie and the advertised UDP payload size,
++which are both ignored.  Options are compared in the order the application
++added them.  An application that attaches its own options and varies them
++between otherwise identical lookups gets a separate cache entry for each.
+ .br
+ .TP 18
+ .B ARES_OPT_EVENT_THREAD
+diff --git a/src/lib/ares_private.h b/src/lib/ares_private.h
+index 9610ba7dab..dd06d303b8 100644
+--- a/src/lib/ares_private.h
++++ b/src/lib/ares_private.h
+@@ -153,6 +153,9 @@ struct ares_query {
+   ares_timeval_t       ts; /*!< Timestamp query was sent */
+   ares_timeval_t       timeout;
+   ares_channel_t      *channel;
++  /*! Query cache key, derived from the caller's request before the send path
++   *  can mutate query->query.  NULL when the cache is disabled. */
++  char                *qcache_key;
+ 
+   /*
+    * Node object for each list entry the query belongs to in order to
+@@ -718,14 +721,47 @@ ares_status_t ares_qcache_create(ares_rand_state *rand_state,
+                                  unsigned int     max_ttl,
+                                  ares_qcache_t  **cache_out);
+ void          ares_qcache_flush(ares_qcache_t *cache);
++/*! Derive the query cache key for a request.  Caller owns the result.
++ *
++ *  \param[in] dnsrec  Request to derive the key from.
++ *  \return allocated key, or NULL on failure.
++ */
++char         *ares_qcache_calc_key(const ares_dns_record_t *dnsrec);
++
++/*! Insert a response into the query cache.
++ *
++ *  \param[in] channel  Initialized channel object.
++ *  \param[in] now      Current timestamp.
++ *  \param[in] query    Query the response answers.  Its cache key, derived
++ *                      when the query was created, becomes the entry key; a
++ *                      NULL key means caching is switched off.
++ *  \param[in] dnsrec   Response to cache.  Duplicated internally; the caller
++ *                      retains ownership.
++ *  \return ARES_SUCCESS if cached, ARES_ENOTIMP if caching is off or the
++ *          response is not cacheable, otherwise another status.
++ */
+ ares_status_t ares_qcache_insert(ares_channel_t          *channel,
+                                  const ares_timeval_t    *now,
+                                  const ares_query_t      *query,
+                                  const ares_dns_record_t *dnsrec);
+-ares_status_t ares_qcache_fetch(ares_channel_t           *channel,
+-                                const ares_timeval_t     *now,
+-                                const ares_dns_record_t  *dnsrec,
+-                                const ares_dns_record_t **dnsrec_resp);
++/*! Fetch a cached answer for a request.
++ *
++ *  \param[in]  channel      Initialized channel object.
++ *  \param[in]  now          Current timestamp.
++ *  \param[in]  key          Cache key for the request, as produced by
++ *                           ares_qcache_calc_key().  Owned by the caller.
++ *  \param[out] dnsrec_resp  On ARES_SUCCESS, the cached answer, owned by the
++ *                           caller and destroyed with
++ *                           ares_dns_record_destroy().  Set to NULL on any
++ *                           other status, except ARES_EFORMERR, which is
++ *                           returned by the argument check before this is
++ *                           touched.
++ *  \return ARES_SUCCESS on a hit, ARES_ENOTFOUND on a miss, ARES_EFORMERR on
++ *          invalid arguments.
++ */
++ares_status_t ares_qcache_fetch(ares_channel_t       *channel,
++                                const ares_timeval_t *now, const char *key,
++                                ares_dns_record_t **dnsrec_resp);
+ 
+ void   ares_metrics_record(const ares_query_t *query, ares_server_t *server,
+                            ares_status_t status, const ares_dns_record_t *dnsrec);
+diff --git a/src/lib/ares_process.c b/src/lib/ares_process.c
+index 1569408b1b..88536704ad 100644
+--- a/src/lib/ares_process.c
++++ b/src/lib/ares_process.c
+@@ -1859,6 +1859,7 @@ void ares_free_query(ares_query_t *query)
+   query->arg      = NULL;
+   /* Deallocate the memory associated with the query */
+   ares_dns_record_destroy(query->query);
++  ares_free(query->qcache_key);
+ 
+   ares_free(query);
+ }
+diff --git a/src/lib/ares_qcache.c b/src/lib/ares_qcache.c
+index ad3bc83505..f48669b56c 100644
+--- a/src/lib/ares_qcache.c
++++ b/src/lib/ares_qcache.c
+@@ -38,7 +38,7 @@ typedef struct {
+   time_t             insert_ts;
+ } ares_qcache_entry_t;
+ 
+-static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
++char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+ {
+   ares_buf_t      *buf = ares_buf_create();
+   size_t           i;
+@@ -49,7 +49,22 @@ static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+     return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */
+   }
+ 
+-  /* Format is OPCODE|FLAGS[|QTYPE1|QCLASS1|QNAME1]... */
++  /* Format is
++   * OPCODE|FLAGS[|EDNS|VER|FLAGS[|ID:HEX]...]|QDCOUNT[|TYPE|CLASS|LEN:QNAME]...
++   *
++   * The EDNS section matters: an answer fetched under one set of EDNS options
++   * is not interchangeable with one fetched under another.  A request with no
++   * OPT record appends nothing; note that EDNS is on by default, so ordinary
++   * lookups do carry one and their keys did change with this.
++   *
++   * Everything a caller does not control is emitted before the questions, so
++   * the names are always last.  A name reaches the key unescaped, so anything
++   * keyed after it could otherwise be imitated by a name containing that same
++   * text, giving two different requests one key.  The question count is part
++   * of that: without it, a request with two questions and a request with one
++   * whose name spells out the second produce identical keys.  Each name is
++   * also length-prefixed, so adjacent names cannot be made to run together
++   * even when the question counts match. */
+ 
+   status = ares_buf_append_str(
+     buf, ares_dns_opcode_tostr(ares_dns_record_get_opcode(dnsrec)));
+@@ -63,7 +78,11 @@ static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+   }
+ 
+   flags = ares_dns_record_get_flags(dnsrec);
+-  /* Only care about RD and CD */
++  /* RD, CD and AD.  AD is here because RFC 6840 section 5.7 defines it in a
++   * request as a signal that the requester wants the AD bit evaluated in the
++   * response, and section 5.8 says a validating resolver should only set AD
++   * in a response when the request carried DO or AD -- so an answer fetched
++   * without it can legitimately differ from one fetched with it. */
+   if (flags & ARES_FLAG_RD) {
+     status = ares_buf_append_str(buf, "rd");
+     if (status != ARES_SUCCESS) {
+@@ -76,6 +95,95 @@ static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+       goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
+     }
+   }
++  if (flags & ARES_FLAG_AD) {
++    status = ares_buf_append_str(buf, "ad");
++    if (status != ARES_SUCCESS) {
++      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++    }
++  }
++
++  /* EDNS state.  Skipped entirely when the request carries no OPT record. */
++  {
++    const ares_dns_rr_t *opt = ares_dns_get_opt_rr_const(dnsrec);
++
++    if (opt != NULL) {
++      size_t opt_cnt = ares_dns_rr_get_opt_cnt(opt, ARES_RR_OPT_OPTIONS);
++      size_t j;
++
++      status = ares_buf_append_str(buf, "|EDNS|");
++      if (status != ARES_SUCCESS) {
++        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++      }
++      status = ares_buf_append_num_hex(
++        buf, ares_dns_rr_get_u8(opt, ARES_RR_OPT_VERSION), 0);
++      if (status != ARES_SUCCESS) {
++        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++      }
++      status = ares_buf_append_byte(buf, '|');
++      if (status != ARES_SUCCESS) {
++        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++      }
++      /* Carries the DO bit, so a DNSSEC-aware request cannot be served an
++       * answer that was fetched without it. */
++      status = ares_buf_append_num_hex(
++        buf, ares_dns_rr_get_u16(opt, ARES_RR_OPT_FLAGS), 0);
++      if (status != ARES_SUCCESS) {
++        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++      }
++
++      /* The advertised UDP payload size is deliberately excluded: it
++       * constrains how a response is transported, not what it says.  A server
++       * that cannot fit the additional section may omit it without setting
++       * the TC bit (RFC 2181 section 9), so two sizes can produce answers
++       * that differ outside the answer section; that is accepted here. */
++      for (j = 0; j < opt_cnt; j++) {
++        const unsigned char *val     = NULL;
++        size_t               val_len = 0;
++        unsigned short       optid =
++          ares_dns_rr_get_opt(opt, ARES_RR_OPT_OPTIONS, j, &val, &val_len);
++
++        /* DNS cookies are per-server transport state and say nothing about
++         * the content of an answer.  A cookie c-ares adds never reaches here
++         * -- ares_cookie_apply() writes to query->query, after this key has
++         * been derived -- so this only ever skips one the caller supplied. */
++        if (optid == ARES_OPT_PARAM_COOKIE) {
++          continue;
++        }
++
++        status = ares_buf_append_byte(buf, '|');
++        if (status != ARES_SUCCESS) {
++          goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++        }
++        status = ares_buf_append_num_hex(buf, optid, 0);
++        if (status != ARES_SUCCESS) {
++          goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++        }
++        status = ares_buf_append_byte(buf, ':');
++        if (status != ARES_SUCCESS) {
++          goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++        }
++        if (val != NULL) {
++          size_t k;
++          for (k = 0; k < val_len; k++) {
++            status = ares_buf_append_num_hex(buf, val[k], 2);
++            if (status != ARES_SUCCESS) {
++              goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++            }
++          }
++        }
++      }
++    }
++  }
++
++  status = ares_buf_append_byte(buf, '|');
++  if (status != ARES_SUCCESS) {
++    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++  }
++
++  status = ares_buf_append_num_dec(buf, ares_dns_record_query_cnt(dnsrec), 0);
++  if (status != ARES_SUCCESS) {
++    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++  }
+ 
+   for (i = 0; i < ares_dns_record_query_cnt(dnsrec); i++) {
+     const char         *name;
+@@ -93,7 +201,13 @@ static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+       goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
+     }
+ 
+-    status = ares_buf_append_str(buf, ares_dns_rec_type_tostr(qtype));
++    /* Numeric, not the mnemonic: ares_dns_rec_type_tostr() returns "UNKNOWN"
++     * for every type outside its table, and ares_dns_record_query_add() does
++     * not validate the type, so any 16-bit value reaches here through the
++     * ordinary public API.  Two such lookups -- LOC and DNAME, say -- would
++     * otherwise key identically and be answered with each other's records.
++     * The key only has to be injective, not readable. */
++    status = ares_buf_append_num_dec(buf, (size_t)qtype, 0);
+     if (status != ARES_SUCCESS) {
+       goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
+     }
+@@ -103,7 +217,10 @@ static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+       goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
+     }
+ 
+-    status = ares_buf_append_str(buf, ares_dns_class_tostr(qclass));
++    /* Numeric for the same reason.  ares_dns_record_query_add() does reject
++     * classes outside its list today, so the mnemonic is safe -- but the key
++     * should not depend on that validation staying where it is. */
++    status = ares_buf_append_num_dec(buf, (size_t)qclass, 0);
+     if (status != ARES_SUCCESS) {
+       goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
+     }
+@@ -121,6 +238,21 @@ static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)
+       name_len--;
+     }
+ 
++    /* Length-prefix the name so it is self-delimiting.  The question count
++     * above stops one question imitating two, but with the counts equal the
++     * boundary between adjacent names is still guessable, since names reach
++     * the key unescaped separated only by '|'.  A length makes each name
++     * unambiguous for any question count. */
++    status = ares_buf_append_num_dec(buf, name_len, 0);
++    if (status != ARES_SUCCESS) {
++      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++    }
++
++    status = ares_buf_append_byte(buf, ':');
++    if (status != ARES_SUCCESS) {
++      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
++    }
++
+     if (name_len > 0) {
+       status = ares_buf_append(buf, (const unsigned char *)name, name_len);
+       if (status != ARES_SUCCESS) {
+@@ -301,10 +433,10 @@ static unsigned int ares_qcache_soa_minimum(ares_dns_record_t *dnsrec)
+ }
+ 
+ /* On success, takes ownership of dnsrec */
+-static ares_status_t ares_qcache_insert_int(ares_qcache_t           *qcache,
+-                                            ares_dns_record_t       *qresp,
+-                                            const ares_dns_record_t *qreq,
+-                                            const ares_timeval_t    *now)
++static ares_status_t ares_qcache_insert_int(ares_qcache_t        *qcache,
++                                            ares_dns_record_t    *qresp,
++                                            const char           *key,
++                                            const ares_timeval_t *now)
+ {
+   ares_qcache_entry_t *entry;
+   unsigned int         ttl;
+@@ -350,11 +482,11 @@ static ares_status_t ares_qcache_insert_int(ares_qcache_t           *qcache,
+   entry->expire_ts = (time_t)now->sec + (time_t)ttl;
+   entry->insert_ts = (time_t)now->sec;
+ 
+-  /* We can't guarantee the server responded with the same flags as the
+-   * request had, so we have to re-parse the request in order to generate the
+-   * key for caching, but we'll only do this once we know for sure we really
+-   * want to cache it */
+-  entry->key = ares_qcache_calc_key(qreq);
++  /* The key was derived from the caller's request when the query was created.
++   * It must not be recomputed from query->query here: the EDNS fallback path
++   * strips the OPT record from that record before a successful retry, so a
++   * key derived from it would not match the one a later lookup computes. */
++  entry->key = ares_strdup(key);
+   if (entry->key == NULL) {
+     goto fail; /* LCOV_EXCL_LINE: OutOfMemory */
+   }
+@@ -382,31 +514,25 @@ static ares_status_t ares_qcache_insert_int(ares_qcache_t           *qcache,
+   /* LCOV_EXCL_STOP */
+ }
+ 
+-ares_status_t ares_qcache_fetch(ares_channel_t           *channel,
+-                                const ares_timeval_t     *now,
+-                                const ares_dns_record_t  *dnsrec,
+-                                const ares_dns_record_t **dnsrec_resp)
++ares_status_t ares_qcache_fetch(ares_channel_t       *channel,
++                                const ares_timeval_t *now, const char *key,
++                                ares_dns_record_t **dnsrec_resp)
+ {
+-  char                *key = NULL;
+   ares_qcache_entry_t *entry;
+   ares_status_t        status = ARES_SUCCESS;
+ 
+-  if (channel == NULL || dnsrec == NULL || dnsrec_resp == NULL) {
++  if (channel == NULL || key == NULL || dnsrec_resp == NULL) {
+     return ARES_EFORMERR;
+   }
+ 
++  *dnsrec_resp = NULL;
++
+   if (channel->qcache == NULL) {
+     return ARES_ENOTFOUND;
+   }
+ 
+   ares_qcache_expire(channel->qcache, now);
+ 
+-  key = ares_qcache_calc_key(dnsrec);
+-  if (key == NULL) {
+-    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */
+-    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */
+-  }
+-
+   entry = ares_htable_strvp_get_direct(channel->qcache->cache, key);
+   if (entry == NULL) {
+     status = ARES_ENOTFOUND;
+@@ -416,10 +542,24 @@ ares_status_t ares_qcache_fetch(ares_channel_t           *channel,
+   ares_dns_record_ttl_decrement(entry->dnsrec,
+                                 (unsigned int)(now->sec - entry->insert_ts));
+ 
+-  *dnsrec_resp = entry->dnsrec;
++  /* Hand back a copy the caller owns rather than the cache's own record.
++   * This is passed straight into an application callback, and that callback
++   * is allowed to re-enter c-ares.  Any lookup it starts runs the expiry
++   * reaper first, and changing the server list flushes the cache outright --
++   * either would destroy this entry while the callback still held a pointer
++   * into it.  Mirrors the ownership fix already made on the insert side. */
++  status = ares_dns_record_duplicate_ex(dnsrec_resp, entry->dnsrec);
++  if (status != ARES_SUCCESS) {
++    /* Could not hand back a private copy.  Report a miss so the lookup falls
++     * through to a real query rather than failing outright: duplication
++     * writes and re-parses the record, so it can fail for reasons other than
++     * memory exhaustion, and none of them are a reason to fail a lookup that
++     * would have gone to a server a moment earlier. */
++    status = ARES_ENOTFOUND; /* LCOV_EXCL_LINE: UntestablePath */
++    goto done;               /* LCOV_EXCL_LINE: UntestablePath */
++  }
+ 
+ done:
+-  ares_free(key);
+   return status;
+ }
+ 
+@@ -428,13 +568,25 @@ ares_status_t ares_qcache_insert(ares_channel_t          *channel,
+                                  const ares_query_t      *query,
+                                  const ares_dns_record_t *dnsrec)
+ {
+-  ares_dns_record_t *dupdns = ares_dns_record_duplicate(dnsrec);
++  ares_dns_record_t *dupdns;
+   ares_status_t      status;
+ 
++  /* Checked before the duplicate below, which is a full write and re-parse:
++   * no key means caching is switched off, so the copy would be thrown away.
++   * ares_init_options() always creates the cache object -- it is disabled by
++   * a zero maximum TTL, not by a NULL pointer -- so this is the only place
++   * the distinction is visible here. */
++  if (query->qcache_key == NULL) {
++    return ARES_ENOTIMP;
++  }
++
++  dupdns = ares_dns_record_duplicate(dnsrec);
+   if (dupdns == NULL) {
+     return ARES_ENOMEM;
+   }
+-  status = ares_qcache_insert_int(channel->qcache, dupdns, query->query, now);
++
++  status =
++    ares_qcache_insert_int(channel->qcache, dupdns, query->qcache_key, now);
+   if (status != ARES_SUCCESS) {
+     ares_dns_record_destroy(dupdns);
+   }
+diff --git a/src/lib/ares_send.c b/src/lib/ares_send.c
+index dd4a28544b..117745ce28 100644
+--- a/src/lib/ares_send.c
++++ b/src/lib/ares_send.c
+@@ -111,11 +111,12 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+                                ares_callback_dnsrec callback, void *arg,
+                                unsigned short *qid)
+ {
+-  ares_query_t            *query;
+-  ares_timeval_t           now;
+-  ares_status_t            status;
+-  unsigned short           id          = generate_unique_qid(channel);
+-  const ares_dns_record_t *dnsrec_resp = NULL;
++  ares_query_t      *query;
++  ares_timeval_t     now;
++  ares_status_t      status;
++  unsigned short     id          = generate_unique_qid(channel);
++  ares_dns_record_t *dnsrec_resp = NULL;
++  char              *qcache_key  = NULL;
+ 
+   /* A channel being destroyed accepts no new queries.  ares_destroy(3)
+    * documents that a callback must not add new requests to a channel being
+@@ -145,13 +146,28 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+     return ARES_ENOSERVER;
+   }
+ 
+-  if (!(flags & ARES_SEND_FLAG_NOCACHE)) {
++  /* Derive the cache key once, from the caller's request, and only when the
++   * cache is actually on.  The send path may mutate query->query afterwards
++   * -- the EDNS fallback strips its OPT record -- and a key derived from it
++   * later would not match.  ares_init_options() always creates the cache
++   * object, so a zero maximum TTL is what "off" means. */
++  if (channel->qcache_max_ttl > 0) {
++    qcache_key = ares_qcache_calc_key(dnsrec);
++    if (qcache_key == NULL) {
++      callback(arg, ARES_ENOMEM, 0, NULL); /* LCOV_EXCL_LINE: OutOfMemory */
++      return ARES_ENOMEM;                  /* LCOV_EXCL_LINE: OutOfMemory */
++    }
++  }
++
++  if (qcache_key != NULL && !(flags & ARES_SEND_FLAG_NOCACHE)) {
+     /* Check query cache */
+-    status = ares_qcache_fetch(channel, &now, dnsrec, &dnsrec_resp);
++    status = ares_qcache_fetch(channel, &now, qcache_key, &dnsrec_resp);
+     if (status != ARES_ENOTFOUND) {
+       /* ARES_SUCCESS means we retrieved the cache, anything else is a critical
+        * failure, all result in termination */
++      ares_free(qcache_key);
+       callback(arg, status, 0, dnsrec_resp);
++      ares_dns_record_destroy(dnsrec_resp);
+       return status;
+     }
+   }
+@@ -159,8 +175,11 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+   /* Allocate space for query and allocated fields. */
+   query = ares_malloc(sizeof(ares_query_t));
+   if (!query) {
+-    callback(arg, ARES_ENOMEM, 0, NULL); /* LCOV_EXCL_LINE: OutOfMemory */
+-    return ARES_ENOMEM;                  /* LCOV_EXCL_LINE: OutOfMemory */
++    /* LCOV_EXCL_START: OutOfMemory */
++    ares_free(qcache_key);
++    callback(arg, ARES_ENOMEM, 0, NULL);
++    return ARES_ENOMEM;
++    /* LCOV_EXCL_STOP */
+   }
+   memset(query, 0, sizeof(*query));
+ 
+@@ -173,6 +192,10 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+     (channel->flags & ARES_FLAG_USEVC) ? ARES_TRUE : ARES_FALSE;
+ 
+   /* Duplicate Query */
++  /* The query adopts the key derived above; ares_free_query() releases it. */
++  query->qcache_key = qcache_key;
++  qcache_key        = NULL;
++
+   status = ares_dns_record_duplicate_ex(&query->query, dnsrec);
+   if (status != ARES_SUCCESS) {
+     /* Sometimes we might get a EBADRESP response from duplicate due to
+@@ -180,7 +203,11 @@ ares_status_t ares_send_nolock(ares_channel_t *channel, ares_server_t *server,
+     if (status == ARES_EBADRESP) {
+       status = ARES_EBADQUERY;
+     }
+-    ares_free(query);
++    /* ares_free_query() rather than ares_free(): the query was zeroed above,
++     * so detaching finds every node NULL and the qid not yet registered, and
++     * it also releases qcache_key.  Reachable without memory pressure -- a
++     * name that is not a valid hostname fails the duplicate. */
++    ares_free_query(query);
+     callback(arg, status, 0, NULL);
+     return status;
+   }
+diff --git a/test/ares-test-internal.cc b/test/ares-test-internal.cc
+index 8881f3b7cc..5ba5d2b39b 100644
+--- a/test/ares-test-internal.cc
++++ b/test/ares-test-internal.cc
+@@ -502,6 +502,60 @@ TEST_F(LibraryTest, URI) {
+   EXPECT_NE(ARES_SUCCESS, ares_uri_parse_buf(NULL, NULL));
+   EXPECT_NE(ARES_SUCCESS, ares_uri_parse_buf(NULL, NULL));
+ }
++
++// The cache key must distinguish requests whose answers are not
++// interchangeable.  Two shapes are easy to get wrong because names reach the
++// key unescaped: a request with two questions versus one whose name spells out
++// the second, and two requests with the same question count whose names can be
++// made to run together.  Both are narrow to reach -- they need a hand-built
++// record with more than one question, which real servers reject -- but the key
++// asserts they are distinct, so pin it.
++TEST_F(LibraryTest, QcacheKeyDistinguishesQuestions) {
++  struct qcase {
++    const char *n1;
++    const char *n2; /* nullptr for a single-question record */
++  };
++  const qcase cases[] = {
++    { "one.example.net",                      "two.example.net"                        },
++    { "one.example.net|A|IN|two.example.net", nullptr                                  },
++    { "one.example.net",                      "two.example.net|A|IN|three.example.net" },
++    { "one.example.net|A|IN|two.example.net", "three.example.net"                      },
++  };
++  std::vector<std::string> keys;
++
++  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
++    ares_dns_record_t *req = nullptr;
++    char              *key = nullptr;
++
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_create(&req, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                     ARES_RCODE_NOERROR));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_query_add(req, cases[i].n1, ARES_REC_TYPE_A,
++                                        ARES_CLASS_IN));
++    if (cases[i].n2 != nullptr) {
++      EXPECT_EQ(ARES_SUCCESS,
++                ares_dns_record_query_add(req, cases[i].n2, ARES_REC_TYPE_A,
++                                          ARES_CLASS_IN));
++    }
++
++    key = ares_qcache_calc_key(req);
++    ASSERT_NE(nullptr, key);
++    keys.push_back(std::string(key));
++    ares_free_string(key);
++    ares_dns_record_destroy(req);
++  }
++
++  /* Every one of these is a different request, so every key must differ. */
++  for (size_t i = 0; i < keys.size(); i++) {
++    for (size_t j = i + 1; j < keys.size(); j++) {
++      EXPECT_NE(keys[i], keys[j])
++        << "cache key collision between case " << i << " and case " << j
++        << ": " << keys[i];
++    }
++  }
++}
++
+ #endif /* !CARES_SYMBOL_HIDING */
+ 
+ TEST_F(LibraryTest, InetPtoN) {
+diff --git a/test/ares-test-mock.cc b/test/ares-test-mock.cc
+index b848c02434..4b409db7c3 100644
+--- a/test/ares-test-mock.cc
++++ b/test/ares-test-mock.cc
+@@ -611,6 +611,425 @@ class CacheQueriesTest
+   struct ares_options opts_;
+ };
+ 
++// A cache hit used to hand the callback a pointer to the cache's own record.
++// That is fine only while the callback does nothing else -- but re-entering
++// c-ares from a callback is documented as allowed, and two ordinary things a
++// callback might do destroy the entry underneath it: changing the server list
++// flushes the whole cache, and starting another lookup runs the expiry reaper
++// first.  The record must therefore be the caller's own copy.
++//
++// Here the callback changes the server list, which flushes the cache, and then
++// reads the record it was handed.
++struct QcacheReentrantCbData {
++  ares_channel_t *channel;
++  bool            done;
++  size_t          ancount;
++};
++
++static void QcacheReentrantCallback(void *arg, ares_status_t status,
++                                    size_t timeouts,
++                                    const ares_dns_record_t *dnsrec) {
++  QcacheReentrantCbData *data = static_cast<QcacheReentrantCbData *>(arg);
++  (void)timeouts;
++  data->done = true;
++  if (status != ARES_SUCCESS || dnsrec == NULL) {
++    return;
++  }
++  /* Documented re-entry.  Reconfiguring servers flushes the query cache. */
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_set_servers_csv(data->channel, "127.0.0.1:53055"));
++  /* Still inside the callback, so this record must still be readable. */
++  data->ancount = ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER);
++}
++
++TEST_P(CacheQueriesTest, ReentrantFlushInCallbackNoUseAfterFree) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {2, 3, 4, 5}));
++  ON_CALL(server_, OnRequest("www.google.com", T_A))
++    .WillByDefault(SetReply(&server_, &rsp));
++
++  /* Populate the cache. */
++  QueryResult first;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QueryCallback, &first, NULL);
++  Process();
++  EXPECT_TRUE(first.done_);
++
++  /* Served from the cache, so the callback runs synchronously holding the
++   * record the cache handed it. */
++  QcacheReentrantCbData data;
++  data.channel = channel_;
++  data.done    = false;
++  data.ancount = 0;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QcacheReentrantCallback, &data, NULL);
++
++  EXPECT_TRUE(data.done);
++  EXPECT_EQ((size_t)1, data.ancount);
++}
++
++// The cache key covered the question and a couple of header flags but ignored
++// the request's OPT record entirely, so two requests differing only in their
++// EDNS options collided.  An answer obtained under one set of options is not
++// interchangeable with one obtained under another -- most obviously, a request
++// with the DO bit set must not be handed an answer fetched without it.
++//
++// Both requests here ask the identical question; only the EDNS state differs,
++// so the server must see two of them.
++TEST_P(CacheQueriesTest, EdnsOptionsSeparateCacheEntries) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {2, 3, 4, 5}));
++  EXPECT_CALL(server_, OnRequest("www.google.com", T_A))
++    .Times(2)
++    .WillRepeatedly(SetReply(&server_, &rsp));
++
++  /* First: no OPT record at all. */
++  ares_dns_record_t *req1 = nullptr;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_create(&req1, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                   ARES_RCODE_NOERROR));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_query_add(req1, "www.google.com", ARES_REC_TYPE_A,
++                                      ARES_CLASS_IN));
++  QueryResult r1;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_send_dnsrec(channel_, req1, QueryCallback, &r1, nullptr));
++  Process();
++  EXPECT_TRUE(r1.done_);
++  EXPECT_EQ(ARES_SUCCESS, r1.status_);
++
++  /* Second: same question, but carrying EDNS with the DO bit set. */
++  ares_dns_record_t *req2 = nullptr;
++  ares_dns_rr_t     *opt  = nullptr;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_create(&req2, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                   ARES_RCODE_NOERROR));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_query_add(req2, "www.google.com", ARES_REC_TYPE_A,
++                                      ARES_CLASS_IN));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_rr_add(&opt, req2, ARES_SECTION_ADDITIONAL, "",
++                                   ARES_REC_TYPE_OPT, ARES_CLASS_IN, 0));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_rr_set_u16(opt, ARES_RR_OPT_UDP_SIZE, 1232));
++  EXPECT_EQ(ARES_SUCCESS, ares_dns_rr_set_u8(opt, ARES_RR_OPT_VERSION, 0));
++  /* DO */
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_rr_set_u16(opt, ARES_RR_OPT_FLAGS, 0x8000));
++
++  QueryResult r2;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_send_dnsrec(channel_, req2, QueryCallback, &r2, nullptr));
++  Process();
++  EXPECT_TRUE(r2.done_);
++  EXPECT_EQ(ARES_SUCCESS, r2.status_);
++
++  ares_dns_record_destroy(req1);
++  ares_dns_record_destroy(req2);
++}
++
++// The test above sets the DO bit, which lives in the OPT flags -- it never
++// reaches the loop that keys the individual EDNS options.  That loop is what
++// separates two client subnets, so it needs its own coverage.
++// The mirror image of the tests above: two things are deliberately left out
++// of the cache key, and leaving them out is a security-relevant judgement --
++// it declares that two requests differing only in these still have
++// interchangeable answers.  Without a test, keying on either one later would
++// turn every request from an affected application into a permanent cache miss
++// and nothing would fail.
++
++// A DNS cookie is per-server transport state and says nothing about the
++// content of an answer, so two requests differing only in their cookie share
++// an entry.  The server must therefore be asked exactly once.
++// Two query types with no mnemonic in ares_dns_rec_type_tostr() both render as
++// "UNKNOWN", so keying the mnemonic made every such type share one entry -- a
++// lookup answered with a record of a type it never asked for.  Any 16-bit
++// value reaches here through ares_query_dnsrec(); LOC (29) and DNAME (39) are
++// both real and both outside the table.
++TEST_P(CacheQueriesTest, UnknownQueryTypesDoNotShareCacheEntries) {
++  DNSPacket rsp29;
++  rsp29.set_response().set_aa().add_question(
++    new DNSQuestion("example.net", 29));
++  DNSPacket rsp39;
++  rsp39.set_response().set_aa().add_question(
++    new DNSQuestion("example.net", 39));
++
++  // One call per type: neither may be served the other's answer.
++  EXPECT_CALL(server_, OnRequest("example.net", 29))
++    .Times(1)
++    .WillRepeatedly(SetReply(&server_, &rsp29));
++  EXPECT_CALL(server_, OnRequest("example.net", 39))
++    .Times(1)
++    .WillRepeatedly(SetReply(&server_, &rsp39));
++
++  QueryResult r1;
++  ares_query_dnsrec(channel_, "example.net", ARES_CLASS_IN,
++                    static_cast<ares_dns_rec_type_t>(29), QueryCallback, &r1,
++                    nullptr);
++  Process();
++  EXPECT_TRUE(r1.done_);
++
++  QueryResult r2;
++  ares_query_dnsrec(channel_, "example.net", ARES_CLASS_IN,
++                    static_cast<ares_dns_rec_type_t>(39), QueryCallback, &r2,
++                    nullptr);
++  Process();
++  EXPECT_TRUE(r2.done_);
++}
++
++// Handing back a duplicate materialises the pending TTL decrement, so a
++// callback that reads the TTL off the record it is given sees the remaining
++// lifetime rather than the value the server sent.  docs/ares_init_options.3
++// states this, so pin it.  Only visible to a caller that does not duplicate
++// first -- QueryResult does, which is why the other cache tests cannot see it.
++static unsigned int g_qcache_hit_ttl = 0;
++
++static void QcacheTtlCallback(void *arg, ares_status_t status, size_t timeouts,
++                              const ares_dns_record_t *dnsrec) {
++  const ares_dns_rr_t *rr;
++  (void)arg;
++  (void)timeouts;
++  if (status != ARES_SUCCESS || dnsrec == NULL) {
++    return;
++  }
++  rr = ares_dns_record_rr_get_const(dnsrec, ARES_SECTION_ANSWER, 0);
++  g_qcache_hit_ttl = rr ? ares_dns_rr_get_ttl(rr) : 0;
++}
++
++TEST_P(CacheQueriesTest, CacheHitReportsRemainingTtl) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {2, 3, 4, 5}));
++  EXPECT_CALL(server_, OnRequest("www.google.com", T_A))
++    .Times(1)
++    .WillRepeatedly(SetReply(&server_, &rsp));
++
++  g_qcache_hit_ttl = 0;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QcacheTtlCallback, nullptr, nullptr);
++  Process();
++  EXPECT_EQ((unsigned int)100, g_qcache_hit_ttl);
++
++  ares_sleep_time(2100);
++
++  g_qcache_hit_ttl = 0;
++  ares_query_dnsrec(channel_, "www.google.com", ARES_CLASS_IN, ARES_REC_TYPE_A,
++                    QcacheTtlCallback, nullptr, nullptr);
++  Process();
++  // Served from the cache, and reporting what is left rather than the
++  // original 100.
++  EXPECT_GT(g_qcache_hit_ttl, (unsigned int)0);
++  EXPECT_LT(g_qcache_hit_ttl, (unsigned int)100);
++}
++
++TEST_P(CacheQueriesTest, CookieDoesNotSplitCacheEntries) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {2, 3, 4, 5}));
++  EXPECT_CALL(server_, OnRequest("www.google.com", T_A))
++    .Times(1)
++    .WillRepeatedly(SetReply(&server_, &rsp));
++
++  const unsigned char  ck1[]   = {1, 2, 3, 4, 5, 6, 7, 8};
++  const unsigned char  ck2[]   = {8, 7, 6, 5, 4, 3, 2, 1};
++  const unsigned char *ck[2]   = {ck1, ck2};
++  QueryResult          r[2];
++
++  for (int i = 0; i < 2; i++) {
++    ares_dns_record_t *req = nullptr;
++    ares_dns_rr_t     *opt = nullptr;
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_create(&req, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                     ARES_RCODE_NOERROR));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_query_add(req, "www.google.com", ARES_REC_TYPE_A,
++                                        ARES_CLASS_IN));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_rr_add(&opt, req, ARES_SECTION_ADDITIONAL, "",
++                                     ARES_REC_TYPE_OPT, ARES_CLASS_IN, 0));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_rr_set_u16(opt, ARES_RR_OPT_UDP_SIZE, 1232));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_rr_set_opt(opt, ARES_RR_OPT_OPTIONS,
++                                  ARES_OPT_PARAM_COOKIE, ck[i], sizeof(ck1)));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_send_dnsrec(channel_, req, QueryCallback, &r[i], nullptr));
++    Process();
++    EXPECT_TRUE(r[i].done_);
++    EXPECT_EQ(ARES_SUCCESS, r[i].status_);
++    ares_dns_record_destroy(req);
++  }
++}
++
++// The advertised UDP payload size constrains how a response is transported,
++// not what it says, so it is excluded too.  Same expectation: one request.
++TEST_P(CacheQueriesTest, UdpPayloadSizeDoesNotSplitCacheEntries) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {2, 3, 4, 5}));
++  EXPECT_CALL(server_, OnRequest("www.google.com", T_A))
++    .Times(1)
++    .WillRepeatedly(SetReply(&server_, &rsp));
++
++  const unsigned short sizes[2] = {512, 1232};
++  QueryResult          r[2];
++
++  for (int i = 0; i < 2; i++) {
++    ares_dns_record_t *req = nullptr;
++    ares_dns_rr_t     *opt = nullptr;
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_create(&req, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                     ARES_RCODE_NOERROR));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_query_add(req, "www.google.com", ARES_REC_TYPE_A,
++                                        ARES_CLASS_IN));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_rr_add(&opt, req, ARES_SECTION_ADDITIONAL, "",
++                                     ARES_REC_TYPE_OPT, ARES_CLASS_IN, 0));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_rr_set_u16(opt, ARES_RR_OPT_UDP_SIZE, sizes[i]));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_send_dnsrec(channel_, req, QueryCallback, &r[i], nullptr));
++    Process();
++    EXPECT_TRUE(r[i].done_);
++    EXPECT_EQ(ARES_SUCCESS, r[i].status_);
++    ares_dns_record_destroy(req);
++  }
++}
++
++TEST_P(CacheQueriesTest, EdnsClientSubnetSeparateCacheEntries) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {2, 3, 4, 5}));
++  EXPECT_CALL(server_, OnRequest("www.google.com", T_A))
++    .Times(2)
++    .WillRepeatedly(SetReply(&server_, &rsp));
++
++  /* 192.0.2.0/24 and 198.51.100.0/24 */
++  const unsigned char  ecs1[]  = {0x00, 0x01, 0x18, 0x00, 0xc0, 0x00, 0x02};
++  const unsigned char  ecs2[]  = {0x00, 0x01, 0x18, 0x00, 0xc6, 0x33, 0x64};
++  const unsigned char *ecs[2]  = {ecs1, ecs2};
++  QueryResult          r[2];
++
++  for (int i = 0; i < 2; i++) {
++    ares_dns_record_t *req = nullptr;
++    ares_dns_rr_t     *opt = nullptr;
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_create(&req, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                     ARES_RCODE_NOERROR));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_query_add(req, "www.google.com", ARES_REC_TYPE_A,
++                                        ARES_CLASS_IN));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_record_rr_add(&opt, req, ARES_SECTION_ADDITIONAL, "",
++                                     ARES_REC_TYPE_OPT, ARES_CLASS_IN, 0));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_rr_set_u16(opt, ARES_RR_OPT_UDP_SIZE, 1232));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_dns_rr_set_opt(opt, ARES_RR_OPT_OPTIONS,
++                                  ARES_OPT_PARAM_EDNS_CLIENT_SUBNET, ecs[i],
++                                  sizeof(ecs1)));
++    EXPECT_EQ(ARES_SUCCESS,
++              ares_send_dnsrec(channel_, req, QueryCallback, &r[i], nullptr));
++    Process();
++    EXPECT_TRUE(r[i].done_);
++    EXPECT_EQ(ARES_SUCCESS, r[i].status_);
++    ares_dns_record_destroy(req);
++  }
++}
++
++// A server answering an EDNS query with FORMERR makes c-ares strip the OPT
++// record from query->query and retry.  The cache key must not be derived from
++// that record afterwards, or the entry is stored under a key no later lookup
++// computes and the cache silently stops working for that name.
++TEST_P(CacheQueriesTest, EdnsFallbackStillCaches) {
++  DNSPacket rspfail;
++  rspfail.set_response().set_aa().set_rcode(FORMERR)
++    .add_question(new DNSQuestion("www.google.com", T_A));
++  DNSPacket rspok;
++  rspok.set_response().set_aa()
++    .add_question(new DNSQuestion("www.google.com", T_A))
++    .add_answer(new DNSARR("www.google.com", 100, {1, 2, 3, 4}));
++  /* Two: the FORMERR and the retry.  The second lookup must be a cache hit. */
++  EXPECT_CALL(server_, OnRequest("www.google.com", T_A))
++    .Times(2)
++    .WillOnce(SetReply(&server_, &rspfail))
++    .WillRepeatedly(SetReply(&server_, &rspok));
++
++  HostResult r1;
++  ares_gethostbyname(channel_, "www.google.com.", AF_INET, HostCallback, &r1);
++  Process();
++  EXPECT_TRUE(r1.done_);
++  EXPECT_EQ(ARES_SUCCESS, r1.status_);
++
++  HostResult r2;
++  ares_gethostbyname(channel_, "www.google.com.", AF_INET, HostCallback, &r2);
++  Process();
++  EXPECT_TRUE(r2.done_);
++  EXPECT_EQ(ARES_SUCCESS, r2.status_);
++}
++
++// The question name is caller-supplied and unescaped, so anything keyed after
++// it could be imitated by a name containing that same text.  A request for
++// "example.net|EDNS|0|8000" with no OPT record must not collide with a request
++// for "example.net" carrying EDNS with the DNSSEC OK bit set.
++TEST_P(CacheQueriesTest, EdnsSectionCannotBeImitatedByName) {
++  DNSPacket rsp;
++  rsp.set_response().set_aa()
++    .add_question(new DNSQuestion("example.net", T_A))
++    .add_answer(new DNSARR("example.net", 100, {5, 6, 7, 8}));
++  ON_CALL(server_, OnRequest("example.net", T_A))
++    .WillByDefault(SetReply(&server_, &rsp));
++
++  /* Cache an answer for the real name, with EDNS and the DO bit set. */
++  ares_dns_record_t *req = nullptr;
++  ares_dns_rr_t     *opt = nullptr;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_create(&req, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                   ARES_RCODE_NOERROR));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_query_add(req, "example.net", ARES_REC_TYPE_A,
++                                      ARES_CLASS_IN));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_rr_add(&opt, req, ARES_SECTION_ADDITIONAL, "",
++                                   ARES_REC_TYPE_OPT, ARES_CLASS_IN, 0));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_rr_set_u16(opt, ARES_RR_OPT_UDP_SIZE, 1232));
++  EXPECT_EQ(ARES_SUCCESS, ares_dns_rr_set_u16(opt, ARES_RR_OPT_FLAGS, 0x8000));
++  QueryResult r1;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_send_dnsrec(channel_, req, QueryCallback, &r1, nullptr));
++  Process();
++  EXPECT_TRUE(r1.done_);
++  EXPECT_EQ(ARES_SUCCESS, r1.status_);
++  ares_dns_record_destroy(req);
++
++  /* A different name that spells out the EDNS suffix, with no OPT record.
++   * It must not be served the entry above; with the cache keyed correctly it
++   * is refused, because '|' is not valid in a hostname. */
++  ares_dns_record_t *req2 = nullptr;
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_create(&req2, 0, ARES_FLAG_RD, ARES_OPCODE_QUERY,
++                                   ARES_RCODE_NOERROR));
++  EXPECT_EQ(ARES_SUCCESS,
++            ares_dns_record_query_add(req2, "example.net|EDNS|0|8000",
++                                      ARES_REC_TYPE_A, ARES_CLASS_IN));
++  QueryResult r2;
++  ares_send_dnsrec(channel_, req2, QueryCallback, &r2, nullptr);
++  Process();
++  EXPECT_TRUE(r2.done_);
++  EXPECT_NE(ARES_SUCCESS, r2.status_);
++  ares_dns_record_destroy(req2);
++}
++
+ TEST_P(CacheQueriesTest, GetHostByNameCache) {
+   DNSPacket rsp;
+   rsp.set_response().set_aa()

@@ -1,10 +1,7 @@
-From 6b1123b313e439d8bfae3570a3e541b3aa26f3ad Mon Sep 17 00:00:00 2001
+From ca21bd382833ff40d19487bf395b4d33b7e1280a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 16 Sep 2023 19:52:56 -0700
 Subject: [PATCH] cppignore.lnx: Ignore PKCS12 and testLaunch test
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
 These tests fail on Linux
 
@@ -15,16 +12,15 @@ Signed-off-by: Peter Marko <peter.marko@siemens.com>
 
 Updated comment and content after fixing some tests.
 Left only MongoDBTest.testArray on ignore list, untested.
-
 ---
  cppignore.lnx | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/cppignore.lnx b/cppignore.lnx
-index b3288d474..9aad48ca5 100644
+index cf779418c..1d7e2670a 100644
 --- a/cppignore.lnx
 +++ b/cppignore.lnx
-@@ -35,3 +35,4 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
+@@ -34,3 +34,4 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
  CppUnit::TestCaller<HTTPSStreamFactoryTest>.testProxy
  CppUnit::TestCaller<DNSTest>.testHostByAddress
  CppUnit::TestCaller<DNSTest>.testHostByName

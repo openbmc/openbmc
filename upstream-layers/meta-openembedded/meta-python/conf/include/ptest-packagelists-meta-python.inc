@@ -19,6 +19,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-cachetools \
     python3-cbor2 \
     python3-configobj \
+    python3-construct \
     python3-pyconnman \
     python3-click \
     python3-dasbus \
@@ -102,6 +103,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-service-identity \
     python3-setproctitle \
     python3-simpleeval \
+    python3-six \
     python3-smpplib \
     python3-soupsieve \
     python3-sqlparse \
@@ -129,6 +131,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-xmltodict \
     python3-xxhash \
     python3-yarl \
+    tomcli \
 "
 
 PTESTS_SLOW_META_PYTHON = "\

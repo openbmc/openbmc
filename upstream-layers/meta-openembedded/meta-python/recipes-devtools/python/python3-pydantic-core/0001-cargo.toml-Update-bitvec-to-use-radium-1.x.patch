@@ -1,4 +1,4 @@
-From ca6400743a86fa334936d9984dcd40e90bb06e60 Mon Sep 17 00:00:00 2001
+From d75df9ca49a825b67b53db9505b2aef2a79e3c76 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 19 Apr 2025 00:09:42 -0700
 Subject: [PATCH] cargo.toml: Update bitvec to use radium 1.x
@@ -13,7 +13,7 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 6f26c8a..91ceade 100644
+index 22a8524..1f97c2d 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -55,7 +55,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -49,7 +49,7 @@ index 6f26c8a..91ceade 100644
  [[package]]
  name = "regex"
 diff --git a/Cargo.toml b/Cargo.toml
-index 1fb5dcc..4949c8a 100644
+index dd453c5..d120608 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -25,6 +25,8 @@ include = [
@@ -61,6 +61,3 @@ index 1fb5dcc..4949c8a 100644
  # TODO it would be very nice to remove the "py-clone" feature as it can panic,
  # but needs a bit of work to make sure it's not used in the codebase
  pyo3 = { version = "0.28", features = ["generate-import-lib", "num-bigint", "py-clone", "smallvec"] }
--- 
-2.47.3
-

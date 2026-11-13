@@ -1,0 +1,26 @@
+From 7acb7aa51db762a723d85b81262ca14614dbeac0 Mon Sep 17 00:00:00 2001
+From: Jan Vermaete <jan.vermaete@gmail.com>
+Date: Mon, 14 Sep 2026 10:24:51 +0200
+Subject: [PATCH 2/2] pytest.ini: disable the benchmark
+
+Benchmark is also disabled in the github workflow of the project
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Jan Vermaete <jan.vermaete@gmail.com>
+---
+ pytest.ini | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pytest.ini b/pytest.ini
+index f5a52af..4b1b4b6 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -1,3 +1,3 @@
+ [pytest]
+ pythonpath = .
+-
++addopts = --benchmark-disable
+-- 
+2.43.0
+

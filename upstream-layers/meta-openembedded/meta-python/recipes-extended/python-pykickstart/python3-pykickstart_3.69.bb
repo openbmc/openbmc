@@ -8,7 +8,6 @@ inherit python_setuptools_build_meta ptest
 
 RDEPENDS:${PN} = "python3 \
                   python3-requests \
-                  python3-six \
 "
 
 RDEPENDS:${PN}-ptest += " \
