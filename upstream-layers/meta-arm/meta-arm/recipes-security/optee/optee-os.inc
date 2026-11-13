@@ -35,6 +35,21 @@ EXTRA_OEMAKE += " CROSS_COMPILE64=${HOST_PREFIX}"
 # Enable BTI in optee
 EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'arm-branch-protection', ' CFG_TA_BTI=1 CFG_CORE_PAUTH=y CFG_TA_PAUTH=y', '', d)}"
 
+# If several .bbappends wants to add an early TA, and they both do
+# EXTRA_OEMAKE += 'EARLY_TA_PATHS="..."', only one of them will take
+# effect. Instead, create a bitbake variable holding the entire list,
+# which the .bbappends can append to, and add a single EARLY_TA_PATHS=
+# to the make cmdline here. Similarly for the in-tree ones.
+#
+# Note that it is not necessary to explicitly pass CFG_EARLY_TA=y as
+# the build systems sets that itself if either list is non-empty (and
+# errors out if CFG_EARLY_TA was explicitly set to n).
+EARLY_TA_PATHS = ""
+CFG_IN_TREE_EARLY_TAS = ""
+
+EXTRA_OEMAKE += "${@'EARLY_TA_PATHS="' + d.getVar('EARLY_TA_PATHS') + '"' if d.getVar('EARLY_TA_PATHS') else ''}"
+EXTRA_OEMAKE += "${@'CFG_IN_TREE_EARLY_TAS="' + d.getVar('CFG_IN_TREE_EARLY_TAS') + '"' if d.getVar('CFG_IN_TREE_EARLY_TAS') else ''}"
+
 LDFLAGS[unexport] = "1"
 CPPFLAGS[unexport] = "1"
 AS[unexport] = "1"

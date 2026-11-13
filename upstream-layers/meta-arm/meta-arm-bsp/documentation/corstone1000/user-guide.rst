@@ -92,7 +92,7 @@ Host Processor Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.1.bb``        |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.15.0.bb``        |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 `Trusted Services <https://trusted-services.readthedocs.io/en/latest/index.html>`__
@@ -131,11 +131,11 @@ Host Processor Components
 `OP-TEE <https://git.trustedfirmware.org/OP-TEE/optee_os.git>`__
 ================================================================
 
-+----------+------------------------------------------------------------------------------------------+
-| bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_%.bbappend``        |
-+----------+------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.9.0.bb``              |
-+----------+------------------------------------------------------------------------------------------+
++----------+-------------------------------------------------------------------------------------------+
+| bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_%.bbappend``         |
++----------+-------------------------------------------------------------------------------------------+
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.10.0.bb``              |
++----------+-------------------------------------------------------------------------------------------+
 
 `U-Boot <https://github.com/u-boot/u-boot.git>`__
 =================================================
@@ -145,7 +145,7 @@ Host Processor Components
 +----------+----------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_%.bbappend``      |
 +----------+----------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.10.bb``      |
+| Recipe   | ``${WORKSPACE}/core/meta/recipes-bsp/u-boot/u-boot_2026.07.bb``                  |
 +----------+----------------------------------------------------------------------------------+
 
 Linux
@@ -173,7 +173,7 @@ Secure Enclave Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.2.bb``         |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.3.0.bb``         |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 ************************************
@@ -2129,35 +2129,75 @@ For more information about this, see the following resources:
  - `Authenticated Debug Access Control Specification <https://developer.arm.com/documentation/den0101/latest/>`__
  - `Arm Corstone-1000 for MPS3 Application Note AN550, Chapter 7 <https://developer.arm.com/documentation/dai0550/latest/>`__
 
-The Secure Debug Manager API is implemented in the `Secure Debug Manager (PSA-ADAC / SDC-600) <secure-debug-manager-repo-readme_>`__ repository.
-This repository also contains the necessary files for the Arm Development Studio support.
-The build and integration instructions can be found in its `README <secure-debug-manager-repo-readme_>`__.
+#. Install `Arm Development Studio <arm-ds-website_>`__ 2026.1, or Arm
+   Development Studio Platinum 2026.b. These releases contain a built-in
+   PSA-ADAC Secure Debug Manager.
 
-The `Secure Debug Manager (PSA-ADAC / SDC-600)` repository also contains the private key and chain certificate to be used during the tests.
-The private key's public pair is provisioned into the One-Time Programmable memory in TrustedFirmware-M.
-These are dummy keys that should not be used in production.
-
-To test the Secure Debug feature, you'll need a debug probe from the `Arm ULINKpro family <arm-ulink-pro-website_>`__
-and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 2023.a.
-
-
-#. Clone the `Secure Debug Manager (PSA-ADAC / SDC-600)` repository to your workspace.
+#. Clone the `Secure Debug Manager
+   <https://github.com/ARM-software/secure-debug-manager>`__
+   repository to obtain the dummy test credentials.
 
     .. code-block:: console
 
         cd ${WORKSPACE}
         git clone https://github.com/ARM-software/secure-debug-manager.git
 
-#. Navigate into the repository directory and checkout the specific commit in the listing below.
+   Only the example private key and certificate chain are needed from this
+   repository.
+
+   The public key corresponding to these credentials is provisioned into the
+   TrustedFirmware-M One-Time Programmable memory. The supplied credentials
+   are test credentials and must not be used in production.
+
+#. Create a user configuration database based on the Arm Development Studio
+   Corstone-1000 database. The following example assumes that Arm Development
+   Studio Platinum 2026.b is installed in ``/opt/arm``:
 
     .. code-block:: console
 
-        cd ${WORKSPACE}/secure-debug-manager
-        git checkout b30d6496ca749123e86b39b161b9f70ef76106d6
-        git submodule update --init
+        export ARMDS_INSTALL_DIR=/opt/arm/developmentstudio_platinum-2026.b
+        export CS1000_ADAC_DB=${WORKSPACE}/armds-cs1000-adac611
 
-#. Follow the instructions in the `Secure Debug Manager (PSA-ADAC / SDC-600)'s README <secure-debug-manager-repo-readme_>`__ for the development machine setup.
-   This setup must include building the Secure Debug Manager because the built library completes the Arm Development Studio configuration.
+        mkdir -p "${CS1000_ADAC_DB}/Boards/Arm_Development_Boards"
+        cp -a \
+          "${ARMDS_INSTALL_DIR}/sw/debugger/configdb/Boards/Arm Development Boards/MPS3_Corstone_1000" \
+          "${CS1000_ADAC_DB}/Boards/Arm_Development_Boards/MPS3_Corstone_1000_ADAC_611"
+        cp -a "${ARMDS_INSTALL_DIR}/sw/debugger/configdb/Include" "${CS1000_ADAC_DB}/"
+        cp -a "${ARMDS_INSTALL_DIR}/sw/debugger/configdb/Schemas" "${CS1000_ADAC_DB}/"
+        cp -a "${ARMDS_INSTALL_DIR}/sw/debugger/configdb/ATP" "${CS1000_ADAC_DB}/"
+
+   If Arm Development Studio is installed elsewhere, change
+   ``ARMDS_INSTALL_DIR`` accordingly.
+
+#. Enable the built-in PSA-ADAC Secure Debug Manager in the copied database.
+   In
+   ``${CS1000_ADAC_DB}/Boards/Arm_Development_Boards/MPS3_Corstone_1000_ADAC_611/project_types.xml``,
+   add the following element alongside the existing ``dtsl_config`` parameter:
+
+    .. code-block:: xml
+
+        <secure_debug_manager type="adac_sdc600" manifest="CDB://../../../ATP/manifest.xml" device="CSAPBCOM" reset_type="nSRST"/>
+
+   This selects the built-in PSA-ADAC implementation, its authentication-token
+   provider, the SDC-600 communication device, and the board reset signal.
+
+#. Describe the Corstone-1000 debug port as DPv3. In
+   ``${CS1000_ADAC_DB}/Boards/Arm_Development_Boards/MPS3_Corstone_1000_ADAC_611/MPS3_Corstone_1000.sdf``,
+   add the following item to the ``<device_info>`` block of the ``ARMCS-DP``
+   device:
+
+    .. code-block:: xml
+
+        <device_info_item name="DP_VERSION">DPv3</device_info_item>
+
+   DPv3 is required so that Arm Development Studio uses the ADIv6 debug-port
+   addressing needed to reach ``CSAPBCOM``.
+
+   In the same file, give the copied platform a unique title:
+
+    .. code-block:: xml
+
+        <platform_info info_url="" manufacturer="Arm" title="MPS3_Corstone_1000_ADAC_611"/>
 
 #. Rebuild the software stack with Secure Debug.
 
@@ -2177,16 +2217,15 @@ and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 202
         IComPortInit                  :  383 : warn  : init       : IComPortInit: Blocked reading LPH2RA
 
 
-#. Connect the debug probe to the MPS3 using the 20-pin 1.27mm connector with the ``CS_20W_1.27MM silkscreen`` label.
-
-#. Open a new Arm Development Studio IDE window and add the Secure Debug Manager configuration database.
+#. Open a new Arm Development Studio IDE window and add the user configuration
+   database.
 
    #. Select ``Window`` > ``Preferences``.
    #. Expand ``Arm DS`` and select ``Configuration Database``.
    #. Select ``Add``.
    #. Enter a descriptive name, such as ``Corstone-1000 Secure Debug``.
       The name does not affect the connection.
-   #. Set ``Location`` to ``${WORKSPACE}/secure-debug-manager/arm_ds/DB``.
+   #. Set ``Location`` to ``${WORKSPACE}/armds-cs1000-adac611``.
    #. Select ``OK`` to close the ``Add configuration database location`` dialog.
    #. Select ``Rebuild database``.
    #. Select ``Apply and Close``.
@@ -2197,16 +2236,41 @@ and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 202
    #. Select ``Hardware Connection``, then select ``Next``.
    #. Enter a descriptive debug connection name, then select ``Next``.
       The name does not affect the connection.
-   #. In ``Target Selection``, select ``MPS3_Corstone-1000_ADAC``.
+   #. In ``Target Selection``, select ``MPS3_Corstone_1000_ADAC_611``.
    #. Select ``Finish``.
 
-#. Configure and start the debug connection.
+#. Configure one of the following external debug connections.
 
-   #. Select ``Arm`` > ``MPS3_Corstone-1000_ADAC`` > ``Bare Metal Debug`` > ``Cortex-A35``.
-   #. For ``Target Connection``, select ``ULINKpro``.
-   #. Select ``Browse...``.
-   #. In the ``Connection Browser``, select the name of the connected ULINKpro probe, then select ``Select``.
-   #. Select ``Debug``.
+   To use an external `ULINKpro D <arm-ulink-pro-d-website_>`__ probe:
+
+   #. Connect the ULINKpro D probe to the MPS3 connector labelled
+      ``CS_20W_1.27MM``.
+   #. Select ``Arm`` > ``MPS3_Corstone_1000_ADAC_611`` >
+      ``Bare Metal Debug`` > ``Cortex-M0+``.
+   #. For ``Target Connection``, select ``ULINKpro D``.
+   #. Select ``Browse...``, select the detected ULINKpro D probe, and then
+      select ``Select``.
+   #. Select ``JTAG/SWJ``, set the debug clock to ``500 kHz``, and select
+      ``Connect only``.
+
+   To use an external `DSTREAM <arm-dstream-website_>`__ probe:
+
+   #. Connect the DSTREAM probe to the MPS3 connector labelled
+      ``CS_20W_1.27MM``.
+   #. Select ``Arm`` > ``MPS3_Corstone_1000_ADAC_611`` >
+      ``Bare Metal Debug`` > ``Cortex-M0+``.
+   #. For ``Target Connection``, select ``DSTREAM``.
+   #. Select ``Browse...``, select the detected DSTREAM probe, and then select
+      ``Select``.
+   #. Select ``JTAG/SWJ``, set the debug clock to ``500 kHz``, and select
+      ``Connect only``.
+
+   In both cases, use ``Cortex-M0+`` because Secure Debug runs in the Secure
+   Enclave. Do not select the host ``Cortex-A35`` connection.
+
+#. Select ``Debug``. Arm Development Studio resets the target using ``nSRST``
+   and the built-in Secure Debug Manager communicates with ``CSAPBCOM`` to
+   perform authentication.
 
 #. Provide the paths to the private key and trust chain certificate when asked by Arm Development Studio Console.
 
@@ -2215,21 +2279,21 @@ and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 202
         ...
 
         Please provide private key file path:
-        Enter file path > ${WORKSPACE}\secure-debug-manager\example\data\keys\EcdsaP256Key-3.pem
+        Enter file path > ${WORKSPACE}/secure-debug-manager/example/data/keys/EcdsaP256Key-3.pem
 
         Please provide trust chain file path:
-        Enter file path > ${WORKSPACE}\secure-debug-manager\example\data\chains\chain.EcdsaP256-3
+        Enter file path > ${WORKSPACE}/secure-debug-manager/example/data/chains/chain.EcdsaP256-3
 
         ...
 
-#. When successful authenticated, Arm Development Studio will connect to the running MPS3 and the debug features can be used.
-   The following prompt should appear in the Secure Enclave terminal (``ttyUSB1``):
+#. After authentication succeeds, verify that the image continues booting and
+   is not left waiting inside the Secure Debug authentication flow.
+   Authentication alone is not sufficient to pass the test. Confirm that the
+   Host terminal reaches the Linux login prompt:
 
     .. code-block:: console
 
-        ...
-        boot_platform_init: Corstone-1000 Secure Debug is a success.
-        ...
+        corstone1000-mps3 login:
 
 
 --------------
@@ -2237,9 +2301,8 @@ and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 202
 *Copyright (c) 2022-2026, Arm Limited. All rights reserved.*
 
 .. _arm-developer-fvp: https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
-.. _secure-debug-manager-repo-readme: https://github.com/ARM-software/secure-debug-manager/tree/master?tab=readme-ov-file#secure-debug-manager-psa-adac--sdc-600
-.. _secure-debug-manager-armds-integration: https://github.com/ARM-software/secure-debug-manager?tab=readme-ov-file#arm-development-studio-integration
 .. _meta-arm-repository-release-branch: https://docs.yoctoproject.org/next/migration-guides/migration-6.0.html
-.. _arm-ulink-pro-website: https://www.arm.com/products/development-tools/debug-probes/ulink-pro
 .. _arm-ds-website: https://www.arm.com/products/development-tools/embedded-and-software/arm-development-studio
+.. _arm-ulink-pro-d-website: https://www.arm.com/products/development-tools/debug-probes/ulink-pro
+.. _arm-dstream-website: https://www.arm.com/products/development-tools/debug-probes/dstream-st
 .. _edk2-repository: https://github.com/tianocore/edk2

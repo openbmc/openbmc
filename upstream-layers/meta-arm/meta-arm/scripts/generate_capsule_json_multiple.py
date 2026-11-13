@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: <text>Copyright 2025 Arm Limited and/or its
+# SPDX-FileCopyrightText: <text>Copyright 2025-2026 Arm Limited and/or its
 # affiliates <open-source-office@arm.com></text>
 #
 # SPDX-License-Identifier: MIT
@@ -19,7 +19,7 @@ Usage:
         --monotonic_counts 1 1 1 \
         --payloads bl2.bin initramfs.bin tfm_s.bin \
         --update_image_indexes 1 4 2 \
-        --private_keys key.key key.key key.key \
+        --signing_pems signing.pem signing.pem signing.pem \
         --certificates cert.crt cert.crt cert.crt \
         --components bl2 initramfs tfm_s \
         --selected_components bl2 \
@@ -50,6 +50,17 @@ def parse_arguments() -> argparse.Namespace:
         "--output", default="capsule_payloads.json", help="Output JSON file name"
     )
 
+    parser.add_argument(
+        "--signing_pems", "--private_keys",
+        dest="signing_pems",
+        nargs="+",
+        required=True,
+        help=(
+            "List of signing PEM file paths (private key and certificate). "
+            "--private_keys is kept as a compatibility alias."
+        ),
+    )
+
     # Required arguments for each payload entry
     required_args = {
         "components": "List of components",
@@ -60,7 +71,6 @@ def parse_arguments() -> argparse.Namespace:
         "monotonic_counts": "List of monotonic counts",
         "payloads": "List of payload file paths",
         "update_image_indexes": "List of update image indexes",
-        "private_keys": "List of private key file paths",
         "certificates": "List of certificate file paths",
     }
 
@@ -105,7 +115,7 @@ def create_payloads(args: argparse.Namespace) -> List[dict]:
             "MonotonicCount": args.monotonic_counts[i],
             "Payload": args.payloads[i],
             "UpdateImageIndex": args.update_image_indexes[i],
-            "OpenSslSignerPrivateCertFile": args.private_keys[i],
+            "OpenSslSignerPrivateCertFile": args.signing_pems[i],
             "OpenSslTrustedPublicCertFile": args.certificates[i],
             "OpenSslOtherPublicCertFile": args.certificates[i],
         }

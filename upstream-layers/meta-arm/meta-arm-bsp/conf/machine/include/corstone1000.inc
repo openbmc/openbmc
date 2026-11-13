@@ -5,20 +5,20 @@ require ${TUNE_FILE}
 MACHINEOVERRIDES =. "corstone1000:"
 
 # TF-M
-PREFERRED_VERSION_trusted-firmware-m ?= "2.2.%"
-PREFERRED_VERSION_trusted-firmware-m-scripts-native ?= "2.2.%"
+PREFERRED_VERSION_trusted-firmware-m ?= "2.3.%"
+PREFERRED_VERSION_trusted-firmware-m-scripts-native ?= "2.3.%"
 
 # TF-A
 TFA_PLATFORM = "corstone1000"
-PREFERRED_VERSION_trusted-firmware-a ?= "2.14.%"
-PREFERRED_VERSION_tf-a-tests ?= "2.14.%"
+PREFERRED_VERSION_trusted-firmware-a ?= "2.15.%"
+PREFERRED_VERSION_tf-a-tests ?= "2.15.%"
 
 TFA_BL2_BINARY = "bl2-corstone1000.bin"
 TFA_FIP_BINARY = "fip-corstone1000.bin"
 
 # optee
-PREFERRED_VERSION_optee-os ?= "4.9.%"
-PREFERRED_VERSION_optee-client ?= "4.9.%"
+PREFERRED_VERSION_optee-os ?= "4.10.%"
+PREFERRED_VERSION_optee-client ?= "4.10.%"
 
 # Trusted Services
 TS_PLATFORM = "arm/corstone1000"
@@ -27,7 +27,7 @@ TS_SP_SE_PROXY_CONFIG = "corstone1000"
 MACHINE_FEATURES += "ts-smm-gateway ts-se-proxy"
 
 # U-Boot
-PREFERRED_VERSION_u-boot ?= "2025.10"
+PREFERRED_VERSION_u-boot ?= "2026.07"
 MACHINE_FEATURES += "efi"
 EFI_PROVIDER ?= "grub-efi"
 

@@ -1,0 +1,77 @@
+From 64fe79ae2d8200ac48658837e5440f2469728dac Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimran.singh.tungal@arm.com>
+Date: Thu, 24 Sep 2026 12:00:00 +0100
+Subject: [PATCH] fix(cot-dt2c): normalise arithmetic cell expressions
+
+TF-A's generated CoT descriptor can contain preprocessed C macro
+expressions in devicetree cells, such as:
+
+    image-id = <((39) + 2)>;
+
+Recent pydevicetree evaluates the inner parenthesised tokens before the
+outer expression and raises a TypeError while parsing these values. This
+makes cot-dt2c report "not a valid CoT DT file" even though the
+descriptor is valid after evaluating the numeric expression.
+
+Keep the normal parser path unchanged, but retry with numeric cell
+expressions reduced to integer values when parsing fails.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/54905]
+Change-Id: I432025f82b48d026a21ae136b12cd681e49f8a00
+Signed-off-by: Harsimran Singh Tungal <harsimran.singh.tungal@arm.com>
+---
+ tools/cot_dt2c/cot_dt2c/cot_parser.py | 33 +++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/tools/cot_dt2c/cot_dt2c/cot_parser.py b/tools/cot_dt2c/cot_dt2c/cot_parser.py
+index 39e51db3c..2aaebd0eb 100644
+--- a/tools/cot_dt2c/cot_dt2c/cot_parser.py
++++ b/tools/cot_dt2c/cot_dt2c/cot_parser.py
+@@ -1,5 +1,5 @@
+ #
+-# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2024, 2026 Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -11,10 +11,39 @@ from pydevicetree import Devicetree, Property, Node
+ from pathlib import Path
+ from typing import List, Optional
+ 
++def _normalise_cell_expression(match):
++    value = match.group(1).strip()
++    if not re.fullmatch(r"[0-9a-fA-FxX\s()+\-*/%<>&|^~]+", value):
++        return match.group(0)
++
++    try:
++        evaluated = eval(value, {"__builtins__": {}}, {})
++    except Exception:
++        return match.group(0)
++
++    if not isinstance(evaluated, int):
++        return match.group(0)
++
++    return f"<{evaluated}>"
++
++def _normalise_cell_expressions(contents):
++    return re.sub(r"<([^<>]+)>", _normalise_cell_expression, contents)
++
++def _parse_cot_file(inputfile):
++    try:
++        return Devicetree.parseFile(inputfile)
++    except Exception:
++        contents = Path(inputfile).read_text()
++        normalised = _normalise_cell_expressions(contents)
++        if normalised == contents:
++            raise
++
++        return Devicetree.from_dts(normalised)
++
+ class COT:
+     def __init__(self, inputfile: str, outputfile=None):
+         try:
+-            self.tree = Devicetree.parseFile(inputfile)
++            self.tree = _parse_cot_file(inputfile)
+         except:
+             print("not a valid CoT DT file")
+             exit(1)

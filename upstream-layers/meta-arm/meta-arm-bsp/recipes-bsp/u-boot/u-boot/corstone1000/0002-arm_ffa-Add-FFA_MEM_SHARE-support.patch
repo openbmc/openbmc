@@ -1,4 +1,4 @@
-From d4dc79029ab883a5baa33fbecd5db20a93716172 Mon Sep 17 00:00:00 2001
+From 05e6d6b8949eb00a1a22f75a53e005a8d9e3c87e Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Oct 2024 17:22:35 +0000
 Subject: [PATCH] arm_ffa: Add FFA_MEM_SHARE support
@@ -48,10 +48,10 @@ index f966f8ba6af..3eec735d741 100644
  - FF-A bus discovery makes sure FF-A framework is responsive and compatible
    with the driver
 diff --git a/drivers/firmware/arm-ffa/arm-ffa-uclass.c b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
-index f8d231204db..2ba0b925fa6 100644
+index 2f5fc879ff4..d09e31177d7 100644
 --- a/drivers/firmware/arm-ffa/arm-ffa-uclass.c
 +++ b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
-@@ -95,6 +95,20 @@ static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
+@@ -92,6 +92,20 @@ static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
  			"DENIED: Buffer pair already registered",
  		},
  	},
@@ -72,7 +72,7 @@ index f8d231204db..2ba0b925fa6 100644
  };
  
  /**
-@@ -929,6 +943,177 @@ int ffa_msg_send_direct_req_hdlr(struct udevice *dev, u16 dst_part_id,
+@@ -926,6 +940,177 @@ int ffa_msg_send_direct_req_hdlr(struct udevice *dev, u16 dst_part_id,
  	return ffa_to_std_errno(ffa_errno);
  }
  
@@ -250,7 +250,7 @@ index f8d231204db..2ba0b925fa6 100644
  /* FF-A driver operations (used by clients for communicating with FF-A)*/
  
  /**
-@@ -1015,6 +1200,31 @@ int ffa_rxtx_unmap(struct udevice *dev)
+@@ -1012,6 +1197,31 @@ int ffa_rxtx_unmap(struct udevice *dev)
  	return ops->rxtx_unmap(dev);
  }
  
@@ -283,7 +283,7 @@ index f8d231204db..2ba0b925fa6 100644
   * ffa_do_probe() - probing FF-A framework
   * @dev:	the FF-A bus device (arm_ffa)
 diff --git a/drivers/firmware/arm-ffa/arm-ffa.c b/drivers/firmware/arm-ffa/arm-ffa.c
-index 94e6105cb38..df904cae412 100644
+index 9e6b5dcc542..8f7c5794f95 100644
 --- a/drivers/firmware/arm-ffa/arm-ffa.c
 +++ b/drivers/firmware/arm-ffa/arm-ffa.c
 @@ -1,6 +1,6 @@
@@ -294,7 +294,7 @@ index 94e6105cb38..df904cae412 100644
   *
   * Authors:
   *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
-@@ -84,6 +84,7 @@ static const struct ffa_bus_ops ffa_ops = {
+@@ -81,6 +81,7 @@ static const struct ffa_bus_ops ffa_ops = {
  	.partition_info_get = ffa_get_partitions_info_hdlr,
  	.sync_send_receive = ffa_msg_send_direct_req_hdlr,
  	.rxtx_unmap = ffa_unmap_rxtx_buffers_hdlr,

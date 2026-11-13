@@ -1,4 +1,4 @@
-From e7858d255652e866f40b455164b172a6a8b92ccf Mon Sep 17 00:00:00 2001
+From 3b671ffcf36abdd02f7537258de2832601ee6f1a Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Fri, 24 Jan 2025 15:13:39 +0000
 Subject: [PATCH] efi_loader: fwu_arm_psa: Keep the FMP payload header
@@ -15,7 +15,7 @@ Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/2025070215
  1 file changed, 2 insertions(+)
 
 diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
-index be439b4019d..80f8acd1774 100644
+index 6ec2e82190c..d70b7e581f8 100644
 --- a/lib/efi_loader/efi_firmware.c
 +++ b/lib/efi_loader/efi_firmware.c
 @@ -521,8 +521,10 @@ static void efi_firmware_get_fw_version(const void **p_image,

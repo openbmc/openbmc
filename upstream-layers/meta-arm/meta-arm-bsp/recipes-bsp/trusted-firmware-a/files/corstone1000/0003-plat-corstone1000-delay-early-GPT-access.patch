@@ -1,0 +1,83 @@
+From: Oscar Belshaw <Oscar.Belshaw@arm.com>
+Subject: [PATCH] fix(corstone1000): delay early GPT access
+
+TF-A 2.15 initializes GPT before MMU setup in the common BL2 boot path.
+On Corstone1000 MPS3, early memory-mapped flash reads have returned an
+invalid MBR signature, preventing boot. A 25 ms delay before GPT access
+has allowed boot and reset tests to complete on the tested configurations.
+
+Override the weak plat_arm_io_setup hook for Corstone1000 BL2 with
+RESET_TO_BL2 and ARM_GPT_SUPPORT enabled. Preserve arm_io_setup and its
+error handling, then wait 25 ms before returning to common GPT setup.
+
+The common system-counter enable occurs in arm_bl31_platform_setup, and
+common generic_delay_timer_init occurs after GPT initialization. Enable
+the system counter here with the same CNTCR configuration used by BL31,
+then initialize the delay driver before calling mdelay. Driver initialization
+alone does not enable the hardware counter. Do not reset the counter value;
+leave the later common initialization unchanged.
+
+Use the same hook for FPGA, A35 FVP and A320 FVP. Keep the common GPT-before-
+MMU ordering and reset handling unchanged, without diagnostic flash reads
+or console output.
+
+This is a timing workaround, not a hardware readiness check. The underlying
+cause and any required hardware settling interval remain under investigation;
+25 ms is the tested delay, not a documented minimum platform requirement.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/54910]
+Signed-off-by: Oscar Belshaw <Oscar.Belshaw@arm.com>
+---
+ .../corstone1000/common/corstone1000_plat.c      | 28 ++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_plat.c b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+index d34e80b..1c51145 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_plat.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+@@ -6,10 +6,14 @@
+ 
+ #include <assert.h>
+ 
++#include <arch.h>
+ #include <common/bl_common.h>
++#include <common/debug.h>
+ 
++#include <drivers/delay_timer.h>
+ #include <drivers/generic_delay_timer.h>
+ #include <drivers/io/io_storage.h>
++#include <lib/mmio.h>
+ #include <plat/common/platform.h>
+ #include <plat/arm/common/arm_fconf_getter.h>
+ #include <plat/arm/common/arm_fconf_io_storage.h>
+@@ -33,6 +37,30 @@ const mmap_region_t plat_arm_mmap[] = {
+ 	{0}
+ };
+ 
++#define CS1K_GPT_DELAY	25U /* GPT initialization delay in milliseconds. */
++
++#if defined(IMAGE_BL2) && RESET_TO_BL2 && ARM_GPT_SUPPORT
++void plat_arm_io_setup(void)
++{
++	int err;
++
++	err = arm_io_setup();
++	if (err < 0) {
++		panic();
++	}
++
++	/*
++	 * Allow time before early memory-mapped flash reads. This is a
++	 * workaround for invalid GPT reads observed on MPS3; the underlying
++	 * readiness requirement still needs investigation.
++	 */
++	mmio_write_32(ARM_SYS_CNTCTL_BASE + CNTCR_OFF,
++		     CNTCR_FCREQ(0U) | CNTCR_EN);
++	generic_delay_timer_init();
++	mdelay(CS1K_GPT_DELAY);
++}
++#endif
++
+ static void set_fip_image_source(void)
+ {
+ 	const struct plat_io_policy *policy;

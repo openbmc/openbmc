@@ -1,4 +1,4 @@
-From 99008b3a0627c975f14b7f7a64bfee5d59cd93ed Mon Sep 17 00:00:00 2001
+From 4e78b3c811b3a7e8d42db48a7fbcec179875593d Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 17 Oct 2024 15:50:02 +0100
 Subject: [PATCH] arm_ffa: sandbox: Add FFA_MEM_RECLAIM emulation
@@ -13,10 +13,10 @@ Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/2025070215
  2 files changed, 43 insertions(+)
 
 diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-index 4918404fb6d..a630392b6d1 100644
+index da3f1430637..68a112e4900 100644
 --- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
 +++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-@@ -603,6 +603,45 @@ static int sandbox_ffa_memory_share(struct udevice *emul, ffa_value_t *pargs,
+@@ -600,6 +600,45 @@ static int sandbox_ffa_memory_share(struct udevice *emul, ffa_value_t *pargs,
  	return 0;
  }
  
@@ -62,7 +62,7 @@ index 4918404fb6d..a630392b6d1 100644
  /**
   * sandbox_query_ffa_emul_state() - Inspect the FF-A ABIs
   * @queried_func_id:	The FF-A function to be queried
-@@ -696,6 +735,9 @@ void sandbox_arm_ffa_smccc_smc(ffa_value_t *args, ffa_value_t *res)
+@@ -693,6 +732,9 @@ void sandbox_arm_ffa_smccc_smc(ffa_value_t *args, ffa_value_t *res)
  	case FFA_SMC_32(FFA_MEM_SHARE):
  		ret = sandbox_ffa_memory_share(emul, args, res);
  		break;
@@ -73,10 +73,10 @@ index 4918404fb6d..a630392b6d1 100644
  		log_err("Undefined FF-A interface (%lx)\n",
  			args->a0);
 diff --git a/drivers/firmware/arm-ffa/sandbox_ffa.c b/drivers/firmware/arm-ffa/sandbox_ffa.c
-index 8d85e660e2b..54c81d12f92 100644
+index 5641b283bc8..218ba60eae3 100644
 --- a/drivers/firmware/arm-ffa/sandbox_ffa.c
 +++ b/drivers/firmware/arm-ffa/sandbox_ffa.c
-@@ -92,6 +92,7 @@ static const struct ffa_bus_ops sandbox_ffa_ops = {
+@@ -89,6 +89,7 @@ static const struct ffa_bus_ops sandbox_ffa_ops = {
  	.sync_send_receive = ffa_msg_send_direct_req_hdlr,
  	.rxtx_unmap = ffa_unmap_rxtx_buffers_hdlr,
  	.memory_share = ffa_memory_share_hdlr,

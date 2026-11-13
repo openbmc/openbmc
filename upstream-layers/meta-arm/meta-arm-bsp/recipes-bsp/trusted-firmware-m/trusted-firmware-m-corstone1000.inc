@@ -28,79 +28,33 @@ EXTRA_OECMAKE += "-DPLATFORM_IS_FVP=${TFM_PLATFORM_IS_FVP}"
 EXTRA_OECMAKE += "-DCC312_LEGACY_DRIVER_API_ENABLED=OFF"
 EXTRA_OECMAKE:append = " -DENABLE_MULTICORE=${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_smp', 'TRUE', 'FALSE', d)}"
 EXTRA_OECMAKE:append:corstone1000-mps3 = " -DPLATFORM_PSA_ADAC_SECURE_DEBUG=${@bb.utils.contains('MACHINE_FEATURES', 'secure-debug', 'ON', 'OFF', d)}"
+# Keep the device in CM until authenticated DCU_EN can be preserved across
+# reset and applied from BL2.
+EXTRA_OECMAKE:append:corstone1000-mps3 = " -DCORSTONE1000_SKIP_PROVISIONING_FOR_DEBUG=${@bb.utils.contains('MACHINE_FEATURES', 'secure-debug', 'ON', 'OFF', d)}"
 EXTRA_OECMAKE:append:corstone1000-mps3 = " -DPLATFORM_PSA_ADAC_SOURCE_PATH=${S}/external/tfm-psa-adac -DPLATFORM_PSA_ADAC_BUILD_PATH=${B}/tfm-psa-adac-build"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:append:corstone1000 = " \
-    file://0001-arm-trusted-firmware-m-disable-address-warnings-into.patch \
-    file://0002-Platform-CS1000-Remove-unused-BL1-files.patch \
-    file://0003-Platform-Corstone1000-Fix-BL1-compiler-switch-and-re.patch \
-    file://0004-CC312-alignment-of-cc312-differences-between-fvp-and.patch \
-    file://0005-Platform-Corstone1000-Enable-FWU-partition.patch \
-    file://0006-Platform-Corstone1000-Implement-Bootloader-Abstracti.patch \
-    file://0007-Platform-Corstone1000-Increase-buffer-sizes.patch \
-    file://0008-Platform-Corstone1000-Remove-duplicate-configuration.patch \
-    file://0009-plat-corstone1000-Add-support-for-Cortex-A320-varian.patch \
-    file://0010-Corstone-1000-Enable-different-DRBG-configurations.patch \
-    file://0011-bl2-corstone-1000-Remove-psa_adac_to_tfm_apply_permi.patch \
-    file://0012-bl2-corstone-1000-secure-debug-waiting-in-CM-LCS.patch \
-    file://0013-Build-adjust-CS1000-platform-for-GCC-v14.2.patch \
-    file://0014-Workaround-compile-errors-in-AES.patch \
-    file://0015-CC312-Add-barrier-before-first-AO-lock-write.patch \
-    file://0016-Platform-CS1K-make-mutlicore-support-platform-generi.patch \
-    file://0017-lib-efi_guid-Added-EFI-GUID-library.patch \
-    file://0018-lib-efi_soft_crc-Added-EFI-CRC-library.patch \
-    file://0019-lib-gpt-Implemented-generic-GPT-parser-for-flash.patch \
-    file://0020-lib-gpt-Expanded-how-GPT-partition-can-be-identified.patch \
-    file://0021-lib-gpt-Added-operations-to-modify-partitions.patch \
-    file://0022-lib-gpt-Added-operation-to-move-entry.patch \
-    file://0023-lib-gpt-Added-ability-to-create-and-remove-partition.patch \
-    file://0024-lib-gpt-Added-table-validation-operations.patch \
-    file://0025-lib-gpt-Added-defragmentation-operation.patch \
-    file://0026-lib-GPT-Fix-cppcheck-warnings.patch \
-    file://0027-lib-efi_guid-Remove-unecessary-include-folder.patch \
-    file://0028-lib-efi_guid-Correct-included-folder.patch \
-    file://0029-lib-efi_soft_crc-Correct-include-directory.patch \
-    file://0030-lib-gpt-Add-missing-link-library.patch \
-    file://0031-lib-gpt-Correct-variable-name-used.patch \
-    file://0032-lib-gpt-Correct-include-directory.patch \
-    file://0033-lib-gpt-Move-contents-of-CMake-config-file.patch \
-    file://0034-plat-cs1k-Fixed-formatting-errors.patch \
-    file://0035-plat-cs1k-Removed-unused-variables.patch \
-    file://0036-plat-cs1k-Fixed-bad-function-returns.patch \
-    file://0037-plat-cs1k-Improved-logging-in-function.patch \
-    file://0038-plat-cs1k-Remove-unused-function.patch \
-    file://0039-plat-cs1k-Reduce-BL1-binary-size.patch \
-    file://0040-plat-cs1k-Update-license-identifier.patch \
-    file://0041-plat-cs1k-Changed-to-use-new-GPT-library.patch \
-    file://0042-plat-cs1k-Move-variable-from-stack-to-data.patch \
-    file://0043-plat-cs1k-Create-and-remove-FWU-image-partitions.patch \
-    file://0044-plat-cs1k-Derive-host-base-addresses-from-offsets.patch \
-    file://0045-plat-cs1k-Drive-NPU-via-external-system-reset-contro.patch \
-    file://0046-lib-gpt-Fix-final-entry-not-being-removed.patch \
-    file://0047-lib-gpt-Replace-warnings-with-errors.patch \
-    file://0048-lib-gpt-Enforce-entry-size-of-128-bytes.patch \
-    file://0049-lib-gpt-Ensure-block-size-complies-with-spec.patch \
-    file://0050-lib-gpt-Expand-table-validation.patch \
-    file://0051-lib-gpt-Show-intent-of-GUIDs-in-unittests-more-clear.patch \
-    file://0052-lib-gpt-Provide-macro-identifying-free-space.patch \
-    file://0053-lib-gpt-Add-operation-to-duplicate-entries.patch \
-    file://0054-lib-gpt-Consecutively-erase-blocks-when-moving-parti.patch \
-    file://0055-lib-gpt-Clarify-API-operation.patch \
-    file://0056-lib-gpt-Add-metadata-only-API-operations.patch \
-    file://0057-plat-cs1k-Add-flash-erase-protection.patch \
-    file://0058-plat-cs1k-Remove-unused-FWU-partitions-upon-version-.patch \
-    file://0059-plat-cs1k-Duplicate-old-images-in-FWU.patch \
-    file://0060-platform-corstone1000-Increase-FIP-partition-size.patch \
+    file://0001-CC312-alignment-of-cc312-differences-between-fvp-and.patch \
+    file://0002-Corstone-1000-Enable-different-DRBG-configurations.patch \
+    file://0003-bl2-corstone-1000-secure-debug-waiting-in-CM-LCS.patch \
+    file://0004-Build-fix-remaining-GCC-v14.2-AES-type-error.patch \
+    file://0005-plat-cs1k-Removed-unused-variables.patch \
+    file://0006-lib-gpt-Show-intent-of-GUIDs-in-unittests-more-clear.patch \
+    file://0007-lib-gpt-Provide-macro-identifying-free-space.patch \
+    file://0008-lib-gpt-Add-operation-to-duplicate-entries.patch \
+    file://0009-lib-gpt-Consecutively-erase-blocks-when-moving-parti.patch \
+    file://0010-lib-gpt-Clarify-API-operation.patch \
+    file://0011-lib-gpt-Add-metadata-only-API-operations.patch \
+    file://0012-plat-cs1k-Add-flash-erase-protection.patch \
+    file://0013-platform-corstone1000-Increase-FIP-partition-size.patch \
+    file://0014-platform-corstone1000-keep-CM-during-secure-debug.patch \
     "
 
-SRCREV_tfm-psa-adac:corstone1000 = "f2809ae231be33a1afcd7714f40756c67d846c88"
 FILESEXTRAPATHS:prepend:corstone1000-mps3 := "${THISDIR}/files/corstone1000/psa-adac:"
 SRC_URI:append:corstone1000-mps3 = " \
     file://0001-PSA-revert-header-versions.patch;patchdir=external/tfm-psa-adac \
-    file://0002-Fix-psa_key_handle_t-initialization.patch;patchdir=external/tfm-psa-adac \
-    file://0003-cmake-Update-psa_adac_psa_crypto-dependencies.patch;patchdir=external/tfm-psa-adac \
-    file://0001-Build-Fix-compiler-warnings.patch;patchdir=external/tfm-psa-adac \
+    file://0002-cmake-Update-psa_adac_psa_crypto-dependencies.patch;patchdir=external/tfm-psa-adac \
     "
 
 create_bl1_image(){

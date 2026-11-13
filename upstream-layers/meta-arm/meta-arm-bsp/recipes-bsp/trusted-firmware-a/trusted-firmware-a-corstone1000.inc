@@ -5,14 +5,12 @@ COMPATIBLE_MACHINE = "(corstone1000)"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/corstone1000:"
 SRC_URI:append = " \
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
-	file://0002-plat-corstone1000-add-Cortex-A320-support.patch \
-	file://0003-feat-corestone-1000-make-mutlicore-support-platform-.patch \
+	file://0002-plat-corstone1000-align-BL-config-region.patch \
+	file://0003-plat-corstone1000-delay-early-GPT-access.patch \
 "
 
 TFA_DEBUG = "1"
 TFA_UBOOT ?= "1"
-#FIXME - this can be removed after moving to 2.15.0
-TFA_MBEDTLS = "1"
 TFA_BUILD_TARGET = "bl2 bl31 fip"
 
 # Enabling Secure-EL1 Payload Dispatcher (SPD)

@@ -1,4 +1,4 @@
-From a0207b9fa7f30ed28a791f8503800dda7130e103 Mon Sep 17 00:00:00 2001
+From 8cae6188a0691396b70fb85fa3ceb74d39a3d37c Mon Sep 17 00:00:00 2001
 From: Sughosh Ganu <sughosh.ganu@linaro.org>
 Date: Thu, 22 May 2025 17:57:14 +0100
 Subject: [PATCH] dt: Provide a way to remove non-compliant nodes and
@@ -42,10 +42,10 @@ index fa1622cb1dc..f535c60471b 100644
 +#define DT_NON_COMPLIANT_PURGE_LIST(__name)	\
 +	ll_entry_declare_list(struct dt_non_compliant_purge, __name, dt_purge)
 diff --git a/lib/Makefile b/lib/Makefile
-index 2643bfc867c..4c931aff4d2 100644
+index d0ffabc2b47..aa89536020b 100644
 --- a/lib/Makefile
 +++ b/lib/Makefile
-@@ -65,6 +65,7 @@ endif
+@@ -67,6 +67,7 @@ endif
  obj-$(CONFIG_$(PHASE_)CRC8) += crc8.o
  obj-$(CONFIG_$(PHASE_)CRC16) += crc16.o
  obj-$(CONFIG_$(PHASE_)CRC16) += crc16-ccitt.o

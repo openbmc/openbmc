@@ -1,7 +1,7 @@
-From 7e878429dc5f186ff945281513593c54beaf03f6 Mon Sep 17 00:00:00 2001
+From ce7c0ac113e07baa9631b131ea8be0cbdc099fe5 Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Fri, 10 Apr 2026 17:20:59 +0100
-Subject: [PATCH 41/53] efi_loader: add runtime memset helper
+Subject: [PATCH] efi_loader: add runtime memset helper
 
 Add efi_memset_runtime() for EFI runtime paths
 
@@ -16,12 +16,12 @@ Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
  2 files changed, 24 insertions(+)
 
 diff --git a/include/efi_loader.h b/include/efi_loader.h
-index 0340847c0b4..ec30042665b 100644
+index 8deaa56a27e..6a59397498b 100644
 --- a/include/efi_loader.h
 +++ b/include/efi_loader.h
-@@ -1149,6 +1149,9 @@ struct pkcs7_message *efi_parse_pkcs7_header(const void *buf,
- /* runtime implementation of memcpy() */
- void efi_memcpy_runtime(void *dest, const void *src, size_t n);
+@@ -1156,6 +1156,9 @@ void efi_memcpy_runtime(void *dest, const void *src, size_t n);
+ /* runtime implementation of memcmp() */
+ int efi_memcmp_runtime(const void *s1, const void *s2, size_t n);
  
 +/* runtime implementation of memset */
 +__efi_runtime void *efi_memset_runtime(void *dest, int c, size_t n);
@@ -30,11 +30,11 @@ index 0340847c0b4..ec30042665b 100644
  u16 *efi_create_indexed_name(u16 *buffer, size_t buffer_size, const char *name,
  			     unsigned int index);
 diff --git a/lib/efi_loader/efi_runtime.c b/lib/efi_loader/efi_runtime.c
-index 35eb6a77766..e91b1583b6e 100644
+index 73d4097464c..d9604399209 100644
 --- a/lib/efi_loader/efi_runtime.c
 +++ b/lib/efi_loader/efi_runtime.c
-@@ -209,6 +209,27 @@ void __efi_runtime efi_memcpy_runtime(void *dest, const void *src, size_t n)
- 		*d++ = *s++;
+@@ -233,6 +233,27 @@ int __efi_runtime efi_memcmp_runtime(const void *s1, const void *s2, size_t n)
+ 	return 0;
  }
  
 +/**

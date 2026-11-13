@@ -17,6 +17,11 @@ TFM_IMAGE_SIGN_DEPLOY_DIR = "${WORKDIR}/deploy-tfm-signed-images"
 # version by default
 RE_WRAPPER_SECURITY_COUNTER ?= "auto"
 
+# Optional PSA key IDs to add to the signed image. Multiple IDs may be
+# provided as a space-separated list.
+TFM_IMAGE_SIGN_PSA_KEY_IDS ?= ""
+TFM_IMAGE_SIGN_PSA_KEY_ID_ARGS = "${@' '.join(['--psa-key-ids %s' % key_id for key_id in d.getVar('TFM_IMAGE_SIGN_PSA_KEY_IDS').split()])}"
+
 SSTATETASKS += "do_sign_images"
 do_sign_images[sstate-inputdirs] = "${TFM_IMAGE_SIGN_DEPLOY_DIR}"
 do_sign_images[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
@@ -47,6 +52,7 @@ TFM_IMAGE_SIGN_ARGS ?= "\
     -s ${RE_WRAPPER_SECURITY_COUNTER} \
     --layout "${TFM_IMAGE_SIGN_DIR}/${host_binary_layout}" \
     --public-key-format full \
+    ${TFM_IMAGE_SIGN_PSA_KEY_ID_ARGS} \
     --align 1 \
     --pad \
     --pad-header \
@@ -86,7 +92,17 @@ EOF
 
     host_binary_signed="${TFM_IMAGE_SIGN_DEPLOY_DIR}/signed_$(basename "${1}")"
 
-    ${PYTHON} "${STAGING_LIBDIR_NATIVE}/tfm-scripts/wrapper/wrapper.py" \
+    # TF-M 2.3 installs the wrapper as a console script. Older releases use
+    # the Python script under tfm-scripts, so retain that as a fallback.
+    if [ -x "${STAGING_BINDIR_NATIVE}/mcuboot_imagesign_wrapper" ]; then
+        tfm_sign_wrapper="${STAGING_BINDIR_NATIVE}/mcuboot_imagesign_wrapper"
+    else
+        tfm_sign_wrapper="${PYTHON} ${STAGING_LIBDIR_NATIVE}/tfm-scripts/wrapper/wrapper.py"
+    fi
+
+    # TF-M's patched imgtool contains IMAGE_TLV_KEYID support required to add
+    # PSA key IDs to image metadata; prefer it over python3-imgtool-native.
+    PYTHONPATH="${STAGING_LIBDIR_NATIVE}/tfm-scripts" ${tfm_sign_wrapper} \
             ${TFM_IMAGE_SIGN_ARGS} \
             -k  "${signing_key_path}" \
             "${1}" \

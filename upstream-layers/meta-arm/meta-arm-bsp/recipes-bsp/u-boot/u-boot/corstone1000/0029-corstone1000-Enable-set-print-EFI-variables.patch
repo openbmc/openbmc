@@ -1,4 +1,4 @@
-From bc8a921c11526e42b601aabae93142f74af9cd41 Mon Sep 17 00:00:00 2001
+From 4258bc23a1fab11d7332e2a44a83b3d625f045ec Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Thu, 20 Mar 2025 16:08:16 +0000
 Subject: [PATCH] corstone1000: Enable set/print EFI variables
@@ -13,7 +13,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  1 file changed, 2 insertions(+)
 
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index cbf4550cdb1..00c3bb5f557 100644
+index f12d0001448..2256686d6d0 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -42,6 +42,7 @@ CONFIG_SYS_PROMPT="corstone1000# "
@@ -24,7 +24,7 @@ index cbf4550cdb1..00c3bb5f557 100644
  CONFIG_CMD_GPT=y
  CONFIG_CMD_LOADM=y
  # CONFIG_CMD_LOADS is not set
-@@ -79,6 +80,7 @@ CONFIG_USB=y
+@@ -78,6 +79,7 @@ CONFIG_USB=y
  CONFIG_USB_ISP1760=y
  # CONFIG_RANDOM_UUID is not set
  CONFIG_ERRNO_STR=y

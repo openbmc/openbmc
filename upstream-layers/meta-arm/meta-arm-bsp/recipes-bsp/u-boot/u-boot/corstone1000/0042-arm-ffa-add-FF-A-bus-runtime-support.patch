@@ -1,7 +1,7 @@
-From 2f4000043db3a5658e946a66f1e2b8b8c48dffc7 Mon Sep 17 00:00:00 2001
+From 663ef530e0618172b7eaf0acb65cd8bf9ce91098 Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Thu, 20 Nov 2025 21:56:22 +0000
-Subject: [PATCH 42/53] arm-ffa: add FF-A bus runtime support
+Subject: [PATCH] arm-ffa: add FF-A bus runtime support
 
 Enable FF-A runtime transport for EFI services
 
@@ -42,15 +42,15 @@ Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
  include/arm_ffa_priv.h                     |  24 +-
  include/arm_ffa_runtime.h                  | 189 +++++++++++++
  test/dm/ffa.c                              |   6 +-
- 10 files changed, 564 insertions(+), 120 deletions(-)
+ 10 files changed, 565 insertions(+), 119 deletions(-)
  create mode 100644 drivers/firmware/arm-ffa/arm-ffa-runtime.c
  create mode 100644 include/arm_ffa_runtime.h
 
 diff --git a/drivers/firmware/arm-ffa/Kconfig b/drivers/firmware/arm-ffa/Kconfig
-index d75f8b53fd8..1be9adeb1db 100644
+index 3706a889305..7aaf25fdb58 100644
 --- a/drivers/firmware/arm-ffa/Kconfig
 +++ b/drivers/firmware/arm-ffa/Kconfig
-@@ -17,6 +17,9 @@ config ARM_FFA_TRANSPORT
+@@ -18,6 +18,9 @@ config ARM_FFA_TRANSPORT
  	  The FF-A support in U-Boot is based on FF-A specification v1.0 and uses SMC32
  	  calling convention.
  
@@ -60,7 +60,7 @@ index d75f8b53fd8..1be9adeb1db 100644
  	  FF-A specification:
  
  	  https://developer.arm.com/documentation/den0077/a/?lang=en
-@@ -40,3 +43,11 @@ config ARM_FFA_TRANSPORT
+@@ -41,3 +44,11 @@ config ARM_FFA_TRANSPORT
  	  Secure World (sandbox_ffa.c).
  
  	  For more details about the FF-A support, please refer to doc/arch/arm64.ffa.rst
@@ -391,7 +391,7 @@ index 00000000000..82c75da7d4b
 +	return ops_rt->sync_send_receive(dst_part_id, msg, is_smc64);
 +}
 diff --git a/drivers/firmware/arm-ffa/arm-ffa-uclass.c b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
-index 597b4e994b4..f769e0e9b05 100644
+index 84023f6a94c..ec344a887de 100644
 --- a/drivers/firmware/arm-ffa/arm-ffa-uclass.c
 +++ b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
 @@ -1,12 +1,13 @@
@@ -409,9 +409,9 @@ index 597b4e994b4..f769e0e9b05 100644
  #include <dm.h>
  #include <log.h>
  #include <malloc.h>
-@@ -21,19 +22,6 @@
- 
- DECLARE_GLOBAL_DATA_PTR;
+@@ -18,18 +19,7 @@
+ #include <linux/errno.h>
+ #include <linux/sizes.h>
  
 -/* Error mapping declarations */
 -
@@ -425,11 +425,11 @@ index 597b4e994b4..f769e0e9b05 100644
 -	[RETRY] = -EAGAIN,
 -	[ABORTED] = -ECANCELED,
 -};
--
++DECLARE_GLOBAL_DATA_PTR;
+ 
  static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
  	[FFA_ID_TO_ERRMAP_ID(FFA_VERSION)] = {
- 		{
-@@ -123,27 +111,6 @@ static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
+@@ -120,27 +110,6 @@ static struct ffa_abi_errmap err_msg_map[FFA_ERRMAP_COUNT] = {
  	},
  };
  
@@ -457,7 +457,7 @@ index 597b4e994b4..f769e0e9b05 100644
  /**
   * ffa_print_error_log() - print the error log corresponding to the selected FF-A ABI
   * @ffa_id:	FF-A ABI ID
-@@ -233,7 +200,7 @@ int ffa_get_version_hdlr(struct udevice *dev)
+@@ -230,7 +199,7 @@ int ffa_get_version_hdlr(struct udevice *dev)
  		if (dev) {
  			uc_priv = dev_get_uclass_priv(dev);
  			if (uc_priv)
@@ -466,7 +466,7 @@ index 597b4e994b4..f769e0e9b05 100644
  		}
  
  		return 0;
-@@ -267,8 +234,8 @@ static int ffa_get_endpoint_id(struct udevice *dev)
+@@ -264,8 +233,8 @@ static int ffa_get_endpoint_id(struct udevice *dev)
  			}, &res);
  
  	if (res.a0 == FFA_SMC_32(FFA_SUCCESS)) {
@@ -477,7 +477,7 @@ index 597b4e994b4..f769e0e9b05 100644
  
  		return 0;
  	}
-@@ -490,7 +457,7 @@ int ffa_unmap_rxtx_buffers_hdlr(struct udevice *dev)
+@@ -487,7 +456,7 @@ int ffa_unmap_rxtx_buffers_hdlr(struct udevice *dev)
  
  	invoke_ffa_fn((ffa_value_t){
  			.a0 = FFA_SMC_32(FFA_RXTX_UNMAP),
@@ -486,7 +486,7 @@ index 597b4e994b4..f769e0e9b05 100644
  			}, &res);
  
  	if (res.a0 == FFA_SMC_32(FFA_SUCCESS)) {
-@@ -880,16 +847,8 @@ static int ffa_cache_partitions_info(struct udevice *dev)
+@@ -877,16 +846,8 @@ static int ffa_cache_partitions_info(struct udevice *dev)
   * @msg: pointer to the message data preallocated by the client (in/out)
   * @is_smc64: select 64-bit or 32-bit FF-A ABI
   *
@@ -505,7 +505,7 @@ index 597b4e994b4..f769e0e9b05 100644
   *
   * Return:
   *
-@@ -898,9 +857,6 @@ static int ffa_cache_partitions_info(struct udevice *dev)
+@@ -895,9 +856,6 @@ static int ffa_cache_partitions_info(struct udevice *dev)
  int ffa_msg_send_direct_req_hdlr(struct udevice *dev, u16 dst_part_id,
  				 struct ffa_send_direct_data *msg, bool is_smc64)
  {
@@ -515,7 +515,7 @@ index 597b4e994b4..f769e0e9b05 100644
  	struct ffa_priv *uc_priv;
  
  	uc_priv = dev_get_uclass_priv(dev);
-@@ -909,50 +865,7 @@ int ffa_msg_send_direct_req_hdlr(struct udevice *dev, u16 dst_part_id,
+@@ -906,50 +864,7 @@ int ffa_msg_send_direct_req_hdlr(struct udevice *dev, u16 dst_part_id,
  	if (!uc_priv->partitions.count || !uc_priv->partitions.descs)
  		return -ENODEV;
  
@@ -567,7 +567,7 @@ index 597b4e994b4..f769e0e9b05 100644
  }
  
  /**
-@@ -1008,7 +921,7 @@ static int ffa_setup_and_transmit(struct udevice *dev, u32 func_id,
+@@ -1005,7 +920,7 @@ static int ffa_setup_and_transmit(struct udevice *dev, u32 func_id,
  
  	mem_region->tag = args->tag;
  	mem_region->flags = args->flags;
@@ -576,7 +576,7 @@ index 597b4e994b4..f769e0e9b05 100644
  
  	/*
  	 * These attributes are only valid for FFA_MEM_SHARE.
-@@ -1322,6 +1235,7 @@ int ffa_memory_reclaim(struct udevice *dev, u64 g_handle, u32 flags)
+@@ -1319,6 +1234,7 @@ int ffa_memory_reclaim(struct udevice *dev, u64 g_handle, u32 flags)
  static int ffa_do_probe(struct udevice *dev)
  {
  	int ret;
@@ -584,7 +584,7 @@ index 597b4e994b4..f769e0e9b05 100644
  
  	ret = ffa_get_version_hdlr(dev);
  	if (ret)
-@@ -1345,6 +1259,11 @@ static int ffa_do_probe(struct udevice *dev)
+@@ -1342,6 +1258,11 @@ static int ffa_do_probe(struct udevice *dev)
  		return ret;
  	}
  
@@ -597,7 +597,7 @@ index 597b4e994b4..f769e0e9b05 100644
  }
  
 diff --git a/drivers/firmware/arm-ffa/arm-ffa.c b/drivers/firmware/arm-ffa/arm-ffa.c
-index de36f5647d2..0d451c0ddc7 100644
+index 863dc7e5cac..f96d7613669 100644
 --- a/drivers/firmware/arm-ffa/arm-ffa.c
 +++ b/drivers/firmware/arm-ffa/arm-ffa.c
 @@ -1,6 +1,6 @@
@@ -615,8 +615,8 @@ index de36f5647d2..0d451c0ddc7 100644
 +#include <arm_ffa_runtime.h>
  #include <dm.h>
  #include <log.h>
- #include <asm/global_data.h>
-@@ -28,6 +29,19 @@ void invoke_ffa_fn(ffa_value_t args, ffa_value_t *res)
+ #include <dm/device-internal.h>
+@@ -25,6 +26,19 @@ void invoke_ffa_fn(ffa_value_t args, ffa_value_t *res)
  	arm_smccc_1_2_smc(&args, res);
  }
  
@@ -637,10 +637,10 @@ index de36f5647d2..0d451c0ddc7 100644
   * arm_ffa_discover() - perform FF-A discovery
   * @dev: The Arm FF-A bus device (arm_ffa)
 diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-index a630392b6d1..531ecb12f3a 100644
+index 68a112e4900..084c0540988 100644
 --- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
 +++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
-@@ -758,6 +758,18 @@ void invoke_ffa_fn(ffa_value_t args, ffa_value_t *res)
+@@ -755,6 +755,18 @@ void invoke_ffa_fn(ffa_value_t args, ffa_value_t *res)
  	sandbox_arm_ffa_smccc_smc(&args, res);
  }
  

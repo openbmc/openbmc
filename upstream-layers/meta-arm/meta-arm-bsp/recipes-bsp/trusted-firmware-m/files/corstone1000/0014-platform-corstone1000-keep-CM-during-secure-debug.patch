@@ -1,0 +1,70 @@
+From 3b01281520036b621166d409634dab9b46d01f70 Mon Sep 17 00:00:00 2001
+From: Ahmed Gomaa <ahmed.gomaa@arm.com>
+Date: Wed, 2 Sep 2026 12:00:00 +0100
+Subject: [PATCH 14/14] platform: corstone1000: keep CM during secure debug
+
+Add a temporary Corstone-1000 Secure Debug workaround that skips runtime
+TF-M provisioning when Secure Debug is enabled. This keeps the device in
+the CM lifecycle state and avoids the provisioning reset, allowing the
+authenticated debug session to remain active.
+
+Keep this workaround until a reset-safe architecture is implemented to
+preserve the authenticated DCU_EN value across reset and apply it from BL2.
+
+Upstream-Status: Inappropriate [temporary platform workaround]
+Signed-off-by: Ahmed Gomaa <ahmed.gomaa@arm.com>
+---
+ secure_fw/spm/CMakeLists.txt | 1 +
+ secure_fw/spm/core/main.c    | 9 +++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/secure_fw/spm/CMakeLists.txt b/secure_fw/spm/CMakeLists.txt
+index bf0ab6e99c16..6741c52089de 100644
+--- a/secure_fw/spm/CMakeLists.txt
++++ b/secure_fw/spm/CMakeLists.txt
+@@ -110,6 +110,7 @@ target_compile_definitions(tfm_spm
+         $<$<STREQUAL:${CONFIG_TFM_BRANCH_PROTECTION_FEAT},BRANCH_PROTECTION_PACRET_LEAF>:BRANCH_PROTECTION_CONTROL=2>
+         $<$<STREQUAL:${CONFIG_TFM_BRANCH_PROTECTION_FEAT},BRANCH_PROTECTION_BTI>:BRANCH_PROTECTION_CONTROL=3>
+         $<$<BOOL:${PLATFORM_PSA_ADAC_SECURE_DEBUG}>:PLATFORM_PSA_ADAC_SECURE_DEBUG>
++        $<$<BOOL:${CORSTONE1000_SKIP_PROVISIONING_FOR_DEBUG}>:CORSTONE1000_SKIP_PROVISIONING_FOR_DEBUG>
+         $<$<BOOL:${CONFIG_TFM_REUSE_COPY_AREA_FOR_SP_STACKS}>:CONFIG_TFM_REUSE_COPY_AREA_FOR_SP_STACKS>
+         $<$<BOOL:${TFM_TZ_REENTRANCY_CHECK}>:TFM_TZ_REENTRANCY_CHECK>
+ )
+diff --git a/secure_fw/spm/core/main.c b/secure_fw/spm/core/main.c
+index 2bafac0c980e..22090c34efc4 100644
+--- a/secure_fw/spm/core/main.c
++++ b/secure_fw/spm/core/main.c
+@@ -31,7 +31,9 @@ static fih_ret tfm_core_init(void)
+ {
+     enum tfm_plat_err_t plat_err = TFM_PLAT_ERR_SYSTEM_ERR;
+     FIH_DECLARE(fih_rc, FIH_FAILURE);
++#ifndef CORSTONE1000_SKIP_PROVISIONING_FOR_DEBUG
+     bool provisioning_required;
++#endif
+ 
+     /*
+      * Access to any peripheral should be performed after programming
+@@ -65,6 +67,7 @@ static fih_ret tfm_core_init(void)
+         FIH_RET(SPM_ERROR_GENERIC);
+     }
+ 
++#ifndef CORSTONE1000_SKIP_PROVISIONING_FOR_DEBUG
+     /* Perform provisioning. */
+     plat_err = tfm_plat_provisioning_is_required(&provisioning_required);
+     if (plat_err != TFM_PLAT_ERR_SUCCESS) {
+@@ -77,6 +80,12 @@ static fih_ret tfm_core_init(void)
+             FIH_RET(SPM_ERROR_GENERIC);
+         }
+     }
++#else
++    /* Temporary workaround: retain CM and avoid the provisioning reset. */
++    WARN("Skipping TF-M provisioning for Secure Debug workaround. "
++            "Device remains unprovisioned and must not be used in "
++            "production.\n");
++#endif
+ 
+     TFM_COVERITY_DEVIATE_LINE(MISRA_C_2023_Rule_2_2, "Parameters can be changed by user and this code will make effect")
+     tfm_plat_provisioning_check_for_dummy_keys();
+-- 
+2.39.5
+

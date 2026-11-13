@@ -1,8 +1,7 @@
-From a4d871a16513e86290aaa2304f0195e533200937 Mon Sep 17 00:00:00 2001
+From 60230fcc1c136544ef28c1d9040f34b3cc9c762d Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Wed, 25 Feb 2026 14:40:19 +0000
-Subject: [PATCH 50/53] doc: arm64: document FF-A runtime path for EFI
- variables
+Subject: [PATCH] doc: arm64: document FF-A runtime path for EFI variables
 
 Document how EFI runtime variables use FF-A MM communication
 
@@ -153,7 +152,7 @@ index d2c4fb49f79..53218cd9c96 100644
  .. _`FF-A v1.0 specification`: https://documentation-service.arm.com/static/5fb7e8a6ca04df4095c1d65e
  .. _`SMC Calling Convention v1.2 specification`: https://documentation-service.arm.com/static/5f8edaeff86e16515cdbe4c6
 diff --git a/doc/usage/cmd/armffa.rst b/doc/usage/cmd/armffa.rst
-index 4f41e3393fd..5dcc3047a45 100644
+index dbe4d5bc842..2b865f88015 100644
 --- a/doc/usage/cmd/armffa.rst
 +++ b/doc/usage/cmd/armffa.rst
 @@ -39,6 +39,17 @@ The command also allows to gather secure partitions information and ping these

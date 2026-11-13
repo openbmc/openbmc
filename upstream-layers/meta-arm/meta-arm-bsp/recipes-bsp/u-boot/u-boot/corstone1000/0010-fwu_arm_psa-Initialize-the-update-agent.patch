@@ -1,4 +1,4 @@
-From 61063c4da940390bea439fc0ded48b3e79b3335d Mon Sep 17 00:00:00 2001
+From b8c376d14b75fca0bb41ee99241d62ac54969825 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Wed, 23 Oct 2024 17:45:32 +0100
 Subject: [PATCH] fwu_arm_psa: Initialize the update agent
@@ -40,10 +40,10 @@ Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/2025070215
  create mode 100644 lib/fwu_updates/fwu_arm_psa.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 1db1070d5f8..0567ba87742 100644
+index 45e9076de67..26c3763cc18 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1229,6 +1229,13 @@ T:	git https://source.denx.de/u-boot/custodians/u-boot-fsl-qoriq.git
+@@ -1256,6 +1256,13 @@ T:	git https://source.denx.de/u-boot/custodians/u-boot-fsl-qoriq.git
  F:	drivers/watchdog/sp805_wdt.c
  F:	drivers/watchdog/sbsa_gwdt.c
  
@@ -55,8 +55,8 @@ index 1db1070d5f8..0567ba87742 100644
 +F:	lib/fwu_updates/fwu_arm_psa.c
 +
  FWU Multi Bank Update
- M:	Sughosh Ganu <sughosh.ganu@linaro.org>
- S:	Maintained
+ M:	Sughosh Ganu <sughosh.ganu@arm.com>
+ M:	Kory Maincent <kory.maincent@bootlin.com>
 diff --git a/include/fwu_arm_psa.h b/include/fwu_arm_psa.h
 new file mode 100644
 index 00000000000..f1d42f9ef24
@@ -122,10 +122,10 @@ index 00000000000..f1d42f9ef24
 +
 +#endif
 diff --git a/lib/fwu_updates/Kconfig b/lib/fwu_updates/Kconfig
-index a722107c129..cdc96109f0a 100644
+index b38808e3463..6e49de57852 100644
 --- a/lib/fwu_updates/Kconfig
 +++ b/lib/fwu_updates/Kconfig
-@@ -46,4 +46,22 @@ config FWU_MDATA_V2
+@@ -47,4 +47,22 @@ config FWU_MDATA_V2
  	  metadata structure. This option enables support for FWU
  	  Metadata version 2 access.
  

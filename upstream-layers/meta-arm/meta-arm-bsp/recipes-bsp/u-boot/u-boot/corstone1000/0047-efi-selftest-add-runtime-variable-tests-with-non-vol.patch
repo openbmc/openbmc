@@ -1,8 +1,8 @@
-From 85edddc46913a19ce9e2dd0cb802a2dac60c9b9d Mon Sep 17 00:00:00 2001
+From 5ad52b35076cb13d403f90bcd99a23e4e8533a77 Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Sun, 11 Jan 2026 20:36:45 +0000
-Subject: [PATCH 47/53] efi: selftest: add runtime variable tests with
- non-volatile storage
+Subject: [PATCH] efi: selftest: add runtime variable tests with non-volatile
+ storage
 
 Extend runtime variable tests for persistent storage
 
@@ -28,7 +28,7 @@ Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
  1 file changed, 105 insertions(+), 3 deletions(-)
 
 diff --git a/lib/efi_selftest/efi_selftest_variables_runtime.c b/lib/efi_selftest/efi_selftest_variables_runtime.c
-index 379c4f9c47b..7c14b9fefd4 100644
+index fd570d673f0..938d0853019 100644
 --- a/lib/efi_selftest/efi_selftest_variables_runtime.c
 +++ b/lib/efi_selftest/efi_selftest_variables_runtime.c
 @@ -3,6 +3,7 @@
@@ -39,7 +39,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
   *
   * This unit test checks the runtime services for variables after
   * ExitBootServices():
-@@ -40,7 +41,13 @@ static int setup(const efi_handle_t img_handle,
+@@ -22,7 +23,13 @@ static const efi_guid_t efi_rt_var_guid = U_BOOT_EFI_RT_VAR_FILE_GUID;
  /**
   * execute() - execute unit test
   *
@@ -54,14 +54,14 @@ index 379c4f9c47b..7c14b9fefd4 100644
   */
  static int execute(void)
  {
-@@ -57,6 +64,80 @@ static int execute(void)
+@@ -39,6 +46,80 @@ static int execute(void)
  	u64 max_storage, rem_storage, max_size;
  	int test_ret;
  
 +	/* Compare the value of EFI variable if it already exists in non volatile storage */
 +	if (!IS_ENABLED(CONFIG_EFI_RT_VOLATILE_STORE)) {
 +		len = sizeof(v) / 2;
-+		ret = runtime->get_variable(u"efi_st_var0", &guid_vendor0,
++		ret = st_runtime->get_variable(u"efi_st_var0", &guid_vendor0,
 +				&attr, &len, data);
 +		if (ret == EFI_SUCCESS) {
 +			efi_st_printf("EFI Variable efi_st_var0 found. Executing Second Phase\n");
@@ -76,7 +76,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
 +
 +			/* Append an existing variable */
 +			append_len = sizeof(v) - len;
-+			ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++			ret = st_runtime->set_variable(u"efi_st_var0", &guid_vendor0,
 +						    EFI_VARIABLE_BOOTSERVICE_ACCESS |
 +						    EFI_VARIABLE_RUNTIME_ACCESS |
 +						    EFI_VARIABLE_APPEND_WRITE |
@@ -88,7 +88,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
 +			}
 +
 +			len = sizeof(v);
-+			ret = runtime->get_variable(u"efi_st_var0", &guid_vendor0,
++			ret = st_runtime->get_variable(u"efi_st_var0", &guid_vendor0,
 +					&attr, &len, data);
 +			if (ret != EFI_SUCCESS) {
 +				efi_st_error("GetVariable failed\n");
@@ -106,7 +106,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
 +			}
 +
 +			/* Delete it by setting the size to 0 */
-+			ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++			ret = st_runtime->set_variable(u"efi_st_var0", &guid_vendor0,
 +						    EFI_VARIABLE_BOOTSERVICE_ACCESS |
 +						    EFI_VARIABLE_RUNTIME_ACCESS |
 +						    EFI_VARIABLE_NON_VOLATILE,
@@ -116,7 +116,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
 +				return EFI_ST_FAILURE;
 +			}
 +
-+			ret = runtime->get_variable(u"efi_st_var0", &guid_vendor0,
++			ret = st_runtime->get_variable(u"efi_st_var0", &guid_vendor0,
 +					&attr, &len, data);
 +			if (ret != EFI_NOT_FOUND) {
 +				efi_st_error("GetVariable failed\n");
@@ -135,16 +135,16 @@ index 379c4f9c47b..7c14b9fefd4 100644
  	memset(v2, 0x1, sizeof(v2));
  
  	if (IS_ENABLED(CONFIG_EFI_VARIABLE_FILE_STORE)) {
-@@ -70,7 +151,7 @@ static int execute(void)
- 		ret = runtime->query_variable_info(EFI_VARIABLE_BOOTSERVICE_ACCESS,
- 					   &max_storage, &rem_storage,
- 					   &max_size);
+@@ -53,7 +134,7 @@ static int execute(void)
+ 		ret = st_runtime->query_variable_info(
+ 			EFI_VARIABLE_BOOTSERVICE_ACCESS, &max_storage,
+ 			&rem_storage, &max_size);
 -		if (ret != EFI_UNSUPPORTED) {
 +		if (ret != EFI_ST_SUCCESS) {
  			efi_st_error("QueryVariableInfo failed\n");
  			return EFI_ST_FAILURE;
  		}
-@@ -286,7 +367,28 @@ static int execute(void)
+@@ -279,7 +360,28 @@ static int execute(void)
  			return EFI_ST_FAILURE;
  		}
  	} else {
@@ -155,7 +155,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
 +		}
 +
 +		/* Delete it by setting the size to 0 */
-+		ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++		ret = st_runtime->set_variable(u"efi_st_var0", &guid_vendor0,
 +					    EFI_VARIABLE_BOOTSERVICE_ACCESS |
 +					    EFI_VARIABLE_RUNTIME_ACCESS,
 +					    0, NULL);
@@ -165,7 +165,7 @@ index 379c4f9c47b..7c14b9fefd4 100644
 +		}
 +
 +		/* Add an 8byte aligned variable */
-+		ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++		ret = st_runtime->set_variable(u"efi_st_var0", &guid_vendor0,
 +					    EFI_VARIABLE_BOOTSERVICE_ACCESS |
 +					    EFI_VARIABLE_RUNTIME_ACCESS |
 +					    EFI_VARIABLE_NON_VOLATILE,

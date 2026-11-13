@@ -1,0 +1,33 @@
+From 8a30545506d8a7f58f0ad30130593e0f78e8b219 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Mon, 23 Feb 2026 11:53:38 -0500
+Subject: [PATCH 04/14] Build: fix remaining GCC v14.2 AES type error
+
+GCC v14.2 diagnoses the incompatible pointer type used when passing
+the ECB key buffer to bl1_key_to_cc3xx_key(). Cast the uint32_t key
+buffer to the uint8_t pointer type expected by the helper.
+
+Upstream-Status: Inappropriate [GCC v14.2 compatibility workaround]
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Signed-off-by: Ahmed Gomaa <Ahmed.Gomaa@arm.com>
+---
+ platform/ext/target/arm/corstone1000/bl1/cc312_rom_crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl1/cc312_rom_crypto.c b/platform/ext/target/arm/corstone1000/bl1/cc312_rom_crypto.c
+index 6bc89fe1155c..2008e9641b49 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/cc312_rom_crypto.c
++++ b/platform/ext/target/arm/corstone1000/bl1/cc312_rom_crypto.c
+@@ -338,7 +338,7 @@ static int32_t aes_256_ecb_encrypt(enum tfm_bl1_key_id_t key_id,
+         return -1;
+     }
+ 
+-    rc = bl1_key_to_cc3xx_key(key_id, &cc3xx_key_type, key_buf, sizeof(key_buf));
++    rc = bl1_key_to_cc3xx_key(key_id, &cc3xx_key_type, (uint8_t *)key_buf, sizeof(key_buf));
+     if (rc) {
+         return rc;
+     }
+-- 
+2.39.5
+

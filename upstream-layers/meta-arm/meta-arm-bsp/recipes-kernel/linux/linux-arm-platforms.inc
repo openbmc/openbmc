@@ -135,3 +135,6 @@ KBUILD_DEFCONFIG:sbsa-ref = "defconfig"
 KCONFIG_MODE:sbsa-ref = "--alldefconfig"
 # Upstream defconfig often causes warnings but we don't maintain it
 KCONF_BSP_AUDIT_LEVEL:sbsa-ref = "0"
+# Build e1000e into the kernel for testimage
+FILESEXTRAPATHS:prepend:sbsa-ref := "${ARMBSPFILESPATHS}"
+SRC_URI:append:sbsa-ref = " file://e1000.cfg"

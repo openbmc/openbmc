@@ -57,7 +57,7 @@ Table: Trusted Firmware-A components
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a_%.bbappend`                |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.1.bb`                     |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.15.0.bb`                     |
 
 #### Trusted Services {.reference}
 
@@ -91,7 +91,7 @@ Table: OP-TEE components
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_%.bbappend`                                 |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.9.0.bb`                                       |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.10.0.bb`                                       |
 
 #### U-Boot {.reference}
 
@@ -103,7 +103,7 @@ Table: U-Boot components
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/u-boot/u-boot_%.bbappend`                                           |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_%.bbappend`                                       |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.10.bb`                                       |
+| Recipe    | `${WORKSPACE}/core/meta/recipes-bsp/u-boot/u-boot_2026.07.bb`                                                   |
 
 #### Linux {.reference}
 
@@ -135,7 +135,7 @@ Table: Trusted Firmware-M secure enclave components
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend`                |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.2.bb`                     |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.3.0.bb`                      |
 
 ## Build {.reference}
 
