@@ -12,7 +12,7 @@ IGPS_BRANCH ?= "main"
 SRC_URI = " \
     git://github.com/Nuvoton-Israel/igps-npcm8xx;branch=${IGPS_BRANCH};protocol=https \
 "
-SRCREV = "7d24d55fac32b2b7c434752d45d86a009cde0f53"
+SRCREV = "e821867fb2700696cfeea9855170d64a2910d037"
 
 DEPENDS = "npcm7xx-bingo-native openssl-native"
 inherit obmc-phosphor-utils
