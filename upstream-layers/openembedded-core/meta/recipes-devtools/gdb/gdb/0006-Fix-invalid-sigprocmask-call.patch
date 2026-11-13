@@ -1,4 +1,4 @@
-From 13e61d515b74389e61fa52ca43656f9d1c294683 Mon Sep 17 00:00:00 2001
+From 7a405e07c213b25800eb79fa401c5bb9eccb91be Mon Sep 17 00:00:00 2001
 From: Yousong Zhou <yszhou4tech@gmail.com>
 Date: Fri, 24 Mar 2017 10:36:03 +0800
 Subject: [PATCH] Fix invalid sigprocmask call
@@ -32,7 +32,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdbsupport/signals-state-save-restore.cc b/gdbsupport/signals-state-save-restore.cc
-index 60724f95c87..8b493271aa6 100644
+index f3b7541a..c1534254 100644
 --- a/gdbsupport/signals-state-save-restore.cc
 +++ b/gdbsupport/signals-state-save-restore.cc
 @@ -37,7 +37,7 @@ save_original_signals_state (bool quiet)

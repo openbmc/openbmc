@@ -1,4 +1,4 @@
-From 882166d7fa113f0c2108864b8a579d01816e1fce Mon Sep 17 00:00:00 2001
+From 82ccfb45b0aacb275b0228ec3b3dd2522e5393e9 Mon Sep 17 00:00:00 2001
 From: Sumanth Gavini <sumanth.gavini@windriver.com>
 Date: Tue, 11 Aug 2026 12:02:31 -0700
 Subject: [PATCH] libarchive: Disable RPM filter auto-bidding
@@ -20,7 +20,7 @@ Signed-off-by: Sumanth Gavini <sumanth.gavini@windriver.com>
  1 file changed, 6 insertions(+), 31 deletions(-)
 
 diff --git a/libarchive/archive_read_support_filter_rpm.c b/libarchive/archive_read_support_filter_rpm.c
-index 01bd1bf..8e90da3 100644
+index 1cfddf7..a9b6ef8 100644
 --- a/libarchive/archive_read_support_filter_rpm.c
 +++ b/libarchive/archive_read_support_filter_rpm.c
 @@ -79,39 +79,14 @@ static int
@@ -69,5 +69,3 @@ index 01bd1bf..8e90da3 100644
  }
  
  static const struct archive_read_filter_vtable
--- 
-2.49.0

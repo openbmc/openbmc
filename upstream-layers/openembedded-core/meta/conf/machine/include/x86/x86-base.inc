@@ -5,7 +5,7 @@
 #
 # common settings for X86 machines
 #
-MACHINE_FEATURES += "screen keyboard pci usbhost ext2 ext3 x86 \
+MACHINE_FEATURES += "screen keyboard pci usbhost ext2 x86 \
                      acpi serial usbgadget alsa"
 
 IMAGE_FSTYPES ?= "wic.zst"

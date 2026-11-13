@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Oct 2026 14:16:28 -0700
+Subject: [PATCH] Remove unused file-scope variables
+
+Crc32 (zm.c), ztrans (lrz.c), vpos and Beenhereb4 (lsz.c) are only ever
+assigned, never read: Crc32 is a leftover display flag superseded by
+Rxframeind, and the other three no longer feed anything. clang 23 adds
+-Wunused-but-set-global, enabled by -Wall, so the default -Werror build
+now fails:
+
+  src/zm.c:37:12: error: variable 'Crc32' set but not used [-Werror,-Wunused-but-set-global]
+  src/lrz.c:111:13: error: variable 'ztrans' set but not used [-Werror,-Wunused-but-set-global]
+  src/lsz.c:97:13: error: variable 'vpos' set but not used [-Werror,-Wunused-but-set-global]
+  src/lsz.c:132:12: error: variable 'Beenhereb4' set but not used [-Werror,-Wunused-but-set-global]
+
+Remove them and their stores.
+
+Upstream-Status: Submitted [https://github.com/UweOhse/lrzsz/pull/3]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/lrz.c | 2 --
+ src/lsz.c | 5 -----
+ src/zm.c  | 4 ----
+ 3 files changed, 11 deletions(-)
+
+diff --git a/src/lrz.c b/src/lrz.c
+index 3fd74bc..a15f285 100644
+--- a/src/lrz.c
++++ b/src/lrz.c
+@@ -108,7 +108,6 @@ static long min_bps_time=120;
+ static char Lzmanag;		/* Local file management request */
+ static char zconv;		/* ZMODEM file conversion request */
+ static char zmanag;		/* ZMODEM file management request */
+-static char ztrans;		/* ZMODEM file transport request */
+ bool Zctlesc;		/* Encode control characters */
+ unsigned int Zrwindow = 1400;	/* RX window size (controls garbage count) */
+ 
+@@ -1683,7 +1682,6 @@ again:
+ 				skip_if_not_found=true;
+ 			}
+ 			zmanag = Rxhdr[ZF1];
+-			ztrans = Rxhdr[ZF2];
+ 			tryzhdrtype = ZRINIT;
+ 			c = zrdata(secbuf, LRZSZ_MAX_SUBPACKET_LEN, &bytes_in_block);
+ 			io_mode(0,3);
+diff --git a/src/lsz.c b/src/lsz.c
+index 18766a6..b9e79cf 100644
+--- a/src/lsz.c
++++ b/src/lsz.c
+@@ -94,8 +94,6 @@ static FILE *input_f;
+ 
+ static char *txbuf;
+ 
+-static long vpos = 0;			/* Number of bytes read from file */
+-
+ static char Lastrx;
+ static char Crcflg;
+ int Verbose=0;
+@@ -129,7 +127,6 @@ static int Cmdtries = 11;
+ static int Cmdack1;		/* Rx ACKs command, then do it */
+ static int Exitcode;
+ static size_t Lastsync;		/* Last offset to which we got a ZRPOS */
+-static int Beenhereb4;		/* How many times we've been ZRPOS'd same place */
+ /* set when an abort arm has answered a receiver's ZABORT/ZFERR with the
+  * spec-required ZFIN sequence (zmodem-wip.txt §4): the session is then
+  * already ended cleanly, and main() must not append a cancel sequence */
+@@ -762,7 +759,6 @@ wcs(const char *oname, const char *remotename)
+ 			setvbuf(input_f,s,_IOFBF,last_length);
+ 		}
+ 	}
+-	vpos = 0;
+ 	/* fstat must succeed: its fields are transmitted below as the file's
+ 	 * metadata (mode/mtime/size). A failure used to send uninitialized
+ 	 * memory - a garbage size in particular can make the receiver
+@@ -1800,7 +1796,6 @@ zsendfdata (struct zm_fileinfo *zi)
+ 
+ 	Lrxpos = 0;
+ 	junkcount = 0;
+-	Beenhereb4 = 0;
+ 	last_txpos = 0;
+ 	low_bps = 0;
+ 	not_printed = 0;
+diff --git a/src/zm.c b/src/zm.c
+index 9aa3298..9a62c1c 100644
+--- a/src/zm.c
++++ b/src/zm.c
+@@ -34,7 +34,6 @@ unsigned char Rxhdr[4];		/* Received header */
+ unsigned char Txhdr[4];		/* Transmitted header */
+ int Txfcs32;		/* true means send binary frames with 32 bit FCS */
+ int Crc32t;		/* Display flag indicating 32 bit CRC being sent */
+-static int Crc32;		/* Display flag indicating 32 bit CRC being received */
+ int Znulls;		/* Number of nulls to send at beginning of ZDATA hdr */
+ char Attn[ZATTNLEN+1];	/* Attention string rx sends to tx on err */
+ 
+@@ -784,7 +783,6 @@ zgethdr(unsigned char *hdr, int eflag, size_t *Rxpos)
+ 				continue;
+ 			case ZBIN:
+ 				Rxframeind = ZBIN;
+-				Crc32 = false;
+ 				c =  zrbhdr(hdr);
+ 				if (c==ERROR) {
+ 					stats_msg_invalid();
+@@ -799,7 +797,6 @@ zgethdr(unsigned char *hdr, int eflag, size_t *Rxpos)
+ 				continue;
+ 			case ZBIN32:
+ 				Rxframeind = ZBIN32;
+-				Crc32 = true;
+ 				c =  zrbhdr32(hdr);
+ 				if (c==ERROR) {
+ 					stats_msg_invalid();
+@@ -814,7 +811,6 @@ zgethdr(unsigned char *hdr, int eflag, size_t *Rxpos)
+ 				continue;
+ 			case ZHEX:
+ 				Rxframeind = ZHEX;
+-				Crc32 = false;
+ 				c =  zrhhdr(hdr);
+ 				if (c==ERROR) {
+ 					stats_msg_invalid();

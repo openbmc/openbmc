@@ -53,6 +53,7 @@ do_install_ptest() {
                -e "s,${STAGING_BINDIR_NATIVE}/perl-native/\.\.,${bindir}/,g" \
                -e "s,${S},,g" \
                -e "s,${D},,g" \
+               -e "s,/${BUILD_ARCH}-${BUILD_OS}',\',g" \
                ${D}${PTEST_PATH}/_build/build_params \
                ${D}${PTEST_PATH}/_build/runtime_params
         rm -rf ${D}${PTEST_PATH}/blib/libhtml/site/lib/Module/

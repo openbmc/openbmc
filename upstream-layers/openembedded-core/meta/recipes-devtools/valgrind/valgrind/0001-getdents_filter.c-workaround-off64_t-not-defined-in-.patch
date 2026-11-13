@@ -1,7 +1,7 @@
-From 8c2313226de5171dd6724c1878a679b556b6cab4 Mon Sep 17 00:00:00 2001
+From 286f86a330efc0d38bb60cc47e9163cc2783f310 Mon Sep 17 00:00:00 2001
 From: Alyssa Ross <hi@alyssa.is>
 Date: Sun, 2 Nov 2025 16:43:47 +0100
-Subject: [PATCH v2] Avoid Glibc-specific ino64_t/off64_t
+Subject: [PATCH] Avoid Glibc-specific ino64_t/off64_t
 
 The *64_t types are transitional APIs for applications that do not yet
 fully support large files on 32-bit platforms.  musl no longer
@@ -21,7 +21,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/none/tests/linux/getdents_filter.c b/none/tests/linux/getdents_filter.c
-index 361659f51..4f46a6ea2 100644
+index 361659f..4f46a6e 100644
 --- a/none/tests/linux/getdents_filter.c
 +++ b/none/tests/linux/getdents_filter.c
 @@ -2,6 +2,7 @@
@@ -43,5 +43,3 @@ index 361659f51..4f46a6ea2 100644
      unsigned short d_reclen;
      unsigned char  d_type;
      char           d_name[];
--- 
-2.51.0

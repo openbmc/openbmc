@@ -1,4 +1,4 @@
-From c83f9dbfd7d9b96e4969ab16d5db69e064c67c50 Mon Sep 17 00:00:00 2001
+From 48490e19f25b0d0eb88d861475f518074419fb92 Mon Sep 17 00:00:00 2001
 From: Paul Barker <paul@pbarker.dev>
 Date: Mon, 5 Jan 2026 09:56:41 +0000
 Subject: [PATCH] tests: script: Disable size option test

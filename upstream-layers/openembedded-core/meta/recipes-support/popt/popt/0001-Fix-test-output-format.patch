@@ -1,0 +1,33 @@
+From 3aac82ac6b8ea69533c6cf5e8e8745a0932b8bac Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Sun, 8 Nov 2026 20:50:31 +0100
+Subject: [PATCH] Fix test output format
+
+"run_diff tests" have different output format than "run tests".
+
+Having : after test results string complies to autotools test format and
+makes all tests output the same.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/popt/pull/149]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ tests/testit.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/testit.sh b/tests/testit.sh
+index b8357c8..f10f4d8 100755
+--- a/tests/testit.sh
++++ b/tests/testit.sh
+@@ -28,10 +28,10 @@ run_diff() {
+     diff_ret=$?
+ 
+     if [ "$diff_ret" != "0" ]; then
+-       echo "FAIL $name: failed output is in $out, diff is:"
++       echo "FAIL: $name: failed output is in $out, diff is:"
+        cat $diff_file
+     else
+-        echo "PASS $name"
++        echo "PASS: $name"
+     fi
+     rm $out $diff_file
+ }

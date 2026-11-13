@@ -7,4 +7,6 @@ SRC_URI[sha256sum] = "4cf17c82fb9646d1bc9ca92ac280813a3b605d8c421225fd9913154103
 
 inherit setuptools3 pypi
 
+PYPI_PACKAGE_SDIST = "sphinx-copybutton"
+
 BBCLASSEXTEND = "native nativesdk"

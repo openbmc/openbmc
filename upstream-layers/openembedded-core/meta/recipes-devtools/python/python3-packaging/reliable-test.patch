@@ -1,0 +1,79 @@
+From ef837aad3127167671eb37b9f6bd8a94ec7ce26e Mon Sep 17 00:00:00 2001
+From: Louis Deconinck <louis.dck@gmail.com>
+Date: Tue, 13 Oct 2026 21:17:05 +0200
+Subject: [PATCH] test: avoid filtering compatible release examples (#1407)
+
+Assisted-by: Codex
+
+Signed-off-by: Louis Deconinck <louis.dck@gmail.com>
+
+Upstream-Status: Backport [https://github.com/pypa/packaging/pull/1407]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/property/strategies.py              | 13 ++++++++++++-
+ tests/property/test_specifier_matching.py |  7 ++++---
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/tests/property/strategies.py b/tests/property/strategies.py
+index 4ce828b76..b42b6dcb4 100644
+--- a/tests/property/strategies.py
++++ b/tests/property/strategies.py
+@@ -85,9 +85,11 @@ def pep440_versions(
+     *,
+     include_local: bool = True,
+     min_segments: int = 1,
++    epoch: int | None = None,
+ ) -> Version:
+     """Generate a random PEP 440 version."""
+-    epoch = draw(st.sampled_from([None, 0, 1, 2, 3]))
++    if epoch is None:
++        epoch = draw(st.sampled_from([None, 0, 1, 2, 3]))
+     num_segments = draw(st.integers(min_value=min_segments, max_value=4))
+     release = tuple(draw(small_ints) for _ in range(num_segments))
+ 
+@@ -153,6 +155,15 @@ def multi_segment_versions(draw: st.DrawFn) -> Version:
+     return v
+ 
+ 
++@st.composite
++def compatible_release_version_pairs(draw: st.DrawFn) -> tuple[Version, Version]:
++    """Generate compatible-release examples whose versions share an epoch."""
++    epoch = draw(st.integers(min_value=0, max_value=3))
++    spec_ver = draw(pep440_versions(include_local=False, min_segments=2, epoch=epoch))
++    candidate = draw(pep440_versions(epoch=epoch))
++    return spec_ver, candidate
++
++
+ @st.composite
+ def versions_with_local(draw: st.DrawFn) -> Version:
+     """Generate a PEP 440 version that always has a local segment."""
+diff --git a/tests/property/test_specifier_matching.py b/tests/property/test_specifier_matching.py
+index 4552ce8ce..d85eadaa7 100644
+--- a/tests/property/test_specifier_matching.py
++++ b/tests/property/test_specifier_matching.py
+@@ -12,6 +12,7 @@
+ from packaging.version import Version
+ from tests.property.strategies import (
+     SETTINGS,
++    compatible_release_version_pairs,
+     multi_segment_versions,
+     nonlocal_versions,
+     ops,
+@@ -198,14 +199,14 @@ class TestCompatibleReleaseDefinition:
+     and a version identifier. It matches any candidate version that is expected
+     to be compatible with the specified version."""
+ 
+-    @given(spec_ver=multi_segment_versions(), candidate=pep440_versions())
++    @given(versions=compatible_release_version_pairs())
+     @SETTINGS
+     def test_compatible_release_matches_expected_compatible(
+-        self, spec_ver: Version, candidate: Version
++        self, versions: tuple[Version, Version]
+     ) -> None:
+         """~=V matches candidate iff candidate >= V and candidate matches the
+         prefix wildcard derived from V."""
+-        assume(spec_ver.epoch == candidate.epoch)
++        spec_ver, candidate = versions
+         spec = Specifier(f"~={spec_ver}")
+         result = candidate in spec
+         # Also check via the expanded form

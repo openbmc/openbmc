@@ -1,0 +1,89 @@
+From f5bde7a5bda6bc10eafd132e0a8a8e7ce9a69779 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 25 Oct 2026 09:09:05 -0700
+Subject: [PATCH] meson: check TLSDESC support with a shared library
+
+The -mtls-dialect probe runs a program whose own TLS access is meant to
+exercise the dynamic loader. However, the linker relaxes TLS accesses
+in an executable, even when compiled with -fpic: lld always rewrites
+TLSDESC to local-exec there. The probe then passes on systems whose
+libc has no TLS descriptor support, e.g. glibc on RISC-V, and mesa is
+built with -mtls-dialect=desc. Loading libgallium then fails with:
+
+  libgallium-26.2.4.so: unexpected reloc type 0x0c
+
+Build the TLS access into a shared library instead and run a program
+linked against it, so the dynamic loader has to process the TLSDESC
+relocation.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/45593]
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ build-support/conftest-tlsdesc.c | 23 +++++++++++++++++++++++
+ meson.build                      | 21 ++++++++++++++++++---
+ 2 files changed, 41 insertions(+), 3 deletions(-)
+ create mode 100644 build-support/conftest-tlsdesc.c
+
+diff --git a/build-support/conftest-tlsdesc.c b/build-support/conftest-tlsdesc.c
+new file mode 100644
+index 00000000000..2351f6fef10
+--- /dev/null
++++ b/build-support/conftest-tlsdesc.c
+@@ -0,0 +1,23 @@
++/*
++ * Used by meson.build to check for TLS descriptor support.  Built once as a
++ * shared library (CONFTEST_TLSDESC_LIB) and once as a program linked against
++ * it, so that the dynamic loader has to process the library's TLSDESC
++ * relocation.  A TLS access in the program itself would be relaxed by the
++ * linker and could not show missing libc support.
++ */
++#ifdef CONFTEST_TLSDESC_LIB
++/* Not static, so that the compiler cannot fold the access away. */
++__thread int conftest_tlsdesc_var = 42;
++
++int conftest_tlsdesc(void)
++{
++   return conftest_tlsdesc_var;
++}
++#else
++int conftest_tlsdesc(void);
++
++int main(void)
++{
++   return conftest_tlsdesc() != 42;
++}
++#endif
+diff --git a/meson.build b/meson.build
+index f725f833a52..75430283eb2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -651,10 +651,25 @@ if not have_mtls_dialect
+     # The way to specify the TLSDESC dialect is architecture-specific.
+     # We probe both because there is not a fallback guaranteed to work for all
+     # future architectures.
++    #
++    # The TLS access has to live in a shared library: in an executable the
++    # linker relaxes it, even with -fpic, so the test would pass without libc
++    # support (e.g. glibc on RISC-V, which rejects R_RISCV_TLSDESC).
++    conftest_tlsdesc = files('build-support/conftest-tlsdesc.c')
++    conftest_tlsdesc_dir = join_paths(meson.project_build_root(), 'meson-private')
++    conftest_tlsdesc_lib = join_paths(conftest_tlsdesc_dir, 'libconftest-tlsdesc.so')
+     foreach tlsdesc_arg : ['-mtls-dialect=gnu2', '-mtls-dialect=desc']
+-      # -fpic to force dynamic tls, otherwise TLS relaxation defeats check
+-      tlsdesc_test = cc.run('int __thread x; int main() { return x; }',
+-                            args: [tlsdesc_arg, '-fpic'],
++      tlsdesc_lib = run_command(cc.cmd_array(), get_option('c_args'),
++                                get_option('c_link_args'), tlsdesc_arg,
++                                '-fpic', '-shared', '-DCONFTEST_TLSDESC_LIB',
++                                '-o', conftest_tlsdesc_lib, conftest_tlsdesc,
++                                check : false)
++      if tlsdesc_lib.returncode() != 0
++        continue
++      endif
++      tlsdesc_test = cc.run(conftest_tlsdesc,
++                            args: [conftest_tlsdesc_lib,
++                                   '-Wl,-rpath,' + conftest_tlsdesc_dir],
+                             name: tlsdesc_arg)
+       if tlsdesc_test.returncode() == 0 and (
+             # check for lld 13 bug: https://gitlab.freedesktop.org/mesa/mesa/-/issues/5665

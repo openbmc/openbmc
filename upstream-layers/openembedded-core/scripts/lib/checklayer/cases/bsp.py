@@ -14,6 +14,10 @@ class BSPCheckLayer(OECheckLayerTestCase):
         if self.tc.layer['type'] not in (LayerType.BSP, LayerType.CORE):
             raise unittest.SkipTest("BSPCheckLayer: Layer %s isn't BSP one." %\
                 self.tc.layer['name'])
+        # test_machine_world and test_machine_signatures share one world
+        # dump per machine
+        self.machine_sigs = {machine: get_signatures(self.td['builddir'], machine=machine)
+                             for machine in self.td['machines'] or []}
 
     def test_bsp_defines_machines(self):
         self.assertTrue(self.tc.layer['conf']['machines'], 
@@ -45,10 +49,9 @@ class BSPCheckLayer(OECheckLayerTestCase):
         msg = []
         for machine in self.td['machines']:
             # In contrast to test_machine_signatures() below, errors are fatal here.
-            try:
-                get_signatures(self.td['builddir'], failsafe=False, machine=machine)
-            except RuntimeError as ex:
-                msg.append(str(ex))
+            error = self.machine_sigs[machine][2]
+            if error:
+                msg.append(error)
         if msg:
             msg.insert(0, 'The following machines broke a world build:')
             self.fail('\n'.join(msg))
@@ -80,7 +83,9 @@ class BSPCheckLayer(OECheckLayerTestCase):
         tunes = {}
         # Preserve ordering of machines as chosen by the user.
         for machine in self.td['machines']:
-            curr_sigs, tune2tasks = get_signatures(self.td['builddir'], failsafe=True, machine=machine)
+            curr_sigs, tune2tasks, error = self.machine_sigs[machine]
+            if curr_sigs is None:
+                raise RuntimeError(error)
             # Invert the tune -> [tasks] mapping.
             tasks2tune = {}
             for tune, tasks in tune2tasks.items():

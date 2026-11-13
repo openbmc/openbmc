@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cd "$(dirname "$0")/testprogs" || exit 1
+
+FILTERTEST_BIN="./filtertest"
+TRANSLATETEST_BIN="./translatetest"
+ENUMERATETEST_BIN="./enumeratetest"
+CONFIG_H="../config.h"
+export FILTERTEST_BIN TRANSLATETEST_BIN ENUMERATETEST_BIN CONFIG_H
+
+./TESTrun --passed --skipped 2>&1 | awk '
+    /^Passed tests:/  { section = "PASS"; next }
+    /^Skipped tests:/ { section = "SKIP"; next }
+    /^Failed tests:/  { section = "FAIL"; next }
+    /^-+$/            { section = ""; next }
+    section != "" && /^    / {
+        c = index($0, ": ")
+        if (c >= 45) {
+            label = substr($0, 5, c - 5)
+            sub(/[[:space:]]+$/, "", label)
+            if (label != "")
+                print section ": " label
+        }
+    }
+'

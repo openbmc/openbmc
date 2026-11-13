@@ -50,8 +50,6 @@ EXTRA_OECONF += "--without-lispdir \
                 "
 EXTRA_OECONF:append:class-target = " \
                  --with-bisonlocaledir=${datadir}/locale \
-                 gt_cv_locale_fr_utf8=fr_FR \
-                 gt_cv_locale_fr=fr_FR.ISO-8859-1 \
                  gt_cv_locale_de_utf8=de_DE \
                  gt_cv_locale_de=de_DE.ISO-8859-1 \
 "
@@ -224,6 +222,7 @@ RDEPENDS:${PN}-ptest:append:libc-glibc = "\
 RRECOMMENDS:${PN}-ptest:append:libc-glibc = "\
     locale-base-de-de.iso-8859-1 \
     locale-base-fr-fr.iso-8859-1 \
+    locale-base-ja-jp.euc-jp \
 "
 
 BBCLASSEXTEND = "native nativesdk"

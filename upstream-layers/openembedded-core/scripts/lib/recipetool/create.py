@@ -261,6 +261,14 @@ class RecipeHandler(object):
     def process(self, srctree, classes, lines_before, lines_after, handled, extravalues):
         return False
 
+    def cleanup(self, pn, pv, classes, extravalues):
+        '''
+        Called once the recipe name and version have been determined, so
+        that handlers can drop values from extravalues that turn out to
+        be redundant.
+        '''
+        pass
+
 
 def validate_pv(pv):
     if not pv or '_version' in pv.lower() or pv[0] not in '0123456789':
@@ -794,6 +802,9 @@ def create_recipe(args):
             pn = name_pn
         if name_pv and not realpv:
             realpv = name_pv
+
+    for handler in handlers:
+        handler.cleanup(pn, realpv, classes, extravalues)
 
     handle_license_vars(srctree_use, lines_before, handled, extravalues, tinfoil.config_data)
 

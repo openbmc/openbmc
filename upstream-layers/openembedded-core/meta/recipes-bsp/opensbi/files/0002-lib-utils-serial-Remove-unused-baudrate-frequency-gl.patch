@@ -1,0 +1,67 @@
+From b2b51e3de12703caad6fbb624d711d411ac0aae4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Oct 2026 13:26:30 -0700
+Subject: [PATCH] lib: utils/serial: Remove unused baudrate/frequency globals
+
+The sifive-uart and cadence-uart drivers store the input clock
+frequency and baudrate into file-static globals during init, but
+never read them back; the divisor is computed directly from the
+function arguments. Clang 23 adds -Wunused-but-set-global, which is
+enabled by -Wall, so the build fails with -Werror:
+
+  sifive-uart.c:34:12: error: variable 'uart_in_freq' set but not used [-Werror,-Wunused-but-set-global]
+  sifive-uart.c:35:12: error: variable 'uart_baudrate' set but not used [-Werror,-Wunused-but-set-global]
+
+Drop the dead variables.
+
+Upstream-Status: Submitted [https://lore.kernel.org/opensbi/20261015203610.835320-1-khem.raj@oss.qualcomm.com/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/utils/serial/cadence-uart.c | 4 ----
+ lib/utils/serial/sifive-uart.c  | 4 ----
+ 2 files changed, 8 deletions(-)
+
+diff --git a/lib/utils/serial/cadence-uart.c b/lib/utils/serial/cadence-uart.c
+index 30fbb95..80dc429 100644
+--- a/lib/utils/serial/cadence-uart.c
++++ b/lib/utils/serial/cadence-uart.c
+@@ -39,8 +39,6 @@
+ /* clang-format on */
+ 
+ static volatile void *uart_base;
+-static u32 uart_in_freq;
+-static u32 uart_baudrate;
+ 
+ /*
+  * Find minimum divisor divides in_freq to max_target_hz;
+@@ -95,8 +93,6 @@ static struct sbi_console_device cadence_console = {
+ int cadence_uart_init(unsigned long base, u32 in_freq, u32 baudrate)
+ {
+ 	uart_base     = (volatile void *)base;
+-	uart_in_freq  = in_freq;
+-	uart_baudrate = baudrate;
+ 
+ 	/* Disable interrupts */
+ 	set_reg(UART_REG_IDR, 0xFFFFFFFF);
+diff --git a/lib/utils/serial/sifive-uart.c b/lib/utils/serial/sifive-uart.c
+index 5563713..235976e 100644
+--- a/lib/utils/serial/sifive-uart.c
++++ b/lib/utils/serial/sifive-uart.c
+@@ -31,8 +31,6 @@
+ /* clang-format on */
+ 
+ static volatile char *uart_base;
+-static u32 uart_in_freq;
+-static u32 uart_baudrate;
+ 
+ /**
+  * Find minimum divisor divides in_freq to max_target_hz;
+@@ -94,8 +92,6 @@ static struct sbi_console_device sifive_console = {
+ int sifive_uart_init(unsigned long base, u32 in_freq, u32 baudrate)
+ {
+ 	uart_base     = (volatile char *)base;
+-	uart_in_freq  = in_freq;
+-	uart_baudrate = baudrate;
+ 
+ 	/* Configure baudrate */
+ 	if (in_freq && baudrate)

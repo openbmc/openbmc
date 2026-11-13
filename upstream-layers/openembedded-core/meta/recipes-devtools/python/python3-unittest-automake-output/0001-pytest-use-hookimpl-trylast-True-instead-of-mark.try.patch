@@ -1,0 +1,28 @@
+From 801e5957e7050b370df60f82025efa2229f764ce Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 29 Oct 2026 09:33:37 +0000
+Subject: [PATCH 1/2] pytest: use hookimpl(trylast=True) instead of
+ mark.trylast
+
+pytest 9.2.0 deprecates mark.trylast and now fails to load the plugin.
+Use the hookimpl decorator instead.
+
+Upstream-Status: Submitted [https://gitlab.com/rossburton/python-unittest-automake-output/-/merge_requests/20]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/putao/pytest.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/putao/pytest.py b/src/putao/pytest.py
+index 13156c0..1e0f194 100644
+--- a/src/putao/pytest.py
++++ b/src/putao/pytest.py
+@@ -17,7 +17,7 @@ def pytest_addoption(parser):
+     )
+ 
+ 
+-@pytest.mark.trylast
++@pytest.hookimpl(trylast=True)
+ def pytest_configure(config):
+     """Set all the options before the test run."""
+     # The help printing uses the terminalreporter,

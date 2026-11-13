@@ -21,21 +21,28 @@ rootfs_run() {
 		if [ -n "$bootparam_root" ]; then
 			debug "No e2fs compatible filesystem has been mounted, mounting $bootparam_root..."
 
-			if [ "`echo ${bootparam_root} | cut -c1-5`" = "UUID=" ]; then
-				root_uuid=`echo $bootparam_root | cut -c6-`
-				bootparam_root="/dev/disk/by-uuid/$root_uuid"
-			elif [ "`echo ${bootparam_root} | cut -c1-9`" = "PARTUUID=" ]; then
-				root_partuuid=`echo $bootparam_root | cut -c10-`
-				bootparam_root="/dev/disk/by-partuuid/$root_partuuid"
-			elif [ "`echo ${bootparam_root} | cut -c1-10`" = "PARTLABEL=" ]; then
-				root_partlabel=`echo $bootparam_root | cut -c11-`
-				bootparam_root="/dev/disk/by-partlabel/$root_partlabel"
-			elif [ "`echo ${bootparam_root} | cut -c1-6`" = "LABEL=" ]; then
-				root_label=`echo $bootparam_root | cut -c7-`
-				bootparam_root="/dev/disk/by-label/$root_label"
-			elif echo "${bootparam_root}" | grep -q '^ubi[0-9]\+:'; then
-				bootparam_rootfstype="ubifs"
-			fi
+			case "$bootparam_root" in
+				UUID=*)
+					bootparam_root="/dev/disk/by-uuid/${bootparam_root#UUID=}"
+					;;
+				PARTUUID=*)
+					bootparam_root="/dev/disk/by-partuuid/${bootparam_root#PARTUUID=}"
+					;;
+				PARTLABEL=*)
+					bootparam_root="/dev/disk/by-partlabel/${bootparam_root#PARTLABEL=}"
+					;;
+				LABEL=*)
+					bootparam_root="/dev/disk/by-label/${bootparam_root#LABEL=}"
+					;;
+				ubi[0-9]*:*)
+					ubi_prefix=${bootparam_root%%:*}
+					ubi_digits=${ubi_prefix#ubi}
+					case "$ubi_digits" in
+						''|*[!0-9]*) ;;
+						*) bootparam_rootfstype="ubifs" ;;
+					esac
+					;;
+			esac
 
 			if [ -e "$bootparam_root" ] || [ -n "$bootparam_rootfstype" ]; then
 				flags=""

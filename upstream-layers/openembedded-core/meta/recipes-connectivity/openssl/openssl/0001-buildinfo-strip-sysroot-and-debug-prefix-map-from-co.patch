@@ -1,4 +1,4 @@
-From 6df53bfebcf8ca65910a18220a6576fb110918a5 Mon Sep 17 00:00:00 2001
+From 4df92463252f8f0695db0143d3a26566a1736b2c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
 Date: Tue, 6 Nov 2018 14:50:47 +0100
 Subject: [PATCH] buildinfo: strip sysroot and debug-prefix-map from compiler
@@ -34,12 +34,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
-index eff66e5..bc48f51 100644
+index f8a5b16..807439f 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -503,13 +503,27 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
-                          '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
- BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
+@@ -532,13 +532,27 @@ BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
+ CMOCKA_LIBS={- $config{cmocka_libs} // '' -}
+ DETOURS_LIBS={- $config{detours_libs} // '' -}
  
 -# CPPFLAGS_Q is used for one thing only: to build up buildinf.h
 +# *_Q variables are used for one thing only: to build up buildinf.h
@@ -67,10 +67,10 @@ index eff66e5..bc48f51 100644
  
  # For x86 assembler: Set PROCESSOR to 386 if you want to support
 diff --git a/crypto/build.info b/crypto/build.info
-index 8e4a885..95b0902 100644
+index 422f4aa..3573af9 100644
 --- a/crypto/build.info
 +++ b/crypto/build.info
-@@ -114,7 +114,7 @@ DEFINE[../libcrypto]=$UPLINKDEF
+@@ -113,7 +113,7 @@ DEFINE[../libcrypto]=$UPLINKDEF
  
  DEPEND[info.o]=buildinf.h
  DEPEND[cversion.o]=buildinf.h

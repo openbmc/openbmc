@@ -37,6 +37,17 @@ if test "x$D" != "x"; then
 		cp $D${sysconfdir}/login.defs.dpkg-new $D${sysconfdir}/login.defs
 	fi
 
+	# opkg/dpkg run preinsts before shadow's postinst has run pwconv/grpconv
+	if test "x$UA_SYSROOT" = "x" -a -e $D${sysconfdir}/login.defs; then
+		# image rootfs only; on deb, packages unpacked before shadow keep the old behaviour
+		if [ ! -e $D${sysconfdir}/shadow ]; then
+			pwconv --root $D || exit 1
+		fi
+		if [ ! -e $D${sysconfdir}/gshadow ]; then
+			grpconv --root $D || exit 1
+		fi
+	fi
+
 	# user/group lookups should match useradd/groupadd --prefix
 	export PSEUDO_PASSWD="$SYSROOT"
 fi

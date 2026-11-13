@@ -1,0 +1,31 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 24 Oct 2026 10:00:00 -0700
+Subject: [PATCH] shader_runner: Keep strchr() result const
+
+The include path parsing walks a const char cursor and stores the
+result of strchr() in a plain char pointer. Since glibc 2.43, strchr()
+preserves the const qualifier of its argument when C23 features are
+enabled, which _GNU_SOURCE does, so clang fails the build:
+
+  tests/shaders/shader_runner.c:1665:10: error: initializing 'char *' with an expression of type 'const char *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+
+line_end is only read, so declare it const.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/1281]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/shaders/shader_runner.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/shaders/shader_runner.c b/tests/shaders/shader_runner.c
+--- a/tests/shaders/shader_runner.c
++++ b/tests/shaders/shader_runner.c
+@@ -1662,7 +1662,7 @@ leave_state(enum states state, const char *line, const char *script_name)
+ 
+ 		cursor = shader_string;
+ 		for (unsigned i = 0; i < num_shader_include_paths; i++) {
+-			char *line_end = strchr(cursor, '\n');
++			const char *line_end = strchr(cursor, '\n');
+ 			unsigned path_len = line_end - cursor - 1;
+ 			char *path = malloc(path_len + 1);
+ 			path[path_len] = '\0';

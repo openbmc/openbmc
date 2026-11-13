@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+cd tests || exit 1
+
+rm -rf tests.log
+
+for atest in test_* ; do
+    if ./"${atest}" >> tests.log 2>&1; then
+        echo "PASS: ${atest}"
+    else
+        echo "FAIL: ${atest}"
+    fi
+done

@@ -21,6 +21,12 @@ EXTRA_OECONF:append:toolchain-clang = " --disable-gprofng"
 # | ../../../gprofng/libcollector/../src/collector_module.h:78:13: error: duplicate member 'pwrite'
 # | ../../../gprofng/libcollector/dispatcher.c:578:8: error: 'struct sigevent' has no member named '_sigev_un'
 EXTRA_OECONF:append:libc-musl = " --disable-gprofng"
+# | ../../../gprofng/libcollector/iolib.c:898:18: error: expected identifier before '_Generic'
+# CALL_UTIL(x) pastes onto its argument, and glibc 2.43 defines strstr as a
+# _Generic macro, so the paste lands on the expansion instead. The target
+# build uses the sysroot's headers and is unaffected; gprofng is a profiler
+# the native build does not ship.
+EXTRA_OECONF:append:class-native = " --disable-gprofng"
 
 EXTRA_OECONF:class-native = "--enable-targets=all \
                              --enable-64-bit-bfd \

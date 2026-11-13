@@ -10,14 +10,14 @@ LIC_FILES_CHKSUM = "\
 "
 
 REVISION = ""
-SRC_URI = "https://gmplib.org/download/${BPN}/${BP}${REVISION}.tar.bz2 \
+SRC_URI = "https://gmplib.org/download/${BPN}/${BP}${REVISION}.tar.xz \
            file://use-includedir.patch \
            file://0001-Append-the-user-provided-flags-to-the-auto-detected-.patch \
            file://0001-confiure.ac-Believe-the-cflags-from-environment.patch \
            file://0001-Complete-function-prototype-in-acinclude.m4-for-C23-.patch \
            file://0001-acinclude.m4-Add-parameter-names-in-prototype-for-g.patch \
            "
-SRC_URI[sha256sum] = "ac28211a7cfb609bae2e2c8d6058d66c8fe96434f740cf6fe2e47b000d1c20cb"
+SRC_URI[sha256sum] = "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
 
 EXTRA_OECONF += " --enable-cxx=detect"
 EXTRA_OECONF:append:mipsarchr6 = " --disable-assembly"

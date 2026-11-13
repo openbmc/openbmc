@@ -163,6 +163,55 @@ SPDX_GIT_PURL_MAPPINGS[doc] = "A space separated list of domain:purl_type \
     on gitlab.example.com to the pkg:gitlab PURL type. \
     github.com is always mapped to pkg:github by default."
 
+SPDX_DEPLOY_TASKS ?= ""
+SPDX_DEPLOY_TASKS[doc] = "A space separated list of sstate tasks that produce \
+    deployed output (usually written to DEPLOY_DIR_IMAGE). Tasks in this list \
+    will produce SPDX documents that describe the deployed output. Items in \
+    list have the format 'TASK(:FUNCTION)' where 'TASK' is the sstate task \
+    (which must start with 'do_deploy'), and 'FUNCTION' is the optional \
+    function to call to produce the deploy SPDX. If 'FUNCTION' is omitted \
+    a default function is provided that uses SPDX_DEPLOY_ARTIFACTS and \
+    SPDX_DEPLOY_ARTIFACTS_DIR to configure what deploy artifacts it describes \
+    in the SPDX output.\
+    \
+    Dependencies of deploy tasks that produce SPDX data will be automatically \
+    linked in as a build time dependency of the deploy task's SBoM. (for \
+    example, if one do_deploy depends on another recipes do_deploy, this will \
+    be reflected in the SPDX data)."
+
+SPDX_DEPLOY_SBOM ??= "1"
+SPDX_DEPLOY_SBOM[doc] = "If '1' (the default) a task named \
+    do_create_deploy_sbom will be created to automatically collect all deploy \
+    SPDX documents (from SPDX_DEPLOY_TASKS) and combine them into a SBoM \
+    which will be placed in DEPLOY_DIR_IMAGE. This task is added as a \
+    dependency of do_build, so it will run whenever the recipe is built \
+    directly. The name of the document can be set with SPDX_DEPLOY_SBOM_NAME. \
+    If the recipe already has another task to create an SBoM, this should be \
+    set to '0' to prevent multiple SBoMs from being created."
+
+SPDX_DEPLOY_SBOM_NAME ?= "${PN}-deploy-sbom"
+SPDX_DEPLOY_SBOM_NAME[doc] = "The name of the output deploy SBoM when using \
+    create_deploy_sbom"
+
+SPDX_DEPLOY_ARTIFACTS = "AUTO"
+SPDX_DEPLOY_ARITFACTS[doc] = "A space separated list of deployed artifacts, \
+    relative to SPDX_DEPLOY_ARTIFACTS_DIR that should be included in the SBoM. \
+    If 'AUTO' (the default), all files in SPDX_DEPLOY_ARITFACTS_DIR will be \
+    added. A :task- override *must* be used to set this value so that it is \
+    scoped to a specific task"
+
+SPDX_DEPLOY_ARTIFACTS_DIR = ""
+SPDX_DEPLOY_ARTIFACTS_DIR[doc] = "The directory recipe specific directory \
+    where artifacts are deployed for staging to sstate (e.g. for do_deploy, \
+    this is DEPLOY_DIR). A :task- override *must* be used to set this value so \
+    that it is scoped to a specific task."
+
+SPDX_DEPLOY_ALLOW_EMPTY = "0"
+SPDX_DEPLOY_ALLOW_EMPTY[doc] = "If set to '1', SPDX deploy task is allowed to \
+    have no output artifacts. A SPDX document will still be produced, but it \
+    will have no output files. This must always be set with a task override, \
+    e.g.: SPDX_DEPLOY_ALLOW_EMPTY:task-deploy = '1'"
+
 IMAGE_CLASSES:append = " create-spdx-image-3.0"
 SDK_CLASSES += "create-spdx-sdk-3.0"
 
@@ -186,6 +235,8 @@ SPDX3_VAR_DEPS = "\
     SPDX_PROFILES \
     SPDX_NAMESPACE_PREFIX \
     SPDX_UUID_NAMESPACE \
+    SPDX_INCLUDE_SOURCES \
+    SPDX_INCLUDE_COMPILED_SOURCES \
     "
 
 python do_create_recipe_spdx() {
@@ -291,3 +342,139 @@ python spdx30_build_started_handler () {
 addhandler spdx30_build_started_handler
 spdx30_build_started_handler[eventmask] = "bb.event.BuildStarted"
 
+python create_deploy_spdx() {
+    import oe.spdx30_tasks
+    from pathlib import Path
+    current_task = "do_" + d.getVar("BB_CURRENTTASK")
+
+    spdxdeploydir = Path(d.getVar("SPDXDIR") + "/deploy-" + current_task)
+
+    artifactsdir = d.getVar("SPDX_DEPLOY_ARTIFACTS_DIR")
+    if not artifactsdir:
+        bb.fatal(f"{pn}: spdx-artifactsdir must be set for task {current_task}")
+        return
+
+    artifacts = d.getVar("SPDX_DEPLOY_ARTIFACTS")
+
+    oe.spdx30_tasks.create_deploy_spdx(d, spdxdeploydir, artifactsdir, artifacts)
+}
+oe.spdx30_tasks.find_build_dep_objsets[vardepsexclude] += "BB_TASKDEPDATA"
+
+python () {
+    # Most recipes generate SPDX output in a distinct task from the task that
+    # actually is the relevant dependency. As such, we need to map the task
+    # that we care about to the task that generates the corresponding SPDX
+    # output so that we can rely on the SPDX output being present when the time
+    # comes to use it downstream.
+    #
+    # The down side of this is that only the first level of dependencies (e.g
+    # tasks listed in SPDX_DEPLOY_TASKS) will have the mapping done and thus
+    # find the dependencies. Transitive dependencies will not be mapped and
+    # thus the SPDX data will not be linked in.
+    #
+    # Ideally, this will be able to go away once more tasks directly generate
+    # SPDX files for their output instead of combining it into monolithic
+    # functions; tasks listed in this map are the best candidates to have this
+    # done first.
+    TASK_MAP = {
+        # If a task requires the RSS be extended, depend on the SPDX build task
+        # for the recipe, at least until it's possible for do_populate_sysroot
+        # to describe it's own output.
+        "do_populate_sysroot": "do_create_spdx",
+    }
+
+    def map_task_deps(task, flag):
+        task_flags= (d.getVarFlag(task, flag) or "").split()
+        for t in task_flags:
+            if t in TASK_MAP and TASK_MAP[t] not in task_flags:
+                d.appendVarFlag(task, flag, f" {TASK_MAP[t]}")
+
+    def before_postfunc(f):
+        return f == "sstate_task_postfunc" or "buildhistory" in f
+
+    if bb.data.inherits_class("nospdx", d):
+        return
+
+    sstate_tasks = set((d.getVar("SSTATETASKS") or "").split())
+    deploy_sbom_tasks = []
+    for task in (d.getVar("SPDX_DEPLOY_TASKS") or "").split():
+        if ":" in task:
+            task, func = task.split(":")
+        else:
+            func = "create_deploy_spdx"
+
+        if not task.startswith("do_deploy") and not task == "do_image_complete":
+            bb.fatal(f"Task {task} is not allowed to deploy SPDX data. Must start with 'do_deploy'")
+
+        deploy_sbom_tasks.append(task)
+
+        if task not in sstate_tasks:
+            bb.fatal(f"{task} is not an sstate task")
+
+        spdx_deploy = "${SPDXDIR}/deploy-" + task
+
+        # Ensure function is sorted properly. It should be right before
+        # sstate_task_postfunc
+        postfuncs = (d.getVarFlag(task, "postfuncs") or "").split()
+
+        new_postfuncs = []
+        while True:
+            if not postfuncs or before_postfunc(postfuncs[0]):
+                break
+            new_postfuncs.append(postfuncs.pop(0))
+        new_postfuncs.append(func)
+        new_postfuncs.extend(postfuncs)
+
+        d.setVarFlag(task, "postfuncs", " ".join(new_postfuncs))
+        d.prependVarFlag(task, "sstate-inputdirs", f"{spdx_deploy} ")
+        d.prependVarFlag(task, "sstate-outputdirs", "${DEPLOY_DIR_SPDX} ")
+        d.prependVarFlag(task, "file-checksums", "${SPDX3_DEP_FILES} ")
+        d.prependVarFlag(task, "dirs", f"{spdx_deploy} ")
+        d.prependVarFlag(task, "cleandirs", f"{spdx_deploy} ")
+        d.prependVarFlag(task, "vardeps", "SPDX_DEPLOY_ALLOW_EMPTY")
+
+        deps = (d.getVarFlag(task, "depends") or "").split()
+        extra_deps = ["${PN}:do_create_recipe_spdx", "${PN}:do_create_spdx"]
+        for dep in deps:
+            _, fn, taskname = bb.runqueue.split_tid(dep)
+            if taskname in TASK_MAP:
+                extra_deps.append(f"{fn}:{TASK_MAP[taskname]}")
+
+        d.prependVarFlag(task, "depends", " ".join(extra_deps) + " ")
+
+        map_task_deps(task, "deptask")
+        map_task_deps(task, "rdeptask")
+        map_task_deps(task, "recrdeptask")
+
+    # For now, if a recipe is directly built, deploy all of it's deploy tasks
+    # into a single SBoM. We may need an option in the future to have tasks
+    # that don't do this (e.g. because they do not deploy to a location that is
+    # intended to be consumed by the user)
+    if deploy_sbom_tasks and (d.getVar("SPDX_DEPLOY_SBOM") or "") == "1":
+        bb.build.addtask("do_create_deploy_sbom", "do_build", " ".join(deploy_sbom_tasks), d)
+}
+
+python do_create_deploy_sbom() {
+    import oe.spdx30_tasks
+    from pathlib import Path
+    deploydir = Path(d.getVar("SPDXDEPLOYSBOMDEPLOY"))
+    deploy_tasks = []
+    for task in (d.getVar("SPDX_DEPLOY_TASKS") or "").split():
+        if ":" in task:
+            task, _ = task.split(":")
+        deploy_tasks.append(task)
+
+    oe.spdx30_tasks.create_deploy_sbom(d, deploydir, deploy_tasks)
+}
+do_create_deploy_sbom[sstate-inputdirs] = "${SPDXDEPLOYSBOMDEPLOY}"
+do_create_deploy_sbom[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
+do_create_deploy_sbom[recrdeptask] += "do_create_recipe_spdx do_create_spdx"
+do_create_deploy_sbom[cleandirs] += "${SPDXDEPLOYSBOMDEPLOY}"
+do_create_deploy_sbom[file-checksums] += "${SPDX3_DEP_FILES}"
+
+SSTATETASKS += "do_create_deploy_sbom"
+python do_create_deploy_sbom_setscene() {
+    sstate_setscene(d)
+}
+addtask do_create_deploy_sbom_setscene
+SSTATE_SKIP_CREATION:task-create-deploy-sbom = "1"

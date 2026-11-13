@@ -28,3 +28,4 @@ FILES:${PN} += "${libdir}/graphene-1.0"
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_STATUS[CVE-2024-1984] = "cpe-incorrect: issue in a WordPress theme"
+CVE_STATUS[CVE-2026-81281] = "cpe-incorrect: issue in a WordPress theme"

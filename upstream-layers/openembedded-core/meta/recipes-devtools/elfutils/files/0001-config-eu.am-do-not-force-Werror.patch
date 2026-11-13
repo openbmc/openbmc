@@ -1,4 +1,4 @@
-From 975357f7585076a072f61684db20180ef8dd31b7 Mon Sep 17 00:00:00 2001
+From 645351e3057b76d9a76495c7e021b3449cd5cae5 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 22 Nov 2024 12:50:48 +0100
 Subject: [PATCH] config/eu.am: do not force -Werror

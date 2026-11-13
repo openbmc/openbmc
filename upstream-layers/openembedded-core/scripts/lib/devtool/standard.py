@@ -2074,11 +2074,14 @@ def _reset(recipes, no_clean, remove_work, config, basepath, workspace):
 
         # Clean up changelog if present
         changelog_file = os.path.join(config.workspace_path, 'changelogs', '%s.txt' % pn)
+        metadata_file = os.path.join(config.workspace_path, 'changelogs', '%s.json' % pn)
         if os.path.exists(changelog_file):
             os.remove(changelog_file)
-            changelog_dir = os.path.dirname(changelog_file)
-            if not os.listdir(changelog_dir):
-                os.rmdir(changelog_dir)
+        if os.path.exists(metadata_file):
+            os.remove(metadata_file)
+        changelog_dir = os.path.join(config.workspace_path, 'changelogs')
+        if os.path.exists(changelog_dir) and not os.listdir(changelog_dir):
+            os.rmdir(changelog_dir)
 
 def reset(args, config, basepath, workspace):
     """Entry point for the devtool 'reset' subcommand"""

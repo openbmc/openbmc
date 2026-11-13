@@ -143,24 +143,9 @@ for item in dif:
 
     cpython_tag = sys.implementation.cache_tag
     cached = ''
-    # Theres no naive way to find *.pyc files on python3
-    try:
-        if debug == True:
-            log.write('\nCalling: sys.modules[' + '%s' % item + '].__cached__\n')
-        cached = sys.modules['%s' % item].__cached__
-    except AttributeError as e:
-        # Deals with thread (builtin module) not having __cached__ attribute
-        if debug == True:
-            log.write(item + ' ')
-            log.write(str(e))
-            log.write('\n')
-        pass
-    except NameError as e:
-        # Deals with NameError: name 'cached' is not defined
-        if debug == True:
-            log.write(item+' ') 
-            log.write(str(e))                                              
-        pass
+    if debug == True:
+        log.write('\nGetting cached attribute for %s\n' % item)
+    cached = sys.modules['%s' % item].__spec__.cached
     if cached is not None:
         if debug == True:
             log.write(cached + '\n')

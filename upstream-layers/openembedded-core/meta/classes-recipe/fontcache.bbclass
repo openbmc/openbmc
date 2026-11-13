@@ -28,6 +28,7 @@ if [ -n "$D" ] ; then
 		'libdir="${libdir}"' \
 		'libexecdir="${libexecdir}"' \
 		'base_libdir="${base_libdir}"' \
+		'datadir="${datadir}"' \
 		'fontconfigcachedir="${FONTCONFIG_CACHE_DIR}"' \
 		'fontconfigcacheparams="${FONTCONFIG_CACHE_PARAMS}"' \
 		'fontconfigcacheenv="${FONTCONFIG_CACHE_ENV}"'

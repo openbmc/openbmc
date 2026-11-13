@@ -63,50 +63,6 @@ class SstateEntry:
         return self.match.group(name)
 
 
-# this is what's in the original script; as far as I can tell, it's an
-# implementation artefact which we don't need?
-def find_archs():
-    # all_archs
-    builder_arch = os.uname().machine
-
-    # FIXME
-    layer_paths = [Path("../..")]
-
-    tune_archs = set()
-    re_tune = re.compile(r'AVAILTUNES .*=.*"(.*)"')
-    for path in layer_paths:
-        for tunefile in [
-            p for p in path.glob("meta*/conf/machine/include/**/*") if p.is_file()
-        ]:
-            with open(tunefile) as f:
-                for line in f:
-                    m = re_tune.match(line)
-                    if m:
-                        tune_archs.update(m.group(1).split())
-
-    # all_machines
-    machine_archs = set()
-    for path in layer_paths:
-        for machine_file in path.glob("meta*/conf/machine/*.conf"):
-            machine_archs.add(machine_file.parts[-1][:-5])
-
-    extra_archs = set()
-    all_archs = (
-        set(
-            arch.replace("-", "_")
-            for arch in machine_archs | tune_archs | set(["allarch", builder_arch])
-        )
-        | extra_archs
-    )
-
-    print(all_archs)
-
-
-# again, not needed?
-def find_tasks():
-    print(set([p.bb_task for p in paths]))
-
-
 def collect_sstate_paths(args):
     def scandir(path, paths):
         # Assume everything is a directory; by not checking we avoid needing an
@@ -125,6 +81,9 @@ def collect_sstate_paths(args):
 
         except NotADirectoryError:
             pass
+        except PermissionError as e:
+            # e.g. lost+found when the cache is the root of a filesystem
+            print(f"Skipping {path}: {e.strerror}", file=sys.stderr)
 
     paths = set()
     # TODO: parellise scandir
@@ -142,6 +101,15 @@ def collect_sstate_paths(args):
     return paths
 
 
+# Where stamps live under STAMPS_DIR, each at a fixed depth: globbing those
+# depths exactly, rather than recursively, keeps the walk from stat()ing
+# everything in the tree, which over NFS is slow with a round trip per entry.
+STAMP_LAYOUTS = (
+    "*/*/",  # <arch>/<pn>/<pv>... (bitbake.conf); also externalsrc's work-shared/<pn>/
+    "work-shared/",  # work-shared/<pn>-<pv>-<pr>... (gcc-source, llvm-project-source, rust-source)
+)
+
+
 def remove_by_stamps(args, paths):
     all_sums = set()
     for stamps_dir in args.stamps_dir:
@@ -151,14 +119,16 @@ def remove_by_stamps(args, paths):
         all_sums |= set(
             [
                 re_sigdata.search(x.parts[-1]).group(1)
-                for x in stamps_path.glob("*/*/*.do_*.sigdata.*")
+                for layout in STAMP_LAYOUTS
+                for x in stamps_path.glob(layout + "*.do_*.sigdata.*")
             ]
         )
         re_setscene = re.compile(r"do_.*_setscene\.([^.]*)")
         all_sums |= set(
             [
                 re_setscene.search(x.parts[-1]).group(1)
-                for x in stamps_path.glob("*/*/*.do_*_setscene.*")
+                for layout in STAMP_LAYOUTS
+                for x in stamps_path.glob(layout + "*.do_*_setscene.*")
             ]
         )
     return [p for p in paths if p.bb_unihash not in all_sums]

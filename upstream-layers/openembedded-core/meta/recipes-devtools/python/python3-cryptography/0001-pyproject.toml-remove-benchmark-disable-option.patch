@@ -1,4 +1,4 @@
-From 74473daa46b315f3d98fbf9a6a58f52c9c29a365 Mon Sep 17 00:00:00 2001
+From 1e86700ed4780712f9c2a78dd1b98cde92d674e2 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Tue, 17 May 2022 17:22:48 +0800
 Subject: [PATCH] pyproject.toml: remove --benchmark-disable option
@@ -26,10 +26,10 @@ Signed-off-by: Tim Orling <tim.orling@konsulko.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index b56cda9..781743b 100644
+index d0187a8..cbec7a1 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -140,7 +140,7 @@ exclude = [
+@@ -141,7 +141,7 @@ exclude = [
  ]
  
  [tool.pytest.ini_options]

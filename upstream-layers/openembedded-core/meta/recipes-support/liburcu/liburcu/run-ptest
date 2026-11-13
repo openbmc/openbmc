@@ -1,0 +1,17 @@
+#!/bin/sh
+
+PTEST_PATH=$(dirname "$0")
+cd "$PTEST_PATH/tests/unit" || exit 1
+
+export URCU_TESTS_SRCDIR="$PTEST_PATH/tests"
+export URCU_TESTS_BUILDDIR="$PTEST_PATH/tests"
+export URCU_TESTS_OS_TYPE="linux"
+
+for test in $(find . -maxdepth 1 -type f -executable -name "test_*" | sort); do
+    testname=$(basename "$test")
+    if ./"$test"; then
+        echo "PASS: $testname"
+    else
+        echo "FAIL: $testname"
+    fi
+done

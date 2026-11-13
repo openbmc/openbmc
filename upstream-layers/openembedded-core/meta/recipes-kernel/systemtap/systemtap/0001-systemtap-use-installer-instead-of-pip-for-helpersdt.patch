@@ -1,0 +1,48 @@
+From 070fe259ffe163b12aea7fae15dc9f8c6ae6d4c0 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 5 Nov 2026 09:00:00 +0000
+Subject: [PATCH] systemtap: use installer instead of pip for HelperSDT
+
+Pip rejects cross-compiled wheels due to platform tag mismatch,
+breaking 32-bit builds on 64-bit hosts.
+
+Use pypa installer to install the wheel without platform checks,
+eliminating the need for RECORD and direct_url.json cleanup.
+
+Upstream-Status: Submitted [https://sourceware.org/bugzilla/show_bug.cgi?id=34959]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ python/Makefile.am | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/python/Makefile.am b/python/Makefile.am
+index 0cb608d5a..226800ad6 100644
+--- a/python/Makefile.am
++++ b/python/Makefile.am
+@@ -35,13 +35,21 @@ if HAVE_PYTHON3_PROBES
+ endif
+ 
+ 
+-# Note that we're installing from the wheel we just built.
++# Install the wheel we just built with pypa "installer" rather than pip.
++#
++# The wheel is cross-built and tagged for the target, but it is installed
++# with the native interpreter; pip rejects a wheel whose platform tag does
++# not match the running interpreter, so it cannot install a cross-built
++# wheel.  installer simply unpacks the wheel and ignores the tag.
++#
++# --compile-bytecode=0 avoids writing .pyc files that record build paths
++# (they are regenerated on first import), and installer does not write a
++# PEP 610 direct_url.json, so neither needs cleaning up afterwards.
+ install-exec-local:
+ if HAVE_PYTHON3_PROBES
+-	$(PYTHON3) -m pip install $(shell readlink -f $(builddir))/py3build/*.whl \
+-		 $(if $(DESTDIR),--root $(DESTDIR)) --prefix $(prefix) \
+-		 --no-deps --no-index --no-build-isolation \
+-		 --ignore-installed --verbose
++	$(PYTHON3) -m installer --compile-bytecode=0 \
++		 $(if $(DESTDIR),--destdir $(DESTDIR)) --prefix $(prefix) \
++		 $(shell readlink -f $(builddir))/py3build/*.whl
+ endif
+ 
+ clean-local:

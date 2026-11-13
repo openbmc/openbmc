@@ -1,4 +1,4 @@
-From 699608a4c03ebbf64c1d7b6f56d9811492175daa Mon Sep 17 00:00:00 2001
+From 899a524ff896d7c400e3b48f8c19feac695a7875 Mon Sep 17 00:00:00 2001
 From: Wang Mingyu <wangmy@fujitsu.com>
 Date: Mon, 17 Nov 2025 00:05:14 +0000
 Subject: [PATCH] utils/utils.cpp: fix compilation with musl
@@ -17,7 +17,7 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/libdnf/utils/utils.cpp b/libdnf/utils/utils.cpp
-index f5d200b8a..501bc0ed2 100644
+index f5d200b8..40866360 100644
 --- a/libdnf/utils/utils.cpp
 +++ b/libdnf/utils/utils.cpp
 @@ -9,6 +9,7 @@
@@ -46,6 +46,3 @@ index f5d200b8a..501bc0ed2 100644
      });
  
      return paths;
--- 
-2.43.0
-

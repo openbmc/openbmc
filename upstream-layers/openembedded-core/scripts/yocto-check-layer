@@ -32,14 +32,14 @@ CASES_PATHS = [os.path.join(os.path.abspath(os.path.dirname(__file__)),
                 'lib', 'checklayer', 'cases')]
 logger = scriptutils.logger_create(PROGNAME, stream=sys.stdout)
 
-def test_layer(td, layer, test_software_layer_signatures):
+def test_layer(td, layer, test_software_layer_signatures, run_tests):
     from checklayer.context import CheckLayerTestContext
     logger.info("Starting to analyze: %s" % layer['name'])
     logger.info('Distro: %s' % td['bbvars']["DISTRO"])
     logger.info("----------------------------------------------------------------------")
 
     tc = CheckLayerTestContext(td=td, logger=logger, layer=layer, test_software_layer_signatures=test_software_layer_signatures)
-    tc.loadTests(CASES_PATHS)
+    tc.loadTests(CASES_PATHS, modules=run_tests, modules_required=run_tests)
     return tc.runTests()
 
 def dump_layer_debug(layer):
@@ -47,6 +47,22 @@ def dump_layer_debug(layer):
     collections = layer.get("collections", {})
     if collections:
         logger.debug("%s collections: %s" % (layer["name"], ", ".join(collections)))
+
+def validate_layers(layers):
+    valid_layers = []
+    for layer in layers:
+        if layer['type'] == LayerType.ERROR_BSP_DISTRO:
+            logger.error("%s: Can't be DISTRO and BSP type at the same time."\
+                     " Both conf/distro and conf/machine folders were found."\
+                     % layer['name'])
+        elif layer['type'] == LayerType.ERROR_NO_LAYER_CONF:
+            logger.info("%s: Doesn't have conf/layer.conf file, so ignoring"\
+                     % layer['name'])
+        else:
+            logger.info("%s: %s, %s" % (layer['name'], layer['type'],
+                layer['path']))
+            valid_layers.append(layer)
+    return valid_layers
 
 def main():
     parser = argparse.ArgumentParser(
@@ -70,6 +86,8 @@ def main():
                        help='check that software layers do not change signatures (on by default)')
     group.add_argument('--without-software-layer-signature-check', action='store_false', dest='test_software_layer_signatures',
                        help='disable signature checking for software layers')
+    parser.add_argument('--run-tests', nargs='+', metavar='TEST', default=[],
+            help='Tests to run, as <module>[.<class>[.<name>]] (default: all)')
     parser.add_argument('-n', '--no-auto', help='Disable auto layer discovery',
             action='store_true')
     parser.add_argument('-d', '--debug', help='Enable debug output',
@@ -125,19 +143,10 @@ def main():
         return 1
 
     logger.info("Detected layers:")
-    for layer in layers:
-        if layer['type'] == LayerType.ERROR_BSP_DISTRO:
-            logger.error("%s: Can't be DISTRO and BSP type at the same time."\
-                     " Both conf/distro and conf/machine folders were found."\
-                     % layer['name'])
-            layers.remove(layer)
-        elif layer['type'] == LayerType.ERROR_NO_LAYER_CONF:
-            logger.info("%s: Doesn't have conf/layer.conf file, so ignoring"\
-                     % layer['name'])
-            layers.remove(layer)
-        else:
-            logger.info("%s: %s, %s" % (layer['name'], layer['type'],
-                layer['path']))
+    layers = validate_layers(layers)
+    # Keep dep_layers in sync when it previously shared the layers list.
+    if not args.dependency:
+        dep_layers = layers
     if not layers:
         return 1
 
@@ -212,7 +221,11 @@ def main():
         logger.info('Getting initial signatures ...')
         td['builddir'] = builddir
         try:
-            td['sigs'], td['tunetasks'] = get_signatures(td['builddir'])
+            # Only test_signatures, a common test, compares against them
+            if not args.run_tests or 'common' in [t.split('.')[0] for t in args.run_tests]:
+                td['sigs'], td['tunetasks'], error = get_signatures(td['builddir'])
+                if error:
+                    raise RuntimeError(error)
         except RuntimeError as e:
             logger.info(str(e))
             results[layer['name']] = None
@@ -228,7 +241,7 @@ def main():
             layers_tested = layers_tested + 1
             continue
 
-        result = test_layer(td, layer, args.test_software_layer_signatures)
+        result = test_layer(td, layer, args.test_software_layer_signatures, args.run_tests)
         results[layer['name']] = result
         results_status[layer['name']] = 'PASS' if results[layer['name']].wasSuccessful() else 'FAIL'
         layers_tested = layers_tested + 1

@@ -240,6 +240,10 @@ class Identifier(Node):
 
 
 class UnknownId(Identifier):
+    @property
+    def name(self):
+        return self.ident
+
     @classmethod
     def reduce(cls, stack, lookahead):
         if not check_stack_types(stack, [Token]):
@@ -761,7 +765,7 @@ def parse(s, *, allow_unknown=False):
 
 def parse_match(s):
     try:
-        tokens = tokenizer(s)
+        tokens = tokenize(s)
         return create_ast(tokens)
     except ParseError as e:
         e.expression = s

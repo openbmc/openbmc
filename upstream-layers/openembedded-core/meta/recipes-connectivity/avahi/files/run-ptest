@@ -1,0 +1,12 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+
+cd "$(dirname "$0")/tests" || exit 1
+
+for t in *; do
+    if ./"$t"; then
+        echo "PASS: $t"
+    else
+        echo "FAIL: $t"
+    fi
+done

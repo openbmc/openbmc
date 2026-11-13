@@ -7,6 +7,9 @@ DEFAULTTUNE ?= "powerpc"
 
 TUNE_PKGARCH = "${TUNE_PKGARCH:tune-${DEFAULTTUNE}}"
 ABIEXTENSION ?= ""
+# Ignore how ABIEXTENSION is computed: the e500 tunes append
+# ${SPEABIEXTENSION}, which is empty unless "spe" is in TUNE_FEATURES.
+ABIEXTENSION[vardepvalue] = "${ABIEXTENSION}"
 
 # Endian
 TUNEVALID[bigendian] = "Use PowerPC Big Endian"

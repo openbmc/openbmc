@@ -7,4 +7,6 @@ SRC_URI[sha256sum] = "1620739f04e36a2c779f1a131a2dfd49b2fd07351bf1968ced07436593
 
 inherit pypi python_flit_core
 
+PYPI_PACKAGE_SDIST = "sphinxcontrib-jquery"
+
 BBCLASSEXTEND = "native nativesdk"

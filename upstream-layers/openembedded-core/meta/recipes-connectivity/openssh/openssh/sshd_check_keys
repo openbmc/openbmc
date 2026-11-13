@@ -70,6 +70,11 @@ for key in ${HOST_KEYS} ; do
         echo "  generating ssh ECDSA host key..."
         generate_key $key ecdsa
         ;;
+    # match the hybrid key before the generic Ed25519 suffix
+    *_mldsa44_ed25519_key)
+        echo "  generating ssh ML-DSA-44/ED25519 host key..."
+        generate_key $key mldsa44-ed25519
+        ;;
     *_ed25519_key)
         echo "  generating ssh ED25519 host key..."
         generate_key $key ed25519

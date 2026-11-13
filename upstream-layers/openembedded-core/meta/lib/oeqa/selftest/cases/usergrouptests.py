@@ -56,6 +56,30 @@ class UserGroupTests(OESelftestTestCase):
         self.logger.info("Rebuild with other staticids")
         self.assertTrue(bitbake(' core-image-minimal'))
 
+    def test_shadow_files_match_across_package_backends(self):
+        # Test for YOCTO #14139
+        image = 'core-image-minimal'
+        backends = ('rpm', 'ipk', 'deb')
+        # Dynamic IDs and line order vary by backend: skip passwd/group, key by name
+        files = ('shadow', 'gshadow')
+        results = {}
+        for backend in backends:
+            classes = ' '.join(['package_' + backend] + ['package_' + b for b in backends if b != backend])
+            self.write_config('PACKAGE_CLASSES = "%s"\nIMAGE_INSTALL:append = " creategroup1"\n' % classes)
+            self.logger.info("Building %s with %s rootfs" % (image, backend))
+            bitbake(image)
+            etcdir = os.path.join(get_bb_var('IMAGE_ROOTFS', image), 'etc')
+            results[backend] = {}
+            for f in files:
+                with open(os.path.join(etcdir, f)) as fd:
+                    results[backend][f] = dict(line.split(':', 1) for line in fd.read().splitlines())
+
+        self.maxDiff = None
+        for backend in backends[1:]:
+            for f in files:
+                self.assertEqual(results[backends[0]][f], results[backend][f],
+                                 "/etc/%s differs between %s and %s rootfs" % (f, backends[0], backend))
+
     def test_useradd_depends_only(self):
         # Test that a recipe inheriting useradd with only USERADD_DEPENDS
         # (and no USERADD_PACKAGES) parses and builds successfully. [YOCTO #15863]

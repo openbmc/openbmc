@@ -41,6 +41,8 @@ def buildinfo_target(d):
         vars = (d.getVar("IMAGE_BUILDINFO_VARS") or "")
         return image_buildinfo_outputvars(vars, d)
 
+buildinfo_target[vardeps] += "${IMAGE_BUILDINFO_VARS}"
+
 python buildinfo() {
     if not d.getVar('IMAGE_BUILDINFO_FILE'):
         return
@@ -70,12 +72,21 @@ python buildinfo_image () {
     bb.build.exec_func("buildinfo", d)
 }
 
+python buildinfo_deploy() {
+    src = d.expand("${IMAGE_ROOTFS}/${IMAGE_BUILDINFO_FILE}")
+    dst = d.expand("${IMGDEPLOYDIR}/${IMAGE_NAME}.buildinfo")
+    oe.path.copyhardlink(src, dst)
+}
+do_image[postfuncs] += "create_symlinks"
+do_image[subimages] += "buildinfo"
+
+
 python buildinfo_sdk () {
     d.setVar("BUILDINFODEST", "${SDK_OUTPUT}/${SDKPATH}")
     d.setVar("IMAGE_BUILDINFO_FILE", d.getVar("SDK_BUILDINFO_FILE"))
     bb.build.exec_func("buildinfo", d)
 }
 
-IMAGE_PREPROCESS_COMMAND += "buildinfo_image"
+IMAGE_PREPROCESS_COMMAND += "buildinfo_image buildinfo_deploy"
 POPULATE_SDK_PRE_TARGET_COMMAND += "buildinfo_sdk"
 

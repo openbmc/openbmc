@@ -1,0 +1,29 @@
+From 8e1b08f3e701bb08b57c85c6818991f92a9611ae Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Thu, 15 Oct 2026 10:58:02 +0100
+Subject: [PATCH] base-passwd: add the render group
+
+eudev-3.2.15 adds the render group:
+
+    Use the dedicated render group for /dev/dri/renderD*, kfd and accel
+    devices, as systemd does. Access is unchanged (mode 0666); systems
+    without a render group log an error and keep them root-owned.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ group.master | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/group.master b/group.master
+index a0f9daf92d57..20ea5da3a450 100644
+--- a/group.master
++++ b/group.master
+@@ -35,6 +35,7 @@ sasl:*:45:
+ plugdev:*:46:
+ kvm:*:47:
+ sgx:*:48:
++render:*:49:
+ staff:*:50:
+ games:*:60:
+ shutdown:*:70:

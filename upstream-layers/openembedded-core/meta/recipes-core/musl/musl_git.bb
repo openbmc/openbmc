@@ -4,7 +4,7 @@
 require musl.inc
 inherit linuxloader
 
-SRCREV = "9fa28ece75d8a2191de7c5bb53bed224c5947417"
+SRCREV = "c4e1bb3994c14ed5112c894d15a451bf00f0d501"
 
 BASEVER = "1.2.6"
 
@@ -13,6 +13,8 @@ PV = "${BASEVER}+git"
 SRC_URI = "git://git.musl-libc.org/musl;branch=master \
            file://0001-Make-dynamic-linker-a-relative-symlink-to-libc.patch \
            file://0002-ldso-Use-syslibdir-and-libdir-as-default-pathes-to-l.patch \
+           file://0003-tools-version.sh-fall-back-to-VERSION-when-git-descr.patch \
+           file://0004-configure-use-ffp-exception-behavior-maytrap-when-su.patch \
           "
 
 PROVIDES += "virtual/libc virtual/libiconv virtual/libintl virtual/crypt"
@@ -47,6 +49,10 @@ CONFIGUREOPTS = " \
     --includedir=${includedir} \
     --syslibdir=${nonarch_base_libdir} \
 "
+
+# The fallback search path of patch 0002 follows base_libdir, as the .path
+# file does. --syslibdir only says where the dynamic linker goes.
+EXTRA_OEMAKE += "baselibdir=${base_libdir}"
 
 do_configure() {
 	${S}/configure ${CONFIGUREOPTS}

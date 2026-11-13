@@ -18,6 +18,9 @@ inherit image-artifact-names
 
 TESTIMAGE_AUTO ??= "0"
 
+# Skip the default initramfs image in auto
+TESTIMAGE_AUTO_SKIP_IMAGES ??= "${INITRAMFS_IMAGE}"
+
 # When any test fails, TESTIMAGE_FAILED_QA ARTIFACTS will be parsed and for
 # each entry in it, if artifact pointed by path description exists on target,
 # it will be retrieved onto host
@@ -520,6 +523,7 @@ def package_extraction(d, test_suites):
 testimage_main[vardepsexclude] += "BB_ORIGENV DATETIME"
 
 python () {
-    if oe.types.boolean(d.getVar("TESTIMAGE_AUTO") or "False"):
+    if oe.types.boolean(d.getVar("TESTIMAGE_AUTO") or "False") and \
+      d.getVar("PN") not in d.getVar("TESTIMAGE_AUTO_SKIP_IMAGES").split():
         bb.build.addtask("testimage", "do_build", "do_image_complete", d)
 }

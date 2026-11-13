@@ -7,11 +7,14 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=bcab380227a83bc147350b40a81e6ffc"
 
 SRC_URI += " \
         file://new-libarchive.patch \
+        file://0001-fix-tests-for-libarchive-3.8.10.patch \
         file://0001-ffi-Insert-a-replacable-anchor-for-find_library.patch \
         file://run-ptest \
 "
 
 inherit pypi setuptools3 ptest-python-pytest
+
+PYPI_PACKAGE_SDIST = "libarchive-c"
 
 SRC_URI[sha256sum] = "7bcce24ea6c0fa3bc62468476c6d2f6264156db2f04878a372027c10615a2721"
 

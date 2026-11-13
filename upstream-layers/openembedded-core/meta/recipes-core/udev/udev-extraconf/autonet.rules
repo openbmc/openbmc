@@ -14,6 +14,6 @@
 #
 
 # Handle network interface setup
-SUBSYSTEM=="net", ACTION=="add" RUN+="/etc/udev/scripts/network.sh"
-SUBSYSTEM=="net", ACTION=="remove" RUN+="/etc/udev/scripts/network.sh"
+SUBSYSTEM=="net", ACTION=="add", RUN+="/etc/udev/scripts/network.sh"
+SUBSYSTEM=="net", ACTION=="remove", RUN+="/etc/udev/scripts/network.sh"
 

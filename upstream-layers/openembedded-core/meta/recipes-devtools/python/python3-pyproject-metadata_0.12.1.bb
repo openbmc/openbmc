@@ -12,8 +12,6 @@ HOMEPAGE = "https://github.com/FFY00/python-pyproject-metadata"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=310439af287b0fb4780b2ad6907c256c"
 
-PYPI_PACKAGE = "pyproject_metadata"
-
 inherit pypi python_flit_core
 
 SRC_URI[sha256sum] = "8809a4df6fe08279b39a8890669506ed3158e0617855ac9aff098fcbe772ae4c"

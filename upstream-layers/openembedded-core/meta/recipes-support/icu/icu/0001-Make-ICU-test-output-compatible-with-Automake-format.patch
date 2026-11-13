@@ -1,4 +1,4 @@
-From 4779f798463d673dd74623979ec93141eb60d07a Mon Sep 17 00:00:00 2001
+From b315f37fd8c588632bcf01c43a191ab56a08fbed Mon Sep 17 00:00:00 2001
 From: Jiaying Song <jiaying.song.cn@windriver.com>
 Date: Fri, 21 Nov 2025 10:47:59 +0800
 Subject: [PATCH] Make ICU test output compatible with Automake format
@@ -22,7 +22,7 @@ Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
  3 files changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index da4f170..514fa0c 100644
+index ec84aae..7e036e1 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1103,6 +1103,21 @@ If set, it will REPLACE any automatic list of libraries.],
@@ -54,10 +54,10 @@ index da4f170..514fa0c 100644
 +
 +
 diff --git a/test/intltest/intltest.cpp b/test/intltest/intltest.cpp
-index 33829b0..bf3ef56 100644
+index f09da7b..9909266 100644
 --- a/test/intltest/intltest.cpp
 +++ b/test/intltest/intltest.cpp
-@@ -824,11 +824,19 @@ UBool IntlTest::runTestLoop( char* testname, char* par, char *baseName )
+@@ -828,11 +828,19 @@ UBool IntlTest::runTestLoop( char* testname, char* par, char *baseName )
              saveBaseLoc[0]=0; /* reset path */
              
              if (lastErrorCount == errorCount) {
@@ -100,6 +100,3 @@ index 7634526..c2e11dd 100644
            if(!ON_LINE) { /* had some output */
              int spaces = FLAG_INDENT-(depth-1);
              log_testinfo_i("} %*s[OK] ", spaces, "---");
--- 
-2.34.1
-

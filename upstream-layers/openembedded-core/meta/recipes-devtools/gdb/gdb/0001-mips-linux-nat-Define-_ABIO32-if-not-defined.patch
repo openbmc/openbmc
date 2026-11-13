@@ -1,4 +1,4 @@
-From 8448967d9cfb09eb11fd3573a72a35ae94a89ba1 Mon Sep 17 00:00:00 2001
+From bb8d6121f63d29184816d8e685c1a7f683a26eda Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 23 Mar 2016 06:30:09 +0000
 Subject: [PATCH] mips-linux-nat: Define _ABIO32 if not defined
@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index 3d072ea935c..ca38caeacc2 100644
+index 9356431c..209c4d2b 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
 @@ -40,6 +40,10 @@

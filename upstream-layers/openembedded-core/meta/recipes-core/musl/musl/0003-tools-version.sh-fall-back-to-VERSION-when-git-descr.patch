@@ -1,0 +1,43 @@
+From 97bb653022ed04c076040ebe899c89d19ddab6bd Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 27 Sep 2026 17:15:34 -0700
+Subject: [PATCH] tools/version.sh: fall back to VERSION when git describe
+ finds nothing
+
+When building from a git checkout, version.sh uses "git describe" and
+only falls back to the VERSION file when git itself is missing. In a
+clone that has no tags, such as the one a build system fetches at a
+fixed revision, git describe prints nothing and libc is built with an
+empty VERSION, so the dynamic linker reports just "Version ". Tools
+that identify musl by that string, e.g. Python's packaging (musllinux
+platform tags), then no longer recognise the system as musl.
+
+Use VERSION, suffixed with -git as before, whenever git describe gives
+no result.
+
+Upstream-Status: Submitted [https://www.openwall.com/lists/musl/2026/09/28/1]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tools/version.sh | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/tools/version.sh b/tools/version.sh
+index f1cc594..578ff46 100644
+--- a/tools/version.sh
++++ b/tools/version.sh
+@@ -2,8 +2,13 @@
+
+ if test -d .git ; then
+ if type git >/dev/null 2>&1 ; then
+-git describe --tags --match 'v[0-9]*' 2>/dev/null \
+-| sed -e 's/^v//' -e 's/-/-git-/'
++v=$(git describe --tags --match 'v[0-9]*' 2>/dev/null \
++| sed -e 's/^v//' -e 's/-/-git-/')
++fi
++# git describe finds nothing in a clone without tags (e.g. a build
++# system checkout); fall back to the VERSION file then too.
++if test -n "$v" ; then
++echo "$v"
+ else
+ sed 's/$/-git/' < VERSION
+ fi

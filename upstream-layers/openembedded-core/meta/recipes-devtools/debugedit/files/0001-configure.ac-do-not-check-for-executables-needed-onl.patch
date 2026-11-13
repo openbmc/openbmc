@@ -1,4 +1,4 @@
-From bb64eddf41794ca5fd85dc3fecd29246d4d9ad23 Mon Sep 17 00:00:00 2001
+From 8e96d0537ef99fb0fd6e12c647cdc279737ac808 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 17 Jun 2026 18:59:57 +0200
 Subject: [PATCH] configure.ac: do not check for executables needed only in
@@ -17,7 +17,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 26 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 4868844..8d74463 100644
+index f9ca877..0782036 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -51,31 +51,6 @@ AC_CHECK_TOOL([NM], [nm])

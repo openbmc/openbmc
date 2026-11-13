@@ -45,7 +45,7 @@ python do_update_modules() {
 
 """
 
-        env = dict(os.environ, GOMODCACHE=mod_cache_dir)
+        env = dict(os.environ, **bb.fetch.get_fetcher_environment(d), GOMODCACHE=mod_cache_dir)
         source = d.expand("${UNPACKDIR}/${GO_SRCURI_DESTSUFFIX}")
         go_install = d.getVar("GO_INSTALL").split()
         output = subprocess.check_output(("go", "list", "-json=Dir,Module", "-deps", *go_install),
@@ -91,10 +91,10 @@ python do_update_modules() {
         licenses_filename = os.path.join(thisdir, f"{bpn}-licenses.inc")
         with open(licenses_filename, "w") as f:
             f.write(notice)
-            f.write('LICENSE += "AND')
+            f.write('LICENSE += "')
             if licenses:
-                f.write(' ')
-                f.write(oe.spdx_license.AndOp.join(licenses).sort().to_string())
+                f.write(oe.spdx_license.AndOp.NAME + ' ' +
+                        oe.spdx_license.AndOp.join(licenses).sort().to_string())
             f.write('"\n\n')
             f.write('LIC_FILES_CHKSUM += "\\\n')
             for lic in sorted(lic_files_chksum, key=fold_uri):

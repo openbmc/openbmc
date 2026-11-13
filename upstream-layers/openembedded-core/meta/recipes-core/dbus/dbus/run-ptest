@@ -1,3 +1,9 @@
 #!/bin/sh
-gnome-desktop-testing-runner dbus
 
+# dbus-daemon creates the transient services directory when it starts as the
+# session bus, dbus-broker does not
+if [ -n "$XDG_RUNTIME_DIR" ] && [ -O "$XDG_RUNTIME_DIR" ]; then
+	(umask 077 && mkdir -p "$XDG_RUNTIME_DIR/dbus-1/services")
+fi
+
+gnome-desktop-testing-runner dbus

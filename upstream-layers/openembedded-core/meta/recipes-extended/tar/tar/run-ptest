@@ -5,4 +5,14 @@ cd @PTEST_PATH@/tests/
 # Clear old data
 rm -rf testsuite.dir testsuite.log
 
-./testsuite --am-fmt
+# Report free space: the sparse tests create multi-GB files and the
+# ptest image is small, so this helps diagnose ENOSPC failures.
+df -h .
+
+# sparse05 (listing sparse files bigger than 2^33 B) writes ~10 GiB of
+# real data (1000 fragments of 10 MiB each), which cannot fit in the
+# ptest image. When genfile hits ENOSPC the test is normally reported
+# as skipped, but the filesystem is left full for a moment and the
+# autotest bookkeeping (status files, mkdir of the next test group)
+# intermittently fails instead, taking the next test down with it.
+./testsuite --am-fmt -k '!sparse05'

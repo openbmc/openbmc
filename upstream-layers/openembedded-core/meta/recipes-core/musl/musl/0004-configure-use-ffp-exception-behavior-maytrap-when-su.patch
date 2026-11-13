@@ -1,0 +1,46 @@
+From fe310a5e2fe6be3c28f800bde383d7df5aac4b49 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 25 Oct 2026 21:54:26 -0700
+Subject: [PATCH] configure: use -ffp-exception-behavior=maytrap when supported
+
+The math library relies on floating point exception flags being raised
+exactly as the C code would raise them. GCC keeps that by default
+(-ftrapping-math), but clang assumes floating point exceptions are never
+inspected unless told otherwise, and may then evaluate both arms of a
+branch and select the result. Built with clang 23 for aarch64, expm1()
+computes both y*2.0*0x1p1023 and y*twopk for the k < 0 || k > 56 case
+and picks one with fcsel, so the unused multiply raises a spurious
+OVERFLOW. libc-test's math/expm1, expm1f, hypot, hypotf and sinh fail
+because of that.
+
+-ffp-exception-behavior=maytrap tells clang to avoid transformations
+that raise exceptions the original code would not raise. GCC does not
+accept the option, so tryflag leaves GCC builds unchanged.
+
+Upstream-Status: Submitted [https://www.openwall.com/lists/musl/2026/10/28/1]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ configure | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/configure b/configure
+index bc9fbe48..7e1e1b72 100755
+--- a/configure
++++ b/configure
+@@ -355,6 +355,16 @@ tryflag CFLAGS_C99FSE -fexcess-precision=standard \
+ || { test "$ARCH" = i386 && tryflag CFLAGS_C99FSE -ffloat-store ; }
+ tryflag CFLAGS_C99FSE -frounding-math
+ 
++#
++# The math library relies on floating point exception flags being
++# raised exactly as the C code would raise them. GCC does not move
++# floating point operations that may trap across branches by default
++# (-ftrapping-math), but clang assumes exceptions are never inspected
++# unless told otherwise, and may then evaluate both sides of a branch,
++# raising spurious exceptions (e.g. OVERFLOW from expm1, hypot, sinh).
++#
++tryflag CFLAGS_C99FSE -ffp-exception-behavior=maytrap
++
+ #
+ # Semantically we want to insist that our sources follow the
+ # C rules for type-based aliasing, but most if not all real-world

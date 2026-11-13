@@ -3,7 +3,7 @@ PACKAGEFUNCS =+ "package_generate_dlopen_deps"
 python package_generate_dlopen_deps() {
     # https://systemd.io/ELF_DLOPEN_METADATA/
 
-    import struct, json
+    import os, struct, json
 
     def extract_segment(filename, segment):
         """
@@ -57,11 +57,12 @@ python package_generate_dlopen_deps() {
             continue
 
         for f in files:
-            # Skip symlinks, just look for real libraries
+            # Skip symlinks, inspect executables and shared libraries.
             if cpath.islink(f):
                 continue
 
-            if ".so." in f or f.endswith(".so"):
+            # Scan shared libraries and executable files for dlopen notes.
+            if cpath.is_executable(f) or ".so." in os.path.basename(f) or f.endswith(".so"):
                 try:
                     elf = oe.qa.ELFFile(f)
                     elf.open()

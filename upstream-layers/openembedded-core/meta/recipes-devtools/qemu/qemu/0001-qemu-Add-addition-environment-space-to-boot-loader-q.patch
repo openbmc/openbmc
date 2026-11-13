@@ -1,4 +1,4 @@
-From 76727fef9006b0936846938b6f8bbbccd829a75f Mon Sep 17 00:00:00 2001
+From f6981f9aedd718c2f908a91be70bb58c9473eaa0 Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Fri, 28 Mar 2014 17:42:43 +0800
 Subject: [PATCH] qemu: Add addition environment space to boot loader

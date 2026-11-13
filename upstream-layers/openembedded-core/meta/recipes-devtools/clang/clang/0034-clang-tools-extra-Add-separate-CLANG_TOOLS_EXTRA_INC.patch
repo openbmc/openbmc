@@ -1,0 +1,82 @@
+From f5fd1587149a039f4592b6e15647668175bb17a7 Mon Sep 17 00:00:00 2001
+From: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+Date: Sun, 30 Aug 2026 01:34:52 +0530
+Subject: [PATCH] [clang-tools-extra] Add separate
+ CLANG_TOOLS_EXTRA_INCLUDE_TESTS option (#215761)
+
+clang-tools-extra tests depend on the llvm-bcanalyzer CMake target,
+which exists in LLVM's CMake project but is not visible when Clang is
+built separately from LLVM. This causes CMake errors when
+CLANG_INCLUDE_TESTS is ON but the LLVM tools are not available.
+
+This patch introduces CLANG_TOOLS_EXTRA_INCLUDE_TESTS as a separate
+CMake option to control clang-tools-extra tests independently, allowing
+users to build Clang with tests enabled (CLANG_INCLUDE_TESTS=ON) while
+disabling clang-tools-extra tests (CLANG_TOOLS_EXTRA_INCLUDE_TESTS=OFF)
+when building Clang separately from LLVM.
+
+For backwards compatibility, CLANG_INCLUDE_TESTS=OFF continues
+to turn off clang-tools-extra tests as well.
+
+Upstream-Status: Backport [https://github.com/llvm/llvm-project/commit/f5fd1587149a039f4592b6e15647668175bb17a7]
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+---
+ clang-tools-extra/CMakeLists.txt                 | 6 ++++--
+ clang-tools-extra/clangd/CMakeLists.txt          | 2 +-
+ clang-tools-extra/include-cleaner/CMakeLists.txt | 2 +-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/clang-tools-extra/CMakeLists.txt b/clang-tools-extra/CMakeLists.txt
+index 0dbdeaed9a9a..291e130ca390 100644
+--- a/clang-tools-extra/CMakeLists.txt
++++ b/clang-tools-extra/CMakeLists.txt
+@@ -7,8 +7,10 @@ option(CLANG_TIDY_ENABLE_STATIC_ANALYZER
+   "Include static analyzer checks in clang-tidy" ON)
+ option(CLANG_TIDY_ENABLE_QUERY_BASED_CUSTOM_CHECKS
+   "Enable query-based custom checks in clang-tidy" ON)
++option(CLANG_TOOLS_EXTRA_INCLUDE_TESTS
++  "Generate build targets for Clang Extra Tools tests." ON)
+ 
+-if(CLANG_INCLUDE_TESTS)
++if(CLANG_INCLUDE_TESTS AND CLANG_TOOLS_EXTRA_INCLUDE_TESTS)
+   umbrella_lit_testsuite_begin(check-clang-tools)
+ 
+   option(CLANG_TOOLS_TEST_USE_VG "Run Clang tools' tests under Valgrind" OFF)
+@@ -46,7 +48,7 @@ if (CLANG_ENABLE_CLANGD)
+ endif()
+ 
+ # Add the common testsuite after all the tools.
+-if(CLANG_INCLUDE_TESTS)
++if(CLANG_INCLUDE_TESTS AND CLANG_TOOLS_EXTRA_INCLUDE_TESTS)
+   add_subdirectory(test)
+   add_subdirectory(unittests)
+   umbrella_lit_testsuite_end(check-clang-tools)
+diff --git a/clang-tools-extra/clangd/CMakeLists.txt b/clang-tools-extra/clangd/CMakeLists.txt
+index 151f4ee028b8..3aa1b7bddb99 100644
+--- a/clang-tools-extra/clangd/CMakeLists.txt
++++ b/clang-tools-extra/clangd/CMakeLists.txt
+@@ -219,7 +219,7 @@ endif()
+ option(CLANGD_BUILD_DEXP "Build the dexp tool as part of Clangd" ON)
+ llvm_canonicalize_cmake_booleans(CLANGD_BUILD_DEXP)
+ 
+-if(CLANG_INCLUDE_TESTS)
++if(CLANG_INCLUDE_TESTS AND CLANG_TOOLS_EXTRA_INCLUDE_TESTS)
+   add_subdirectory(test)
+   add_subdirectory(unittests)
+ endif()
+diff --git a/clang-tools-extra/include-cleaner/CMakeLists.txt b/clang-tools-extra/include-cleaner/CMakeLists.txt
+index dc147f9ca08d..4ccd3da21f70 100644
+--- a/clang-tools-extra/include-cleaner/CMakeLists.txt
++++ b/clang-tools-extra/include-cleaner/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ include_directories(include)
+ add_subdirectory(lib)
+ add_subdirectory(tool)
+-if(CLANG_INCLUDE_TESTS)
++if(CLANG_INCLUDE_TESTS AND CLANG_TOOLS_EXTRA_INCLUDE_TESTS)
+   add_subdirectory(test)
+   add_subdirectory(unittests)
+ endif()
+-- 
+2.49.0
+

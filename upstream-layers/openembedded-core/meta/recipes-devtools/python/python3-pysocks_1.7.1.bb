@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1d457bcffb9661b45f799d4efee72f16"
 
 SRC_URI[sha256sum] = "3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0"
 
-PYPI_PACKAGE = "PySocks"
+PYPI_PACKAGE_SDIST = "PySocks"
 
 inherit pypi setuptools3
 

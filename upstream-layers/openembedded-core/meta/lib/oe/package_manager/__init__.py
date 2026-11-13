@@ -223,6 +223,12 @@ class PackageManager(object, metaclass=ABCMeta):
         bb.note("Running intercept scripts:")
         os.environ['D'] = self.target_rootfs
         os.environ['STAGING_DIR_NATIVE'] = self.d.getVar('STAGING_DIR_NATIVE')
+        # The mtime every file in the image will end with; intercepts that
+        # record an mtime need it, and do_rootfs only exports it to shell
+        # functions it emits, not to the environment they run in.
+        timestamp = self.d.getVar('REPRODUCIBLE_TIMESTAMP_ROOTFS')
+        if timestamp:
+            os.environ['REPRODUCIBLE_TIMESTAMP_ROOTFS'] = timestamp
         for script in os.listdir(intercepts_dir):
             script_full = os.path.join(intercepts_dir, script)
 

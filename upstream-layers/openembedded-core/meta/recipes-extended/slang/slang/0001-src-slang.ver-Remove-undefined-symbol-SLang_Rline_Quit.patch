@@ -1,0 +1,32 @@
+From eb22c5c3cb253bd4c6ad20d73f76dc7105ed0f3d Mon Sep 17 00:00:00 2001
+From: "John E. Davis" <jed@jedsoft.org>
+Date: Thu, 1 Feb 2024 13:18:03 -0500
+Subject: [PATCH] src/slang.ver: Remove the undefined symbol SLang_Rline_Quit
+
+SLang_Rline_Quit is listed in the version script but not defined
+anywhere. lld rejects this by default (--no-undefined-version):
+
+  ld.lld: error: version script assignment of 'SLANG2' to symbol
+  'SLang_Rline_Quit' failed: symbol not defined
+
+Only the src/slang.ver hunk of the upstream commit is taken; the rest
+is the pre-release version bump and changes.txt.
+
+Upstream-Status: Backport [git://git.jedsoft.org/git/slang.git eb22c5c3cb253bd4c6ad20d73f76dc7105ed0f3d]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/slang.ver | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/slang.ver b/src/slang.ver
+index aa030c9..4b01f9f 100644
+--- a/src/slang.ver
++++ b/src/slang.ver
+@@ -70,7 +70,6 @@ SLANG2 {
+ 		SLang_Last_Key_Char;
+ 		SLang_Load_File_Hook;
+ 		SLang_Num_Function_Args;
+-		SLang_Rline_Quit;
+ 		SLang_TT_Baud_Rate;
+ 		SLang_TT_Read_FD;
+ 		SLang_TT_Write_FD;

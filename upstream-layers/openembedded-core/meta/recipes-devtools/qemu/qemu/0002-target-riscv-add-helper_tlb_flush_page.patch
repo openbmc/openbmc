@@ -1,7 +1,7 @@
-From eb8773847363989d9396492a3c9bc517ca04959f Mon Sep 17 00:00:00 2001
+From a6da8e0d87a06e2ed39e3fe37693fb3335a3bb39 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Mon, 24 Aug 2026 17:54:45 +0000
-Subject: [PATCH 2/3] target/riscv: add helper_tlb_flush_page()
+Subject: [PATCH] target/riscv: add helper_tlb_flush_page()
 
 Add a page-level counterpart to helper_tlb_flush(), and condition its
 internal call to tlb_flush_page() on return value from the new
@@ -16,10 +16,10 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  2 files changed, 8 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 4fc2d3a155..652f85a5c7 100644
+index 542b7c264..2b88888f8 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -137,6 +137,7 @@ DEF_HELPER_1(ctr_clear, void, env)
+@@ -138,6 +138,7 @@ DEF_HELPER_1(ctr_clear, void, env)
  DEF_HELPER_1(wfi, void, env)
  DEF_HELPER_1(wrs_nto, void, env)
  DEF_HELPER_1(tlb_flush, void, env)
@@ -28,7 +28,7 @@ index 4fc2d3a155..652f85a5c7 100644
  DEF_HELPER_4(ctr_add_entry, void, env, tl, tl, tl)
  /* Native Debug */
 diff --git a/target/riscv/tcg/op_helper.c b/target/riscv/tcg/op_helper.c
-index 8039df2b48..723a45d181 100644
+index 8039df2b4..723a45d18 100644
 --- a/target/riscv/tcg/op_helper.c
 +++ b/target/riscv/tcg/op_helper.c
 @@ -610,6 +610,13 @@ void helper_tlb_flush(CPURISCVState *env)
@@ -45,6 +45,3 @@ index 8039df2b48..723a45d181 100644
  void helper_tlb_flush_all(CPURISCVState *env)
  {
      CPUState *cs = env_cpu(env);
--- 
-2.55.0
-

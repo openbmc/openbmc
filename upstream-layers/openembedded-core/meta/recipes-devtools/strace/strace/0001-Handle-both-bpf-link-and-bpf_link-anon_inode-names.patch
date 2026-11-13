@@ -1,0 +1,135 @@
+From fa20cc5e8c736ec606efaa18427f0fd49cc45d12 Mon Sep 17 00:00:00 2001
+From: Zkingom <15024777017@163.com>
+Date: Thu, 22 Oct 2026 19:20:15 +0800
+Subject: [PATCH] Handle both "bpf-link" and "bpf_link" anon_inode names for
+ BPF links
+
+The kernel uses two different anon_inode name strings for BPF link file
+descriptors due to an inconsistency introduced across two commits:
+
+- commit 70ed506c3bbc ("bpf: Introduce pinnable bpf_link abstraction")
+  introduced bpf_link_new_fd() with anon_inode_getfd("bpf-link", ...),
+  matching the naming convention used by other BPF objects ("bpf-map",
+  "bpf-prog", "bpf-stats").
+- commit babf3164095b ("bpf: Add bpf_link_new_file that doesn't install
+  FD") added bpf_link_new_file(), later renamed to bpf_link_prime(),
+  with anon_inode_getfile("bpf_link", ...), using an underscore instead
+  of a hyphen.
+
+As a result, BPF link file descriptors appear as anon_inode:bpf-link
+when obtained via BPF_LINK_GET_FD_BY_ID or BPF_OBJ_GET from bpffs, and
+as anon_inode:bpf_link when returned by BPF_LINK_CREATE.
+
+Recognize both names to correctly identify BPF link descriptors
+regardless of how they were obtained.
+
+* src/bpf.c (print_bpf_obj_info): Recognize anon_inode:bpf_link.
+* tests/bpf-obj_get_info_by_fd-link.c (main): Obtain the link fd
+path dynamically and skip when procfs is unavailable.
+* tests/gen_tests.in (bpf-obj_get_info_by_fd-link): Filter out
+setup calls preceding the information query.
+* NEWS: Mention the fix.
+
+Signed-off-by: Xu Zhou <15024777017@163.com>
+Signed-off-by: Zkingom <15024777017@163.com>
+Assisted-by: Codex:GPT-6.1-Sol
+
+Upstream-Status: Submitted [https://github.com/strace/strace/pull/429]
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ NEWS                                |  8 ++++++++
+ src/bpf.c                           |  3 ++-
+ tests/bpf-obj_get_info_by_fd-link.c | 11 ++++++++---
+ tests/gen_tests.in                  |  2 +-
+ 4 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index eb5465a66c..da93026b4f 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,3 +1,11 @@
++Noteworthy changes in release ?.? (????-??-??)
++==============================================
++
++* Bug fixes
++
++  * Fixed decoding of BPF_OBJ_GET_INFO_BY_FD for BPF links created by
++    BPF_LINK_CREATE.
++
+ Noteworthy changes in release 7.3 (2026-10-22)
+ ==============================================
+ 
+diff --git a/src/bpf.c b/src/bpf.c
+index 3b09f45955..1498d5c0f2 100644
+--- a/src/bpf.c
++++ b/src/bpf.c
+@@ -1662,7 +1662,8 @@ print_bpf_obj_info(struct tcb * const tcp, uint32_t bpf_fd, uint64_t info,
+ 	} obj_printers[] = {
+ 		{ "anon_inode:bpf-map", print_bpf_map_info },
+ 		{ "anon_inode:bpf-prog", print_bpf_prog_info },
+-		{ "anon_inode:bpf-link", print_bpf_link_info }
++		{ "anon_inode:bpf-link", print_bpf_link_info },
++		{ "anon_inode:bpf_link", print_bpf_link_info }
+ 	};
+ 
+ 	if (entering(tcp)) {
+diff --git a/tests/bpf-obj_get_info_by_fd-link.c b/tests/bpf-obj_get_info_by_fd-link.c
+index 9536f0222f..c5f60ffc95 100644
+--- a/tests/bpf-obj_get_info_by_fd-link.c
++++ b/tests/bpf-obj_get_info_by_fd-link.c
+@@ -14,6 +14,7 @@
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <stdint.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
+@@ -43,6 +44,8 @@ sys_bpf(kernel_ulong_t cmd, void *attr, kernel_ulong_t size)
+ int
+ main(void)
+ {
++	skip_if_unavailable("/proc/self/fd/");
++
+ 	static const struct bpf_insn cgroup_prog[] = {
+ 		{ /* r0 = 1 (allow) */
+ 			.code    = BPF_ALU64 | BPF_K | BPF_MOV,
+@@ -97,10 +100,11 @@ main(void)
+ 	if (ret < 0)
+ 		perror_msg_and_skip("BPF_OBJ_GET_INFO_BY_FD");
+ 
++	char *link_fd_path = get_fd_path(link_fd);
+ 	printf("bpf(BPF_OBJ_GET_INFO_BY_FD"
+-	       ", {info={bpf_fd=%d<anon_inode:bpf-link>"
++	       ", {info={bpf_fd=%d<%s>"
+ 	       ", info_len=%zu",
+-	       link_fd, LINK_INFO_SZ);
++	       link_fd, link_fd_path, LINK_INFO_SZ);
+ 	if (get_info_attr.info_len != LINK_INFO_SZ)
+ 		printf(" => %u", get_info_attr.info_len);
+ 	printf(", info={type=");
+@@ -110,8 +114,9 @@ main(void)
+ 	printf(", cgroup={cgroup_id=%" PRIu64, link_info->cgroup.cgroup_id);
+ 	printf(", attach_type=");
+ 	printxval(bpf_attach_type, link_info->cgroup.attach_type, "BPF_???");
+-	printf("}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
++	printf("}}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
+ 
++	free(link_fd_path);
+ 	puts("+++ exited with 0 +++");
+ 	return 0;
+ }
+diff --git a/tests/gen_tests.in b/tests/gen_tests.in
+index 71393c72a6..6bf0e91db9 100644
+--- a/tests/gen_tests.in
++++ b/tests/gen_tests.in
+@@ -31,7 +31,7 @@ arch_prctl-success-Xverbose	+prctl-success.sh ARCH_PRCTL_INJECT_RETVALS="0 1 2 3
+ at_fdcwd-pathmax	-a36 --trace=openat -y -P sample
+ bpf	-a20
+ bpf-obj_get_info_by_fd	-a20 -y -e trace=bpf
+-bpf-obj_get_info_by_fd-link	-a20 -y -v -e trace=bpf
++bpf-obj_get_info_by_fd-link	-a20 -y -v -e trace=bpf "QUIRK:START-OF-TEST-OUTPUT:bpf(BPF_OBJ_GET_INFO_BY_FD"
+ bpf-obj_get_info_by_fd-prog	-a20 -y -e trace=bpf
+ bpf-obj_get_info_by_fd-prog-v	-a20 -y -v -e trace=bpf
+ bpf-obj_get_info_by_fd-v	-a20 -y -v -e trace=bpf

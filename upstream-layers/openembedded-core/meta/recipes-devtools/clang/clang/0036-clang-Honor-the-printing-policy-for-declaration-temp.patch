@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Oct 2026 13:05:20 -0700
+Subject: [PATCH] [clang] Honor the printing policy for declaration template
+ arguments
+
+TemplateArgument::print printed the declaration of a Declaration
+argument with printQualifiedName(Out), which falls back to the
+ASTContext's default printing policy and drops the caller's. Among
+other things this loses the policy's Callbacks, so -fdebug-prefix-map
+and -ffile-prefix-map are not applied to lambdas named in such an
+argument, e.g.
+
+  template <typename T> struct S { void m() {} };
+  template <auto P> void d() {}
+  void e() { auto l = [] {}; d<&S<decltype(l)>::m>(); }
+
+emits "d<&S<(lambda at /abs/path/t.cc:3:21)>::m>" as the DWARF name of
+the d instantiation, while the same lambda is remapped everywhere else.
+This leaks build paths into otherwise reproducible debug info.
+
+Pass the policy through to printQualifiedName.
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/236240]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ clang/lib/AST/TemplateBase.cpp                 |  2 +-
+ clang/test/DebugInfo/CXX/prefix-map-lambda.cpp | 12 ++++++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/clang/lib/AST/TemplateBase.cpp b/clang/lib/AST/TemplateBase.cpp
+index a5e0dde..13d7698 100644
+--- a/clang/lib/AST/TemplateBase.cpp
++++ b/clang/lib/AST/TemplateBase.cpp
+@@ -543,7 +543,7 @@ void TemplateArgument::print(const PrintingPolicy &Policy, raw_ostream &Out,
+     }
+     if (needsAmpersandOnTemplateArg(getParamTypeForDecl(), VD->getType()))
+       Out << "&";
+-    VD->printQualifiedName(Out);
++    VD->printQualifiedName(Out, Policy);
+     break;
+   }
+ 
+diff --git a/clang/test/DebugInfo/CXX/prefix-map-lambda.cpp b/clang/test/DebugInfo/CXX/prefix-map-lambda.cpp
+index f0fb1a3..962bbc0 100644
+--- a/clang/test/DebugInfo/CXX/prefix-map-lambda.cpp
++++ b/clang/test/DebugInfo/CXX/prefix-map-lambda.cpp
+@@ -8,3 +8,15 @@ void c() {
+   // CHECK-SAME:          [[@LINE+1]]:{{[0-9]+}})>"
+   b([]{});
+ }
++
++// The lambda in a declaration template argument (here a pointer to member)
++// must be remapped as well.
++template <typename T> struct S { void m() {} };
++template <auto P> void d() {}
++void e() {
++  auto l = [] {};
++  // CHECK: !DISubprogram(name: "d<&S<(lambda at
++  // CHECK-SAME:          SOURCE_ROOT
++  // CHECK-SAME:          [[@LINE-3]]:{{[0-9]+}})>::m>"
++  d<&S<decltype(l)>::m>();
++}

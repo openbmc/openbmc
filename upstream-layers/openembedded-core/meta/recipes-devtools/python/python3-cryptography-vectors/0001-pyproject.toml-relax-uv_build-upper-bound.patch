@@ -1,0 +1,29 @@
+From 9315d44ea059d68629c5adb33df7a84fa8ea03c2 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Tue, 13 Oct 2026 17:53:26 +0000
+Subject: [PATCH] Allow uv-build 0.13.0
+
+Upstream-Status: Backport [https://github.com/pyca/cryptography/commit/1e0ced8ad61d3c84215fd749abb183e87b58caea]
+
+Note: The upstream change also updates .github/requirements/build-requirements.{in,txt},
+which only exist in the git repository. The PyPI sdist that this recipe builds
+from contains just pyproject.toml, so only that file is patched here.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 0b10dcc..ee03759 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["uv_build>=0.7.19,<0.13.0"]
++requires = ["uv_build>=0.7.19,<0.14.0"]
+ build-backend = "uv_build"
+ 
+ [project]
+-- 
+2.40.0

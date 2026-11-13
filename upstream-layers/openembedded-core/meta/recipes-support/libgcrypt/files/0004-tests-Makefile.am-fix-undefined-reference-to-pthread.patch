@@ -1,4 +1,4 @@
-From 6322f759b58ba78d5b01c09c19d91571e999334c Mon Sep 17 00:00:00 2001
+From 7394a5bf89760822515ea5b153c83f6d90ef95ab Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 27 Aug 2025 11:46:17 +0800
 Subject: [PATCH] tests/Makefile.am: fix undefined reference to

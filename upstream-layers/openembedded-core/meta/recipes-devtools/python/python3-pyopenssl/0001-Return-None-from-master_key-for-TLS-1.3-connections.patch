@@ -1,0 +1,66 @@
+From a0d7c02047a991ad2bd32621ac5f1b57062dc296 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 29 Oct 2026 07:44:15 +0000
+Subject: [PATCH] Return None from master_key() for TLS 1.3 connections
+
+TLS 1.3 has no master secret, so SSL_SESSION_get_master_key() reports a
+length of 0. master_key() asserted length > 0 and raised
+OpenSSL.SSL.Error([]) for TLS 1.3 connections; return None instead,
+matching the existing bytes | None return type.
+
+Fixes https://github.com/pyca/pyopenssl/issues/1544
+
+Upstream-Status: Submitted [https://github.com/pyca/pyopenssl/pull/1545]
+
+Note: Exclude ChangeLog change for backport
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/OpenSSL/SSL.py | 7 +++++--
+ tests/test_ssl.py  | 8 +++++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/src/OpenSSL/SSL.py b/src/OpenSSL/SSL.py
+index b7d5887..15ac4ab 100644
+--- a/src/OpenSSL/SSL.py
++++ b/src/OpenSSL/SSL.py
+@@ -2803,14 +2803,17 @@ class Connection:
+         """
+         Retrieve the value of the master key for this session.
+ 
+-        :return: A string representing the state
++        :return: The master key, or :obj:`None` if there is no session or the
++            connection uses TLS 1.3, which has no master secret.
+         """
+         session = _lib.SSL_get_session(self._ssl)
+         if session == _ffi.NULL:
+             return None
+ 
+         length = _lib.SSL_SESSION_get_master_key(session, _ffi.NULL, 0)
+-        _openssl_assert(length > 0)
++        # TLS 1.3 has no master secret, so the length is 0.
++        if length == 0:
++            return None
+         outp = _no_zero_allocator("unsigned char[]", length)
+         _lib.SSL_SESSION_get_master_key(session, outp, length)
+         return _ffi.buffer(outp, length)[:]
+diff --git a/tests/test_ssl.py b/tests/test_ssl.py
+index a551fc7..085ab35 100644
+--- a/tests/test_ssl.py
++++ b/tests/test_ssl.py
+@@ -4259,8 +4259,13 @@ class TestMemoryBIO:
+         # speaking any more.
+         assert interact_in_memory(client_conn, server_conn) is None
+ 
+-        # Now that the handshake is done, there should be a key and nonces.
+-        assert server_conn.master_key() is not None
++        # Now that the handshake is done, there should be nonces. For TLS <=
++        # 1.2 there is also a master secret; TLS 1.3 has none, so master_key()
++        # may be None there (it is with OpenSSL 4.1+) and must not raise.
++        if server_conn.get_protocol_version() < TLS1_3_VERSION:
++            assert server_conn.master_key() is not None
++        else:
++            server_conn.master_key()
+         assert server_conn.client_random() is not None
+         assert server_conn.server_random() is not None
+         assert server_conn.client_random() == client_conn.client_random()

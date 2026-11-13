@@ -124,10 +124,13 @@ ALTERNATIVE:${PN} = "${@bb.utils.filter('BINCOMMANDS', 'scp ssh', d)}"
 ALTERNATIVE_TARGET = "${sbindir}/dropbearmulti"
 
 pkg_postrm:${PN} () {
-  if [ -f "${sysconfdir}/dropbear/dropbear_rsa_host_key" ]; then
+  # The host keys are generated on the target, not shipped in the package,
+  # so keep them on upgrade: a new key changes the identity every client
+  # has recorded for this host.
+  if [ "$1" != "upgrade" ] && [ -f "${sysconfdir}/dropbear/dropbear_rsa_host_key" ]; then
         rm ${sysconfdir}/dropbear/dropbear_rsa_host_key
   fi
-  if [ -f "${sysconfdir}/dropbear/dropbear_dss_host_key" ]; then
+  if [ "$1" != "upgrade" ] && [ -f "${sysconfdir}/dropbear/dropbear_dss_host_key" ]; then
         rm ${sysconfdir}/dropbear/dropbear_dss_host_key
   fi
 }

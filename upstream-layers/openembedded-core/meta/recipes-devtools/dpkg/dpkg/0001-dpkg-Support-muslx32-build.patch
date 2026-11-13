@@ -1,4 +1,4 @@
-From df6c641e3fc248d0c864e4e752c4609412067df7 Mon Sep 17 00:00:00 2001
+From 14b3bbbcfd8505c3833bbb40d2472a23d1bcf5ef Mon Sep 17 00:00:00 2001
 From: sweeaun <swee.aun.khor@intel.com>
 Date: Sun, 10 Sep 2017 00:14:15 -0700
 Subject: [PATCH] dpkg: Support muslx32 build
@@ -13,7 +13,7 @@ Signed-off-by: sweeaun <swee.aun.khor@intel.com>
  2 files changed, 2 insertions(+)
 
 diff --git a/data/ostable b/data/ostable
-index 860355774..28779beca 100644
+index edfa2e0b27a6..a40f7c7fa578 100644
 --- a/data/ostable
 +++ b/data/ostable
 @@ -21,6 +21,7 @@ base-uclibc-linux	linux-uclibc		linux[^-]*-uclibc
@@ -25,7 +25,7 @@ index 860355774..28779beca 100644
  eabi-gnu-linux		linux-gnueabi		linux[^-]*-gnueabi
  abin32-gnu-linux	linux-gnuabin32		linux[^-]*-gnuabin32
 diff --git a/data/tupletable b/data/tupletable
-index 82ae3604e..707d85bdb 100644
+index 6168027dc761..42162bc93f7e 100644
 --- a/data/tupletable
 +++ b/data/tupletable
 @@ -26,6 +26,7 @@ base-uclibc-linux-<cpu>		uclibc-linux-<cpu>

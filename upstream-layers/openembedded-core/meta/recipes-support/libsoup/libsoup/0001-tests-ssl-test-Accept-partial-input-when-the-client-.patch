@@ -1,0 +1,112 @@
+From 2d43fb0049313bdb2025625196040a65d8583dc5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 9 Nov 2026 01:53:35 -0800
+Subject: [PATCH] tests: ssl-test: Accept partial input when the client
+ certificate is rejected
+
+With TLS 1.3 the client finishes the handshake before the server checks
+the client certificate. When the server rejects it, it sends an alert
+and closes the connection, and depending on timing the client reports
+either the certificate error, a closed connection, or, if it was
+already reading the response, G_IO_ERROR_PARTIAL_INPUT:
+
+  ERROR:../tests/ssl-test.c:437:do_tls_interaction_msg_test: assertion
+  failed (error == (g-tls-error-quark, 5)): Connection terminated
+  unexpectedly (g-io-error-quark, 34)
+
+The tests already tolerate G_IO_ERROR_CONNECTION_CLOSED for this race;
+accept G_IO_ERROR_PARTIAL_INPUT as well. Seen with the openssl backend
+on a loaded qemux86-64 in 9 of 50 runs.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/586]
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/ssl-test.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/tests/ssl-test.c b/tests/ssl-test.c
+index f31bc72..e67d571 100644
+--- a/tests/ssl-test.c
++++ b/tests/ssl-test.c
+@@ -29,6 +29,17 @@ static const StrictnessTest strictness_tests[] = {
+ 	  FALSE, FALSE, SOUP_STATUS_OK },
+ };
+
++/* When the server rejects the client certificate, it can close the
++ * connection before the client has read the alert. The client then sees
++ * a closed connection, or partial input if it was reading the response.
++ */
++static gboolean
++connection_closed_by_peer (const GError *error)
++{
++        return g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED) ||
++               g_error_matches (error, G_IO_ERROR, G_IO_ERROR_PARTIAL_INPUT);
++}
++
+ static gboolean
+ accept_certificate (SoupMessage *msg,
+ 		    GTlsCertificate *certificate,
+@@ -185,7 +196,7 @@ do_tls_interaction_test (gconstpointer data)
+ 	/* Sometimes glib-networking fails to report the error as certificate required
+ 	 * and we end up with connection reset by peer because the server closes the connection
+ 	 */
+-	if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++	if (!connection_closed_by_peer (error))
+ 		g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+ 	g_clear_error (&error);
+ 	g_bytes_unref (body);
+@@ -331,7 +342,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+         /* Not handling request-certificate signal */
+         msg = soup_message_new_from_uri ("GET", uri);
+         body = soup_test_session_async_send (session, msg, NULL, &error);
+-        if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++        if (!connection_closed_by_peer (error))
+                 g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+         g_clear_error (&error);
+         g_bytes_unref (body);
+@@ -364,7 +375,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+         msg = soup_message_new_from_uri ("GET", uri);
+         soup_message_add_flags (msg, SOUP_MESSAGE_NEW_CONNECTION);
+         body = soup_test_session_async_send (session, msg, NULL, &error);
+-        if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++        if (!connection_closed_by_peer (error))
+                 g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+         g_clear_error (&error);
+         g_bytes_unref (body);
+@@ -383,7 +394,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+                           G_CALLBACK (request_certificate_cb),
+                           wrong_certificate);
+         body = soup_test_session_async_send (session, msg, NULL, &error);
+-        if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++        if (!connection_closed_by_peer (error))
+                 g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+         g_assert_null (body);
+         g_clear_error (&error);
+@@ -396,7 +407,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+                           G_CALLBACK (request_certificate_cb),
+                           NULL);
+         body = soup_test_session_async_send (session, msg, NULL, &error);
+-        if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++        if (!connection_closed_by_peer (error))
+                 g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+         g_clear_error (&error);
+         g_bytes_unref (body);
+@@ -433,7 +444,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+                           G_CALLBACK (request_certificate_async_cb),
+                           wrong_certificate);
+         body = soup_test_session_async_send (session, msg, NULL, &error);
+-        if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++        if (!connection_closed_by_peer (error))
+                 g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+         g_assert_null (body);
+         g_clear_error (&error);
+@@ -446,7 +457,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+                           G_CALLBACK (request_certificate_async_cb),
+                           NULL);
+         body = soup_test_session_async_send (session, msg, NULL, &error);
+-        if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
++        if (!connection_closed_by_peer (error))
+                 g_assert_error (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED);
+         g_assert_null (body);
+         g_clear_error (&error);

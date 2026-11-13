@@ -1,4 +1,4 @@
-From 3483d0bc400eb618add607097027eafb075722f4 Mon Sep 17 00:00:00 2001
+From f0150581619d331522a7f26fb24b445c4f305fa0 Mon Sep 17 00:00:00 2001
 From: Saul Wold <sgw@linux.intel.com>
 Date: Tue, 5 Sep 2017 16:02:55 -0700
 Subject: [PATCH] staprun/stapbpf: don't support installing a non-root
@@ -14,10 +14,10 @@ Signed-off-by: Saul Wold <sgw@linux.intel.com>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/stapbpf/Makefile.am b/stapbpf/Makefile.am
-index 4bd116bc3..e06d0801b 100644
+index 962b2dbec..ac24b7997 100644
 --- a/stapbpf/Makefile.am
 +++ b/stapbpf/Makefile.am
-@@ -40,10 +40,10 @@ git_version.stamp ../git_version.h:
+@@ -56,10 +56,10 @@ git_version.stamp ../git_version.h:
  
  # Why the "id -u" condition?  This way, an unprivileged user can run
  # make install, and have "sudo stap ...." or "sudo stapbpf ...." work later.

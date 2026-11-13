@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://apache-2.0.LICENSE;md5=86d3f3a95c324c9479bd8986968f43
 SRC_URI[sha256sum] = "73448f0aacd8d0808895bdc4b2c8e01a8d67646e4188f887375398c761f340fd"
 
 inherit pypi ptest-python-pytest python_setuptools_build_meta
-PYPI_PACKAGE = "license_expression"
 
 DEPENDS += "python3-setuptools-scm-native python3-wheel-native"
 

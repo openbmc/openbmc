@@ -92,6 +92,12 @@ oe_mkext234fs () {
 		extra_imagecmd=$@
 	fi
 
+	# mke2fs reads SOURCE_DATE_EPOCH itself and clamps every inode time to it,
+	# so give it the time the rootfs files carry, as oe_mksquashfs does.
+	if [ -n "$SOURCE_DATE_EPOCH" ]; then
+		export SOURCE_DATE_EPOCH=$(stat -c '%Y' ${IMAGE_ROOTFS})
+	fi
+
 	# For reproducible builds, make mke2fs/e2fsck deterministic: a fixed time and
 	# directory hash seed (the fsck "-D" pass reorders directories using it).
 	# This mirrors what wic does for its ext4 partitions.

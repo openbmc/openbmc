@@ -443,6 +443,7 @@ def package_qa_check_buildpaths(path, name, d, elf):
         if tmpdir in file_content:
             path = package_qa_clean_path(path, d, name)
             oe.qa.handle_error("buildpaths", "File %s in package %s contains reference to TMPDIR" % (path, name), d)
+            buildpaths_skip.append(tmpdir.decode())
         if homedir and homedir in file_content and not any(path.startswith(homedir.decode()) for path in buildpaths_skip):
             path = package_qa_clean_path(path, d, name)
             oe.qa.handle_error("buildpaths", "File %s in package %s contains a reference to the build host HOME directory. If upstream hardcodes a directory path that matches your home, you can set OEQA_BUILDPATHS_SKIP = \"%s\" in the recipe." % (path, name, homedir.decode()), d)
@@ -1301,7 +1302,7 @@ python do_qa_patch() {
         except FileNotFoundError:
             # pathlib.Path.glob() might throw this when file/directory
             # disappear while scanning.
-            bb.note("unimplemented-ptest: FileNotFoundError exception while scanning (disappearing file while scanning?). Check was ignored." % d.getVar('PN'))
+            bb.note("Recipe %s QA: unimplemented-ptest: FileNotFoundError exception while scanning (disappearing file while scanning?). Check was ignored." % d.getVar('PN'))
             pass
         return False
 

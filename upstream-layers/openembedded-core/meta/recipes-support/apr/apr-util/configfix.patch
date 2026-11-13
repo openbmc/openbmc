@@ -1,9 +1,17 @@
-Upstream-Status: Inappropriate [configuration]
+From f05a53c7e957b215743359ff787eff3040f51e89 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <rpurdie@linux.intel.com>
+Date: Mon, 12 Jan 2009 17:34:52 +0000
+Subject: [PATCH] apr/apr-util: Fix some other config path gremlins breaking
 
-Index: apr-util-1.3.4/apu-config.in
-===================================================================
---- apr-util-1.3.4.orig/apu-config.in	2009-01-12 17:08:06.000000000 +0000
-+++ apr-util-1.3.4/apu-config.in	2009-01-12 17:09:00.000000000 +0000
+Upstream-Status: Inappropriate [configuration]
+---
+ apu-config.in | 27 +--------------------------
+ 1 file changed, 1 insertion(+), 26 deletions(-)
+
+diff --git a/apu-config.in b/apu-config.in
+index 82109e5..12d9fca 100644
+--- a/apu-config.in
++++ b/apu-config.in
 @@ -139,14 +139,7 @@ while test $# -gt 0; do
      exit 0
      ;;

@@ -1,4 +1,4 @@
-From 71df5a5471081cf2338f9f046cdc51d064534297 Mon Sep 17 00:00:00 2001
+From 5684a44dd48f82e00c356383137f0aad9d796466 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:31:02 +0200
 Subject: [PATCH] Do not set PYTHON_INSTALL_DIR by running python
@@ -13,7 +13,7 @@ Signed-off-by: Moritz Haase <Moritz.Haase@bmw.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/python/CMakeLists.txt b/src/python/CMakeLists.txt
-index 05ac89f9f491f93367283974ea38b5e314f0c5b6..44e38b386abc1c8eb135721d89509c649fdc6297 100644
+index 05ac89f..44e38b3 100644
 --- a/src/python/CMakeLists.txt
 +++ b/src/python/CMakeLists.txt
 @@ -48,7 +48,7 @@ IF (SKBUILD)

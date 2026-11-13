@@ -1,0 +1,33 @@
+From a5cd57f103038c06b64d5f6ebfd0e627bb40af4e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Schwarz?= <aschwarz@usp.br>
+Date: Tue, 15 Sep 2026 00:11:56 +0000
+Subject: [PATCH] file-collection: Make sure we include <fcntl.h>
+
+Without it, libsecret fails to compile with musl/libc++. Specifically,
+Clang compiler complains that the `open()` and the constants `O_CREAT`
+and `O_RDRW` are not defined.
+
+Fixes: https://gitlab.gnome.org/GNOME/libsecret/-/work_items/117
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/181]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ libsecret/secret-file-collection.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libsecret/secret-file-collection.c b/libsecret/secret-file-collection.c
+index d528023..59667a4 100644
+--- a/libsecret/secret-file-collection.c
++++ b/libsecret/secret-file-collection.c
+@@ -24,6 +24,8 @@
+ #include <sys/file.h>
+ #include <errno.h>
+ 
++#include <fcntl.h>
++
+ EGG_SECURE_DECLARE (secret_file_collection);
+ 
+ #ifdef WITH_GCRYPT
+-- 
+GitLab
+

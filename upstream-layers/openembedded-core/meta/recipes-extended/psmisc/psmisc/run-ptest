@@ -1,0 +1,13 @@
+#!/bin/sh
+
+cd ./testsuite
+
+tmpdir="$(pwd)/tmp"
+mkdir -p "$tmpdir"
+TMPDIR="$(cd "$tmpdir" && pwd -P)"
+export TMPDIR
+
+for tool in @DEJATOOL@; do
+    runtest -a --tool $tool --outdir ../log
+done
+cd -

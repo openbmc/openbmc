@@ -12,7 +12,6 @@ inherit ptest
 SRC_URI += " \
             file://run-ptest \
             file://rt_bmark.py \
-            file://0001-Makefile-Allow-for-CC-and-AR-to-be-overridden.patch \
            "
 
 # rt-tests needs PI mutex support in libc
@@ -20,6 +19,11 @@ COMPATIBLE_HOST:libc-musl = 'null'
 
 # Do not install hwlatdetect
 EXTRA_OEMAKE += "PYLIB=''"
+
+# Upstream Makefile hardcodes CC/AR with '=' (git.kernel.org rt-tests commit
+# 7763cf316d78). Pass them as make command-line args so they override those
+# assignments, avoiding a local Makefile patch.
+EXTRA_OEMAKE += "CC='${CC}' AR='${AR}'"
 
 do_install() {
         oe_runmake install DESTDIR=${D} SBINDIR=${sbindir} MANDIR=${mandir} \

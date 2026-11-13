@@ -29,7 +29,7 @@ def mesonpy_get_args(d):
             varlist.append("-Csetup-args=" + elem)
     return ' '.join(varlist)
 
-PEP517_BUILD_OPTS = "-Cbuilddir='${B}' ${@mesonpy_get_args(d)}"
+PEP517_BUILD_OPTS += "-Cbuilddir='${B}' ${@mesonpy_get_args(d)}"
 
 python_mesonpy_do_configure () {
     python_pep517_do_configure

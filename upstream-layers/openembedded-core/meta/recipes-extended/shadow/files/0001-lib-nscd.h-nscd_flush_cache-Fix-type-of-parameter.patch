@@ -1,0 +1,30 @@
+From b8d3549a49acfe967f45aebaf06d474c82c46d22 Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Wed, 30 Sep 2026 19:12:01 +0200
+Subject: [PATCH] lib/nscd.h: nscd_flush_cache(): Fix type of parameter
+
+Fixes: deef7d84c3e4 (2026-09-09; "lib/nscd.h: nscd_flush_cache(): Define as static inline function")
+Closes: <https://github.com/shadow-maint/shadow/issues/1763>
+Reported-by: <https://github.com/Bonnietwin>
+Tested-by: <https://github.com/Bonnietwin>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+
+Upstream-Status: Backport [https://github.com/shadow-maint/shadow/commit/b8d3549a49acfe967f45aebaf06d474c82c46d22]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ lib/nscd.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/nscd.h b/lib/nscd.h
+index fda3b1cb..30b56720 100644
+--- a/lib/nscd.h
++++ b/lib/nscd.h
+@@ -8,7 +8,7 @@
+ extern int nscd_flush_cache (const char *service);
+ #else
+ static inline int
+-nscd_flush_cache(MAYBE_UNUSED int _1)
++nscd_flush_cache(MAYBE_UNUSED const char *_1)
+ {
+ 	return 0;
+ }

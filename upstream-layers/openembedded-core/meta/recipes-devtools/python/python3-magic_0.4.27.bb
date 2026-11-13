@@ -8,6 +8,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=61495c152d794e6be5799a9edca149e3"
 
 PYPI_PACKAGE = "python-magic"
+PYPI_PACKAGE_SDIST = "python-magic"
 
 inherit pypi setuptools3
 

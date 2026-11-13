@@ -1,4 +1,4 @@
-From baf4fc9f157e4c08c67d1a577b0f1e10f213a642 Mon Sep 17 00:00:00 2001
+From ec69d285812fc442ee04fe37144e7de4fecd24f1 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 9 Nov 2023 10:29:31 +0000
 Subject: [PATCH] libdnf: Fix arm arch mapping issues for qemuarmv5
@@ -15,7 +15,7 @@ Upstream-Status: Inappropriate [Relies on OE rpm config]
  1 file changed, 23 deletions(-)
 
 diff --git a/libdnf/hy-util.cpp b/libdnf/hy-util.cpp
-index 9978c8e9..aa1369b6 100644
+index 82f24edd..43cdea69 100644
 --- a/libdnf/hy-util.cpp
 +++ b/libdnf/hy-util.cpp
 @@ -117,29 +117,6 @@ hy_detect_arch(char **arch)
@@ -45,6 +45,6 @@ index 9978c8e9..aa1369b6 100644
 -    else if (!strcmp(un.machine, "mips64"))
 -        strcpy(un.machine, "mips64el");
 -#endif
-     *arch = g_strdup(un.machine);
-     return 0;
- }
+ #if defined(__e2k__)
+     if (__builtin_cpu_is("elbrus-v4") || __builtin_cpu_is("elbrus-8c") || __builtin_cpu_is("elbrus-1c+"))
+         strcpy(un.machine, "e2kv4");

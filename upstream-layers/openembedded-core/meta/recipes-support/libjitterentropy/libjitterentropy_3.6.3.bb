@@ -3,7 +3,7 @@ DESCRIPTION = "The Jitter RNG provides a noise source using the CPU execution ti
 It does not depend on any system resource other than a high-resolution time \
 stamp. It is a small-scale, yet fast entropy source that is viable in almost \
 all environments and on a lot of CPU architectures."
-HOMEPAGE = "http://www.chronox.de/jent.html"
+HOMEPAGE = "https://www.chronox.de/jent"
 LICENSE = "BSD-3-Clause OR GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e01027c4ad1fe5a4768f8488c945d491 \
                     file://LICENSE.gplv2;md5=eb723b61539feef013de476e68b5c50a \

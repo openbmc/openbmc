@@ -6,7 +6,7 @@ SECTION = "base"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI = "${GNU_MIRROR}/tar/tar-${PV}.tar.bz2 \
+SRC_URI = "${GNU_MIRROR}/tar/tar-${PV}.tar.xz \
            file://run-ptest \
            file://0001-tests-fix-TESTSUITE_AT.patch \
            file://0002-tests-check-for-recently-fixed-bug.patch \
@@ -18,7 +18,7 @@ SRC_URI = "${GNU_MIRROR}/tar/tar-${PV}.tar.bz2 \
            file://0001-Avoid-acl_-prefix-for-functions.patch \
            "
 
-SRC_URI[sha256sum] = "7edb8886a3dc69420a1446e1e2d061922b642f1cf632d2cd0f9ee7e690775985"
+SRC_URI[sha256sum] = "4d62ff37342ec7aed748535323930c7cf94acf71c3591882b26a7ea50f3edc16"
 
 inherit autotools gettext texinfo
 

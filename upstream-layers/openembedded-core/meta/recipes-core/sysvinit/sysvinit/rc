@@ -116,8 +116,18 @@ then
 	esac
 
 	num_steps=0
-	for s in /etc/rc$runlevel.d/[SK]*; do
-		case "${s##/etc/rc$runlevel.d/S??}" in
+	if [ $previous != N ]
+	then
+		for i in /etc/rc$runlevel.d/K[0-9][0-9]*
+		do
+			[ ! -f $i ] && continue
+			num_steps=$(($num_steps + 1))
+		done
+	fi
+	for i in /etc/rc$runlevel.d/S*
+	do
+		[ ! -f $i ] && continue
+		case "${i##/etc/rc$runlevel.d/S??}" in
 			gdm|xdm|kdm|reboot|halt)
 				break
 				;;
@@ -158,7 +168,11 @@ then
 			# and _no_ stop script in this level, we don't
 			# have to re-start the service.
 			#
-			[ -f $previous_start ] && [ ! -f $stop ] && continue
+			if [ -f $previous_start ] && [ ! -f $stop ]
+			then
+				startup_progress
+				continue
+			fi
 		fi
 		if [ x"${PSPLASH_TEXT_UPDATES}" = x"yes" ]; then
 			psplash-write "MSG $(basename $i .sh | cut -c 4-)" || true

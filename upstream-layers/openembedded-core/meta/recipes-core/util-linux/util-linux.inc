@@ -17,14 +17,11 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/util-linux/v${MAJOR_VERSION}/util-lin
            file://display_testname_for_subtest.patch \
            file://avoid_parallel_tests.patch \
            file://0001-tests-script-Disable-size-option-test.patch \
-           file://0001-libmount-add-missing-fileutils.h-include-to-hook_idma.patch \
-           file://0002-lib-fileutils-fix-unused-parameter-warnings-without-.patch \
-           file://0003-mount-fix-grammar-and-typo-in-X-mount.idmap-document.patch \
-           file://0004-libmount-use-USE_LIBMOUNT_MOUNTFD_SUPPORT-for-idmap-h.patch \
-           file://0005-tools-add-non-newmount.conf-config-gen-profile.patch \
+           file://0006-tests-lsfd-accept-rw-mode-for-mmap-ed-packet-socket-.patch \
+           file://0001-tests-flock-increase-wait-for-flock-child-timeout.patch \
            "
 
-SRC_URI[sha256sum] = "66ac7c0e725278eb2b039e3104f2c91119341d941b41bac7a285c695f940bd57"
+SRC_URI[sha256sum] = "fbd62a100ab7bb8746ba0661255c3c48185b1e9021507c624da01fbc696330ec"
 
 CVE_PRODUCT = "util-linux"
 

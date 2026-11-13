@@ -1,17 +1,14 @@
 #!/bin/sh
 
-# Define test work dir
-WORKDIR=@PTEST_PATH@/tests/
+cd @PTEST_PATH@/tests/ || exit 1
 
-# Run test
-cd ${WORKDIR}
+run() {
+    if "./$1"; then
+        echo "PASS: lz4/$2"
+    else
+        echo "FAIL: lz4/$2"
+    fi
+}
 
-case_name="test_frame"
-./frametest 
-ret=$?
-if [[ ${ret} == "0" ]]; then
-    echo "PASS: lz4/$case_name"
-else
-    echo "FAIL: lz4/$case_name"
-fi
-
+run frametest test_frame
+run unittest test_unit

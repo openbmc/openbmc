@@ -1,0 +1,30 @@
+From f11c932f15c91c3cb7579df8c8f9adf73a23f261 Mon Sep 17 00:00:00 2001
+From: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+Date: Wed, 30 Sep 2026 11:21:27 +0000
+Subject: [PATCH] CMakeLists: Do not use -fno-exceptions
+
+Build is failing with g++ 12.2 (Debian 12) with -fno-exceptions. Build
+without it.
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b69ec9fb54f8..e666cf51111a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -188,7 +188,7 @@ function(spvtools_default_compile_options TARGET)
+   if (${COMPILER_IS_LIKE_GNU})
+     target_compile_options(${TARGET} PRIVATE
+       -Wall -Wextra -Wno-long-long -Wshadow -Wundef -Wconversion
+-      -Wno-sign-conversion -fno-exceptions)
++      -Wno-sign-conversion)
+ 
+     if(NOT ENABLE_RTTI)
+         add_compile_options(-fno-rtti)
+-- 
+2.39.5
+

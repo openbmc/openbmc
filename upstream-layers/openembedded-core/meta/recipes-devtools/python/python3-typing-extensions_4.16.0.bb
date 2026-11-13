@@ -12,9 +12,6 @@ SECTIONS = "libs"
 LICENSE = "PSF-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fcf6b249c2641540219a727f35d8d2c2"
 
-# The name on PyPi is slightly different.
-PYPI_PACKAGE = "typing_extensions"
-
 SRC_URI[sha256sum] = "dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5"
 
 inherit pypi python_flit_core

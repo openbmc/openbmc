@@ -1,18 +1,21 @@
-From 783d9e0d3d7824fbca53c2c3a80e8e5e23eacc82 Mon Sep 17 00:00:00 2001
+From c3ce4ce9b23ec8e6f0966bca8edef6cf937bdc7b Mon Sep 17 00:00:00 2001
 From: Daisuke Yamane <yamane07ynct@gmail.com>
 Date: Tue, 1 Jul 2025 18:35:25 +0900
 Subject: [PATCH] test: Add support ptest
 
 Upstream-Status: Inappropriate [oe-core specific]
 
+Note: Updated for 79.1 - dropped the intltest.cpp hunk since upstream
+removed that code, kept the four Makefile.in changes.
+
 Signed-off-by: Daisuke Yamane <yamane07ynct@gmail.com>
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
 ---
- test/cintltst/Makefile.in  | 2 +-
- test/intltest/Makefile.in  | 2 +-
- test/intltest/intltest.cpp | 2 +-
- test/iotest/Makefile.in    | 2 +-
- test/letest/Makefile.in    | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ test/cintltst/Makefile.in | 2 +-
+ test/intltest/Makefile.in | 2 +-
+ test/iotest/Makefile.in   | 2 +-
+ test/letest/Makefile.in   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/test/cintltst/Makefile.in b/test/cintltst/Makefile.in
 index 552a105..9cf3071 100644
@@ -28,7 +31,7 @@ index 552a105..9cf3071 100644
  LIBS = $(LIBCTESTFW) $(LIBICUI18N) $(LIBICUTOOLUTIL) $(LIBICUUC) $(DEFAULT_LIBS) $(LIB_M)
  
 diff --git a/test/intltest/Makefile.in b/test/intltest/Makefile.in
-index 5d4a03b..ca4e4cd 100644
+index 2e44831..d5bd240 100644
 --- a/test/intltest/Makefile.in
 +++ b/test/intltest/Makefile.in
 @@ -39,7 +39,7 @@ CPPFLAGS += -DUNISTR_FROM_CHAR_EXPLICIT= -DUNISTR_FROM_STRING_EXPLICIT=
@@ -40,19 +43,6 @@ index 5d4a03b..ca4e4cd 100644
  endif
  LIBS = $(LIBCTESTFW) $(LIBICUI18N) $(LIBICUUC) $(LIBICUTOOLUTIL) $(DEFAULT_LIBS) $(LIB_M) $(LIB_THREAD)
  
-diff --git a/test/intltest/intltest.cpp b/test/intltest/intltest.cpp
-index 3806d0f..33829b0 100644
---- a/test/intltest/intltest.cpp
-+++ b/test/intltest/intltest.cpp
-@@ -1707,7 +1707,7 @@ static bool fileExists(const char* fileName) {
-  * Returns the path to icu/testdata/
-  */
- const char *IntlTest::getSharedTestData(UErrorCode& err) {
--#define SOURCE_TARBALL_TOP U_TOPSRCDIR U_FILE_SEP_STRING ".." U_FILE_SEP_STRING
-+#define SOURCE_TARBALL_TOP U_TOPSRCDIR U_FILE_SEP_STRING
- #define REPO_TOP SOURCE_TARBALL_TOP ".." U_FILE_SEP_STRING
- #define FILE_NAME U_FILE_SEP_STRING "message2" U_FILE_SEP_STRING "valid-tests.json"
-     const char *srcDataDir = nullptr;
 diff --git a/test/iotest/Makefile.in b/test/iotest/Makefile.in
 index 16c510f..9eeff4b 100644
 --- a/test/iotest/Makefile.in
@@ -79,6 +69,3 @@ index 156c86f..555a820 100644
  LIBS = $(LIBICULX) $(LIBICUUC) $(LIBICUI18N) $(LIBCTESTFW) $(LIBICUTOOLUTIL) $(DEFAULT_LIBS) $(LIB_M) $(ICULEHB_LIBS)
  
  COMMONOBJECTS = SimpleFontInstance.o
--- 
-2.43.0
-

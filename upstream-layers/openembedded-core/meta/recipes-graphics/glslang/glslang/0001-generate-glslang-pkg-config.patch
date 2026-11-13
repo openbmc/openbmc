@@ -1,4 +1,4 @@
-From f7aad1905705097782ebfea3c74c75856158a2ba Mon Sep 17 00:00:00 2001
+From 347ba2f438483f66d14fa0e8ef7baf828ed6be92 Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 7 Feb 2021 01:30:39 +0000
 Subject: [PATCH] generate glslang pkg-config

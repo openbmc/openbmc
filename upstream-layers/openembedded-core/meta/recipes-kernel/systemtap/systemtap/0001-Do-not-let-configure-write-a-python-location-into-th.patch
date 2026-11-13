@@ -1,4 +1,4 @@
-From adf505ededdd25cf43111fd12a59090a8f7de856 Mon Sep 17 00:00:00 2001
+From cba033a67d6d977cb5fa3862c4d3daa2eede08ba Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 22 Feb 2017 13:37:33 +0200
 Subject: [PATCH] Do not let configure write a python location into the dtrace

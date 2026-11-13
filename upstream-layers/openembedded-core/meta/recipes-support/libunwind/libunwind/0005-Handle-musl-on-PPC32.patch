@@ -13,7 +13,7 @@ structures.
 
 Closes #709.
 
-Upstream-Status: Submitted [https://github.com/libunwind/libunwind/pull/710]
+Upstream-Status: Backport [71559717599cecc4d1ccb2061766ec5c12e10ac6]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  src/ppc32/Ginit.c      | 13 ++++++++++---

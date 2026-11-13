@@ -1,0 +1,46 @@
+From 6288d9367a17afef395ca898844ccbf4c0b58ef7 Mon Sep 17 00:00:00 2001
+From: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+Date: Wed, 2 Sep 2026 13:07:05 +0200
+Subject: [PATCH] libfaketime.c: do not declare __time64 when -D_TIME_BITS=64
+ is used
+
+When _TIME_BITS macro is set to 64, __clock_gettime64(),
+__gettimeofday64() and __time64 will be defined in the glibc. There is
+no need to define these here.
+
+Upstream-Status: Submitted [https://github.com/wolfcw/libfaketime/pull/553]
+Signed-off-by: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+---
+ src/libfaketime.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/libfaketime.c b/src/libfaketime.c
+index e6748832fecb..7f3c65bf2bc9 100644
+--- a/src/libfaketime.c
++++ b/src/libfaketime.c
+@@ -1802,11 +1802,13 @@ int __lxstat (int ver, const char *path, struct stat *buf)
+ #endif
+ 
+ #ifdef __GLIBC__
++#if (_TIME_BITS != 64)
+ int stat64 (const char *path, struct stat64 *buf)
+ {
+   STAT64_HANDLER(stat64, buf, path, buf);
+ }
+ #endif
++#endif
+ 
+ /* Contributed by Philipp Hachtmann in version 0.6 */
+ #ifndef __ANDROID__
+@@ -3375,7 +3377,7 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
+ 
+ #ifdef __GLIBC__
+ /* This is used by glibc 32-bit architectures only. */
+-#ifndef FAKETIME_TIME64_BUILD
++#if (_TIME_BITS != 64)
+ int __clock_gettime64(clockid_t clk_id, struct __timespec64 *tp64)
+ {
+   struct timespec tp;
+-- 
+2.47.3
+

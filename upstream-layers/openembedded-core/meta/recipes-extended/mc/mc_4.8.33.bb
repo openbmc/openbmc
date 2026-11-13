@@ -8,10 +8,10 @@ DEPENDS = "ncurses glib-2.0 util-linux file-replacement-native"
 RDEPENDS:${PN} = "ncurses-terminfo-base"
 RRECOMMENDS:${PN} = "ncurses-terminfo"
 
-SRC_URI = "http://ftp.midnight-commander.org/${BPN}-${PV}.tar.bz2 \
+SRC_URI = "http://ftp.midnight-commander.org/${BPN}-${PV}.tar.xz \
            file://nomandate.patch \
            "
-SRC_URI[sha256sum] = "a3ceb0af84226fedfe5f339464ff2849c3f6bf0321b72027c47b2c10e66a6dba"
+SRC_URI[sha256sum] = "cae149d42f844e5185d8c81d7db3913a8fa214c65f852200a9d896b468af164c"
 
 inherit autotools gettext pkgconfig
 

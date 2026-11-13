@@ -37,6 +37,16 @@ LICENSE:${PN}-dev = "GPL-3.0-or-later WITH GCC-exception-3.1"
 LICENSE:${PN}-dbg = "GPL-3.0-or-later WITH GCC-exception-3.1"
 LICENSE:${PN}-src = "GPL-3.0-or-later WITH GCC-exception-3.1"
 
+# On baremetal there is no libc:
+# configure need limits.h for its sanity check
+# libc dependencies have to be patched out just like in libgcc-initial
+do_configure:prepend:libc-baremetal () {
+	install -d ${STAGING_INCDIR}
+	touch ${STAGING_INCDIR}/limits.h
+	sed -i -e 's#INHIBIT_LIBC_CFLAGS =.*#INHIBIT_LIBC_CFLAGS = -Dinhibit_libc#' ${B}/gcc/libgcc.mvars
+	sed -i -e 's#inhibit_libc = false#inhibit_libc = true#' ${B}/gcc/Makefile
+}
+
 FILES:${PN}-dev = "\
     ${base_libdir}/libgcc*.so \
     ${@oe.utils.conditional('BASETARGET_SYS', '${TARGET_SYS}', '', '${libdir}/${BASETARGET_SYS}', d)} \

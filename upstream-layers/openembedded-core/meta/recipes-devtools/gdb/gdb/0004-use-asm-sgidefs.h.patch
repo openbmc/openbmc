@@ -1,4 +1,4 @@
-From 6d37100388d45185a6e88ea7099a698c2c76b084 Mon Sep 17 00:00:00 2001
+From ed199bfc463ef489eba85c577710a6083abeea0b Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <amccurdy@gmail.com>
 Date: Sat, 30 Apr 2016 15:29:06 -0700
 Subject: [PATCH] use <asm/sgidefs.h>
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index ca38caeacc2..2f044ca508a 100644
+index 209c4d2b..7849b6fd 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
 @@ -30,7 +30,7 @@

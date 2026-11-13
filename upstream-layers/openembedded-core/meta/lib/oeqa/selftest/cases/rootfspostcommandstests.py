@@ -34,7 +34,7 @@ class ShadowUtilsTidyFiles(OESelftestTestCase):
             test_image)
         passwd_postprocess_cmd = vars["SORT_PASSWD_POSTPROCESS_COMMAND"]
         self.assertIsNotNone(passwd_postprocess_cmd)
-        if (passwd_postprocess_cmd.strip() != 'tidy_shadowutils_files;'):
+        if (passwd_postprocess_cmd.strip() != 'tidy_shadowutils_files'):
             raise unittest.SkipTest("Testcase skipped as 'tidy_shadowutils_files' "
                 "rootfs post process command is not the set SORT_PASSWD_POSTPROCESS_COMMAND.")
 

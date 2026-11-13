@@ -83,14 +83,20 @@ do_install_ptest() {
 	# randtest is a statistical test that intermittently fails on overloaded systems
 	# https://bugzilla.yoctoproject.org/show_bug.cgi?id=16254
 	rm -f ${D}${PTEST_PATH}/test/randtest.*
-	for t in time timeout randtest; do
+	# clos1way2/clos1way6 drive a two-way coprocess (|&) and expect a fixed
+	# interleaving of the child's stderr and gawk's own warning/error output.
+	# That ordering is not guaranteed and races on loaded hosts, failing
+	# intermittently across arches and libcs.
+	# https://bugzilla.yoctoproject.org/show_bug.cgi?id=15477
+	# Reported upstream: https://lists.gnu.org/archive/html/bug-gawk/2021-02/msg00005.html
+	rm -f ${D}${PTEST_PATH}/test/clos1way2.*
+	rm -f ${D}${PTEST_PATH}/test/clos1way6.*
+	for t in time timeout randtest clos1way2 clos1way6; do
 		echo $t >> ${D}${PTEST_PATH}/test/skipped.txt
 	done
 }
 
 do_install_ptest:append:libc-musl() {
-	# Reported  https://lists.gnu.org/archive/html/bug-gawk/2021-02/msg00005.html
-	rm -f ${D}${PTEST_PATH}/test/clos1way6.*
 	# Needs en_US.UTF-8 but then does not work with musl
 	rm -f ${D}${PTEST_PATH}/test/backsmalls1.*
 	# Needs en_US.UTF-8 but then does not work with musl
@@ -98,7 +104,7 @@ do_install_ptest:append:libc-musl() {
 	# The below two need LANG=C inside the make rule for musl
 	rm -f ${D}${PTEST_PATH}/test/rebt8b1.*
 	rm -f ${D}${PTEST_PATH}/test/regx8bit.*
-	for t in clos1way6 backsmalls1 commas rebt8b1 regx8bit; do
+	for t in backsmalls1 commas rebt8b1 regx8bit; do
 		echo $t >> ${D}${PTEST_PATH}/test/skipped.txt
 	done
 }

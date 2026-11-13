@@ -1,0 +1,121 @@
+From de8ea6f3990511cc9478ad25dcb60413126a5a15 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 22 Oct 2026 13:30:00 +0000
+Subject: [PATCH] Fix build on 32-bit (ILP32) targets with -Werror
+
+The default -Werror build fails on 32-bit targets in a few spots that
+assume LP64 sizes:
+
+- src/zm.c (zsda32), src/zreadline.c, src/lsz.c: size_t values are
+  printed with "%lu", which mismatches on ILP32 where size_t is
+  unsigned int [-Werror=format=]. Use "%zu", as the rest of the code
+  (stats.c, lrz.c, lsz.c) already does.
+
+- src/linesimulator.c: the xorshift64 RNG kept its state in unsigned
+  long, so the 64-bit seed constant 0x9E3779B97F4A7C15 was truncated on
+  ILP32 [-Werror=overflow]. Use uint64_t for the state and the
+  error_state rng/seed fields.
+
+- src/zm.c: zsendline() is "static inline" but can exceed the inliner's
+  size limit at -O2, which fails with -Werror=inline. Mark it
+  LRZSZ_ALWAYS_INLINE like the other hot helpers (noxrd7, zdlread,
+  zgeth1) to keep it inlined and silence the error.
+
+Builds cleanly for x86, x86-64, arm, aarch64, mips, mips64, riscv64 and
+powerpc.
+
+Upstream-Status: Submitted [https://github.com/UweOhse/lrzsz/pull/2]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+
+---
+ src/linesimulator.c | 11 ++++++-----
+ src/lsz.c           |  2 +-
+ src/zm.c            |  4 ++--
+ src/zreadline.c     |  2 +-
+ 4 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/src/linesimulator.c b/src/linesimulator.c
+index aec7c59..7707c6a 100644
+--- a/src/linesimulator.c
++++ b/src/linesimulator.c
+@@ -15,6 +15,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <errno.h>
+@@ -118,10 +119,10 @@ parse_ranges(const char *s, struct range_list *rl)
+ /* RNG: xorshift64                                                    */
+ /* ------------------------------------------------------------------ */
+ 
+-static unsigned long
+-xorshift64(unsigned long *state)
++static uint64_t
++xorshift64(uint64_t *state)
+ {
+-    unsigned long x = *state;
++    uint64_t x = *state;
+     if (x == 0)
+         x = 0x9E3779B97F4A7C15UL;
+     x ^= x << 13;
+@@ -313,8 +314,8 @@ enum err_type {
+ };
+ 
+ struct error_state {
+-    unsigned long rng;
+-    unsigned long seed;
++    uint64_t rng;
++    uint64_t seed;
+     int flip_bits;      /* max bits to flip per event (0=disabled) */
+     int drop_bytes;     /* max bytes to drop per event (0=disabled) */
+     int garble_bytes;   /* max bytes to garble per event (0=disabled) */
+diff --git a/src/lsz.c b/src/lsz.c
+index 18766a6..f571385 100644
+--- a/src/lsz.c
++++ b/src/lsz.c
+@@ -1426,7 +1426,7 @@ getzrxinit(void)
+ 				blklen = Rxbuflen;
+ 			if (blkopt && blklen > blkopt)
+ 				blklen = blkopt;
+-			DPRINTF(DEBUG_WINDOWHANDLING, "Rxbuflen=%u blklen=%lu\n", Rxbuflen, blklen);
++			DPRINTF(DEBUG_WINDOWHANDLING, "Rxbuflen=%u blklen=%zu\n", Rxbuflen, blklen);
+ 			DPRINTF(DEBUG_WINDOWHANDLING, "Txwindow = %u Txwspac = %u\n", Txwindow, Txwspac);
+ 			Rxtimeout=old_timeout;
+                         if (debugmode & DEBUG_WINDOWHANDLING) {
+diff --git a/src/zm.c b/src/zm.c
+index 9aa3298..9207095 100644
+--- a/src/zm.c
++++ b/src/zm.c
+@@ -257,7 +257,7 @@ zdlread2(int c)
+  * Send character c with ZMODEM escape sequence encoding.
+  *  Escape XON, XOFF. Escape CR following @ (Telenet net escape)
+  */
+-static inline void 
++static inline LRZSZ_ALWAYS_INLINE void 
+ zsendline(int c)
+ {
+ 
+@@ -476,7 +476,7 @@ zsda32(const char *buf, size_t length, int frameend)
+ 	int c;
+ 	unsigned long crc;
+ 	int i;
+-	DPRINTF(DEBUG_PROTOCOL, "zsdat32: %lu %s", length, Zendnames[(frameend-ZCRCE)&3]);
++	DPRINTF(DEBUG_PROTOCOL, "zsdat32: %zu %s", length, Zendnames[(frameend-ZCRCE)&3]);
+ 
+ 	crc = 0xFFFFFFFFL;
+         stats_msg_valid(length);
+diff --git a/src/zreadline.c b/src/zreadline.c
+index 8ed3c8f..20bf6ff 100644
+--- a/src/zreadline.c
++++ b/src/zreadline.c
+@@ -53,7 +53,7 @@ readline_internal(unsigned int timeout)
+ 	struct timeval *tvp;
+ 	int rc;
+ 
+-	DPRINTF(DEBUG_READLINE, "Calling read: timeout=%u/10s  readnum=%lu ",
++	DPRINTF(DEBUG_READLINE, "Calling read: timeout=%u/10s  readnum=%zu ",
+ 	  timeout, readline_readnum);
+ 
+ 	if (no_timeout) {

@@ -11,6 +11,7 @@ HOMEPAGE = "https://www.yoctoproject.org/"
 PTESTS = "${PTESTS_SLOW} ${PTESTS_FAST}"
 PTEST_RUNNER_TIMEOUT:virtclass-mcextend-python3-cffi = "600"
 PTEST_RUNNER_TIMEOUT:virtclass-mcextend-go = "4800"
+PTEST_RUNNER_TIMEOUT:virtclass-mcextend-icu = "2400"
 
 IMAGE_INSTALL:append = " ${MCNAME}-ptest openssh"
 
@@ -49,6 +50,7 @@ QB_MEM:virtclass-mcextend-tcl = "-m 5100"
 QB_MEM:virtclass-mcextend-go = "-m 4096"
 QB_MEM:virtclass-mcextend-gnutls = "-m 1536"
 QB_MEM:virtclass-mcextend-zstd = "-m 4096"
+QB_MEM:virtclass-mcextend-icu = "-m 4096"
 
 TEST_SUITES = "ping ssh parselogs ptest"
 

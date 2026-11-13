@@ -50,7 +50,7 @@ PACKAGECONFIG[selinux] = "-Dselinux=enabled,-Dselinux=disabled,libselinux"
 PACKAGECONFIG[tests] = "-Dmodular_tests=enabled -Dinstalled_tests=true,-Dmodular_tests=disabled -Dinstalled_tests=false,glib-2.0"
 
 DEPENDS = "virtual/libintl"
-RDEPENDS:${PN} += "${PN}-common ${PN}-tools"
+RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'message-bus', '${PN}-daemon', '', d)} ${PN}-common ${PN}-tools"
 RDEPENDS:${PN}:class-native = ""
 
 inherit systemd useradd update-rc.d
@@ -58,7 +58,7 @@ inherit systemd useradd update-rc.d
 INITSCRIPT_NAME = "dbus-1"
 INITSCRIPT_PARAMS = "start 02 5 3 2 . stop 20 0 1 6 ."
 
-PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-tools"
+PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-daemon ${PN}-tools"
 
 USERADD_PACKAGES = "dbus-common"
 USERADD_PARAM:dbus-common = "--system --home ${localstatedir}/lib/dbus \
@@ -69,10 +69,7 @@ CONFFILES:${PN} = "${sysconfdir}/dbus-1/system.conf ${sysconfdir}/dbus-1/session
 
 DEBIANNAME:${PN} = "dbus-1"
 
-FILES:${PN} = "${bindir}/dbus-daemon* \
-               ${bindir}/dbus-cleanup-sockets \
-               ${bindir}/dbus-launch \
-               ${bindir}/dbus-run-session \
+FILES:${PN} = "${bindir}/dbus-launch \
                ${libexecdir}/dbus* \
                ${sysconfdir} \
                ${localstatedir} \
@@ -93,6 +90,14 @@ FILES:${PN}-common = "${sysconfdir}/dbus-1 \
                       ${systemd_user_unitdir}/sockets.target.wants \
                       ${nonarch_libdir}/sysusers.d/dbus.conf \
 "
+# The message bus executable on its own, without the system bus units, so that
+# it can be installed next to another system bus implementation (dbus-broker)
+# for things like test suites which start private buses.
+FILES:${PN}-daemon = "${bindir}/dbus-daemon* \
+                      ${bindir}/dbus-cleanup-sockets \
+                      ${bindir}/dbus-run-session \
+"
+RDEPENDS:${PN}-daemon = "${PN}-common"
 FILES:${PN}-tools = "${bindir}/dbus-uuidgen \
                      ${bindir}/dbus-send \
                      ${bindir}/dbus-monitor \
@@ -103,7 +108,14 @@ RRECOMMENDS:${PN}-lib = "${PN}"
 RRECOMMENDS:${PN}-lib:class-target = "${VIRTUAL-RUNTIME_dbus}"
 FILES:${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-test-tool ${datadir}/xml/dbus-1"
 
-RDEPENDS:${PN}-ptest += "bash make dbus"
+# Not using += or append here is to avoid adding PN as dependency.
+# The tests start their own buses with dbus-daemon and talk to them with
+# dbus-send; they don't need the system bus (dbus), which would conflict with
+# other system bus implementations such as dbus-broker.
+# using hard = also threw away gnome-desktop-testing, which ptest-gnome.bbclass adds the same way
+# needs adding explicitly as well
+RDEPENDS:${PN}-ptest = "bash gnome-desktop-testing \
+                        make ${@bb.utils.contains('PACKAGECONFIG', 'message-bus', '${PN}-daemon', '', d)} ${PN}-tools"
 
 pkg_postinst:${PN}() {
 	if [ -z "$D" ] && [ -e /etc/init.d/populate-volatile.sh ] ; then

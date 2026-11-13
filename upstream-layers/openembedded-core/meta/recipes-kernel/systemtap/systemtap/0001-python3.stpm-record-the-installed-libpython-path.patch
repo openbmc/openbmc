@@ -1,0 +1,51 @@
+From b9bd609254f54fedba0b7155c63a3b3f6d84993c Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Wed, 23 Sep 2026 18:52:56 -0400
+Subject: [PATCH] PR34652: python3.stpm: record the installed libpython path
+
+tapset/python3.stpm is generated at build time and installed, and its
+stap_python3_libpython macro is the module argument of the @cast()s
+in tapset/python3.stp.  @cast module names are taken literally, so
+the macro has to name libpython as it exists on the machine stap is
+tracing.
+
+configure instead derives it from sysconfig's LIBDIR for the
+interpreter that built HelperSDT.  When cross compiling that is a
+directory in the build host's staging area, which exists on no
+machine but the builder, so every python3 probe on the installed
+system fails to resolve PyFrameObject.
+
+Keep only the library soname from sysconfig and anchor it at the
+$(libdir) being installed into, so the macro names the installed
+library.  For a native build where the interpreter's LIBDIR is
+$(libdir) the generated value is unchanged.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=systemtap.git;a=commit;h=b9bd609254f54fedba0b7155c63a3b3f6d84993c]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ Makefile.am | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 1f668df..4d255dd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -140,9 +140,17 @@ $(TAPSET_PYTHON3_STP): $(srcdir)/$(TAPSET_PYTHON3_CANDIDATE)
+ 	mkdir -p tapset # create build-tree tapset/ dir if needed
+ 	cp $< $@
+ 
++# The libpython path baked into python3.stpm is resolved at run time on the
++# machine being probed, so it has to be the installed location.  configure
++# gets PYTHON3_LIBPYTHON from sysconfig, whose LIBDIR points at the python
++# build/staging area; when cross compiling that is a build host directory
++# which does not exist on the target.  Keep only the library soname from
++# sysconfig and anchor it at the $(libdir) we are installing against.
++PYTHON3_LIBPYTHON_INSTALLED = $(libdir)/$(notdir $(PYTHON3_LIBPYTHON))
++
+ $(TAPSET_PYTHON3_STPM):
+ 	mkdir -p tapset # create build-tree tapset/ dir if needed
+-	@echo '@define stap_python3_libpython %("$(PYTHON3_LIBPYTHON)" %)' > $@
++	@echo '@define stap_python3_libpython %("$(PYTHON3_LIBPYTHON_INSTALLED)" %)' > $@
+ 
+ install: all
+ 	$(MAKE) $(AM_MAKEFLAGS) install-recursive

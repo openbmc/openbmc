@@ -1,0 +1,49 @@
+From c40ce55b02b89b31a0bed9e0d2586be80681de64 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 24 Oct 2026 12:00:00 +1100
+Subject: [PATCH] Bug 5277723 - configure.ac: do not fail the arm64 test probes
+ when cross-compiling
+
+Commit cd8a547aa changed the dotprod probe from AC_COMPILE_IFELSE to
+AC_RUN_IFELSE and commit 938c24838 added the crypto probe as
+AC_RUN_IFELSE, neither with an action for cross-compiling. autoconf
+then aborts configure with "cannot run test program while cross
+compiling" for every target, not just arm64, as the probes are not
+guarded by the architecture.
+
+Both only decide whether the matching regression tests are built, so
+answer no when the test program cannot be run.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;h=74e91f2970fc90a76f616c679a81b98e1f303257]
+
+Notes: Drop NEWS change for backport
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ configure.ac | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 60c3861da..c1dbcbab7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4144,6 +4144,9 @@ AC_MSG_RESULT([yes])
+ ], [
+ ac_have_armv82_dotprod_feature=no
+ AC_MSG_RESULT([no])
++], [
++ac_have_armv82_dotprod_feature=no
++AC_MSG_RESULT([cross compiling, assuming no])
+ ])
+ CFLAGS="$save_CFLAGS"
+ 
+@@ -4164,6 +4167,9 @@ AC_MSG_RESULT([yes])
+ ], [
+ ac_have_armv8_crypto=no
+ AC_MSG_RESULT([no])
++], [
++ac_have_armv8_crypto=no
++AC_MSG_RESULT([cross compiling, assuming no)])
+ ])
+ CFLAGS="$save_CFLAGS"
+ 

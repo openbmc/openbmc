@@ -1,4 +1,4 @@
-From 3d27ccbc3409c473a4acba56df15e6b7e71f83fb Mon Sep 17 00:00:00 2001
+From 804e3cc382fc28f2c67dd34fc42997b70d61b337 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 8 Feb 2026 21:11:56 -0800
 Subject: [PATCH] Adapt to linux-wrs kernel version, which has character '_'
@@ -16,7 +16,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/lib/dpkg/parsehelp.c b/lib/dpkg/parsehelp.c
-index 307b7705a..82713c008 100644
+index 307b7705a522..82713c0088c7 100644
 --- a/lib/dpkg/parsehelp.c
 +++ b/lib/dpkg/parsehelp.c
 @@ -303,18 +303,16 @@ parseversion(struct dpkg_version *rversion, const char *string,
@@ -40,6 +40,3 @@ index 307b7705a..82713c008 100644
  			return dpkg_put_warn(err, _("invalid character in revision number"));
  	}
  
--- 
-2.49.0
-

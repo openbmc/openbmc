@@ -1,0 +1,35 @@
+From 54accd2a65ec689be9f0bbed6870d231a8d35f90 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 31 Oct 2026 02:56:00 +0000
+Subject: [PATCH] http.test: Do not rely on tk TLD in http-4.15
+
+http-4.15 expects the lookup of the bogus host not_a_host.tcl.tk to
+fail, but tcl.tk now has a wildcard DNS record, so the request
+succeeds with a "301 Moved Permanently" reply and the test fails:
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+
+Use a host in a non-existent TLD instead and increase the timeout so a
+slow negative DNS lookup does not confound the test, as done upstream
+for Tcl 9 in [bbaf69c3dd].
+
+Upstream-Status: Backport [https://github.com/tcltk/tcl/commit/0a97f6d1c55f4158bafd1539dc1b20cce6188857]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/http.test | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/http.test b/tests/http.test
+index 6406675..d6b3537 100644
+--- a/tests/http.test
++++ b/tests/http.test
+@@ -624,7 +624,7 @@ test http-4.14 {http::Event} -body {
+ test http-4.15 {http::Event} -body {
+     # This test may fail if you use a proxy server. That is to be
+     # expected and is not a problem with Tcl.
+-    set token [http::geturl //not_a_host.tcl.tk -timeout 3000 -command \#]
++    set token [http::geturl //not-a-host.nodns. -timeout 30000 -command \#]
+     http::wait $token
+     http::status $token
+     # error codes vary among platforms.

@@ -1,4 +1,4 @@
-From 2bafa636db0241952b9168c62f051900ebf8b058 Mon Sep 17 00:00:00 2001
+From dedb9b25edc15c63c4068b87fb6ae2e205ab30da Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 3 Oct 2017 10:45:55 +0300
 Subject: [PATCH] Do not hardcode python path into various tools

@@ -1,7 +1,7 @@
-From 22fa800b4cbcfddd57fa262fd7f2aeb06a15a711 Mon Sep 17 00:00:00 2001
+From 23e4f2d9c47de7c4b855e72691217e98c1a504ba Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Mon, 14 Mar 2022 14:39:22 +0000
-Subject: [PATCH 1/2] installer: add --interpreter option
+Subject: [PATCH] installer: add --interpreter option
 
 The currently running Python might not be the right one for the installed
 wheels, so add an option to allow the interpreter to be overridden.
@@ -14,8 +14,9 @@ host might not be the right path for the scripts to use on the target.
 Upstream-Status: Submitted [https://github.com/pypa/installer/pull/332]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
- src/installer/__main__.py | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ src/installer/__main__.py |  9 ++++++++-
+ src/installer/scripts.py  | 15 +--------------
+ 2 files changed, 9 insertions(+), 15 deletions(-)
 
 diff --git a/src/installer/__main__.py b/src/installer/__main__.py
 index b7a7445..25415ea 100644
@@ -67,6 +68,3 @@ index b21a72e..551941f 100644
 -        # I don't understand a lick what this is trying to do.
 -        return b"#!/bin/sh\n'''exec' " + quoted + b' "$0" "$@"\n' + b"' '''"
 +        return b"#!" + executable_bytes
--- 
-2.43.0
-

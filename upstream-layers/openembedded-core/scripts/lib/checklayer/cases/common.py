@@ -11,6 +11,11 @@ from checklayer import get_signatures, LayerType, check_command, compare_signatu
 from checklayer.case import OECheckLayerTestCase
 
 class CommonCheckLayer(OECheckLayerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        # test_world and test_signatures share one world dump
+        cls.world_sigs, _, cls.world_error = get_signatures(cls.td['builddir'])
+
     def test_readme(self):
         """
         Test that the layer contains a valid README file and that is meets
@@ -98,7 +103,8 @@ class CommonCheckLayer(OECheckLayerTestCase):
         are not actually buildable, so here we fail when "bitbake -S none world"
         fails.
         '''
-        get_signatures(self.td['builddir'], failsafe=False)
+        if self.world_error:
+            raise RuntimeError(self.world_error)
 
     def test_world_inherit_class(self):
         '''
@@ -106,10 +112,9 @@ class CommonCheckLayer(OECheckLayerTestCase):
         class, which can do additional per-recipe test cases.
         '''
         msg = []
-        try:
-            get_signatures(self.td['builddir'], failsafe=False, machine=None, extravars='BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS INHERIT" INHERIT="yocto-check-layer"')
-        except RuntimeError as ex:
-            msg.append(str(ex))
+        _, _, error = get_signatures(self.td['builddir'], machine=None, extravars='BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS INHERIT" INHERIT="yocto-check-layer"')
+        if error:
+            msg.append(error)
         if msg:
             msg.insert(0, 'Layer %s failed additional checks from yocto-check-layer.bbclass\nSee below log for specific recipe parsing errors:\n' % \
                 self.tc.layer['name'])
@@ -135,8 +140,9 @@ class CommonCheckLayer(OECheckLayerTestCase):
             raise unittest.SkipTest("Not testing for signature changes in a software layer %s." \
                      % self.tc.layer['name'])
 
-        curr_sigs, _ = get_signatures(self.td['builddir'], failsafe=True)
-        msg = compare_signatures(self.td['sigs'], curr_sigs)
+        if self.world_sigs is None:
+            raise RuntimeError(self.world_error)
+        msg = compare_signatures(self.td['sigs'], self.world_sigs)
         if msg is not None:
             self.fail('Adding layer %s changed signatures.\n%s' % (self.tc.layer['name'], msg))
 

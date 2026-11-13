@@ -1,4 +1,4 @@
-From b2d321b9c493a6e36203c50ad20adb655485c951 Mon Sep 17 00:00:00 2001
+From c7ebd558e5d62af7723ba804df4f0887ce7a83fd Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sat, 13 Feb 2021 00:45:56 +0000
 Subject: [PATCH] cmake: disable building external dependencies

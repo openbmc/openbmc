@@ -423,7 +423,12 @@ do_populate_sdk[vardeps] += "${@sdk_variables(d)}"
 python () {
     variables = sdk_command_variables(d)
     for var in variables:
-        d.setVarFlag(var, 'vardeps', d.getVar(var))
+        value = d.getVar(var)
+        if value and ';' in value:
+            bb.warn("%s contains ';' but is a space separated list of functions, "
+                    "remove the ';' delimiters or the functions will not be part "
+                    "of the task signature: %s" % (var, value.strip()))
+        d.setVarFlag(var, 'vardeps', value)
 }
 
 do_populate_sdk[file-checksums] += "${TOOLCHAIN_SHAR_REL_TMPL}:True \

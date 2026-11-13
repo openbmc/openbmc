@@ -43,9 +43,9 @@ do_configure:prepend() {
 GTKDOC_MESON_OPTION = 'gtk_doc'
 
 EXTRA_OEMESON = "-Dxinerama=no -Dtests=false"
-EXTRA_OEMESON:append:class-native = " -Ddemos=false -Dexamples=false"
 
 PACKAGECONFIG ??= " \
+	examples \
 	${@bb.utils.filter('DISTRO_FEATURES', 'opengl x11', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'opengl wayland', 'wayland', '', d)} \
 "
@@ -60,6 +60,7 @@ PACKAGECONFIG[cups] = ",,cups,cups gtk3-printbackend-cups"
 PACKAGECONFIG[colord] = "-Dcolord=yes,-Dcolord=no,colord"
 PACKAGECONFIG[cloudproviders] = "-Dcloudproviders=true,-Dcloudproviders=false,libcloudproviders"
 PACKAGECONFIG[tracker3] = "-Dtracker3=true,-Dtracker3=false,tinysparql,localsearch"
+PACKAGECONFIG[examples] = "-Ddemos=true -Dexamples=true,-Ddemos=false -Dexamples=false"
 
 prepare_gtk_scripts() {
     mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-3.0
@@ -140,7 +141,7 @@ GTKGLIBC_RRECOMMENDS ?= "${GTKBASE_RRECOMMENDS} glibc-gconv-iso8859-1"
 RRECOMMENDS:${PN} = "${GTKBASE_RRECOMMENDS}"
 RRECOMMENDS:${PN}:libc-glibc = "${GTKGLIBC_RRECOMMENDS}"
 RDEPENDS:${PN}-dev += "${@bb.utils.contains("PACKAGECONFIG", "wayland", "wayland-protocols", "", d)}"
-RDEPENDS:${PN}-demo += "librsvg-gtk"
+RDEPENDS:${PN}-demo += "${@bb.utils.contains("PACKAGECONFIG", "examples", "librsvg-gtk", "", d)} "
 
 PACKAGES_DYNAMIC += "^gtk3-immodule-.* ^gtk3-printbackend-.*"
 

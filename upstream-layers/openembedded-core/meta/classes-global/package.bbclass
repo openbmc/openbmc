@@ -57,8 +57,8 @@ LOCALE_SECTION ?= ''
 ALL_MULTILIB_PACKAGE_ARCHS = "${@oe.utils.all_multilib_tune_values(d, 'PACKAGE_ARCHS')}"
 
 # rpm is used for the per-file dependency identification
-# dwarfsrcfiles is used to determine the list of debug source files
-PACKAGE_DEPENDS += "rpm-native dwarfsrcfiles-native"
+# elfutils is used to determine the list of debug source files (eu-srcfiles)
+PACKAGE_DEPENDS += "rpm-native elfutils-native"
 
 # If your postinstall can execute at rootfs creation time rather than on
 # target but depends on a native/cross tool in order to execute, you need to

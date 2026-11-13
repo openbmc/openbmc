@@ -7,7 +7,17 @@ set -e
 
 rm -f $D${fontconfigcachedir}/CACHEDIR.TAG
 
-PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D -E ${fontconfigcacheenv} $D${libexecdir}/${binprefix}fc-cache --sysroot=$D --system-only ${fontconfigcacheparams}
+# fontconfig only uses a cache while the mtime it recorded for a font
+# directory, clamped to SOURCE_DATE_EPOCH, matches the directory. Every
+# mtime in the image is set to REPRODUCIBLE_TIMESTAMP_ROOTFS later, so set
+# the font directories' mtimes to it now and have fc-cache record that.
+sde=
+if [ -n "$REPRODUCIBLE_TIMESTAMP_ROOTFS" ] && [ -d $D${datadir}/fonts ]; then
+	find $D${datadir}/fonts -type d -exec touch -h --date=@$REPRODUCIBLE_TIMESTAMP_ROOTFS '{}' +
+	sde="-E SOURCE_DATE_EPOCH=$REPRODUCIBLE_TIMESTAMP_ROOTFS"
+fi
+
+PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D -E ${fontconfigcacheenv} $sde $D${libexecdir}/${binprefix}fc-cache --sysroot=$D --system-only ${fontconfigcacheparams}
 
 chown -R root:root $D${fontconfigcachedir}
 find $D -type f -name .uuid -exec chown root:root '{}' +

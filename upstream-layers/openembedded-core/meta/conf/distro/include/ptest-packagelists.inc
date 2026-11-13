@@ -7,6 +7,7 @@ PTESTS_FAST = "\
     acl \
     apr-util \
     attr \
+    avahi \
     babeltrace2 \
     bc \
     bluez5 \
@@ -48,7 +49,9 @@ PTESTS_FAST = "\
     libtest-needs-perl \
     libtest-warnings-perl \
     libtimedate-perl \
+    libtoml11 \
     libtry-tiny-perl \
+    liburcu \
     libusb1 \
     libxml-namespacesupport-perl \
     libxml-parser-perl \
@@ -64,10 +67,14 @@ PTESTS_FAST = "\
     lua \
     lzo \
     m4 \
+    mpfr \
     nettle \
+    npth \
     opkg \
+    patch \
     popt \
     procps \
+    psmisc \
     python3-atomicwrites \
     python3-attrs \
     python3-bcrypt \
@@ -87,9 +94,9 @@ PTESTS_FAST = "\
     python3-pefile \
     python3-pyasn1 \
     python3-pyopenssl \
-    python3-pytz \
     python3-pyyaml \
     python3-rpds-py \
+    python3-tomlkit \
     python3-trove-classifiers \
     python3-vcs-versioning \
     python3-uritools \
@@ -132,7 +139,9 @@ PTESTS_SLOW = "\
     libevent \
     libgcrypt \
     libmodule-build-perl \
+    libpcap \
     libpng \
+    libsoup \
     ${@bb.utils.contains('DISTRO_FEATURES', 'seccomp', 'libseccomp', '',d)} \
     lttng-tools \
     lz4 \
@@ -154,16 +163,13 @@ PTESTS_SLOW = "\
     zstd \
 "
 
-# python3 ptests hang on qemuriscv64
-PTESTS_SLOW:remove:riscv64 = "python3"
-PTESTS_PROBLEMS:append:riscv64 = " python3"
 PTESTS_SLOW:remove:riscv32 = "lttng-tools strace "
 PTESTS_PROBLEMS:append:riscv32 = " lttng-tools strace"
 PTESTS_SLOW:append:libc-musl = " libc-test"
 
 # These tests don't yet pass for riscv64
-PTESTS_SLOW:remove:riscv64 = "tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl glib-2.0"
-PTESTS_PROBLEMS:append:riscv64 = " tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl glib-2.0"
+PTESTS_SLOW:remove:riscv64 = "tcl python3-cffi lttng-tools python3-numpy perl glib-2.0 zstd libpcap"
+PTESTS_PROBLEMS:append:riscv64 = " tcl python3-cffi lttng-tools python3-numpy perl glib-2.0 zstd libpcap"
 
 # These tests don't yet pass for musl qemuarm64
 PTESTS_SLOW:remove:libc-musl:qemuarm64 = "strace perl gnutls glib-2.0"

@@ -115,8 +115,8 @@ def main():
         changes = process_changes(args.buildhistory_dir, fromrev, torev,
                                   args.report_all, args.report_ver, args.sigs,
                                   args.sigsdiff, args.exclude_path)
-    except gitdb.exc.BadObject as e:
-        if not args.revisions:
+    except (gitdb.exc.BadObject, gitdb.exc.BadName) as e:
+        if args.revisions == parser.get_default('revisions'):
             sys.stderr.write("Unable to find previous build revision in buildhistory repository\n\n")
             parser.print_help()
         else:

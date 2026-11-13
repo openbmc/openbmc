@@ -1,4 +1,4 @@
-From e3bdf5adc50b12d8625e70415c81402e0e938b68 Mon Sep 17 00:00:00 2001
+From d6a4fa6fa4529f37856913b598d4b3760d64e7a3 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 17 Feb 2021 17:57:13 +0000
 Subject: [PATCH] generate-configlist.sh: Fix determinism issue
@@ -23,7 +23,7 @@ Upstream-Status: Submitted [https://public-inbox.org/git/f029a942dd3d50d85e60bd3
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/generate-configlist.sh b/tools/generate-configlist.sh
-index e28054f..96ddd51 100755
+index d1d2ba4..c259b77 100755
 --- a/tools/generate-configlist.sh
 +++ b/tools/generate-configlist.sh
 @@ -24,7 +24,7 @@ EOF

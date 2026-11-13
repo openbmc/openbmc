@@ -16,6 +16,7 @@ SRC_URI = "http://downloads.yoctoproject.org/releases/${BPN}/${BPN}-${PV}.tar.gz
            file://opkg.conf \
            file://0001-opkg_conf-create-opkg.lock-in-run-instead-of-var-run.patch \
            file://0002-config.h.in-add-missing-WITH_SHA256-define.patch \
+           file://0003-CMakeLists-take-the-default-architecture-from-the-ta.patch \
            file://run-ptest \
            "
 

@@ -1,0 +1,466 @@
+From e53cc3da832cae3722b969e515b9f8612250377d Mon Sep 17 00:00:00 2001
+From: Adam Duskett <adam.duskett@amarulasolutions.com>
+Date: Tue, 3 Nov 2026 15:08:49 +0100
+Subject: [PATCH] avoid maybe-uninitialized warnings in operator=
+
+GCC 16 warns that the format may be used uninitialized when a value is
+assigned a different type, for example:
+
+  toml::value v(true);
+  v = std::chrono::hours(1);
+
+The warning is a false positive, but the tests build with -Werror, so
+the build fails.
+
+Every operator= copied the old format out of the union behind a type
+check that GCC could not see through, so it flagged a possible read of
+an inactive member.
+
+Add a small helper that keeps the format when the type is unchanged and
+uses the default format otherwise, so the old format is never copied.
+The convenience overloads now convert their argument and forward to the
+main ones, removing a lot of duplicated code.
+
+Upstream-Status: Submitted [https://github.com/ToruNiina/toml11/pull/325]
+Signed-off-by: Adam Duskett <adam.duskett@amarulasolutions.com>
+---
+ include/toml11/value.hpp | 293 ++++++++-------------------------------
+ 1 file changed, 57 insertions(+), 236 deletions(-)
+
+diff --git a/include/toml11/value.hpp b/include/toml11/value.hpp
+index 8b446a7..e512c3e 100644
+--- a/include/toml11/value.hpp
++++ b/include/toml11/value.hpp
+@@ -404,18 +404,8 @@ class basic_value
+     {}
+     basic_value& operator=(boolean_type x)
+     {
+-        boolean_format_info fmt;
+-        if(this->is_boolean())
+-        {
+-            fmt = this->as_boolean_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::boolean;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->boolean_, boolean_storage(x, fmt));
++        this->assign_keeping_format(value_t::boolean, this->boolean_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -444,18 +434,8 @@ class basic_value
+     {}
+     basic_value& operator=(integer_type x)
+     {
+-        integer_format_info fmt;
+-        if(this->is_integer())
+-        {
+-            fmt = this->as_integer_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::integer;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->integer_, integer_storage(std::move(x), std::move(fmt)));
++        this->assign_keeping_format(value_t::integer, this->integer_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -497,18 +477,7 @@ class basic_value
+     template<typename T, enable_if_integer_like_t<T> = nullptr>
+     basic_value& operator=(T x)
+     {
+-        integer_format_info fmt;
+-        if(this->is_integer())
+-        {
+-            fmt = this->as_integer_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::integer;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->integer_, integer_storage(x, std::move(fmt)));
++        *this = static_cast<integer_type>(x);
+         return *this;
+     }
+ 
+@@ -537,18 +506,8 @@ class basic_value
+     {}
+     basic_value& operator=(floating_type x)
+     {
+-        floating_format_info fmt;
+-        if(this->is_floating())
+-        {
+-            fmt = this->as_floating_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::floating;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->floating_, floating_storage(std::move(x), std::move(fmt)));
++        this->assign_keeping_format(value_t::floating, this->floating_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -594,18 +553,7 @@ class basic_value
+     template<typename T, enable_if_floating_like_t<T> = nullptr>
+     basic_value& operator=(T x)
+     {
+-        floating_format_info fmt;
+-        if(this->is_floating())
+-        {
+-            fmt = this->as_floating_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::floating;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->floating_, floating_storage(x, std::move(fmt)));
++        *this = static_cast<floating_type>(x);
+         return *this;
+     }
+ 
+@@ -635,18 +583,8 @@ class basic_value
+     {}
+     basic_value& operator=(string_type x)
+     {
+-        string_format_info fmt;
+-        if(this->is_string())
+-        {
+-            fmt = this->as_string_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::string;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->string_, string_storage(x, std::move(fmt)));
++        this->assign_keeping_format(value_t::string, this->string_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -674,18 +612,7 @@ class basic_value
+     {}
+     basic_value& operator=(const typename string_type::value_type* x)
+     {
+-        string_format_info fmt;
+-        if(this->is_string())
+-        {
+-            fmt = this->as_string_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::string;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->string_, string_storage(string_type(x), std::move(fmt)));
++        *this = string_type(x);
+         return *this;
+     }
+ 
+@@ -715,18 +642,7 @@ class basic_value
+     {}
+     basic_value& operator=(string_view_type x)
+     {
+-        string_format_info fmt;
+-        if(this->is_string())
+-        {
+-            fmt = this->as_string_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::string;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->string_, string_storage(string_type(x), std::move(fmt)));
++        *this = string_type(x);
+         return *this;
+     }
+ 
+@@ -779,18 +695,7 @@ class basic_value
+         >::value, std::nullptr_t> = nullptr>
+     basic_value& operator=(const T& x)
+     {
+-        string_format_info fmt;
+-        if(this->is_string())
+-        {
+-            fmt = this->as_string_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::string;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->string_, string_storage(detail::string_conv<string_type>(x), std::move(fmt)));
++        *this = detail::string_conv<string_type>(x);
+         return *this;
+     }
+ 
+@@ -820,18 +725,8 @@ class basic_value
+     {}
+     basic_value& operator=(local_date_type x)
+     {
+-        local_date_format_info fmt;
+-        if(this->is_local_date())
+-        {
+-            fmt = this->as_local_date_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::local_date;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->local_date_, local_date_storage(x, fmt));
++        this->assign_keeping_format(value_t::local_date, this->local_date_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -861,18 +756,8 @@ class basic_value
+     {}
+     basic_value& operator=(local_time_type x)
+     {
+-        local_time_format_info fmt;
+-        if(this->is_local_time())
+-        {
+-            fmt = this->as_local_time_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::local_time;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->local_time_, local_time_storage(x, fmt));
++        this->assign_keeping_format(value_t::local_time, this->local_time_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -901,18 +786,7 @@ class basic_value
+     template<typename Rep, typename Period>
+     basic_value& operator=(const std::chrono::duration<Rep, Period>& x)
+     {
+-        local_time_format_info fmt;
+-        if(this->is_local_time())
+-        {
+-            fmt = this->as_local_time_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::local_time;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->local_time_, local_time_storage(local_time_type(x), std::move(fmt)));
++        *this = local_time_type(x);
+         return *this;
+     }
+ 
+@@ -942,18 +816,8 @@ class basic_value
+     {}
+     basic_value& operator=(local_datetime_type x)
+     {
+-        local_datetime_format_info fmt;
+-        if(this->is_local_datetime())
+-        {
+-            fmt = this->as_local_datetime_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::local_datetime;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->local_datetime_, local_datetime_storage(x, fmt));
++        this->assign_keeping_format(value_t::local_datetime, this->local_datetime_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -983,18 +847,8 @@ class basic_value
+     {}
+     basic_value& operator=(offset_datetime_type x)
+     {
+-        offset_datetime_format_info fmt;
+-        if(this->is_offset_datetime())
+-        {
+-            fmt = this->as_offset_datetime_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::offset_datetime;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->offset_datetime_, offset_datetime_storage(x, fmt));
++        this->assign_keeping_format(value_t::offset_datetime, this->offset_datetime_,
++                                    std::move(x));
+         return *this;
+     }
+ 
+@@ -1018,18 +872,7 @@ class basic_value
+     {}
+     basic_value& operator=(std::chrono::system_clock::time_point x)
+     {
+-        offset_datetime_format_info fmt;
+-        if(this->is_offset_datetime())
+-        {
+-            fmt = this->as_offset_datetime_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::offset_datetime;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->offset_datetime_, offset_datetime_storage(offset_datetime_type(x), fmt));
++        *this = offset_datetime_type(x);
+         return *this;
+     }
+ 
+@@ -1060,19 +903,8 @@ class basic_value
+     {}
+     basic_value& operator=(array_type x)
+     {
+-        array_format_info fmt;
+-        if(this->is_array())
+-        {
+-            fmt = this->as_array_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::array;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->array_, array_storage(
+-                    detail::storage<array_type>(std::move(x)), std::move(fmt)));
++        this->assign_keeping_format(value_t::array, this->array_,
++                                    detail::storage<array_type>(std::move(x)));
+         return *this;
+     }
+ 
+@@ -1124,21 +956,8 @@ class basic_value
+     template<typename T, enable_if_array_like_t<T> = nullptr>
+     basic_value& operator=(T x)
+     {
+-        array_format_info fmt;
+-        if(this->is_array())
+-        {
+-            fmt = this->as_array_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::array;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        array_type a(std::make_move_iterator(x.begin()),
+-                     std::make_move_iterator(x.end()));
+-        assigner(this->array_, array_storage(
+-                    detail::storage<array_type>(std::move(a)), std::move(fmt)));
++        *this = array_type(std::make_move_iterator(x.begin()),
++                           std::make_move_iterator(x.end()));
+         return *this;
+     }
+ 
+@@ -1169,19 +988,8 @@ class basic_value
+     {}
+     basic_value& operator=(table_type x)
+     {
+-        table_format_info fmt;
+-        if(this->is_table())
+-        {
+-            fmt = this->as_table_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::table;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        assigner(this->table_, table_storage(
+-            detail::storage<table_type>(std::move(x)), std::move(fmt)));
++        this->assign_keeping_format(value_t::table, this->table_,
++                                    detail::storage<table_type>(std::move(x)));
+         return *this;
+     }
+ 
+@@ -1231,21 +1039,8 @@ class basic_value
+     template<typename T, enable_if_table_like_t<T> = nullptr>
+     basic_value& operator=(T x)
+     {
+-        table_format_info fmt;
+-        if(this->is_table())
+-        {
+-            fmt = this->as_table_fmt();
+-        }
+-        this->cleanup();
+-        this->type_   = value_t::table;
+-        this->region_ = region_type{};
+-#ifdef TOML11_ENABLE_ACCESS_CHECK
+-        this->accessed_ = false;
+-#endif
+-        table_type t(std::make_move_iterator(x.begin()),
+-                     std::make_move_iterator(x.end()));
+-        assigner(this->table_, table_storage(
+-            detail::storage<table_type>(std::move(t)), std::move(fmt)));
++        *this = table_type(std::make_move_iterator(x.begin()),
++                           std::make_move_iterator(x.end()));
+         return *this;
+     }
+ 
+@@ -2083,6 +1878,32 @@ class basic_value
+         return;
+     }
+ 
++    // Assign a new value of type `ty`. If this already holds a value of that
++    // type, only the value is replaced and its format is kept. Otherwise the
++    // current value is destroyed and the new one gets the default format.
++    //
++    // The format of the inactive union member is never read, so compilers do
++    // not see a (false positive) maybe-uninitialized read through the union.
++    template<typename Storage>
++    void assign_keeping_format(const value_t ty, Storage& dst,
++                               typename Storage::value_type v)
++    {
++        if(this->type_ == ty)
++        {
++            dst.value = std::move(v);
++        }
++        else
++        {
++            this->cleanup();
++            this->type_ = ty;
++            assigner(dst, Storage(std::move(v), typename Storage::format_type{}));
++        }
++        this->region_ = region_type{};
++#ifdef TOML11_ENABLE_ACCESS_CHECK
++        this->accessed_ = false;
++#endif
++    }
++
+     template<typename T, typename U>
+     static void assigner(T& dst, U&& v)
+     {

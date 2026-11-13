@@ -1,4 +1,4 @@
-From a499a56467f56f362c4a7e31d64265a47faefacb Mon Sep 17 00:00:00 2001
+From 8f0419ee02d265c0c92686b88053f08a99d113bf Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
 Date: Tue, 26 Feb 2013 11:43:28 -0500
 Subject: [PATCH] apic: fixup fallthrough to PIC

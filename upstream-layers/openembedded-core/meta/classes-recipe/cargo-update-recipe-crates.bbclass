@@ -75,8 +75,9 @@ python do_update_crates() {
                 c = get_crates(cargo_lock_path)
                 if c is not None:
                     crates += c
+                    found = True
 
-    if crates is None:
+    if not found:
         raise ValueError(f"Unable to find any Cargo.lock in {cargo_lock_src_dir}")
 
     target_file = d.expand("${THISDIR}/${BPN}-crates.inc")

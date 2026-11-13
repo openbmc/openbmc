@@ -1,8 +1,8 @@
-From b1ab58d3b4a8164e5978409706d6769f5cfde404 Mon Sep 17 00:00:00 2001
+From 4793a67d3d738520f0193a9edff491989e8d77bc Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 21 Feb 2019 16:23:24 +0800
-Subject: [PATCH 01/16] binfmt: Don't install dependency links at install time
- for the binfmt services
+Subject: [PATCH] binfmt: Don't install dependency links at install time for
+ the binfmt services
 
 use [Install] blocks so that they get created when the service is enabled
 like a traditional service.
@@ -25,10 +25,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/units/meson.build b/units/meson.build
-index 4f47a3b2bd..237870025b 100644
+index 9f8f8d0e41..9a74236690 100644
 --- a/units/meson.build
 +++ b/units/meson.build
-@@ -154,7 +154,6 @@ units = [
+@@ -172,7 +172,6 @@ units = [
          {
            'file' : 'proc-sys-fs-binfmt_misc.automount',
            'conditions' : ['ENABLE_BINFMT'],
@@ -36,7 +36,7 @@ index 4f47a3b2bd..237870025b 100644
          },
          {
            'file' : 'proc-sys-fs-binfmt_misc.mount',
-@@ -263,7 +262,6 @@ units = [
+@@ -283,7 +282,6 @@ units = [
          {
            'file' : 'systemd-binfmt.service.in',
            'conditions' : ['ENABLE_BINFMT'],
@@ -74,6 +74,3 @@ index 318bf8efc2..6ef684861d 100644
 +
 +[Install]
 +WantedBy=sysinit.target
--- 
-2.34.1
-

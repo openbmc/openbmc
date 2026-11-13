@@ -9,7 +9,11 @@ require opensbi-payloads.inc
 inherit deploy
 
 SRCREV = "cbf9f6734dd85a982c63e3cb5db7ffe09da839ca"
-SRC_URI = "git://github.com/riscv/opensbi.git;branch=master;protocol=https;tag=v${PV}"
+SRC_URI = " \
+            git://github.com/riscv/opensbi.git;branch=master;protocol=https;tag=v${PV} \
+            file://0001-Makefile-don-t-grep-when-setting-CC_SUPPORT_ZICSR_ZI.patch \
+            file://0002-lib-utils-serial-Remove-unused-baudrate-frequency-gl.patch \
+            "
 
 TARGET_DBGSRC_DIR = "/share/opensbi/*/generic/firmware/"
 

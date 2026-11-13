@@ -87,10 +87,6 @@ mount -t sysfs sysfs /sys
 mount -t tmpfs tmpfs /run
 mkdir -p /run/lock
 
-if [ -d $EFI_DIR ];then
-	mount -t efivarfs none /sys/firmware/efi/efivars
-fi
-
 # populate bootparam environment
 for p in `cat /proc/cmdline`; do
 	if [ -n "$quoted" ]; then
@@ -104,13 +100,20 @@ for p in `cat /proc/cmdline`; do
 		continue
 	fi
 
-	opt=`echo $p | cut -d'=' -f1`
-	opt=`echo $opt | sed -e 'y/.-/__/'`
-	if [ "`echo $p | cut -d'=' -f1`" = "$p" ]; then
+	key=${p%%=*}
+	opt=$key
+	while :; do
+		case "$opt" in
+			*.*) opt=${opt%%.*}_${opt#*.} ;;
+			*-*) opt=${opt%%-*}_${opt#*-} ;;
+			*) break ;;
+		esac
+	done
+	if [ "$key" = "$p" ]; then
 		# opt parameter
 		eval "bootparam_${opt}=true"
 	else
-		value="`echo $p | cut -d'=' -f2-`"	# Option value
+		value=${p#*=}	# Option value
 		value_lstripped=${value#\"}
 		value_rstripped=${value%\"}
 
@@ -130,6 +133,12 @@ for p in `cat /proc/cmdline`; do
 	fi
 done
 
+# Keep efivarfs available in the initramfs by default.  Systems which
+# provide it from the real root filesystem can opt out of the early mount.
+if [ "${bootparam_initramfs_efivarfs:-1}" != "0" ] && [ -d "$EFI_DIR" ]; then
+	mount -t efivarfs none /sys/firmware/efi/efivars
+fi
+
 # use /dev with devtmpfs
 if grep -q devtmpfs /proc/filesystems; then
 	mkdir -p /dev
@@ -145,11 +154,15 @@ mkdir $ROOTFS_DIR
 # Load and run modules
 for m in $MODULES_DIR/*; do
 	# Skip backup files
-	if [ "`echo $m | sed -e 's/\~$//'`" != "$m" ]; then
-		continue
-	fi
+	case "$m" in
+		*~)
+			continue
+			;;
+	esac
 
-	module=`basename $m | cut -d'-' -f 2`
+	module=${m##*/}
+	module=${module#*-}
+	module=${module%%-*}
 	debug "Loading module $module"
 
 	# pre hooks

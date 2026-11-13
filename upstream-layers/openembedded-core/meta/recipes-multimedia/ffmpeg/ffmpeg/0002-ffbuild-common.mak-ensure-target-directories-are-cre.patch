@@ -1,4 +1,4 @@
-From cb0f8bf74b53130ceedb97af317840f76ddfce31 Mon Sep 17 00:00:00 2001
+From 01b4d2e905e79a6858078927c111ce96bd03b314 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 11 Dec 2025 19:55:46 +0100
 Subject: [PATCH] ffbuild/common.mak: ensure target directories are created

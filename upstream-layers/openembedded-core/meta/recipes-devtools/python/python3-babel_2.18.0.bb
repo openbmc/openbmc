@@ -17,10 +17,9 @@ RDEPENDS:${PN} += " \
     python3-netserver \
     python3-numbers \
     python3-pickle \
-    python3-pytz \
-    python3-setuptools \
     python3-shell \
     python3-threading \
+    python3-zoneinfo \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -5,6 +5,21 @@ SECTION = "base"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
+# We carry a number of extra groups in group.master which can neither go
+# upstream nor be created by the recipes which need them:
+#
+# - Upstream base-passwd only serves Debian and Debian-based systems. Debian
+#   policy (9.2.2) restricts base-passwd to IDs which must be statically
+#   allocated and identical everywhere; any other group is created by the
+#   package which needs it (adduser/systemd-sysusers). Upstream has told us
+#   anyone else using base-passwd is on their own:
+#   https://salsa.debian.org/debian/base-passwd/-/merge_requests/17
+#
+# - We can't create them with useradd.bbclass in the recipes which use them.
+#   Using useradd also brings shadow's login into the image, which fails with
+#   "setgid: Function not implemented" on kernels without CONFIG_MULTIUSER,
+#   unlike busybox's login.
+
 SRC_URI = "https://launchpad.net/debian/+archive/primary/+files/${BPN}_${PV}.tar.xz \
            file://0001-Add-a-shutdown-group.patch \
            file://0002-Use-bin-sh-instead-of-bin-bash-for-the-root-user.patch \
@@ -14,6 +29,7 @@ SRC_URI = "https://launchpad.net/debian/+archive/primary/+files/${BPN}_${PV}.tar
            file://0007-Add-wheel-group.patch \
            file://0001-base-passwd-Add-the-sgx-group.patch \
            file://0001-Add-clock-group.patch \
+           file://0001-base-passwd-add-the-render-group.patch \
            "
 
 SRC_URI[sha256sum] = "fab3d0e6e8b641e116bda9bd5f7a7ed24482384c1513f6a369b506327fbc8dde"

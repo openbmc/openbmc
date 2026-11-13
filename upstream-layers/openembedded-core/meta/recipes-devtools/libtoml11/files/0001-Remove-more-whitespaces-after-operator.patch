@@ -1,0 +1,34 @@
+From 6af7de3d5eaae59c53c42aab8eca1e1e9a365da5 Mon Sep 17 00:00:00 2001
+From: Steffen Winter <steffen.winter@proton.me>
+Date: Thu, 25 Dec 2025 20:48:02 +0100
+Subject: [PATCH] Remove more whitespaces after operator""
+
+Upstream-Status: Submitted [https://github.com/ToruNiina/toml11/pull/306]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ include/toml11/fwd/literal_fwd.hpp   | 4 ++--
+ include/toml11/impl/literal_impl.hpp | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+--- a/include/toml11/fwd/literal_fwd.hpp
++++ b/include/toml11/fwd/literal_fwd.hpp
+@@ -24,7 +24,7 @@ inline namespace toml_literals
+ #if defined(TOML11_HAS_CHAR8_T)
+ // value of u8"" literal has been changed from char to char8_t and char8_t is
+ // NOT compatible to char
+-::toml::value operator"" _toml(const char8_t* str, std::size_t len);
++::toml::value operator""_toml(const char8_t* str, std::size_t len);
+ #endif
+ 
+ } // toml_literals
+--- a/include/toml11/impl/literal_impl.hpp
++++ b/include/toml11/impl/literal_impl.hpp
+@@ -146,7 +146,7 @@ operator""_toml(const char* str, std::si
+ // value of u8"" literal has been changed from char to char8_t and char8_t is
+ // NOT compatible to char
+ TOML11_INLINE ::toml::value
+-operator"" _toml(const char8_t* str, std::size_t len)
++operator""_toml(const char8_t* str, std::size_t len)
+ {
+     if(len == 0)
+     {

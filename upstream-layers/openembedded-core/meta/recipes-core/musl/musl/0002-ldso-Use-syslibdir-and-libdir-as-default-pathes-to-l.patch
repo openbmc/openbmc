@@ -1,4 +1,4 @@
-From e27de983ef70257ca1fd7f5096eea41613612ecf Mon Sep 17 00:00:00 2001
+From 4c5bc7ad461e4a0ddb81511d3f6e1f25d369436d Mon Sep 17 00:00:00 2001
 From: Serhey Popovych <serhe.popovych@gmail.com>
 Date: Tue, 11 Dec 2018 05:44:20 -0500
 Subject: [PATCH 2/2] ldso: Use syslibdir and libdir as default pathes to
@@ -10,45 +10,58 @@ libraries /lib:/usr/local/lib:/usr/lib.
 However this path isn't relevant in case when library is put in dirs
 like lib64 or libx32.
 
-Adjust CFLAGS_ALL to pass syslibdir as SYSLIBDIR and libdir as LIBDIR
+Adjust CFLAGS_ALL to pass baselibdir as BASELIBDIR and libdir as LIBDIR
 preprocessor macroses to construct default ldso library search path
 in ldso/dynlink.c::SYS_PATH_DFLT.
 
+baselibdir defaults to syslibdir. OE sets it to base_libdir, because
+syslibdir is where the dynamic linker goes, and multilib can put the
+libraries in another directory.
+
 Upstream-Status: Pending
 Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
+Signed-off-by: mark.yang <mark.yang@lge.com>
 ---
- Makefile       | 3 ++-
+ Makefile       | 4 +++-
  ldso/dynlink.c | 4 +++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 466d9afd..d2f458fa 100644
+index f10f0d6c..27c08fe0 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -47,7 +47,8 @@ CFLAGS_AUTO = -Os -pipe
+@@ -16,6 +16,7 @@ prefix = /usr/local/musl
+ includedir = $(prefix)/include
+ libdir = $(prefix)/lib
+ syslibdir = /lib
++baselibdir = $(syslibdir)
+ 
+ MALLOC_DIR = mallocng
+ SRC_DIRS = $(addprefix $(srcdir)/,src/* src/malloc/$(MALLOC_DIR) crt ldso $(COMPAT_SRC_DIRS))
+@@ -47,7 +48,8 @@ CFLAGS_AUTO = -Os -pipe
  CFLAGS_C99FSE = -std=c99 -ffreestanding -nostdinc 
  
  CFLAGS_ALL = $(CFLAGS_C99FSE)
 -CFLAGS_ALL += -D_XOPEN_SOURCE=700 -I$(srcdir)/arch/$(ARCH) -I$(srcdir)/arch/generic -Iobj/src/internal -I$(srcdir)/src/include -I$(srcdir)/src/internal -Iobj/include -I$(srcdir)/include
-+CFLAGS_ALL += -D_XOPEN_SOURCE=700 -DSYSLIBDIR='"$(syslibdir)"' -DLIBDIR='"$(libdir)"'
++CFLAGS_ALL += -D_XOPEN_SOURCE=700 -DBASELIBDIR='"$(baselibdir)"' -DLIBDIR='"$(libdir)"'
 +CFLAGS_ALL += -I$(srcdir)/arch/$(ARCH) -I$(srcdir)/arch/generic -Iobj/src/internal -I$(srcdir)/src/include -I$(srcdir)/src/internal -Iobj/include -I$(srcdir)/include
  CFLAGS_ALL += $(CPPFLAGS) $(CFLAGS_AUTO) $(CFLAGS)
  
  LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
 diff --git a/ldso/dynlink.c b/ldso/dynlink.c
-index 324aa859..7d3ab44c 100644
+index 10471b23..e2f1e01d 100644
 --- a/ldso/dynlink.c
 +++ b/ldso/dynlink.c
-@@ -35,6 +35,8 @@ static size_t ldso_page_size;
+@@ -37,6 +37,8 @@ static size_t ldso_page_size;
  #define realloc __libc_realloc
  #define free __libc_free
  
-+#define SYS_PATH_DFLT SYSLIBDIR ":" LIBDIR
++#define SYS_PATH_DFLT BASELIBDIR ":" LIBDIR
 +
  static void error_impl(const char *, ...);
  static void error_noop(const char *, ...);
  static void (*error)(const char *, ...) = error_noop;
-@@ -1159,7 +1161,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+@@ -1161,7 +1163,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
  					sys_path = "";
  				}
  			}

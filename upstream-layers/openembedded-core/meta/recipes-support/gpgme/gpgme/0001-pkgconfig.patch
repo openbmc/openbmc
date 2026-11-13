@@ -1,4 +1,4 @@
-From 04838f9ce25f6964254310b66069ed1b37b019ce Mon Sep 17 00:00:00 2001
+From 36e642f39cc607a5e2132915c633ad6bedd1128d Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 21 Jul 2025 12:43:29 +0800
 Subject: [PATCH] pkgconfig
@@ -29,7 +29,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index cd0af89..5ee3891 100644
+index ee56d99..51c0598 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -845,6 +845,7 @@ AC_CONFIG_FILES(Makefile src/Makefile

@@ -35,7 +35,7 @@ class BBLock(OESelftestTestCase):
             for recipe in recipes:
                 for task in tasks:
                     find_in_contents = re.search(
-                        'SIGGEN_LOCKEDSIGS_.+\s\+=\s"%s:%s:.*"' % (recipe, task),
+                        r'SIGGEN_LOCKEDSIGS_.+\s\+=\s"%s:%s:.*"' % (recipe, task),
                         contents,
                     )
                     self.assertFalse(
@@ -62,7 +62,7 @@ class BBLock(OESelftestTestCase):
             if tasks:
                 for task in tasks:
                     find_in_contents = re.search(
-                        'SIGGEN_LOCKEDSIGS_.+\s\+=\s"%s:%s:.*"' % (recipe, task),
+                        r'SIGGEN_LOCKEDSIGS_.+\s\+=\s"%s:%s:.*"' % (recipe, task),
                         contents,
                     )
                     self.assertTrue(

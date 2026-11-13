@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 DEPENDS += "openssl python3-cryptography"
 
+SRC_URI += "file://0001-Return-None-from-master_key-for-TLS-1.3-connections.patch"
 SRC_URI[sha256sum] = "28dfcce0162b9211413e26dfbfdf1d24317fbeba18fc93c12400a1856b2a0bc7"
 
 inherit pypi setuptools3 ptest-python-pytest

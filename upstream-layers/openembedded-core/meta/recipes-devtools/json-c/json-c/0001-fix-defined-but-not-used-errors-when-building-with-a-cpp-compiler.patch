@@ -1,0 +1,50 @@
+From aab792578b4f081af6ed7b993475bcb2dbca8912 Mon Sep 17 00:00:00 2001
+From: Eric Hawicz <erh+git@nimenees.com>
+Date: Sat, 11 Jul 2026 09:28:49 -0400
+Subject: [PATCH] Issue #941: fix "defined but not used" errors when building
+ with a c++ compiler.
+
+ 
+Upstream-Status: Backport [https://github.com/json-c/json-c/commit/aab792578b4f081af6ed7b993475bcb2dbca8912]
+Signed-off-by: Eric Hawicz <erh+git@nimenees.com>
+Signed-off-by: Adam Duskett <adam.duskett@amarulasolutions.com>
+---
+ json_object.h | 4 ++--
+ linkhash.h    | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/json_object.h b/json_object.h
+index 7edb63d4f8..2cd94906e7 100644
+--- a/json_object.h
++++ b/json_object.h
+@@ -488,7 +488,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
+  * @param val the local name for the json_object* object variable defined in
+  *            the body
+  */
+-#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
++#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
+ 
+ #define json_object_object_foreach(obj, key, val)                                \
+ 	char *key = NULL;                                                        \
+@@ -520,7 +520,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
+ 	                 : 0);                                                 \
+ 	     entry##key = entry_next##key)
+ 
+-#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
++#endif
+ 
+ /** Iterate through all keys and values of an object (ANSI C Safe)
+  * @param obj the json_object instance
+diff --git a/linkhash.h b/linkhash.h
+index 5ad17cf2d2..48fb7c0b0a 100644
+--- a/linkhash.h
++++ b/linkhash.h
+@@ -345,7 +345,7 @@ int lh_table_resize(struct lh_table *t, int new_size);
+ /**
+  * @deprecated Don't use this outside of linkhash.h:
+  */
+-#if !defined (__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
++#if !defined(__cplusplus) && (!defined (__STDC_VERSION__) || (__STDC_VERSION__ < 199901L))
+ /* C89 compilers like VS2010 can't handle inline funcs, so skip it there,
+    note: this also applies to -std=c89 in GCC! */
+ #define _LH_INLINE

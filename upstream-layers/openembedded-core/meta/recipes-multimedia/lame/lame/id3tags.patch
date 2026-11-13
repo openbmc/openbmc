@@ -1,0 +1,60 @@
+Fix id3tag_set_textinfo_utf8 issues
+
+Fix issues with id3tag_set_textinfo_utf8 based on the proposed
+patch from the mailing list:
+https://sourceforge.net/p/lame/mailman/message/59358795/
+
+This has been also fixed in the dev tree and will be included in
+LAME release 4.1.
+
+Upstream-Status: Inappropriate [obsoleted by "frontend, libmp3lame: fix ID3v2
+                 UTF-8 tag path" upstream in lame-4.1]
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+
+diff --git a/frontend/parse.c b/frontend/parse.c
+index 4a6b660..2ae7eb2 100644
+--- a/frontend/parse.c
++++ b/frontend/parse.c
+@@ -402,6 +402,10 @@ static int getIntValue(char const* token, char const* arg, int* ptr)
+ }
+ 
+ #ifdef ID3TAGS_EXTENDED
++extern int
++id3tag_set_comment_ucs2(lame_t gfp, char const *lang, unsigned short const *desc, unsigned short const *text);
++extern int
++id3tag_set_fieldvalue_ucs2(lame_t gfp, const unsigned short *fieldvalue);
+ static int
+ set_id3v2tag(lame_global_flags* gfp, TextEncoding enc, int type, unsigned short const* str)
+ {
+@@ -410,13 +414,13 @@ set_id3v2tag(lame_global_flags* gfp, TextEncoding enc, int type, unsigned short
+         case TENC_UTF8:
+             switch (type)
+             {
+-                case 'a': return id3tag_set_textinfo_utf8(gfp, "TPE1", str);
+-                case 't': return id3tag_set_textinfo_utf8(gfp, "TIT2", str);
+-                case 'l': return id3tag_set_textinfo_utf8(gfp, "TALB", str);
+-                case 'g': return id3tag_set_textinfo_utf8(gfp, "TCON", str);
++                case 'a': return id3tag_set_textinfo_utf8(gfp, "TPE1", (const char *)str);
++                case 't': return id3tag_set_textinfo_utf8(gfp, "TIT2", (const char *)str);
++                case 'l': return id3tag_set_textinfo_utf8(gfp, "TALB", (const char *)str);
++                case 'g': return id3tag_set_textinfo_utf8(gfp, "TCON", (const char *)str);
+                 case 'c': return id3tag_set_comment_ucs2(gfp, 0, 0, str);
+-                case 'n': return id3tag_set_textinfo_utf8(gfp, "TRCK", str);
+-                case 'y': return id3tag_set_textinfo_utf8(gfp, "TYER", str);
++                case 'n': return id3tag_set_textinfo_utf8(gfp, "TRCK", (const char *)str);
++                case 'y': return id3tag_set_textinfo_utf8(gfp, "TYER", (const char *)str);
+                 case 'v': return id3tag_set_fieldvalue_ucs2(gfp, str);
+             }
+             ;;
+diff --git a/include/libmp3lame.sym b/include/libmp3lame.sym
+index 7651fb3..77657ab 100644
+--- a/include/libmp3lame.sym
++++ b/include/libmp3lame.sym
+@@ -193,6 +193,7 @@ hip_decode_headers
+ hip_decode1
+ hip_decode1_headers
+ hip_decode1_headersB
++hip_finish_pinfo
+ lame_decode_init
+ lame_decode
+ lame_decode_headers

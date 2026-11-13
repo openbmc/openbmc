@@ -137,14 +137,59 @@ class TestImage(OESelftestTestCase):
 
         features = '''
 IMAGE_CLASSES:append = " testimage"
-IMAGE_FEATURES:append = " ssh-server-dropbear"
 IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("IMAGE_CLASSES", "testimage", " + 5120", "", d)}"
 TEST_RUNQEMUPARAMS += " slirp"
 '''
         self.write_config(features)
 
-        bitbake('core-image-minimal')
-        bitbake('-c testimage core-image-minimal')
+        bitbake('oe-selftest-image')
+        bitbake('-c testimage oe-selftest-image')
+
+    def _test_testimage_nfs(self, slirp=False):
+        """
+        Check testimage functionality with an NFS rootfs-dbg image
+        (image-combined-dbg), the same rootfs devtool ide-sdk --nfs=rootfs-dbg
+        boots. runqemu recognizes the rootfs tarball and extracts it itself
+        for NFS boot, the same way test_qemu_can_boot_nfs_and_shutdown
+        (runqemu.py) does. Also installs cmake-example-ptest and runs the
+        ptest suite on top of it.
+        """
+
+        # IMAGE_LINK_NAME/DEPLOY_DIR_IMAGE don't depend on the features below,
+        # so the rootfs-dbg tarball path can be derived before building it.
+        bb_vars = get_bb_vars(('DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'), 'oe-selftest-image')
+        rootfs_tar = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], '%s-dbg.tar.zst' % bb_vars['IMAGE_LINK_NAME'])
+
+        features = '''
+IMAGE_CLASSES:append = " testimage image-combined-dbg"
+IMAGE_GEN_DEBUGFS = "1"
+IMAGE_FSTYPES_DEBUGFS:append = " tar.zst"
+DISTRO_FEATURES:append = " ptest"
+IMAGE_INSTALL:append = " ptest-runner cmake-example-ptest"
+QB_DEFAULT_FSTYPE = "tar.zst"
+QB_FSINFO = "tar.zst:rootfs-dbg"
+'''
+        if slirp:
+            features += 'TEST_RUNQEMUPARAMS += " slirp"\n'
+        self.write_config(features)
+
+        bitbake('oe-selftest-image')
+        self.assertExists(rootfs_tar)
+
+        bitbake('-c testimage oe-selftest-image')
+
+    def test_testimage_nfs(self):
+        """
+        Summary: Check testimage functionality with an NFS rootfs-dbg image.
+        """
+        self._test_testimage_nfs(slirp=False)
+
+    def test_testimage_slirp_nfs(self):
+        """
+        Summary: Check testimage functionality with qemu slirp networking and
+        an NFS rootfs-dbg image.
+        """
+        self._test_testimage_nfs(slirp=True)
 
     def test_testimage_dnf(self):
         """

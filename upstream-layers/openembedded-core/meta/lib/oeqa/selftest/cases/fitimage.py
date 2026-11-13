@@ -14,7 +14,7 @@ import oe.fitimage
 
 from bb import BBHandledException
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_vars, get_bb_var
+from oeqa.utils.commands import runCmd, bitbake, get_bb_vars, get_bb_vars_flags, get_bb_var
 
 
 class BbVarsMockGenKeys:
@@ -614,7 +614,7 @@ class FitImageTestCase(OESelftestTestCase):
         self._is_req_dict_in_dict(sections, req_sections)
 
         # Call the signing related checks if the function is provided by a inherited class
-        self._check_signing(bb_vars, sections, num_signatures, uboot_tools_bindir, fitimage_path)
+        self._check_signing(bb_vars, sections, req_sections, num_signatures, uboot_tools_bindir, fitimage_path)
 
     def _get_req_its_paths(self, bb_vars):
         self.logger.error("This function needs to be implemented")
@@ -636,7 +636,7 @@ class FitImageTestCase(OESelftestTestCase):
         self.logger.error("This function needs to be implemented")
         return ({}, 0)
 
-    def _check_signing(self, bb_vars, sections, num_signatures, uboot_tools_bindir, fitimage_path):
+    def _check_signing(self, bb_vars, sections, req_sections, num_signatures, uboot_tools_bindir, fitimage_path):
         """Verify the signatures in the FIT image."""
         self.fail("Function needs to be implemented by inheriting classes")
 
@@ -662,10 +662,12 @@ class FitImageTestCase(OESelftestTestCase):
 class KernelFitImageBase(FitImageTestCase):
     """Test cases for the linux-yocto-fitimage recipe"""
 
-    def _fit_get_bb_vars(self, additional_vars=[]):
+    def _fit_get_bb_vars(self, additional_vars=[], flags=None):
         """Retrieve BitBake variables specific to the test case.
 
-        Call the get_bb_vars function once and get all variables needed by the test case.
+        Call the get_bb_vars_flags function once and get all variables needed by
+        the test case. flags maps variable names to lists of flag names. The
+        flags are returned as dict {flag name: value} for their variable name.
         """
         internal_used = {
             'DEPLOY_DIR_IMAGE',
@@ -676,8 +678,6 @@ class KernelFitImageBase(FitImageTestCase):
             'FIT_HASH_ALG',
             'FIT_KERNEL_COMP_ALG',
             'FIT_LOADABLES',
-            'FIT_LOADABLE_ENTRYPOINT',
-            'FIT_LOADABLE_LOADADDRESS',
             'FIT_OS',
             'FIT_SIGN_ALG',
             'FIT_SIGN_INDIVIDUAL',
@@ -712,7 +712,9 @@ class KernelFitImageBase(FitImageTestCase):
             'UBOOT_FIT_TEE_LOADADDRESS',
             'UBOOT_FIT_TEE_ENTRYPOINT',
         }
-        bb_vars = get_bb_vars(list(internal_used | set(additional_vars)), self.kernel_recipe)
+        bb_vars, bb_flags = get_bb_vars_flags([*internal_used, *additional_vars], flags, self.kernel_recipe)
+        bb_vars = {var: val or None for var, val in bb_vars.items()}
+        bb_vars.update(bb_flags)
         self.logger.debug("bb_vars: %s" % pprint.pformat(bb_vars, indent=4))
         return bb_vars
 
@@ -1025,10 +1027,10 @@ class KernelFitImageBase(FitImageTestCase):
                 "Entry Point": bb_vars['UBOOT_RD_ENTRYPOINT']
             }
         # Create one section per loadable
-        for index,loadable in enumerate(loadables):
-            loadaddress = bb_vars['FIT_LOADABLE_LOADADDRESS'].split("?")[index].strip()
+        for loadable in loadables:
+            loadaddress = bb_vars['FIT_LOADABLE_LOADADDRESS'][loadable]
             req_sections[loadable] = { "Load Address": loadaddress }
-            entrypoint = bb_vars['FIT_LOADABLE_ENTRYPOINT'].split("?")[index].strip()
+            entrypoint = bb_vars['FIT_LOADABLE_ENTRYPOINT'][loadable]
             if entrypoint:
                 req_sections[loadable]['Entry Point'] = entrypoint
         # Create a configuration section for each DTB
@@ -1076,7 +1078,7 @@ class KernelFitImageBase(FitImageTestCase):
                     req_sections[section]['Hash algo'] = fit_hash_alg
         return (req_sections, num_signatures)
 
-    def _check_signing(self, bb_vars, sections, num_signatures, uboot_tools_bindir, fitimage_path):
+    def _check_signing(self, bb_vars, sections, req_sections, num_signatures, uboot_tools_bindir, fitimage_path):
         """Verify the signature nodes in the FIT image"""
         if bb_vars['UBOOT_SIGN_ENABLE'] == "1":
             self.logger.debug("Verifying signatures in the FIT image")
@@ -1204,7 +1206,9 @@ FIT_LOADABLE_TYPE[loadable2] = "firmware"
         config = FitImageTestCase._config_add_machine_settings(config, machine, keys=["KERNEL_DEVICETREE", "FIT_CONF_DEFAULT_DTB"])
         config = self._config_add_kernel_classes(config)
         self.write_config(config)
-        bb_vars = self._fit_get_bb_vars()
+        loadables = ['loadable1', 'loadable2']
+        bb_vars = self._fit_get_bb_vars(flags={'FIT_LOADABLE_ENTRYPOINT': loadables,
+                                               'FIT_LOADABLE_LOADADDRESS': loadables})
         self._gen_atf_tee_dummy_images(bb_vars)
         self._test_fitimage(bb_vars)
 
@@ -1685,9 +1689,13 @@ class UBootFitImageTests(FitImageTestCase):
             'FIT_SIGN_INDIVIDUAL',
             'FIT_SIGN_NUMBITS',
             'MACHINE',
+            'SPL_DTB_BINARY',
+            'SPL_DTB_IMAGE',
             'SPL_MKIMAGE_SIGN_ARGS',
             'SPL_SIGN_ENABLE',
             'SPL_SIGN_KEYNAME',
+            'SPL_SIGN_INDIVIDUAL',
+            'SPL_SIGN_CONF',
             'TOPDIR',
             'UBOOT_ARCH',
             'UBOOT_DTB_BINARY',
@@ -1697,6 +1705,7 @@ class UBootFitImageTests(FitImageTestCase):
             'UBOOT_FIT_ARM_TRUSTED_FIRMWARE_LOADADDRESS',
             'UBOOT_FIT_ARM_TRUSTED_FIRMWARE',
             'UBOOT_FIT_CONF_DESC',
+            'UBOOT_FIT_CONF_FIRMWARE',
             'UBOOT_FIT_CONF_USER_LOADABLES',
             'UBOOT_FIT_DESC',
             'UBOOT_FIT_HASH_ALG',
@@ -1759,15 +1768,30 @@ class UBootFitImageTests(FitImageTestCase):
         # configuration nodes
         configurations = [ 'conf']
 
+        spl_sign_enable = bb_vars['SPL_SIGN_ENABLE'] == "1"
+        spl_sign_individual = spl_sign_enable and bb_vars['SPL_SIGN_INDIVIDUAL'] == "1"
+        spl_sign_conf = spl_sign_enable and bb_vars['SPL_SIGN_CONF'] == "1"
+
         # Create a list of paths for all image and configuration nodes
         req_its_paths = []
+        not_req_its_paths = []
         for image in images:
             req_its_paths.append(['/', 'images', image])
-            if bb_vars['SPL_SIGN_ENABLE'] == "1":
+            if spl_sign_individual:
                 req_its_paths.append(['/', 'images', image, 'signature'])
+            else:
+                not_req_its_paths.append(['/', 'images', image, 'signature'])
+            if spl_sign_conf:
+                req_its_paths.append(['/', 'images', image, 'hash-1'])
+            else:
+                not_req_its_paths.append(['/', 'images', image, 'hash-1'])
         for configuration in configurations:
             req_its_paths.append(['/', 'configurations', configuration])
-        return (req_its_paths, [])
+            if spl_sign_conf:
+                req_its_paths.append(['/', 'configurations', configuration, 'signature'])
+            else:
+                not_req_its_paths.append(['/', 'configurations', configuration, 'signature'])
+        return (req_its_paths, not_req_its_paths)
 
     def _get_req_its_fields(self, bb_vars):
         loadables = ["uboot"]
@@ -1817,10 +1841,17 @@ class UBootFitImageTests(FitImageTestCase):
             'loadables = "%s";' % '", "'.join(loadables),
             'fdt = "fdt";',
         ]
+        if bb_vars['SPL_SIGN_ENABLE'] == "1" and bb_vars['SPL_SIGN_CONF'] == "1":
+            sign_images = []
+            if bb_vars.get('UBOOT_FIT_CONF_FIRMWARE'):
+                sign_images.append("firmware")
+            sign_images += ["loadables", "fdt"]
+            its_field_check.append('sign-images = "%s";' % '", "'.join(sign_images))
         return its_field_check
 
     def _get_req_sigvalues_config(self, bb_vars):
-        # COnfigurations are not signed by uboot-sign
+        # The "conf" node does not match FIT_CONF_PREFIX, so a configuration
+        # signature (SPL_SIGN_CONF) is checked against _get_req_sigvalues_image
         return {}
 
     def _get_req_sigvalues_image(self, bb_vars):
@@ -1874,16 +1905,26 @@ class UBootFitImageTests(FitImageTestCase):
         uboot_fit_sign_alg = bb_vars['UBOOT_FIT_SIGN_ALG']
         spl_sign_enable = bb_vars['SPL_SIGN_ENABLE']
         spl_sign_keyname = bb_vars['SPL_SIGN_KEYNAME']
+        spl_sign_conf = bb_vars['SPL_SIGN_CONF']
+        spl_sign_individual = bb_vars['SPL_SIGN_INDIVIDUAL']
         num_signatures = 0
         if spl_sign_enable == "1":
             for section in req_sections:
-                if not section.startswith('conf'):
-                    req_sections[section]['Sign algo'] = "%s,%s:%s" % \
-                        (uboot_fit_hash_alg, uboot_fit_sign_alg, spl_sign_keyname)
-                    num_signatures += 1
+                if section.startswith('conf'):
+                    if spl_sign_conf == "1":
+                        req_sections[section]['Sign algo'] = "%s,%s:%s" % \
+                            (uboot_fit_hash_alg, uboot_fit_sign_alg, spl_sign_keyname)
+                        num_signatures += 1
+                else:
+                    if spl_sign_conf == "1":
+                        req_sections[section]['Hash algo'] = uboot_fit_hash_alg
+                    elif spl_sign_individual == "1":
+                        req_sections[section]['Sign algo'] = "%s,%s:%s" % \
+                            (uboot_fit_hash_alg, uboot_fit_sign_alg, spl_sign_keyname)
+                        num_signatures += 1
         return (req_sections, num_signatures)
 
-    def  _check_signing(self, bb_vars, sections, num_signatures, uboot_tools_bindir, fitimage_path):
+    def  _check_signing(self, bb_vars, sections, req_sections, num_signatures, uboot_tools_bindir, fitimage_path):
         if bb_vars['UBOOT_FITIMAGE_ENABLE'] == '1' and bb_vars['SPL_SIGN_ENABLE'] == "1":
             self.logger.debug("Verifying signatures in the FIT image")
         else:
@@ -1896,16 +1937,25 @@ class UBootFitImageTests(FitImageTestCase):
         fit_sign_alg_len = FitImageTestCase.MKIMAGE_SIGNATURE_LENGTHS[uboot_fit_sign_alg]
         for section, values in sections.items():
             # Configuration nodes are always signed with UBOOT_SIGN_KEYNAME (if UBOOT_SIGN_ENABLE = "1")
-            if section.startswith("conf"):
-                # uboot-sign does not sign configuration nodes
-                pass
-            else:
-                # uboot-sign does not add hash nodes, only image signatures
-                sign_algo = values.get('Sign algo', None)
-                req_sign_algo = "%s,%s:%s" % (uboot_fit_hash_alg, uboot_fit_sign_alg, spl_sign_keyname)
-                self.assertEqual(sign_algo, req_sign_algo, 'Signature algorithm for %s not expected value' % section)
-                sign_value = values.get('Sign value', None)
-                self.assertEqual(len(sign_value), fit_sign_alg_len, 'Signature value for section %s not expected length' % section)
+            if 'Sign algo' not in req_sections[section]:
+               continue
+            sign_algo = values.get('Sign algo', None)
+            req_sign_algo = "%s,%s:%s" % (uboot_fit_hash_alg, uboot_fit_sign_alg, spl_sign_keyname)
+            self.assertEqual(sign_algo, req_sign_algo, 'Signature algorithm for %s not expected value' % section)
+            sign_value = values.get('Sign value', None)
+            self.assertEqual(len(sign_value), fit_sign_alg_len, 'Signature value for section %s not expected length' % section)
+
+        # The public key added to the SPL DTB tells SPL what has to be signed:
+        # "conf" for configuration signatures, "image" for individual image signatures.
+        if bb_vars['SPL_DTB_BINARY']:
+            dtc_bindir = FitImageTestCase._setup_native('dtc-native')
+            spl_dtb_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], bb_vars['SPL_DTB_IMAGE'])
+            key_dtb_path = "/signature/key-" + spl_sign_keyname
+            req_required = "conf" if bb_vars['SPL_SIGN_CONF'] == "1" else "image"
+            self._verify_dtb_property(dtc_bindir, spl_dtb_path, key_dtb_path, "required", req_required)
+            self._verify_dtb_property(dtc_bindir, spl_dtb_path, key_dtb_path, "algo",
+                                      "%s,%s" % (uboot_fit_hash_alg, uboot_fit_sign_alg))
+            self._verify_dtb_property(dtc_bindir, spl_dtb_path, key_dtb_path, "key-name-hint", spl_sign_keyname)
 
         # Search for the string passed to mkimage in each signed section of the FIT image.
         # Looks like mkimage supports to add a comment but does not support to read it back.
@@ -2030,6 +2080,48 @@ UBOOT_LOADADDRESS = "0x80000000"
 UBOOT_DTB_LOADADDRESS = "0x82000000"
 SPL_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
 SPL_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot comment'"
+UBOOT_EXTLINUX = "0"
+UBOOT_FIT_GENERATE_KEYS = "1"
+UBOOT_FIT_HASH_ALG = "sha256"
+"""
+        config = FitImageTestCase._config_add_machine_settings(config, machine, keys=["UBOOT_MACHINE", "SPL_BINARY", "UBOOT_DTB_BINARY", "UBOOT_ARCH"])
+        config = self._require_machine_capability(config, machine, '_cap_spl_dtb')
+        self.write_config(config)
+        bb_vars = self._fit_get_bb_vars()
+        self._test_fitimage(bb_vars)
+
+
+    def test_sign_standalone_uboot_fit_image_individual(self):
+        """
+        Summary:     Check if U-Boot FIT image and Image Tree Source (its) are
+                     created and signed correctly when the individual images
+                     are signed (SPL_SIGN_INDIVIDUAL = "1") instead of the FIT
+                     configuration (SPL_SIGN_CONF = "0").
+        Expected:    1) U-Boot its and FIT image are built successfully
+                     2) The its file has a signature node in each image node,
+                        no image hash nodes and no configuration signature node
+                     3) Dumping the FIT image shows signatures for the images
+                        and no signature for the configuration
+                     4) The public key in the SPL DTB is required for "image"
+                     5) SPL_MKIMAGE_SIGN_ARGS is passed to mkimage
+        Product:     oe-core
+        """
+        machine = self._get_machine_or_skip()
+        config = """
+# There's no U-boot defconfig with CONFIG_FIT_SIGNATURE yet, so we need at
+# least CONFIG_SPL_LOAD_FIT and CONFIG_SPL_OF_CONTROL set
+# Enable creation and signing of the individual U-Boot fitImage images
+UBOOT_FITIMAGE_ENABLE = "1"
+SPL_SIGN_ENABLE = "1"
+SPL_SIGN_CONF = "0"
+SPL_SIGN_INDIVIDUAL = "1"
+SPL_SIGN_KEYNAME = "spl-individual-oe-selftest"
+SPL_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
+UBOOT_ENTRYPOINT  = "0x80000000"
+UBOOT_LOADADDRESS = "0x80000000"
+UBOOT_DTB_LOADADDRESS = "0x82000000"
+SPL_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
+SPL_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot individual comment'"
 UBOOT_EXTLINUX = "0"
 UBOOT_FIT_GENERATE_KEYS = "1"
 UBOOT_FIT_HASH_ALG = "sha256"

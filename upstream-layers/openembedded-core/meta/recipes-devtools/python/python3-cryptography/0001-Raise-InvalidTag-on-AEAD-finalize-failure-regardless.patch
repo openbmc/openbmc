@@ -1,0 +1,53 @@
+From 098b3b1816c3541847b507b2b1e0ae2e3aa85102 Mon Sep 17 00:00:00 2001
+From: Alex Gaynor <alex.gaynor@gmail.com>
+Date: Sat, 5 Sep 2026 17:11:53 -0400
+Subject: [PATCH] Raise InvalidTag on AEAD finalize failure regardless of error
+ queue (#15596)
+
+OpenSSL f7d2d2acef (openssl/openssl#32587) now pushes PROV_R_BAD_DECRYPT
+onto the error queue when an AEAD tag check fails in EVP_DecryptFinal_ex.
+Our finalize only mapped failures to InvalidTag when the error queue was
+empty, so on OpenSSL master a bad GCM tag surfaced as a ValueError about
+block length instead.
+
+For modes with an authentication tag, treat any finalize failure as
+InvalidTag. Older OpenSSL, BoringSSL, AWS-LC, and LibreSSL still leave
+the queue empty, so behavior there is unchanged.
+
+Claude-Session: https://claude.ai/code/session_01Eg4jjDRiLcBQrdEFsL3fCD
+
+Co-authored-by: Claude Fable 5.1 <noreply@anthropic.com>
+
+Upstream-Status: Backport [https://github.com/pyca/cryptography/commit/e83bbe58e373536636baaa7c33a64a6e8f04c953]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/rust/src/backend/ciphers.rs | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/src/rust/src/backend/ciphers.rs b/src/rust/src/backend/ciphers.rs
+index f850bef..073bee3 100644
+--- a/src/rust/src/backend/ciphers.rs
++++ b/src/rust/src/backend/ciphers.rs
+@@ -233,12 +233,16 @@ impl CipherContext {
+         py: pyo3::Python<'p>,
+     ) -> CryptographyResult<pyo3::Bound<'p, pyo3::types::PyBytes>> {
+         let mut out_buf = vec![0; self.ctx.block_size()];
+-        let n = self.ctx.cipher_final(&mut out_buf).or_else(|e| {
+-            if e.errors().is_empty()
+-                && self
+-                    .py_mode
+-                    .bind(py)
+-                    .is_instance(&types::MODE_WITH_AUTHENTICATION_TAG.get(py)?)?
++        let n = self.ctx.cipher_final(&mut out_buf).or_else(|_| {
++            // For authenticated modes, the only way finalize can fail is a
++            // tag mismatch. Older OpenSSL versions (and BoringSSL, AWS-LC,
++            // and LibreSSL) leave the error queue empty in that case, while
++            // OpenSSL >= 4.1 pushes PROV_R_BAD_DECRYPT, so we can't key on
++            // the error queue.
++            if self
++                .py_mode
++                .bind(py)
++                .is_instance(&types::MODE_WITH_AUTHENTICATION_TAG.get(py)?)?
+             {
+                 return Err(CryptographyError::from(exceptions::InvalidTag::new_err(())));
+             }

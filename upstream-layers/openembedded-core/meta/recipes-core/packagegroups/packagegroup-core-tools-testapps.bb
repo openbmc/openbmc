@@ -18,7 +18,7 @@ KEXECTOOLS:riscv64 ?= ""
 KEXECTOOLS:riscv32 ?= ""
 KEXECTOOLS:loongarch64 ?= ""
 
-# go does not support ppc32, only ppc64
+# go does not support ppc32 and, in goarch.bbclass, only little-endian ppc64
 # https://github.com/golang/go/issues/22885
 # gccgo may do better
 GOTOOLS ?= "\
@@ -26,10 +26,12 @@ GOTOOLS ?= "\
     cgo-helloworld \
     "
 GOTOOLS:powerpc ?= ""
+GOTOOLS:powerpc64 ?= ""
 GOTOOLS:riscv32 ?= ""
 
 GSTEXAMPLES ?= "gst-examples"
 GSTEXAMPLES:riscv64 = ""
+GSTEXAMPLES:riscv32 = ""
 
 X11GLTOOLS = "\
     mesa-demos \

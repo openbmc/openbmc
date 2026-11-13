@@ -1,0 +1,37 @@
+From e93cd673d49aa087f13ff9edccb2e70fa0fad9db Mon Sep 17 00:00:00 2001
+From: Pratik Farkase <pratik.farkase@est.tech>
+Date: Thu, 17 Sep 2026 12:00:00 +0000
+Subject: [PATCH] tests: flock: increase "wait for flock child" timeout
+
+The flock test launches "flock ... bash -c '... sleep 3 ...'" in the
+background and then waits for flock to spawn its child using a hardcoded
+"timeout 1s" around a pgrep poll loop. That 1 second only covers process
+startup, so it is purely a function of host speed. Under emulation (e.g.
+qemuriscv64 under TCG) spawning the shell and flock can exceed 1s, so
+pgrep does not see the child in time and the test aborts with "timeout
+waiting for flock child", failing intermittently.
+
+Increase the timeout to 30s. The loop exits as soon as the child
+appears, so this does not slow down fast hosts; it only adds headroom on
+slow/emulated targets.
+
+Upstream-Status: Backport [https://github.com/util-linux/util-linux/commit/ab519f323c620a32b21a0861285f1a4a5591d3dc]
+
+Signed-off-by: Pratik Farkase <pratik.farkase@est.tech>
+---
+ tests/ts/flock/flock | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/ts/flock/flock b/tests/ts/flock/flock
+index 85e341d..e0e5ebe 100755
+--- a/tests/ts/flock/flock
++++ b/tests/ts/flock/flock
+@@ -65,7 +65,7 @@ for api in flock fcntl ; do
+ 		ts_die "unable to run flock"
+ 	fi
+ 	# the lock should be established when flock has a child
+-	timeout 1s bash -c "while ! pgrep -P $pid >/dev/null; do sleep 0.1 ;done" \
++	timeout 30s bash -c "while ! pgrep -P $pid >/dev/null; do sleep 0.1 ;done" \
+ 		|| ts_die "timeout waiting for flock child"
+ 
+ 	ts_init_subtest "${subtest_prefix}non-block"

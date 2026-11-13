@@ -33,8 +33,11 @@ class Signing(OESelftestTestCase):
 
         nsysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native")
 
-        runCmd('gpg --agent-program=`which gpg-agent`\|--auto-expand-secmem --batch --homedir %s --import %s %s' % (self.gpg_dir, self.pub_key_path, self.secret_key_path), native_sysroot=nsysroot)
-        return nsysroot + get_bb_var("bindir_native")
+        with open(os.path.join(self.gpg_dir, "gpg-agent.conf"), "w") as f:
+            f.write("auto-expand-secmem\n")
+
+        runCmd('gpg --batch --homedir %s --import %s %s' % (self.gpg_dir, self.pub_key_path, self.secret_key_path), native_sysroot=nsysroot)
+        return nsysroot
 
 
     @contextmanager
@@ -155,7 +158,6 @@ class Signing(OESelftestTestCase):
 
         with self.create_new_builddir(os.environ['BUILDDIR'], builddir):
 
-            os.environ["PATH"] = nsysroot + ":" + os.environ["PATH"]
             self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
             self.add_command_to_tearDown('rm -rf %s' % sstatedir)
             self.add_command_to_tearDown('rm -rf %s' % builddir)
@@ -169,7 +171,7 @@ class Signing(OESelftestTestCase):
             self.assertEqual(len(recipe_sig), 1, 'Failed to find .sig file.')
             self.assertEqual(len(recipe_archive), 1, 'Failed to find .tar.zst file.')
 
-            ret = runCmd('gpg --homedir %s --verify %s %s' % (self.gpg_dir, recipe_sig[0], recipe_archive[0]))
+            ret = runCmd('gpg --homedir %s --verify %s %s' % (self.gpg_dir, recipe_sig[0], recipe_archive[0]), native_sysroot=nsysroot)
             # gpg: Signature made Thu 22 Oct 2015 01:45:09 PM EEST using RSA key ID 61EEFB30
             # gpg: Good signature from "testuser (nocomment) <testuser@email.com>"
             self.assertIn('gpg: Good signature from', ret.output, 'Package signed incorrectly.')

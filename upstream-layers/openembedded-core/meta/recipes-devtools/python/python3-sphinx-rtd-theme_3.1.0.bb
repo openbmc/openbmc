@@ -12,8 +12,6 @@ RDEPENDS:${PN} += " \
     python3-sphinxcontrib-jquery \
 "
 
-PYPI_PACKAGE = "sphinx_rtd_theme"
-
 SRC_URI[sha256sum] = "b44276f2c276e909239a4f6c955aa667aaafeb78597923b1c60babc76db78e4c"
 
 inherit setuptools3 pypi

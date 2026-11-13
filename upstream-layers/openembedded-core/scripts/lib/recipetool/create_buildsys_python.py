@@ -115,6 +115,25 @@ class PythonRecipeHandler(RecipeHandler):
     def __init__(self):
         pass
 
+    @staticmethod
+    def pypi_normalise(s):
+        """
+        Normalize the package names.
+        https://packaging.python.org/en/latest/specifications/name-normalization/
+        """
+        return re.sub(r"[-_.]+", "-", s).lower()
+
+    @staticmethod
+    def comment_lines(s):
+        """
+        Some Python packages put the full license text into the license
+        field of PKG-INFO or pyproject.toml instead of a short identifier.
+        Prefix follow-up lines with '#' so that multi-line values (e.g.
+        a full license text) remain a valid comment in the recipe.
+        """
+        return "\n".join(("# " + line).rstrip() if i else line
+                         for i, line in enumerate(s.splitlines()))
+
     def process_url(self, args, classes, handled, extravalues):
         """
         Convert any pypi url https://pypi.org/project/<package>/<version> into https://files.pythonhosted.org/packages/source/...
@@ -143,6 +162,7 @@ class PythonRecipeHandler(RecipeHandler):
                 for release in reversed(data["releases"][version]):
                     if release["packagetype"] == "sdist":
                         fetch_uri = release["url"]
+                        sdist = release["filename"].rsplit("-", 1)[0]
                         break
             else:
                 logger.warning("Cannot handle pypi url %s: cannot fetch package information using %s", source, json_url)
@@ -151,15 +171,23 @@ class PythonRecipeHandler(RecipeHandler):
             match = re.match(r'^https?://files.pythonhosted.org/packages.*/(.*)-.*$', source)
             if match:
                 fetch_uri = source
-                pypi_package = match.group(1)
+                # The sdist name as found in the filename, not normalised
+                sdist = match.group(1)
+                pypi_package = sdist
                 _, version = determine_from_url(fetch_uri)
 
         if match and not args.no_pypi:
             if required_version and version != required_version:
                 raise Exception("Version specified using --version/-V (%s) and version specified in the url (%s) do not match" % (required_version, version))
-            # This is optionnal if BPN looks like "python-<pypi_package>" or "python3-<pypi_package>" (see pypi.bbclass)
-            # but at this point we cannot know because because user can specify the output name of the recipe on the command line
+            # PYPI_PACKAGE is optional if BPN looks like "python-<pypi_package>" or "python3-<pypi_package>" (see pypi.bbclass)
+            # but at this point we cannot know because the user can specify the output name of the recipe on the command line,
+            # so it is set here and dropped later in cleanup() once the recipe name is known
+            pypi_package = self.pypi_normalise(pypi_package)
             extravalues["PYPI_PACKAGE"] = pypi_package
+            # Some sdists don't use normalised names, so check and set PYPI_PACKAGE_SDIST if needed
+            if sdist != pypi_package.replace("-", "_"):
+                extravalues["PYPI_PACKAGE_SDIST"] = sdist
+
             # If the tarball extension is not 'tar.gz' (default value in pypi.bblcass) whe should set PYPI_PACKAGE_EXT in the recipe
             pypi_package_ext = re.match(r'.*%s-%s\.(.*)$' % (pypi_package, version), fetch_uri)
             if pypi_package_ext:
@@ -177,6 +205,25 @@ class PythonRecipeHandler(RecipeHandler):
 
         handled.append('url')
         return fetch_uri
+
+    def cleanup(self, pn, pv, classes, extravalues):
+        """
+        PYPI_PACKAGE is not needed if it matches the default derived from BPN (see pypi.bbclass)
+        """
+        if not pn or 'pypi' not in classes or not extravalues.get('PYPI_PACKAGE'):
+            return
+
+        bpn = pn
+        if bpn.endswith('-native'):
+            bpn = bpn[:-len('-native')]
+        if bpn.startswith('nativesdk-'):
+            bpn = bpn[len('nativesdk-'):]
+        for prefix in ('python-', 'python3-'):
+            if bpn.startswith(prefix):
+                bpn = bpn[len(prefix):]
+                break
+        if self.pypi_normalise(bpn) == extravalues['PYPI_PACKAGE']:
+            del extravalues['PYPI_PACKAGE']
 
     def handle_classifier_license(self, classifiers, existing_licenses=""):
 
@@ -224,7 +271,7 @@ class PythonRecipeHandler(RecipeHandler):
             if bbvar == "PN":
                 # by convention python recipes start with "python3-"
                 if not value.startswith('python'):
-                    value = 'python3-' + value
+                    value = 'python3-' + self.pypi_normalise(value)
 
             if bbvar not in extravalues and value:
                 extravalues[bbvar] = value
@@ -661,7 +708,7 @@ class PythonSetupPyRecipeHandler(PythonRecipeHandler):
         if license_str:
             for i, line in enumerate(lines_before):
                 if line.startswith('##LICENSE_PLACEHOLDER##'):
-                    lines_before.insert(i, '# NOTE: License in setup.py/PKGINFO is: %s' % license_str)
+                    lines_before.insert(i, '# NOTE: License in setup.py/PKGINFO is: %s' % self.comment_lines(license_str))
                     break
 
         if 'Classifier' in info:
@@ -900,7 +947,7 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
                 for i, line in enumerate(lines_before):
                     if line.startswith("##LICENSE_PLACEHOLDER##"):
                         lines_before.insert(
-                            i, "# NOTE: License in pyproject.toml is: %s" % license_str
+                            i, "# NOTE: License in pyproject.toml is: %s" % self.comment_lines(license_str)
                         )
                         break
 

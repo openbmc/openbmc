@@ -425,8 +425,8 @@ def parse_legacy_license(d, licensestr):
     once legacy licenses are not longer allowed.
 
     Unknown license IDs in the string are automatically converted to
-    LicenseRefs, assuming that they are provided as either a common license
-    file or a NO_GENERIC_LICENSE
+    LicenseRefs. To check if a LicenseRef actually exists, use
+    get_license_path()
     """
     licensestr = _substitute_legacy_license(licensestr)
     if licensestr is None:

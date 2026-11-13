@@ -218,25 +218,33 @@ def runCmd(command, ignore_status=False, timeout=None, assert_error=True, sync=T
     return result
 
 
-def bitbake(command, ignore_status=False, timeout=None, postconfig=None, output_log=None, **options):
+@contextlib.contextmanager
+def _postconfig_file(postconfig):
+    """Write postconfig to a temporary configuration file and yield its path
 
-    if postconfig:
-        postconfig_file = os.path.join(os.environ.get('BUILDDIR'), 'oeqa-post.conf')
-        ftools.write_file(postconfig_file, postconfig)
-        extra_args = "-R %s" % postconfig_file
-    else:
-        extra_args = ""
-
-    if isinstance(command, str):
-        cmd = "bitbake " + extra_args + " " + command
-    else:
-        cmd = [ "bitbake" ] + [a for a in (command + extra_args.split(" ")) if a not in [""]]
-
+    Yield None if there is no postconfig.
+    """
+    if not postconfig:
+        yield None
+        return
+    path = os.path.join(os.environ.get('BUILDDIR'), 'oeqa-post.conf')
+    ftools.write_file(path, postconfig)
     try:
-        return runCmd(cmd, ignore_status, timeout, output_log=output_log, **options)
+        yield path
     finally:
-        if postconfig:
-            os.remove(postconfig_file)
+        os.remove(path)
+
+
+def bitbake(command, ignore_status=False, timeout=None, postconfig=None, output_log=None, **options):
+    with _postconfig_file(postconfig) as postfile:
+        extra_args = "-R %s" % postfile if postfile else ""
+
+        if isinstance(command, str):
+            cmd = "bitbake " + extra_args + " " + command
+        else:
+            cmd = [ "bitbake" ] + [a for a in (command + extra_args.split(" ")) if a not in [""]]
+
+        return runCmd(cmd, ignore_status, timeout, output_log=output_log, **options)
 
 
 def get_bb_env(target=None, postconfig=None):
@@ -245,60 +253,77 @@ def get_bb_env(target=None, postconfig=None):
     else:
         return bitbake("-e", postconfig=postconfig).output
 
-def get_bb_vars(variables=None, target=None, postconfig=None):
-    """Get values of multiple bitbake variables"""
-    bbenv = get_bb_env(target, postconfig=postconfig)
+def _opt_str(val):
+    return str(val) if val is not None else None
 
-    if variables is not None:
-        variables = list(variables)
-    var_re = re.compile(r'^(export )?(?P<var>\w+(_.*)?)="(?P<value>.*)"$')
-    unset_re = re.compile(r'^unset (?P<var>\w+)$')
-    lastline = None
+def get_bb_vars_flags(variables=None, flags=None, target=None, postconfig=None):
+    """Get values and flags of multiple bitbake variables
+
+    Everything is read with a single tinfoil session. variables is a list of
+    variable names or None to get all variables which are set. flags maps
+    variable names to lists of flag names. For example:
+
+        get_bb_vars_flags(['FIT_HASH_ALG'],
+                          {'FIT_LOADABLE_LOADADDRESS': ['loadable1', 'loadable2']},
+                          'linux-yocto-fitimage')
+
+    returns a tuple of the values and the flags:
+
+        ({'FIT_HASH_ALG': 'sha256'},
+         {'FIT_LOADABLE_LOADADDRESS': {'loadable1': '0x1000', 'loadable2': None}})
+
+    Unset variables and flags are returned as None, empty ones as an empty
+    string.
+    """
+    import bb.tinfoil
+
     values = {}
-    for line in bbenv.splitlines():
-        match = var_re.match(line)
-        val = None
-        if match:
-            val = match.group('value')
+    flag_values = {}
+    with _postconfig_file(postconfig) as postfile, bb.tinfoil.Tinfoil() as tinfoil:
+        config_params = None
+        if postfile:
+            config_params = bb.tinfoil.TinfoilConfigParameters(config_only=not target, quiet=2, postfile=[postfile])
+        tinfoil.prepare(config_only=not target, config_params=config_params, quiet=2)
+        if target:
+            d = tinfoil.parse_recipe(target)
         else:
-            match = unset_re.match(line)
-            if match:
-                # Handle [unexport] variables
-                if lastline.startswith('#   "'):
-                    val = lastline.split('"')[1]
-        if val:
-            var = match.group('var')
-            if variables is None:
-                values[var] = val
-            else:
-                if var in variables:
-                    values[var] = val
-                    variables.remove(var)
-                # Stop after all required variables have been found
-                if not variables:
-                    break
-        lastline = line
-    if variables:
-        # Fill in missing values
-        for var in variables:
-            values[var] = None
-    return values
+            # Expand keys and run anonymous functions to get the same result as "bitbake -e"
+            d = tinfoil.finalizeData()
+
+        if variables is None:
+            for var in d.keys():
+                if var.startswith('__') or d.getVarFlag(var, 'func'):
+                    continue
+                val = d.getVar(var)
+                if val is not None:
+                    values[var] = str(val)
+        else:
+            for var in variables:
+                values[var] = _opt_str(d.getVar(var))
+
+        for var, names in (flags or {}).items():
+            flag_values[var] = {name: _opt_str(d.getVarFlag(var, name)) for name in names}
+    return values, flag_values
+
+def get_bb_vars(variables=None, target=None, postconfig=None):
+    """Get values of multiple bitbake variables
+
+    All values are read with a single tinfoil session. If variables is None,
+    all variables are returned. Unset or empty values are returned as None.
+    """
+    values, _ = get_bb_vars_flags(variables, None, target, postconfig)
+    if variables is None:
+        return {var: val for var, val in values.items() if val}
+    return {var: val or None for var, val in values.items()}
 
 def get_bb_var(var, target=None, postconfig=None):
-    if postconfig:
-        return bitbake("-e %s" % target or "", postconfig=postconfig).output
-    else:
-        # Fast-path for the non-postconfig case
-        cmd = ["bitbake-getvar", "--quiet", "--value", var]
-        if target:
-            cmd.extend(["--recipe", target])
-        try:
-            return subprocess.run(cmd, check=True, text=True, stdout=subprocess.PIPE).stdout.strip()
-        except subprocess.CalledProcessError as e:
-            # We need to return None not the empty string if the variable hasn't been set.
-            if e.returncode == 1:
-                return None
-            raise
+    """Get the value of a bitbake variable
+
+    Unset variables are returned as None, empty values as an empty string.
+    """
+    values, _ = get_bb_vars_flags([var], None, target, postconfig)
+    val = values[var]
+    return val.strip() if val is not None else None
 
 def get_test_layer(bblayers=None):
     if bblayers is None:

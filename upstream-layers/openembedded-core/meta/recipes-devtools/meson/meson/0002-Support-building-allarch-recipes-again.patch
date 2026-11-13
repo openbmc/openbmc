@@ -1,4 +1,4 @@
-From 21abed6786056ae31e4028b98068ff78740872e6 Mon Sep 17 00:00:00 2001
+From 88cef14eb829f7ad5c869695d3ea079ffeccc839 Mon Sep 17 00:00:00 2001
 From: Peter Kjellerstedt <pkj@axis.com>
 Date: Thu, 26 Jul 2018 16:32:49 +0200
 Subject: [PATCH] Support building allarch recipes again
@@ -12,7 +12,7 @@ Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 762818c..0efa628 100644
+index 07433f0..d818427 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
 @@ -37,6 +37,7 @@ if T.TYPE_CHECKING:

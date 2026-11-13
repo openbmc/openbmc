@@ -1,4 +1,4 @@
-From f71cfa9db1a196f0fadb2090ac04ce3164e171d3 Mon Sep 17 00:00:00 2001
+From 3782818f994e6fdb99b4a5083e178a47d6629fb0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 16 Mar 2025 12:48:46 -0700
 Subject: [PATCH] Add fix for packages that are not compatible with C23
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/readline/readline/rlstdc.h b/readline/readline/rlstdc.h
-index 2aaa30babfb..a7a0ef30428 100644
+index 2aaa30ba..a7a0ef30 100644
 --- a/readline/readline/rlstdc.h
 +++ b/readline/readline/rlstdc.h
 @@ -44,7 +44,7 @@

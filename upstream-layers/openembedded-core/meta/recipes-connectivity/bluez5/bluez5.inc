@@ -28,7 +28,6 @@ PACKAGECONFIG ??= "obex-profiles \
     hid-profiles \
     hog-profiles \
     tools \
-    deprecated \
     udev \
 "
 PACKAGECONFIG[obex-profiles] = "--enable-obex,--disable-obex,libical"
@@ -56,7 +55,6 @@ PACKAGECONFIG[hfp-profiles] = "--enable-hfp,--disable-hfp"
 PACKAGECONFIG[asha-profiles] = "--enable-asha,--disable-asha"
 PACKAGECONFIG[sixaxis] = "--enable-sixaxis,--disable-sixaxis"
 PACKAGECONFIG[tools] = "--enable-tools,--disable-tools"
-PACKAGECONFIG[deprecated] = "--enable-deprecated,--disable-deprecated"
 PACKAGECONFIG[mesh] = "--enable-mesh --enable-external-ell,--disable-mesh, json-c ell"
 PACKAGECONFIG[btpclient] = "--enable-btpclient --enable-external-ell,--disable-btpclient, ell"
 PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
@@ -66,8 +64,6 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
            file://init \
            file://run-ptest \
            file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
-           file://0001-adapter-restrict-delta-0-RSSI-to-proximity-filters.patch \
-           file://0001-gobex-Fix-ABORT-response-being-discarded.patch \
            "
 S = "${UNPACKDIR}/bluez-${PV}"
 
@@ -84,6 +80,8 @@ EXTRA_OECONF = "\
 "
 
 CFLAGS += "-DFIRMWARE_DIR='"${firmwaredir}"'"
+
+EXTRA_OEMAKE += "'unit_test_sdp_xml_CFLAGS=$(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\"${PTEST_PATH}\"'"
 
 # bluez5 builds a large number of useful utilities but does not
 # install them.  Specify which ones we want put into ${PN}-noinst-tools.
@@ -155,6 +153,7 @@ do_compile_ptest() {
 
 do_install_ptest() {
 	cp -r ${B}/unit/ ${D}${PTEST_PATH}
+	cp -r ${S}/unit/sdp-xml ${D}${PTEST_PATH}/unit/
 	rm -f ${D}${PTEST_PATH}/unit/*.o
 }
 

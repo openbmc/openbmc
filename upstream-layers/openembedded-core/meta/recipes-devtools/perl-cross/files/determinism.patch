@@ -1,4 +1,4 @@
-From 8fd84d6d760b21bad2c499b572951cc3f2235953 Mon Sep 17 00:00:00 2001
+From 454646b5ecd14e7bc1b54521f78b1af69549c108 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 5 Feb 2020 23:54:02 +0000
 Subject: [PATCH] Fixes to make the perl build reproducible:
@@ -39,7 +39,7 @@ index 2f451c6..86bc865 100755
  base=${0%/*}; test -z "$base" && base=.
  
 diff --git a/cnf/configure_mods.sh b/cnf/configure_mods.sh
-index d4ef5a7..8e88b48 100644
+index da463d2..4299c1b 100644
 --- a/cnf/configure_mods.sh
 +++ b/cnf/configure_mods.sh
 @@ -108,7 +108,7 @@ extonlyif() {

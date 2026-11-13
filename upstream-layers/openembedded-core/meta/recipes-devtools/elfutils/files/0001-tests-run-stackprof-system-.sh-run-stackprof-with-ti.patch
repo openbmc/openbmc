@@ -1,0 +1,73 @@
+From c2a4fcba9dd949e72826591367aeabbb72d826ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 8 Nov 2026 16:06:40 -0800
+Subject: [PATCH] tests/run-stackprof-system*.sh: run stackprof with timeout
+ --foreground
+
+GNU timeout sends the timeout signal to the command and then again to
+its whole process group. stackprof treats a second SIGINT/SIGTERM as a
+request to exit immediately, now if the handler runs between the two
+kill() calls, the second one makes it _exit(1) before the destructors
+print the summary. The output then lacks the pid/buildid sample counts
+and run-stackprof-system{,-gprof}.sh fail intermittently, more often on
+loaded SMP machines.
+
+stackprof does not spawn children in system-wide mode, so --foreground,
+which signals only the command, is enough.
+
+Changelog:
+
+        * tests/run-stackprof-system.sh: Invoke timeout with --foreground
+          option.
+        * tests/run-stackprof-system-gprof.sh: Invoke timeout with
+          --foreground option.
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/elfutils-devel/2026q4/009891.html]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/run-stackprof-system-gprof.sh | 4 ++--
+ tests/run-stackprof-system.sh       | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/run-stackprof-system-gprof.sh b/tests/run-stackprof-system-gprof.sh
+index 980a35be..1c511aaf 100755
+--- a/tests/run-stackprof-system-gprof.sh
++++ b/tests/run-stackprof-system-gprof.sh
+@@ -33,14 +33,14 @@ tempfiles test.out
+ testjob_launch
+
+ # run systemwide scan, no gprof output
+-testrun timeout -p --kill-after=5 10 ${abs_top_builddir}/src/stackprof -v 2>&1 | tee test.out
++testrun timeout -p --foreground --kill-after=5 10 ${abs_top_builddir}/src/stackprof -v 2>&1 | tee test.out
+ grep "^perf_event_attr configuration" test.out
+ grep "Starting stack profile collection systemwide" test.out || (grep "ERROR: Unsupported architecture" test.out && echo "unsupported arch" && exit 77)
+ grep -E "^[0-9]+ " test.out # -- pid / sample counts entries
+
+ # run systemwide scan again, with gprof output
+ # reduce verbosity, bump post-processing timeout compared to the first run
+-testrun timeout -p --kill-after=10 10 ${abs_top_builddir}/src/stackprof -g 2>&1 | tee test.out
++testrun timeout -p --foreground --kill-after=10 10 ${abs_top_builddir}/src/stackprof -g 2>&1 | tee test.out
+ tempfiles gmon.*
+ grep "^perf_event_attr configuration" test.out
+ grep "Starting stack profile collection systemwide" test.out
+diff --git a/tests/run-stackprof-system.sh b/tests/run-stackprof-system.sh
+index af64e7f1..76da8d8f 100755
+--- a/tests/run-stackprof-system.sh
++++ b/tests/run-stackprof-system.sh
+@@ -32,14 +32,14 @@ tempfiles test.out
+ testjob_launch
+
+ # run systemwide scan, no gprof output
+-testrun timeout -p --kill-after=5 10 ${abs_top_builddir}/src/stackprof -v 2>&1 | tee test.out
++testrun timeout -p --foreground --kill-after=5 10 ${abs_top_builddir}/src/stackprof -v 2>&1 | tee test.out
+ grep "^perf_event_attr configuration" test.out
+ grep "Starting stack profile collection systemwide" test.out || (grep "ERROR: Unsupported architecture" test.out && echo "unsupported arch" && exit 77)
+ grep -E "^[0-9]+ " test.out # -- pid / sample counts entries
+
+ # run systemwide scan again, with gprof output
+ # reduce verbosity, bump post-processing timeout compared to the first run
+-testrun timeout -p --kill-after=10 15 ${abs_top_builddir}/src/stackprof -g 2>&1 | tee test.out
++testrun timeout -p --foreground --kill-after=10 15 ${abs_top_builddir}/src/stackprof -g 2>&1 | tee test.out
+ tempfiles gmon.*
+ grep "^perf_event_attr configuration" test.out
+ grep "Starting stack profile collection systemwide" test.out

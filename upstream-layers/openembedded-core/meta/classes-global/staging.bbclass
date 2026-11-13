@@ -34,7 +34,6 @@ SYSROOT_DIRS_IGNORE = " \
     ${mandir} \
     ${docdir} \
     ${infodir} \
-    ${datadir}/X11/locale \
     ${datadir}/applications \
     ${datadir}/bash-completion \
     ${datadir}/fonts \

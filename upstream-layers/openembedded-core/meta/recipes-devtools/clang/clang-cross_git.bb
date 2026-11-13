@@ -9,6 +9,9 @@ SECTION = "devel"
 
 PN = "clang-cross-${TARGET_ARCH}"
 
+# Ignore how TARGET_ARCH is computed.
+TARGET_ARCH[vardepvalue] = "${TARGET_ARCH}"
+
 inherit cross
 
 DEPENDS = "clang-native virtual/cross-binutils ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', 'lld-native', '', d)}"

@@ -18,7 +18,7 @@ Handle this case by checking HWCAP for SVE support, and skipping the
 test unless we know it is available.  This check is Linux-specific at
 present, but the logic is easily extended.
 
-Upstream-Status: Backport
+Upstream-Status: Backport [c8499e99dc7422a31c126f2954c8150c62d8a017]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  tests/Garm64-test-sve-signal.c | 19 +++++++++++++++++++

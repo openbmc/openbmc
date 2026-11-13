@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From a729216a3fbc4d9eda9cbacd8b8dc6670c797978 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg.sommer@navimatix.de>
 Date: Sat, 28 Mar 2026 20:29:53 +0100
 Subject: [PATCH] test/udatatst: Mangle /build/tmp
@@ -8,12 +8,11 @@ Content-Transfer-Encoding: 8bit
 This string matches $TMPDIR (in a kas-container) which triggers the QA
 check buildpaths:
 
-ERROR: icu-78.2-r0 do_package_qa: QA Issue: File /usr/src/debug/icu/78.2/test/cintltst/udatatst.c in package icu-src contains reference to TMPDIR [buildpaths] 
+ERROR: icu-78.2-r0 do_package_qa: QA Issue: File /usr/src/debug/icu/78.2/test/cintltst/udatatst.c in package icu-src contains reference to TMPDIR [buildpaths]
 
 Signed-off-by: Jörg Sommer <joerg.sommer@navimatix.de>
----
 Upstream-Status: Inappropriate [This QA check collision of Yocto specific]
-
+---
  test/cintltst/udatatst.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

@@ -1,4 +1,4 @@
-From fe0f3729a7b6396b0d9cc54897955c1af56fc9db Mon Sep 17 00:00:00 2001
+From b41b5d85eb38efc12e17def65ff172036844c8b1 Mon Sep 17 00:00:00 2001
 From: Andreas Oberritter <obi@opendreambox.org>
 Date: Thu, 15 Mar 2012 23:17:52 +0100
 Subject: [PATCH] parted: update to version 3.1

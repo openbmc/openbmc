@@ -1,4 +1,4 @@
-From bbd0cb5705e5dff0c4ad54c957f6f6d4617ad174 Mon Sep 17 00:00:00 2001
+From b5dd7847f0bd0f527b5ff9c9f69df5cd80108287 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 10 Jun 2026 15:00:26 +0200
 Subject: [PATCH] ui/sdl2.c: force-disable SDL_HINT_VIDEO_X11_FORCE_EGL,

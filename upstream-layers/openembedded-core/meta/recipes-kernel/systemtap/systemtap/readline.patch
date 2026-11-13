@@ -1,4 +1,4 @@
-From ee20cb1c1ca0337c56087934efbd66ba30d2d5c3 Mon Sep 17 00:00:00 2001
+From 6bd6439042b9fc1155568e8a476257925424b7cb Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Mon, 13 Apr 2026 11:28:39 +0100
 Subject: [PATCH] configure: add option to enable/disable readline
@@ -18,10 +18,10 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 38 insertions(+), 29 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 6fb99da40..2ec72e85a 100644
+index 5bfc86f92..c1835ea51 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -525,38 +525,47 @@ AC_CHECK_HEADERS([rpm/rpmcrypto.h], [
+@@ -526,38 +526,47 @@ AC_CHECK_HEADERS([rpm/rpmcrypto.h], [
                        have_rpmcrypto_h=yes
  		      AC_MSG_NOTICE([separate rpm/rpmcrypto.h])])
  

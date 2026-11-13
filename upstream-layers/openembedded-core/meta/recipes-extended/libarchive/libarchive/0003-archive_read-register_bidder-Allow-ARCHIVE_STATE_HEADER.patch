@@ -1,0 +1,29 @@
+From de3e8eb0219dbe21c805cc03f1aa25b4f19dcb8a Mon Sep 17 00:00:00 2001
+From: Davide Beatrici <git@davidebeatrici.dev>
+Date: Tue, 25 Aug 2026 22:39:08 +0000
+Subject: [PATCH] __archive_read_register_bidder(): Allow ARCHIVE_STATE_HEADER
+
+This allows formats to apply filters when they know what they need.
+
+In the case of RPM, that's after parsing the (uncompressed) header.
+
+Upstream-Status: Submitted [https://github.com/libarchive/libarchive/pull/2846 commit 84b6ba6f4ac5]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ libarchive/archive_read.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libarchive/archive_read.c b/libarchive/archive_read.c
+index 6235d66..66bd4e8 100644
+--- a/libarchive/archive_read.c
++++ b/libarchive/archive_read.c
+@@ -1325,7 +1325,8 @@ __archive_read_register_bidder(struct archive_read *a,
+ 	int i, number_slots;
+ 
+ 	archive_check_magic(&a->archive, ARCHIVE_READ_MAGIC,
+-	    ARCHIVE_STATE_NEW, "__archive_read_register_bidder");
++	    ARCHIVE_STATE_NEW | ARCHIVE_STATE_HEADER,
++		"__archive_read_register_bidder");
+ 
+ 	number_slots = sizeof(a->bidders) / sizeof(a->bidders[0]);
+ 

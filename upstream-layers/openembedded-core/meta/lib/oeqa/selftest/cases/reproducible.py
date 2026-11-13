@@ -229,7 +229,7 @@ class ReproducibleTests(OESelftestTestCase):
         bb.utils.mkdirhier(os.path.dirname(dest))
         shutil.copyfile(source, dest)
 
-    def do_test_build(self, name, use_sstate):
+    def do_test_build(self, name, use_sstate, use_faketime, libfaketime_sysroot):
         capture_vars = ['DEPLOY_DIR_' + c.upper() for c in self.package_classes]
 
         tmpdir = os.path.join(self.topdir, name, 'tmp')
@@ -295,7 +295,17 @@ class ReproducibleTests(OESelftestTestCase):
         d = get_bb_vars(capture_vars)
         try:
             # targets used to be called images
-            bitbake("--continue "+' '.join(getattr(self, 'images', self.targets)))
+            targets = ' '.join(getattr(self, 'images', self.targets))
+            if use_faketime:
+                # 397 days: one year and 31/32 days: this will always be a
+                # different year, month and day of week.
+                # 2 hours, 2 minutes and 2 seconds: different values, even if we
+                # have some DST or leap second involved.
+                timespecs = "+397days +2hours +2minutes +2seconds"
+                runCmd(f"faketime '{timespecs}' bitbake --continue {targets}",
+                       native_sysroot=libfaketime_sysroot)
+            else:
+                bitbake(f"--continue {targets}")
         except AssertionError as e:
             bitbake_failure_count += 1
             self.logger.error("Bitbake failed! but keep going... Log:")
@@ -320,9 +330,10 @@ class ReproducibleTests(OESelftestTestCase):
 
         # Build native utilities
         self.write_config('')
-        bitbake("diffoscope-native diffutils-native -c addto_recipe_sysroot")
+        bitbake("diffoscope-native diffutils-native libfaketime-native -c addto_recipe_sysroot")
         diffutils_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "diffutils-native")
         diffoscope_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "diffoscope-native")
+        libfaketime_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "libfaketime-native")
 
         if self.save_results:
             os.makedirs(self.save_results, exist_ok=True)
@@ -338,10 +349,13 @@ class ReproducibleTests(OESelftestTestCase):
         fails = []
         vars_list = [None, None]
 
-        for i, (name, use_sstate) in enumerate(
-                                 (('reproducibleA', self.build_from_sstate),
-                                 ('reproducibleB-extended', False))):
-            (variables, bitbake_failure_count) = self.do_test_build(name, use_sstate)
+        for i, (name, use_sstate, use_faketime) in enumerate(
+                                 (('reproducibleA', self.build_from_sstate, False),
+                                 ('reproducibleB-extended', False, True))):
+            (variables, bitbake_failure_count) = self.do_test_build(name,
+                                                                    use_sstate,
+                                                                    use_faketime,
+                                                                    libfaketime_sysroot)
             if bitbake_failure_count > 0:
                 self.logger.error('%s build failed. Trying to compute built packages differences but the test will fail.' % name)
                 fails.append("Bitbake %s failure" % name)

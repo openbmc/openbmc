@@ -1,4 +1,8 @@
-Ensure that directories are created before files are compiled into them.
+From a0aad59e068b6ed852db38cf26c5d862ce0ec2ab Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 5 Mar 2026 11:51:30 +0000
+Subject: [PATCH] Ensure that directories are created before files are compiled
+ into them.
 
 This is a hacky workaround, upstream have been informed and a better
 solution proposed:
@@ -7,12 +11,15 @@ https://lists.apache.org/thread/nr0w8hcpr9my2gkys09kj89rlxgd84of
 
 Upstream-Status: Inappropriate [discussion upstream]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ Makefile.in | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git i/Makefile.in w/Makefile.in
-index 0fb9e39602..8bae2cc3d2 100644
---- i/Makefile.in
-+++ w/Makefile.in
-@@ -424,7 +424,9 @@ ECHO_N = @ECHO_N@
+diff --git a/Makefile.in b/Makefile.in
+index 983f3d1..bea3a35 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -419,7 +419,9 @@ ECHO_N = @ECHO_N@
  
  TESTS = $(TEST_PROGRAMS) @BDB_TEST_PROGRAMS@
  

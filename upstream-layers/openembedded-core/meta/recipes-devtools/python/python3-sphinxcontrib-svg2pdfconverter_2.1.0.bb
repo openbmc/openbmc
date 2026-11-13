@@ -9,8 +9,6 @@ inherit pypi python_setuptools_build_meta
 
 DEPENDS += "python3-wheel-native"
 
-PYPI_PACKAGE = "sphinxcontrib_svg2pdfconverter"
-
 RDEPENDS:${PN} = "python3-sphinx"
 # Only support sphinxcontrib.rsvgconverter for now.
 # sphinxcontrib.cairosvgconverter depends on cairosvg module, no recipe yet

@@ -10,7 +10,7 @@ SECTION = "libs"
 
 PV = "1.2.3"
 SRCREV = "f4385255be1615688c6a5f042277304d7ab288b1"
-SRC_URI = "git://github.com/void-linux/musl-obstack;branch=master;protocol=https"
+SRC_URI = "git://github.com/void-linux/musl-obstack;branch=master;protocol=https;tag=v${PV}"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

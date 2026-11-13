@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 		    file://COPYING.LIB;md5=e3eda01d9815f8d24aae2dbd89b68b06"
 
 SRC_URI = "git://github.com/stevegrubb/libcap-ng.git;protocol=https;branch=master;tag=v${PV}"
-SRCREV = "9ae44402f4c405f08b9dd5ec070127d0d92afee4"
+SRCREV = "c382c641ca5730442289c09d3c3d30cc2c8635a9"
 
 inherit lib_package autotools pkgconfig bash-completion
 

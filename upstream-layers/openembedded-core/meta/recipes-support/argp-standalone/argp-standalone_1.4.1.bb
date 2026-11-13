@@ -8,7 +8,7 @@ LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://argp.h;beginline=1;endline=20;md5=464f2cfb1c35a5123f9e309d7afd79f8"
 SECTION = "libs"
 
-SRC_URI = "git://github.com/ericonr/argp-standalone;branch=master;protocol=https \
+SRC_URI = "git://github.com/ericonr/argp-standalone;branch=master;protocol=https;tag=${PV} \
            file://out_of_tree_build.patch \
           "
 SRCREV = "e5fe9ad9e83e6765cf8fa787f903d4c6792338b5"

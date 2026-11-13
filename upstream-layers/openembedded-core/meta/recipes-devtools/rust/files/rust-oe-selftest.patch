@@ -280,10 +280,13 @@ index 89c61cd..144ea0e 100644
  use std::process::ExitCode;
 
  // A note about jemalloc: rustc uses jemalloc when built for CI and
-@@ -41,6 +41,7 @@
- #[cfg(feature = "jemalloc")]
- use tikv_jemalloc_sys as _;
-
+@@ -34,8 +34,10 @@
+ // to compare their performance, see
+ // https://github.com/rust-lang/rust/commit/b90cfc887c31c3e7a9e6d462e2464db1fe506175#diff-43914724af6e464c1da2171e4a9b6c7e607d5bc1203fa95c0ab85be4122605ef
+ // for an example of how to do so.
++#[cfg(not(test))]
+ rustc_driver::override_c_allocator_in_binary!();
+ 
 +#[cfg(not(test))]
  fn main() -> ExitCode {
      rustc_driver::main()
@@ -292,13 +295,12 @@ diff --git a/tests/ui/c-variadic/same-program-multiple-abis-arm.rs b/tests/ui/c-
 index fbc5573..f259529 100644
 --- a/tests/ui/c-variadic/same-program-multiple-abis-arm.rs
 +++ b/tests/ui/c-variadic/same-program-multiple-abis-arm.rs
-@@ -1,5 +1,6 @@
+@@ -1,4 +1,5 @@
  //@ run-pass
  //@ only-arm
 +//@ ignore-arm
  //@ ignore-thumb (this test uses arm assembly)
  //@ only-eabihf (the assembly below requires float hardware support)
- #![feature(c_variadic, c_variadic_naked_functions)]
 diff --git a/compiler/rustc_interface/src/tests.rs b/compiler/rustc_interface/src/tests.rs
 index ab69cf5..f0e3fd3 100644
 --- a/compiler/rustc_interface/src/tests.rs

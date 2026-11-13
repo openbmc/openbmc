@@ -24,6 +24,7 @@ SRC_URI = "git://github.com/avahi/avahi;protocol=https;branch=master;tag=v0.9-rc
            file://avahi-daemon.in \
            file://avahi-dnsconfd.in \
            file://0001-Fix-opening-etc-resolv.conf-error.patch \
+           file://run-ptest \
            "
 
 PV = "0.9~rc5"
@@ -47,7 +48,7 @@ PACKAGECONFIG[libevent] = "--enable-libevent,--disable-libevent,libevent"
 PACKAGECONFIG[systemd] = "--enable-libsystemd,--disable-libsystemd --without-systemdsystemunitdir,systemd"
 PACKAGECONFIG[qt5] = "--enable-qt5,--disable-qt5,qtbase"
 
-inherit autotools pkgconfig gettext gobject-introspection github-releases
+inherit autotools pkgconfig gettext gobject-introspection github-releases ptest
 
 EXTRA_OECONF = " \
              --runstatedir=${runtimedir} \
@@ -62,6 +63,7 @@ EXTRA_OECONF = " \
              --disable-python \
              --disable-doxygen-doc \
              --disable-manpages \
+             --enable-tests \
              ${EXTRA_OECONF_SYSVINIT} \
            "
 
@@ -78,6 +80,28 @@ do_compile:prepend() {
 }
 
 RRECOMMENDS:${PN}:append:libc-glibc = " avahi-libnss-mdns"
+
+AVAHI_PTESTS = " \
+    avahi-common/strlst-test \
+    avahi-common/domain-test \
+    avahi-common/alternative-test \
+    avahi-common/timeval-test \
+    avahi-common/utf8-test \
+    avahi-core/dns-spin-test \
+    avahi-core/dns-test \
+    avahi-core/hashmap-test \
+"
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+    for t in ${AVAHI_PTESTS}; do
+        ${B}/libtool --mode=install install -m 0755 ${B}/$t \
+            ${D}${PTEST_PATH}/tests/$(basename $t)
+    done
+}
+
+RDEPENDS:${PN}-ptest += "libavahi-common libavahi-core"
+RDEPENDS:${PN}-ptest:remove = "${PN}"
 
 do_install() {
 	autotools_do_install

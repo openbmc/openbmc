@@ -53,6 +53,7 @@ test_disallowlist="${test_disallowlist} system-override-sig"
 test_disallowlist="${test_disallowlist} system-override-sig-tls"
 test_disallowlist="${test_disallowlist} system-prio-file"
 test_disallowlist="${test_disallowlist} x509cert-tl"
+test_disallowlist="${test_disallowlist} @EXTRA_TEST_DISALLOWLIST@"
 
 LOG=${PWD}/tests.log
 cd tests

@@ -21,7 +21,6 @@ RDEPENDS:${PN} = " \
     python3-ctypes \
     python3-io \
     python3-pycparser \
-    python3-setuptools \
     python3-shell \
 "
 
@@ -29,6 +28,7 @@ RDEPENDS:${PN}-ptest += " \
     python3-pytest \
     python3-unittest-automake-output \
     python3-dev \
+    python3-setuptools \
     gcc-symlinks \
     g++-symlinks \
 "

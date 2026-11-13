@@ -48,6 +48,9 @@ BAREBOX_BUILDSYSTEM_VERSION ??= "${@get_layer_rev(os.path.dirname(d.getVar('FILE
 BAREBOX_FIRMWARE_DIR[doc] = "Overwrite barebox' firmware blobs search directory (CONFIG_EXTRA_FIRMWARE_DIR) with this path, default ${B}/firmware"
 BAREBOX_FIRMWARE_DIR ??= "${B}/firmware"
 
+BAREBOX_INSTALL_DTB[doc] = "Install dtb files from barebox into sysroot. By default, this variable is set to '0'."
+BAREBOX_INSTALL_DTB ??= "0"
+
 EXTRA_OEMAKE = " \
     ARCH=${@oe.kernel.map_kernel_arch(d)} CROSS_COMPILE=${TARGET_PREFIX} -C ${S} O=${B} \
     BUILDSYSTEM_VERSION=${BAREBOX_BUILDSYSTEM_VERSION} \
@@ -137,6 +140,10 @@ barebox_do_install () {
                 for image in $(cat ${B}/barebox-flash-images); do
                         install -m 644 ${B}/${image} ${D}${BAREBOX_INSTALL_PATH}/
                 done
+        fi
+
+        if [ "${BAREBOX_INSTALL_DTB}" = "1" ]; then
+                make dtbs_install INSTALL_DTBS_PATH=${D}/sysroot-only/
         fi
 }
 FILES:${PN} = "${BAREBOX_INSTALL_PATH}"

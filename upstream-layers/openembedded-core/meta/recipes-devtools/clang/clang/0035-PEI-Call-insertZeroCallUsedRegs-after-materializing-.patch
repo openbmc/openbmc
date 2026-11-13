@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lucas Chollet <lucas.chollet@free.fr>
+Date: Thu, 3 Sep 2026 21:31:08 +0200
+Subject: [PATCH] [PEI] Call insertZeroCallUsedRegs after materializing registers
+ (#214147)
+
+As insertZeroCallUsedRegs only operates on physical registers, we need
+to call after all registers are materialized, so after
+scavengeFrameVirtualRegs.
+
+This fixes a crash that occurs when virtual registers reach
+insertZeroCallUsedRegs. Virtual registers can be introduced during the
+pass by emit{Prologue,Epilogue}. For example, RISC-V uses a virtual
+register to hold the size of a large alloca.
+
+Upstream-Status: Backport [https://github.com/llvm/llvm-project/commit/7a27b9779e73d3bcb0cf2deb1f74f68ec725595b]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ llvm/lib/CodeGen/PrologEpilogInserter.cpp      |  5 ++---
+ llvm/test/CodeGen/RISCV/zero-call-used-regs.ll | 17 +++++++++++++++++
+ 2 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/llvm/lib/CodeGen/PrologEpilogInserter.cpp b/llvm/lib/CodeGen/PrologEpilogInserter.cpp
+index 43c7e89..d3ad107 100644
+--- a/llvm/lib/CodeGen/PrologEpilogInserter.cpp
++++ b/llvm/lib/CodeGen/PrologEpilogInserter.cpp
+@@ -285,6 +285,8 @@ bool PEIImpl::run(MachineFunction &MF) {
+   if (TRI->requiresRegisterScavenging(MF) && FrameIndexVirtualScavenging)
+     scavengeFrameVirtualRegs(MF, *RS);
+ 
++  insertZeroCallUsedRegs(MF);
++
+   // Warn on stack size when we exceeds the given limit.
+   MachineFrameInfo &MFI = MF.getFrameInfo();
+   uint64_t StackSize = MFI.getStackSize();
+@@ -1179,9 +1181,6 @@ void PEIImpl::insertPrologEpilogCode(MachineFunction &MF) {
+   for (MachineBasicBlock *RestoreBlock : RestoreBlocks)
+     TFI.emitEpilogue(MF, *RestoreBlock);
+ 
+-  // Zero call used registers before restoring callee-saved registers.
+-  insertZeroCallUsedRegs(MF);
+-
+   for (MachineBasicBlock *SaveBlock : SaveBlocks)
+     TFI.inlineStackProbe(MF, *SaveBlock);
+ 
+diff --git a/llvm/test/CodeGen/RISCV/zero-call-used-regs.ll b/llvm/test/CodeGen/RISCV/zero-call-used-regs.ll
+index 46b0cba..78198b4 100644
+--- a/llvm/test/CodeGen/RISCV/zero-call-used-regs.ll
++++ b/llvm/test/CodeGen/RISCV/zero-call-used-regs.ll
+@@ -335,5 +335,22 @@ entry:
+   ret double %mul2
+ }
+ 
++define void @huge_stack() #0 "zero-call-used-regs"="used-gpr" {
++; CHECK-LABEL: huge_stack:
++; CHECK:       # %bb.0:
++; CHECK-NEXT:    lui a0, 10
++; CHECK-NEXT:    addi a0, a0, -944
++; CHECK-NEXT:    sub sp, sp, a0
++; CHECK-NEXT:    .cfi_def_cfa_offset 40016
++; CHECK-NEXT:    lui a0, 10
++; CHECK-NEXT:    addi a0, a0, -944
++; CHECK-NEXT:    add sp, sp, a0
++; CHECK-NEXT:    .cfi_def_cfa_offset 0
++; CHECK-NEXT:    li a0, 0
++; CHECK-NEXT:    ret
++  %1 = alloca [10000 x i32], align 4
++  ret void
++}
++
+ attributes #0 = { "target-cpu"="generic" "target-features"="+m,+f,+d" }
+ attributes #1 = { "target-cpu"="generic" "target-features"="+m,+zdinx" }

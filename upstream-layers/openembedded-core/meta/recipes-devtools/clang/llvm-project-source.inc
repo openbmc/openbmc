@@ -31,14 +31,30 @@ CLANG_EXTRA_OE_DISTRO ?= "poky:poky"
 # Match with MULTILIB_GLOBAL_VARIANTS
 ML_VARIANTS = "lib32 lib64 libx32"
 
+# Insert lines before the //<anchor> comment in path. The anchor stays in
+# place and every inserted line carries a comment naming it, so a later run
+# of do_preconfigure on the same shared tree first drops what the previous
+# run inserted: the result only depends on the current configuration.
+def clang_oe_generate(path, anchor, lines):
+    anchor_comment = "//" + anchor
+    marker = "// do_preconfigure: " + anchor
+    with open(path) as f:
+        content = [line for line in f.read().split("\n") if not line.rstrip().endswith(marker)]
+    anchors = [i for i, line in enumerate(content) if line.rstrip().endswith(anchor_comment)]
+    if len(anchors) != 1:
+        bb.fatal("Expected one %s anchor in %s, found %d" % (anchor_comment, path, len(anchors)))
+    i = anchors[0]
+    indent = content[i][:len(content[i]) - len(content[i].lstrip())]
+    content[i:i] = [indent + line + " " + marker for line in lines]
+    with open(path, "w") as f:
+        f.write("\n".join(content))
+
 python do_preconfigure() {
-    import subprocess
-    case = ""
-    triple = ""
-    vendors = d.getVar('CLANG_EXTRA_OE_VENDORS')
+    source = d.getVar("S")
     multilib_variants = (d.getVar("ML_VARIANTS") or "").split()
+
     vendors_to_add = []
-    for vendor in vendors.split():
+    for vendor in (d.getVar('CLANG_EXTRA_OE_VENDORS') or "").split():
         # convert -yoe into yoe
         vendor = vendor.lstrip('-')
         # generate possible multilib vendor names for yoe
@@ -48,45 +64,34 @@ python do_preconfigure() {
         if vendor != "oe":
             vendors_to_add.append(vendor)
 
-    for vendor_to_add in vendors_to_add:
-        case += '\\n    .Case("' + vendor_to_add + '", Triple::OpenEmbedded)'
-        triple += ' "x86_64-' + vendor_to_add + '-linux",'
-
     bb.note("Adding support following TARGET_VENDOR values")
     bb.note(str(vendors_to_add))
     bb.note("in llvm/lib/TargetParser/Triple.cpp and ${S}/clang/lib/Driver/ToolChains/Gnu.cpp")
-    source = d.getVar("S")
-    cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_VENDORS_TRIPLES#%s#g' % triple, source + '/clang/lib/Driver/ToolChains/Gnu.cpp']
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_VENDORS_CASES#%s#g' % case, source + '/llvm/lib/TargetParser/Triple.cpp']
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    clang_oe_generate(source + '/llvm/lib/TargetParser/Triple.cpp', 'CLANG_EXTRA_OE_VENDORS_CASES',
+                      ['.Case("%s", Triple::OpenEmbedded)' % v for v in vendors_to_add])
+    clang_oe_generate(source + '/clang/lib/Driver/ToolChains/Gnu.cpp', 'CLANG_EXTRA_OE_VENDORS_TRIPLES',
+                      ['"x86_64-%s-linux",' % v for v in vendors_to_add])
 
-    case = ""
-    triple = ""
-    name = ""
-    check = ""
-    oe_names = []
-    distros = d.getVar('CLANG_EXTRA_OE_DISTRO')
-    for distro in distros.split():
-        distro_id_raw = distro.split(":")[0]
-        distro_id = distro_id_raw.replace('-','_')
-        distro_triple = distro.split(":")[1]
-        case += '\\n    .Case("' + distro_id_raw + '", Distro::' + distro_id.upper() + ')'
-        triple += '\\n   if (Distro.Is' + distro_id.upper() + '())\\n     return "x86_64-' + distro_triple + '-linux";'
-        name += '\\n    '+ distro_id.upper() + ','
-        check += '\\nbool Is' + distro_id.upper() + '() const { return DistroVal == ' + distro_id.upper() + '; }'
-        oe_names.append('DistroVal == ' + distro_id.upper())
+    names = []
+    checks = []
+    cases = []
+    triples = []
+    oe_checks = []
+    for distro in (d.getVar('CLANG_EXTRA_OE_DISTRO') or "").split():
+        distro_id, distro_triple = distro.split(":")
+        # the ID doubles as a C++ enumerator name
+        enum = distro_id.replace('-', '_').upper()
+        names.append(enum + ",")
+        checks.append("bool Is%s() const { return DistroVal == %s; }" % (enum, enum))
+        cases.append('.Case("%s", Distro::%s)' % (distro_id, enum))
+        triples.append('if (Distro.Is%s()) return "x86_64-%s-linux";' % (enum, distro_triple))
+        oe_checks.append("DistroVal == " + enum)
+    checks.append("bool IsOpenEmbedded() const { return %s; }" % (" || ".join(oe_checks) or "false"))
 
-    check += '\\nbool IsOpenEmbedded() const { return ' + ' || '.join(oe_names) + '; }'
-
-    cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_DISTRO_NAME#%s#g' % name, source + '/clang/include/clang/Driver/Distro.h']
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_DISTRO_CHECK#%s#g' % check, source + '/clang/include/clang/Driver/Distro.h']
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_DISTRO_TRIPLE#%s#g' % triple, source + '/clang/lib/Driver/ToolChains/Linux.cpp']
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_DISTRO_CASE#%s#g' % case, source + '/clang/lib/Driver/Distro.cpp']
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    clang_oe_generate(source + '/clang/include/clang/Driver/Distro.h', 'CLANG_EXTRA_OE_DISTRO_NAME', names)
+    clang_oe_generate(source + '/clang/include/clang/Driver/Distro.h', 'CLANG_EXTRA_OE_DISTRO_CHECK', checks)
+    clang_oe_generate(source + '/clang/lib/Driver/Distro.cpp', 'CLANG_EXTRA_OE_DISTRO_CASE', cases)
+    clang_oe_generate(source + '/clang/lib/Driver/ToolChains/Linux.cpp', 'CLANG_EXTRA_OE_DISTRO_TRIPLE', triples)
 }
 
 do_patch[vardepsexclude] += "MULTILIBS MULTILIB_VARIANTS"

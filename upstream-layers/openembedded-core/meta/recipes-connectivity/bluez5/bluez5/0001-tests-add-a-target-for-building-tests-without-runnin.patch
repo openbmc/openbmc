@@ -1,4 +1,4 @@
-From e7407ddb1b52308d4b69036da94bbd6021f0c7ab Mon Sep 17 00:00:00 2001
+From 67e885ad913ebc0a5224ec1ed09f2ed98eac8122 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 1 Apr 2016 17:07:34 +0300
 Subject: [PATCH] tests: add a target for building tests without running them
@@ -10,12 +10,12 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 76c4ab5..91a6277 100644
+index 37302ed..7efff21 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -812,6 +812,9 @@ endif
- TESTS = $(unit_tests)
- AM_TESTS_ENVIRONMENT = MALLOC_CHECK_=3 MALLOC_PERTURB_=69
+@@ -892,6 +892,9 @@ if FUNCTIONAL_TESTING
+ check: check-functional
+ endif
  
 +# This allows building tests without running them
 +buildtests: $(TESTS)

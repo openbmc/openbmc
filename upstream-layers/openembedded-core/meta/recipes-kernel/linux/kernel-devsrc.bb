@@ -158,6 +158,13 @@ do_install() {
         # Remove as we else would ned to RDEPEND on make
         rm $kerneldir/build/scripts/package/debian/rules 2>/dev/null || :
 
+        # scripts/mksysmap is a '#!/bin/sed -f' script that is only consumed by
+        # scripts/link-vmlinux.sh during a full vmlinux link. External module
+        # builds never relink vmlinux, so it is unused here. Remove it as otherwise
+        # we would need to pull sed into the package/SDK to satisfy
+        # the dependency generated via the RPM shebang dependency generator (Requires: /bin/sed).
+        rm $kerneldir/build/scripts/mksysmap 2>/dev/null || :
+
         # tools/include is needed by the archscripts host tools that
         # 'make scripts prepare' rebuilds on target (e.g. x86 vdso2c) and
 	# not checked against objtool as it previously was.

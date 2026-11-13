@@ -1069,16 +1069,23 @@ def get_recipe_upstream_version(rd, stable_upgrade=False):
     else:
         ud = bb.fetch.FetchData(src_uri, rd)
         if rd.getVar("UPSTREAM_CHECK_COMMITS") == "1":
-            bb.fetch.get_srcrev(rd)
-            upversion = None
-            revision = None
-            try:
-                revision = ud.method.latest_revision(ud, rd, ud.name)
+            if stable_upgrade:
+                # UPSTREAM_CHECK_COMMITS recipes only track git HEAD, not a
+                # version number, so there's no way to filter for a "stable"
+                # release; treat as no update available.
                 upversion = pv
-                if revision != ud.revision:
-                    upversion = upversion + "-new-commits-available"
-            except bb.fetch.FetchError as e:
-                bb.warn("Unable to obtain latest revision: {}".format(e))
+                revision = None
+            else:
+                bb.fetch.get_srcrev(rd)
+                upversion = None
+                revision = None
+                try:
+                    revision = ud.method.latest_revision(ud, rd, ud.name)
+                    upversion = pv
+                    if revision != ud.revision:
+                        upversion = upversion + "-new-commits-available"
+                except bb.fetch.FetchError as e:
+                    bb.warn("Unable to obtain latest revision: {}".format(e))
         else:
             if stable_upgrade:
                 stable_release_regex = rd.getVar("UPSTREAM_STABLE_RELEASE_REGEX")

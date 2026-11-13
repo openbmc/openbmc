@@ -1,4 +1,4 @@
-From 8ded32a35287a840de7e505c66e76cccd9edbac6 Mon Sep 17 00:00:00 2001
+From 0535ba354ed82144695178d3831f2db7e7945be4 Mon Sep 17 00:00:00 2001
 From: "Krishnanjanappa, Jagadeesh"
  <jagadeesh.krishnanjanappa@caviumnetworks.com>
 Date: Wed, 8 Apr 2015 18:08:14 +0530
@@ -34,7 +34,7 @@ Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/data/tupletable b/data/tupletable
-index ae9f2ddb4..7436f8056 100644
+index 7c306d497962..bc1fcc5ab808 100644
 --- a/data/tupletable
 +++ b/data/tupletable
 @@ -27,6 +27,7 @@ eabihf-musl-linux-arm		musl-linux-armhf

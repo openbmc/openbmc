@@ -16,8 +16,6 @@ inherit pypi python_flit_core
 DEPENDS:remove:class-native = " python3-build-native python3-installer-native"
 DEPENDS:append:class-native = " unzip-native"
 
-PYPI_PACKAGE = "flit_core"
-
 do_compile:class-native () {
     python_flit_core_do_manual_build
 }

@@ -5,7 +5,16 @@
 #
 
 def gnome_verdir(v):
-    return ".".join(v.split(".")[:-1]) or v
+    # Upstream treats a major of 40+ as a flag day to switch between major.minor
+    # versioned directories, or just major.
+    # See get_majmin() in
+    # https://gitlab.gnome.org/Infrastructure/openshift-images/gnome-release-service/-/blob/main/gnome_release_service/gnome_release_system/utils.py
+    parts = v.split(".")
+    major = int(parts[0])
+    if major >= 40:
+        return major
+    else:
+        return ".".join(parts[:2])
 
 
 GNOME_COMPRESS_TYPE ?= "xz"

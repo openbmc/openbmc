@@ -1,4 +1,4 @@
-From 89c83185e757ddaeb0262c17a10f605056f53916 Mon Sep 17 00:00:00 2001
+From 725ae507600f409cc7736a823fe6babdfcf210ad Mon Sep 17 00:00:00 2001
 From: Jiaying Song <jiaying.song.cn@windriver.com>
 Date: Fri, 23 May 2025 15:17:49 +0800
 Subject: [PATCH] syscalls/semctl08: Skip semctl08 when __USE_TIME64_REDIRECTS
@@ -16,13 +16,13 @@ Upstream-Status: Submitted [https://lists.linux.it/pipermail/ltp/2025-May/043647
 
 Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
 ---
- testcases/kernel/syscalls/ipc/semctl/semctl08.c | 8 +++++---
+ testcases/kernel/syscalls/semctl/semctl08.c | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/testcases/kernel/syscalls/ipc/semctl/semctl08.c b/testcases/kernel/syscalls/ipc/semctl/semctl08.c
+diff --git a/testcases/kernel/syscalls/semctl/semctl08.c b/testcases/kernel/syscalls/semctl/semctl08.c
 index 083179c92..a98eb35d6 100644
---- a/testcases/kernel/syscalls/ipc/semctl/semctl08.c
-+++ b/testcases/kernel/syscalls/ipc/semctl/semctl08.c
+--- a/testcases/kernel/syscalls/semctl/semctl08.c
++++ b/testcases/kernel/syscalls/semctl/semctl08.c
 @@ -12,7 +12,11 @@
  #include "tst_test.h"
  #include "tse_newipc.h"

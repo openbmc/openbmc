@@ -1,0 +1,51 @@
+From cda383625f5d1fd06657fb998b7d1370a7fabd8f Mon Sep 17 00:00:00 2001
+Message-ID: <cda383625f5d1fd06657fb998b7d1370a7fabd8f.1791114851.git.marcel@ziswiler.com>
+From: Icenowy Zheng <zhengxingda@iscas.ac.cn>
+Date: Wed, 30 Sep 2026 14:10:14 +0800
+Subject: [PATCH] gallivm: adapt for JITLink in LLVM 23
+
+In LLVM 23, the ObjectLinkingLayerCreator callback now takes an
+additional memory manager argument.
+
+Adapt for this API change.
+
+This argument eliminates the need to create a InProcessMemoryManager
+by ourselves so a dedicated implementation is added.
+
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16325
+Signed-off-by: Icenowy Zheng <zhengxingda@iscas.ac.cn>
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16325]
+---
+ src/gallium/auxiliary/gallivm/lp_bld_init_orc.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/gallium/auxiliary/gallivm/lp_bld_init_orc.cpp b/src/gallium/auxiliary/gallivm/lp_bld_init_orc.cpp
+index 09d56e543ee..bc9d7837ecd 100644
+--- a/src/gallium/auxiliary/gallivm/lp_bld_init_orc.cpp
++++ b/src/gallium/auxiliary/gallivm/lp_bld_init_orc.cpp
+@@ -346,6 +346,13 @@ LPJit::LPJit() :jit_dylib_count(0) {
+          .setJITTargetMachineBuilder(std::move(JTMB))
+ #ifdef USE_JITLINK
+          .setObjectLinkingLayerCreator(
++#if LLVM_VERSION_MAJOR >= 23
++            /* LLVM 23 added a JITLinkMemoryManager argument, use it as our
++             * JITLinkMemoryManager. */
++            [&](ExecutionSession &ES, llvm::jitlink::JITLinkMemoryManager &MM) {
++               return std::make_unique<ObjectLinkingLayer>(ES, MM);
++            })
++#else
+ #if LLVM_VERSION_MAJOR >= 21
+             /* LLVM 21 removed the Triple argument */
+             [&](ExecutionSession &ES) {
+@@ -355,6 +362,7 @@ LPJit::LPJit() :jit_dylib_count(0) {
+                return std::make_unique<ObjectLinkingLayer>(
+                   ES, ExitOnErr(llvm::jitlink::InProcessMemoryManager::Create()));
+             })
++#endif
+ #else
+ #if LLVM_USE_INTEL_JITEVENTS
+          .RegisterJITEventListener(
+-- 
+2.52.0
+

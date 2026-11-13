@@ -1,0 +1,40 @@
+#!/bin/sh
+
+cd "$(dirname "$0")/tests" || exit 1
+
+PATCH="$(command -v patch)"
+srcdir="."
+abs_top_builddir="$(cd .. && pwd)"
+export PATCH srcdir abs_top_builddir
+
+XFAIL_TESTS="dash-o-append context-format"
+
+is_xfail() {
+    for x in $XFAIL_TESTS; do
+        [ "$1" = "$x" ] && return 0
+    done
+    return 1
+}
+
+for t in *; do
+    [ -f "$t" ] || continue
+    [ "$t" = "test-lib.sh" ] && continue
+
+    sh "$t"
+    rc=$?
+
+    if is_xfail "$t"; then
+        if [ "$rc" -eq 0 ]; then
+            echo "FAIL: $t (unexpected pass)"
+        else
+            echo "PASS: $t (expected failure)"
+        fi
+        continue
+    fi
+
+    case "$rc" in
+        0)  echo "PASS: $t" ;;
+        77) echo "SKIP: $t" ;;
+        *)  echo "FAIL: $t" ;;
+    esac
+done

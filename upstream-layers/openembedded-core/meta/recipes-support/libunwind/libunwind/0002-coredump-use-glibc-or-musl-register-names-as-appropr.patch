@@ -10,7 +10,7 @@ Handle this by using a macro to use the correct names.
 
 Closes #708.
 
-Upstream-Status: Backport
+Upstream-Status: Backport [df0807c1c2302c364c281d3d1109ddc10c9c7b19]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  src/coredump/_UCD_access_reg_linux.c | 69 ++++++++++++++++------------

@@ -249,5 +249,6 @@ do_deploy:class-target() {
     fi
 }
 addtask do_deploy after do_compile before do_build
+SPDX_DEPLOY_ALLOW_EMPTY:task-deploy = "1"
 
 BBCLASSEXTEND = "native"

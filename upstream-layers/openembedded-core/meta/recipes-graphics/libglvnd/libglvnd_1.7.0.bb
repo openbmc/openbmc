@@ -5,7 +5,7 @@ HOMEPAGE = "https://gitlab.freedesktop.org/glvnd/libglvnd"
 LICENSE = "MIT AND BSD-1-Clause AND BSD-3-Clause AND GPL-3.0-or-later WITH Autoconf-exception-macro"
 LIC_FILES_CHKSUM = "file://README.md;beginline=323;md5=7ac5f0111f648b92fe5427efeb08e8c4"
 
-SRC_URI = "git://gitlab.freedesktop.org/glvnd/libglvnd.git;protocol=https;branch=master"
+SRC_URI = "git://gitlab.freedesktop.org/glvnd/libglvnd.git;protocol=https;branch=master;tag=v${PV}"
 
 SRCREV = "faa23f21fc677af5792825dc30cb1ccef4bf33a6"
 

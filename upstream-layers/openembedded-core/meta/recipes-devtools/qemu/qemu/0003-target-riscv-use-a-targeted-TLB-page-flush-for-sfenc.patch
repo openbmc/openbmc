@@ -1,8 +1,8 @@
-From 858d6d9a587e4ed44f92e017375c5265bc40934b Mon Sep 17 00:00:00 2001
+From e53b203900cd5d04ac938b1ff4643667b6b63efa Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Mon, 24 Aug 2026 17:55:00 +0000
-Subject: [PATCH 3/3] target/riscv: use a targeted TLB page flush for
- sfence.vma with a vaddr operand
+Subject: [PATCH] target/riscv: use a targeted TLB page flush for sfence.vma
+ with a vaddr operand
 
 sfence.vma unconditionally called helper_tlb_flush(), regardless of the
 rs1 (vaddr) and rs2 (asid) operands, forcing a page-table walk on the
@@ -26,10 +26,10 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/target/riscv/tcg/insn_trans/trans_privileged.c.inc b/target/riscv/tcg/insn_trans/trans_privileged.c.inc
-index a8eaccef67..8655fa332e 100644
+index ebbbb0117..2b1bb83bf 100644
 --- a/target/riscv/tcg/insn_trans/trans_privileged.c.inc
 +++ b/target/riscv/tcg/insn_trans/trans_privileged.c.inc
-@@ -155,7 +155,11 @@ static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
+@@ -156,7 +156,11 @@ static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
  {
  #ifndef CONFIG_USER_ONLY
      decode_save_opc(ctx, 0);
@@ -42,6 +42,3 @@ index a8eaccef67..8655fa332e 100644
      return true;
  #endif
      return false;
--- 
-2.55.0
-

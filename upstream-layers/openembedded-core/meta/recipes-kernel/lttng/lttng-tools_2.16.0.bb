@@ -72,6 +72,7 @@ SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://disable-tests2.patch \
            file://0001-m4-ax_am_macros_static.m4-do-not-write-generation-da.patch \
            file://muslfix.patch \
+           file://0001-tests-honour-LTTNG_TOOLS_DISABLE_KERNEL_TESTS.patch \
            "
 
 SRC_URI[sha256sum] = "b8b3244894e49e773d4942b8899f768057974edf75c18dbb48b65bb123c7b2c7"

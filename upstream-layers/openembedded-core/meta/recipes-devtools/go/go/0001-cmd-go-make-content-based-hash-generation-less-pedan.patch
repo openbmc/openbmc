@@ -108,7 +108,7 @@ index 8dcf324529f5..617b7ece73f0 100644
  	}
  
  	// Configuration specific to compiler toolchain.
-@@ -2838,8 +2840,25 @@ func envList(key, def string) []string {
+@@ -2839,8 +2841,25 @@ func envList(key, def string) []string {
  	return args
  }
  
@@ -135,7 +135,7 @@ index 8dcf324529f5..617b7ece73f0 100644
  	if cppflags, err = buildFlags("CPPFLAGS", "", p.CgoCPPFLAGS, checkCompilerFlags); err != nil {
  		return
  	}
-@@ -2855,6 +2874,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
+@@ -2856,6 +2875,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
  	if ldflags, err = buildFlags("LDFLAGS", DefaultCFlags, p.CgoLDFLAGS, checkLinkerFlags); err != nil {
  		return
  	}
@@ -149,7 +149,7 @@ index 8dcf324529f5..617b7ece73f0 100644
  
  	return
  }
-@@ -2943,7 +2969,7 @@ func (b *Builder) runCgo(ctx context.Context, a *Action) error {
+@@ -2944,7 +2970,7 @@ func (b *Builder) runCgo(ctx context.Context, a *Action) error {
  	cgoExe := base.Tool("cgo")
  	cgofiles = mkAbsFiles(p.Dir, cgofiles)
  
@@ -158,7 +158,7 @@ index 8dcf324529f5..617b7ece73f0 100644
  	if err != nil {
  		return err
  	}
-@@ -3501,7 +3527,7 @@ func (b *Builder) swigOne(a *Action, file, objdir string, pcCFLAGS []string, cxx
+@@ -3502,7 +3528,7 @@ func (b *Builder) swigOne(a *Action, file, objdir string, pcCFLAGS []string, cxx
  	p := a.Package
  	sh := b.Shell(a)
  

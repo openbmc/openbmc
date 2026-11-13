@@ -121,6 +121,12 @@ class CachedPath(object):
     def lstat(self, path):
         return self.calllstat(path)
 
+    def is_executable(self, path):
+        """
+        Test if the file has any executable bits set.
+        """
+        return bool(self.stat(path).st_mode & (statmod.S_IXUSR | statmod.S_IXGRP | statmod.S_IXOTH))
+
     def walk(self, top, topdown=True, onerror=None, followlinks=False):
         # Matches os.walk, not os.path.walk()
 

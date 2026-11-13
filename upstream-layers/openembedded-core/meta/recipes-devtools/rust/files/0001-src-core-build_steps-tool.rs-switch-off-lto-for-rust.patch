@@ -18,35 +18,33 @@ Upstream-Status: Inappropriate [reported at https://github.com/rust-lang/rust/is
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
 ---
- src/bootstrap/src/core/build_steps/tool.rs | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/bootstrap/src/core/build_steps/tool.rs | 19 +++----------------
+ src/bootstrap/src/core/builder/mod.rs      |  2 +-
+ 2 files changed, 4 insertions(+), 17 deletions(-)
 
-diff --git a/src/bootstrap/src/core/build_steps/tool.rs b/src/bootstrap/src/core/build_steps/tool.rs
-index 087df2f8a..00790affb 100644
 --- a/src/bootstrap/src/core/build_steps/tool.rs
 +++ b/src/bootstrap/src/core/build_steps/tool.rs
-@@ -13,14 +13,12 @@ use std::ffi::OsStr;
+@@ -13,14 +13,13 @@
  use std::path::{Path, PathBuf};
  use std::{env, fs};
-
+ 
 -use crate::core::build_steps::compile::is_lto_stage;
  use crate::core::build_steps::toolstate::ToolState;
  use crate::core::build_steps::{compile, llvm};
- use crate::core::builder;
--use crate::core::builder::{
--    Builder, Cargo as CargoCommand, RunConfig, ShouldRun, Step, StepMetadata, cargo_profile_var,
--};
--use crate::core::config::{DebuginfoLevel, RustcLto, TargetSelection};
-+
-+use crate::core::builder::{Builder, Cargo as CargoCommand, RunConfig, ShouldRun, Step, StepMetadata};
-+use crate::core::config::{DebuginfoLevel, TargetSelection};
+ use crate::core::builder::{
+     self, Builder, Cargo as CargoCommand, CommandLineStep, Kind, RunConfig, ShouldRun, Step,
+-    StepMetadata, apply_pgo, cargo_profile_var,
++    StepMetadata, apply_pgo,
+ };
+-use crate::core::config::{Allocator, DebuginfoLevel, RustcLto, TargetSelection};
++use crate::core::config::{Allocator, DebuginfoLevel, TargetSelection};
  use crate::utils::exec::{BootstrapCommand, command};
- use crate::utils::helpers::{add_dylib_path, exe, t};
- use crate::{Compiler, FileType, Kind, Mode};
-@@ -121,22 +118,7 @@ impl Step for ToolBuild {
+ use crate::utils::helpers::{self, add_dylib_path, exe, t};
+ use crate::{Compiler, FileType, Mode};
+@@ -117,21 +116,7 @@
              cargo.env("RUSTC_WRAPPER", ccache);
          }
-
+ 
 -        // RustcPrivate tools (miri, clippy, rustfmt, rust-analyzer) and cargo
 -        // could use the additional optimizations.
 -        if is_lto_stage(&self.build_compiler)
@@ -62,21 +60,18 @@ index 087df2f8a..00790affb 100644
 -                cargo.env(cargo_profile_var("LTO", &builder.config, self.mode), lto);
 -            }
 -        }
--
 +        cargo.rustflag("-Clto=off");
-         if !self.allow_features.is_empty() {
-             cargo.allow_features(self.allow_features);
-         }
-diff --git a/src/bootstrap/src/core/builder/mod.rs b/src/bootstrap/src/core/builder/mod.rs
-index 1234567..abcdefg 100644
+ 
+         let pgo_config = match self.path {
+             "src/tools/rustdoc" => Some(&builder.config.rustdoc_pgo),
 --- a/src/bootstrap/src/core/builder/mod.rs
 +++ b/src/bootstrap/src/core/builder/mod.rs
-@@ -13,7 +13,7 @@ use clap::ValueEnum;
+@@ -13,7 +13,7 @@
  #[cfg(feature = "tracing")]
  use tracing::instrument;
  
--pub use self::cargo::{Cargo, cargo_profile_var};
-+pub use self::cargo::Cargo;
+-pub use self::cargo::{Cargo, apply_pgo, cargo_profile_var};
++pub use self::cargo::{Cargo, apply_pgo};
  pub use crate::Compiler;
- use crate::core::build_steps::compile::{Std, StdLink};
+ use crate::core::build_steps::compile::{Std, StdLink, looks_like_codegen_backend};
  use crate::core::build_steps::tool::RustcPrivateCompilers;

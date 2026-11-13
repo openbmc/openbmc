@@ -28,6 +28,7 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-libtool \
     nativesdk-pkgconfig \
     nativesdk-glibc-utils \
+    nativesdk-ldd \
     nativesdk-glibc-gconvs \
     nativesdk-libxcrypt-dev \
     "

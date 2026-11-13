@@ -166,6 +166,10 @@ class QemuRunner:
         if self.tmpfsdir:
             env["RUNQEMU_TMPFS_DIR"] = self.tmpfsdir
 
+        if self.native_sysroot:
+            # Needed by runqemu-export-rootfs (avoid a second tinfoil connection)
+            env["OECORE_NATIVE_SYSROOT"] = self.native_sysroot
+
         if not launch_cmd:
             launch_cmd = 'runqemu %s' % ('snapshot' if discard_writes else '')
             if self.use_kvm:
@@ -571,7 +575,7 @@ class QemuRunner:
                 if errs:
                     self.logger.info("Stderr from runqemu:\n%s", errs.decode("utf-8"))
             except subprocess.TimeoutExpired:
-                self.logger.debug("Sending SIGKILL to runqemu")
+                self.logger.info("Sending SIGKILL to runqemu")
                 os.killpg(os.getpgid(self.runqemu.pid), signal.SIGKILL)
             if not self.runqemu.stdout.closed:
                 self.logger.info("Output from runqemu:\n%s" % getOutput(self.runqemu.stdout))

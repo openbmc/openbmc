@@ -1,0 +1,48 @@
+From 10cf84fb4946d1b7b41401be00d22c80366df348 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Mon, 19 Oct 2026 19:27:01 +0000
+Subject: [PATCH] fix tests for libarchive 3.8.10
+
+Two entry tests broke with libarchive 3.8.10:
+
+- testtar.tar is now rejected with "Unsupported pax global extended
+  header attribute 'gname'" rather than "Damaged tar archive" [1], so
+  accept either message.
+
+- The ZIP reader now honours the NTFS (0x000A) extra field [2],
+  reporting unicode2.zip's mtime in UTC with sub-second precision instead
+  of the local-time MS-DOS field stored in the fixture, so ignore mtime
+  in that comparison.
+
+[1] https://github.com/libarchive/libarchive/commit/1769a39ecce23efff9684f36571a998533088df9
+[2] https://github.com/libarchive/libarchive/commit/4f16dbc9edcb771a19119eaaf8634ee6b57287cb
+
+Upstream-Status: Submitted [https://github.com/Changaco/python-libarchive-c/pull/145]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ tests/test_entry.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_entry.py b/tests/test_entry.py
+index 7c8afa7..6eaba52 100644
+--- a/tests/test_entry.py
++++ b/tests/test_entry.py
+@@ -65,7 +65,8 @@ def test_check_archiveentry_using_python_testtar():
+     try:
+         check_entries(join(data_dir, 'testtar.tar'))
+     except ArchiveError as e:
+-        assert e.msg == "Damaged tar archive"
++        assert e.msg in ("Damaged tar archive",
++                         "Unsupported pax global extended header attribute 'gname'")
+ 
+ 
+ def test_check_archiveentry_with_unicode_and_binary_entries_tar():
+@@ -77,7 +78,7 @@ def test_check_archiveentry_with_unicode_and_binary_entries_zip():
+ 
+ 
+ def test_check_archiveentry_with_unicode_and_binary_entries_zip2():
+-    check_entries(join(data_dir, 'unicode2.zip'), ignore='mode')
++    check_entries(join(data_dir, 'unicode2.zip'), ignore='mode mtime')
+ 
+ 
+ def test_check_archiveentry_with_unicode_entries_and_name_zip():

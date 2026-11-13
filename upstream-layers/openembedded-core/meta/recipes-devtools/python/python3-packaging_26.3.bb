@@ -5,7 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=faadaedca9251a90b205c9167578ce91"
 
 SRC_URI[sha256sum] = "94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79"
 
-SRC_URI += "file://run-ptest.in"
+SRC_URI += "file://run-ptest.in \
+            file://reliable-test.patch"
 
 inherit pypi python_flit_core ptest
 

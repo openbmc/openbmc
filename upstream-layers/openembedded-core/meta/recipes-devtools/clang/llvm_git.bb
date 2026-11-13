@@ -105,8 +105,17 @@ reproducible_build_variables() {
         ${B}/tools/llvm-config/BuildVariables.inc
 }
 
+# The tests run on the target, so lit must use the target python.
+llvm_lit_target_python() {
+    sed -i 's|^config.python_executable = .*|config.python_executable = "${bindir}/python3"|' \
+        ${B}/test/lit.site.cfg.py
+}
+
 do_configure:append:class-target() {
     reproducible_build_variables
+    if [ "${CLANG_ENABLE_TESTSUITE}" = "1" ]; then
+        llvm_lit_target_python
+    fi
 }
 do_configure:append:class-nativesdk() {
     reproducible_build_variables

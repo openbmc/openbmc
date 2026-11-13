@@ -5,6 +5,7 @@
 #
 import contextlib
 from oeqa.core.decorator import OETestTag
+from oeqa.core.decorator.data import skipIfMachine
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, runqemu
 from oeqa.utils.nfs import unfs_server
@@ -155,8 +156,6 @@ class LLVMSelfTestSystemEmulated(ClangFamilyBase):
         "tools/llvm-cgdata/merge-hashtree-concat\\.test$",
         "tools/llvm-cgdata/merge-hashtree-double\\.test$",
         "tools/llvm-cgdata/merge-hashtree-single\\.test$",
-        "tools/llvm-locstats/locstats\\.ll$",
-        "tools/llvm-locstats/no_scope_bytes\\.ll$",
         "tools/llvm-objcopy/DXContainer/dump-section\\.yaml$",
         "tools/llvm-objcopy/DXContainer/dump-section-priv\\.yaml$",
         "tools/llvm-objcopy/ELF/basic-binary-copy\\.test$",
@@ -174,12 +173,9 @@ class LLVMSelfTestSystemEmulated(ClangFamilyBase):
         "tools/llvm-objcopy/ELF/strip-sections-only-section\\.test$",
         "tools/llvm-objcopy/ELF/strip-sections\\.test$",
         "tools/llvm-objcopy/ELF/update-section\\.test$",
-        "tools/llvm-original-di-preservation/acceptance-test\\.test$",
-        "tools/llvm-original-di-preservation/basic\\.test$",
         "tools/llvm-reduce/temporary-files-as-bitcode-split\\.ll$",
         "tools/not/disable-symbolization\\.test$",
         "tools/opt-viewer/.*",
-        "tools/UpdateTestChecks/.*",
         "tools/yaml2obj/ELF/custom-fill\\.yaml$",
         "tools/yaml2obj/ELF/header-elfdatanone\\.yaml$",
         "tools/yaml2obj/ELF/header-sh-fields\\.yaml$",
@@ -187,6 +183,7 @@ class LLVMSelfTestSystemEmulated(ClangFamilyBase):
         "tools/yaml2obj/GOFF/GOFF-header-settings\\.yaml$",
     ]
 
+    @skipIfMachine("qemuppc", "qemuppc cannot run this lit test suite within practical resource and runtime limits")
     def test_llvm(self):
         bitbake("llvm -c install")
         self.build_core_image()
@@ -237,8 +234,6 @@ class ClangSelfTestSystemEmulated(ClangFamilyBase):
         "AST/ByteCode/records\\.cpp$",
         "AST/ByteCode/spaceship\\.cpp$",
         "AST/ByteCode/unions\\.cpp$",
-        "Analysis/dead-stores\\.c$",
-        "Analysis/exploded-graph-rewriter/.*",
         "Analysis/scan-build/cxx-name\\.test$",
         "Analysis/scan-build/deduplication\\.test$",
         "Analysis/scan-build/exclude_directories\\.test$",
@@ -248,19 +243,9 @@ class ClangSelfTestSystemEmulated(ClangFamilyBase):
         "Analysis/scan-build/plist_output\\.test$",
         "Analysis/scan-build/rebuild_index/rebuild_index\\.test$",
         "Analysis/scan-build/silence-core-checkers\\.test$",
-        "Analysis/virtualcall-fixits\\.cpp$",
         "C/C23/n3018\\.c$",
         "ClangScanDeps/build-session-validation-outdated-module\\.c$",
         "ClangScanDeps/build-session-validation-relocated-modules\\.c$",
-        "ClangScanDeps/diagnostics\\.c$",
-        "ClangScanDeps/module.*",
-        "ClangScanDeps/multiple-commands\\.c$",
-        "ClangScanDeps/optimize-vfs-edgecases\\.m$",
-        "ClangScanDeps/optimize-vfs-pch\\.m$",
-        "ClangScanDeps/prebuilt-modules-in-stable-dirs\\.c$",
-        "ClangScanDeps/tu-buffer\\.c$",
-        "ClangScanDeps/visible-modules\\.c$",
-        "ClangScanDeps/Wsystem-headers-in-module\\.c$",
         "CodeGen/builtins\\.c$",
         "CodeGen/compound-literal\\.c$",
         "CodeGenCUDA/device-const-var-linkage\\.cu$",
@@ -273,15 +258,7 @@ class ClangSelfTestSystemEmulated(ClangFamilyBase):
         "Frontend/rewrite-includes-bom\\.c$",
         "Interpreter/cxx20-modules\\.cppm$",
         "Modules/crash-vfs-umbrella-frameworks\\.m$",
-        "Modules/double-quotes\\.m$",
-        "Modules/framework-public-includes-private\\.m$",
-        "Modules/implicit-module-header-maps\\.cpp$",
         "Preprocessor/embed_constexpr\\.c$",
-        "Preprocessor/header-search-crash\\.c$",
-        "Preprocessor/headermap-rel\\.c$",
-        "Preprocessor/headermap-rel2\\.c$",
-        "Preprocessor/include-header-missing-in-framework-with-headermap\\.c$",
-        "Preprocessor/search-path-usage\\.m$",
         "PCH/cxx20-template-args\\.cpp$",
         "Sema/arithmetic-fence-builtin\\.c$",
         "Sema/atomic-expr\\.c$",
@@ -298,6 +275,7 @@ class ClangSelfTestSystemEmulated(ClangFamilyBase):
         "Sema/fp-eval-pragma-with-float-double_t-3\\.c$",
     ]
 
+    @skipIfMachine("qemuppc", "qemuppc cannot run this lit test suite within practical resource and runtime limits")
     def test_clang(self):
         bitbake("clang -c install")
         self.build_core_image()
@@ -327,6 +305,7 @@ class LLDSelfTestSystemEmulated(ClangFamilyBase):
         "ELF/reproduce\\.s$",
     ]
 
+    @skipIfMachine("qemuppc", "qemuppc cannot run this lit test suite within practical resource and runtime limits")
     def test_lld(self):
         bitbake("lld -c install")
         self.build_core_image()

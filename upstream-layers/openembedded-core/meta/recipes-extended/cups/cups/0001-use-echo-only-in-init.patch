@@ -1,4 +1,4 @@
-From 575a890a818e8ddc95d22838480b62988ffcd639 Mon Sep 17 00:00:00 2001
+From 4b7e48fb41dce9c10a4c4f91dc9fabfb14b9f1d7 Mon Sep 17 00:00:00 2001
 From: Saul Wold <sgw@linux.intel.com>
 Date: Thu, 13 Dec 2012 19:03:52 -0800
 Subject: [PATCH] use echo only in init

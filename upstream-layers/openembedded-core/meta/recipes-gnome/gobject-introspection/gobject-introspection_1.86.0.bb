@@ -39,9 +39,11 @@ export B
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[doctool] = "-Ddoctool=enabled,-Ddoctool=disabled,python3-mako,"
 
+EXTRA_OEMESON = "-Dtests=false -Dcairo=disabled"
+
 # Configure target build to use native tools of itself and to use a qemu wrapper
 # and optionally to generate introspection data
-EXTRA_OEMESON:class-target = " \
+EXTRA_OEMESON:append:class-target = " \
     -Dgi_cross_use_prebuilt_gi=true \
     -Dgi_cross_binary_wrapper=${B}/g-ir-scanner-qemuwrapper \
     -Dgi_cross_ldd_wrapper=${B}/g-ir-scanner-lddwrapper \

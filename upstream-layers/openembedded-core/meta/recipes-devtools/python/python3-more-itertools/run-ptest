@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# test_concurrent_consumers is a 100-thread stress test that times out under
+# qemu TCG emulation (~1700s on riscv), skip it
+pytest --automake -k 'not test_concurrent_consumers'

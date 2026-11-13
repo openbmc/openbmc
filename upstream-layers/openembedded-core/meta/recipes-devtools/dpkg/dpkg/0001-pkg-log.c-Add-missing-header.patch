@@ -1,0 +1,29 @@
+From 0fd1a56b750c42efe392d58fd97a57841ca27491 Mon Sep 17 00:00:00 2001
+From: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+Date: Thu, 10 Sep 2026 10:58:19 +0200
+Subject: [PATCH] pkg/log.c: Add missing header
+
+Build is failing with some compilers, as free() is not declared. Add the
+missing stdlib.h include.
+
+Upstream-Status: Submitted [https://lists.debian.org/debian-dpkg/2026/09/msg00012.html]
+Signed-off-by: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+---
+ lib/dpkg/log.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/dpkg/log.c b/lib/dpkg/log.c
+index ae65ed4092a3..ef9b209d42a6 100644
+--- a/lib/dpkg/log.c
++++ b/lib/dpkg/log.c
+@@ -29,6 +29,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <stdarg.h>
++#include <stdlib.h>
+ 
+ #include <dpkg/i18n.h>
+ #include <dpkg/dpkg.h>
+-- 
+2.47.3
+

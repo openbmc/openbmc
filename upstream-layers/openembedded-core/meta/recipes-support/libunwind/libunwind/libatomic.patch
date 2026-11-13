@@ -7,7 +7,7 @@ Some OS runtimes require libatomic be linked in separately to get
 standard atomic operations to work. Try to detect that at configure
 time.
 
-Upstream-Status: Submitted [https://github.com/libunwind/libunwind/pull/732/]
+Upstream-Status: Denied [https://github.com/libunwind/libunwind/pull/732/]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  configure.ac | 12 ++++++++++++
