@@ -1,0 +1,31 @@
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+# Wireless interfaces
+iface wlan0 inet dhcp
+	wireless_mode managed
+	wireless_essid any
+	wpa-driver wext
+	wpa-conf /etc/wpa_supplicant.conf
+
+iface atml0 inet dhcp
+
+# Wired or wireless interfaces including predictable names
+auto eth0
+iface eth0 inet dhcp
+iface eth1 inet dhcp
+
+# Busybox ifupdown won't process /en* correctly
+auto /en*=eth
+iface eth inet dhcp
+
+# Ethernet/RNDIS gadget (g_ether)
+# ... or on host side, usbnet and random hwaddr
+auto usb0
+iface usb0 inet dhcp
+
+# Bluetooth networking
+iface bnep0 inet dhcp

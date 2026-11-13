@@ -21,7 +21,7 @@ SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bookworm;protocol
 SRCREV = "c9d3ae6584ab79d19a4f94ccf701e888f9f87a53"
 PV = "20240709-2~bpo12+1+rpt3"
 
-inherit allarch
+INHIBIT_DEFAULT_DEPS = "1"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
@@ -54,6 +54,8 @@ do_install() {
     install -d ${D}${sysconfdir}/modprobe.d
     install -m 0644 debian/rpi-brcmfmac.conf ${D}${sysconfdir}/modprobe.d/
 }
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PACKAGES = "\
     ${PN}-bcm43430 \
@@ -117,6 +119,5 @@ RREPLACES:${PN}-bcm43439 = "linux-firmware-bcm43439"
 RREPLACES:${PN}-bcm43455 = "linux-firmware-bcm43455"
 RREPLACES:${PN}-bcm43456 = "linux-firmware-bcm43456"
 
-# Firmware files are generally not run on the CPU, so they can be
-# allarch despite being architecture specific
+# Firmware files are not run on the CPU
 INSANE_SKIP = "arch"

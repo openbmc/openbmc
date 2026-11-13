@@ -39,6 +39,9 @@ done
 # Build configuration
 printf "\n# ------ ci ------\n" >> conf/local.conf
 [ -z "$SSTATE_DIR" ] || echo SSTATE_DIR = \""$SSTATE_DIR"\" >> conf/local.conf
+# Keep the hash equivalence database next to the sstate it describes so it
+# persists across builds. This matches the bitbake-setup default.
+[ -z "$SSTATE_DIR" ] || echo BB_HASHSERVE_DB_DIR = \""$SSTATE_DIR"\" >> conf/local.conf
 [ -z "$DL_DIR" ] || echo DL_DIR = \""$DL_DIR"\" >> conf/local.conf
 [ -z "$DISTRO" ] || echo DISTRO = \""$DISTRO"\" >> conf/local.conf
 cat <<EOCONF >>conf/local.conf

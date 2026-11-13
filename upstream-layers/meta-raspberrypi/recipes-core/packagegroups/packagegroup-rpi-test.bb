@@ -8,10 +8,7 @@ inherit packagegroup
 
 COMPATIBLE_MACHINE = "^rpi$"
 
-OMXPLAYER  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', 'omxplayer', d)}"
-
 RDEPENDS:${PN} = "\
-    ${OMXPLAYER} \
     bcm2835-tests \
     raspi-gpio \
     rpio \

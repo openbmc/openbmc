@@ -14,7 +14,7 @@ jobs:
     name: Yocto Git Mirror
     runs-on: ubuntu-latest
     steps:
-      - uses: agherzan/git-mirror-me-action@11f54c7186724daafbe5303b5075954f1a19a63e
+      - uses: agherzan/git-mirror-me-action@62634a2cbf5af756d0678f0826018810d7811dc1 # v3.0.0
         env:
           GMM_SSH_PRIVATE_KEY: ${{ secrets.YOCTO_META_RASPBERRYPI_SSH_PRIVATE_KEY }}
           GMM_SSH_KNOWN_HOSTS: ${{ secrets.YOCTO_META_RASPBERRYPI_SSH_KNOWN_HOSTS }}

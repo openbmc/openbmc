@@ -9,28 +9,24 @@ name: Builds
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
       fail-fast: true
       matrix:
+        # Tier 1: one machine per tune / kernel defconfig. All machines are
+        # signature checked by yocto-check-layer in yocto-layer.yml.
         machine:
-          - raspberrypi
-          - raspberrypi0-2w-64
-          - raspberrypi0-2w
-          - raspberrypi0
           - raspberrypi0-wifi
-          - raspberrypi2-64
-          - raspberrypi2
-          - raspberrypi3-64
-          - raspberrypi3
-          - raspberrypi4-64
-          - raspberrypi4
-          - raspberrypi5
-          - raspberrypi-cm3
-          - raspberrypi-cm
           - raspberrypi-armv7
           - raspberrypi-armv8
+          - raspberrypi3-64
+          - raspberrypi4-64
+          - raspberrypi5
         image: [rpi-test-image]
         distro: [poky]
     runs-on: [self-hosted, Linux]
@@ -40,34 +36,23 @@ jobs:
       SSTATE_DIR: /var/lib/ci/yocto/sstate
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - name: Define Yocto build files
+          persist-credentials: false
+      - name: Check for Yocto relevant changes
         id: changed-files-specific
-        uses: tj-actions/changed-files@v24
-        with:
-          files: |
-            .github/actions/**
-            .github/workflows/docker-images/yocto-builder/**
-            .github/workflows/docker-images/*.sh
-            .github/workflows/yocto-builds.yml
-            classes/**
-            conf/**
-            dynamic-layers/**
-            files/**
-            lib/**
-            recipes-**
-            wic/**
-      - name: Build a temporary yocto-builder image
+        uses: ./.github/actions/changed-files
+      - name: Build the yocto-builder image
+        id: docker
         uses: ./.github/actions/docker-build
         with:
           docker_image: yocto-builder
-          id: ${{ github.event.number }}
         if: steps.changed-files-specific.outputs.any_changed == 'true'
       - name: Build the image
         run: |
           docker run --rm --security-opt apparmor=unconfined \
+            --label "meta-raspberrypi-ci.runner=$RUNNER_NAME" \
             --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:/work:ro" \
             -v "$DL_DIR:$DL_DIR:rw" \
@@ -79,13 +64,11 @@ jobs:
             --env "DL_DIR=$DL_DIR" \
             --env "SSTATE_DIR=$SSTATE_DIR" \
             --ulimit "nofile=1024:1048576" \
-            "yocto-builder-${{ github.event.number }}" \
+            "${{ steps.docker.outputs.image }}" \
             /entrypoint-build.sh
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-      - name: Cleanup temporary docker image
-        uses: ./.github/actions/docker-clean-image
-        with:
-          docker_image: yocto-builder-${{ github.event.number }}
+      - name: Cleanup CI docker containers and images
+        uses: ./.github/actions/docker-cleanup
         if: always()
       - name: Cleanup dangling docker images
         uses: ./.github/actions/docker-clean-dangling

@@ -16,6 +16,13 @@ GIT_REPO_PATH="/work"
 [ -d "$GIT_REPO_PATH/.git" ] ||
     error "Can't find a git checkout under $GIT_REPO_PATH ."
 
+# The GitHub runner user and the container user might differ making git error
+# out with:
+# 	error: fatal: detected dubious ownership in repository at '/work'
+# Avoid this as the security risk is minimum here while guarding the git hooks
+# via PRs.
+git config --global --add safe.directory /work
+
 TEMP_DIR="$(mktemp -d)"
 cd "$TEMP_DIR"
 
@@ -30,5 +37,18 @@ done
 
 # shellcheck disable=SC1091,SC2240
 . ./openembedded-core/oe-init-build-env build
+
+# Build configuration
+printf "\n# ------ ci ------\n" >> conf/local.conf
+cat <<EOCONF >>conf/local.conf
+LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"
+EOCONF
+
+MACHINES="$(find "$GIT_REPO_PATH/conf/machine" -maxdepth 1 -name '*.conf' \
+    -exec basename {} .conf \; | sort)"
+[ -n "$MACHINES" ] ||
+    error "No machines found under $GIT_REPO_PATH/conf/machine ."
+
+# shellcheck disable=SC2086
 yocto-check-layer --with-software-layer-signature-check --debug \
-    "$GIT_REPO_PATH"
+    "$GIT_REPO_PATH" --machines $MACHINES

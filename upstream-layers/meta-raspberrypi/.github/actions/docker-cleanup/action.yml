@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: "Cleanup CI docker containers and images"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Remove CI containers left on this runner
+      shell: bash
+      # A runner executes one job at a time, so any container labelled with
+      # its name is left over from this job (e.g. after a cancellation) or a
+      # previous one.
+      run: |
+        echo "Removing CI containers left by runner $RUNNER_NAME..."
+        docker ps -aq --filter "label=meta-raspberrypi-ci.runner=$RUNNER_NAME" |
+          xargs -r docker rm -f
+    - name: Prune old CI docker images
+      shell: bash
+      # Only images built by docker-build carry the label. Keep this at twice
+      # its max_age_days so an image a running job relies on is never pruned.
+      run: |
+        echo "Pruning CI images older than 14 days..."
+        docker image prune -af \
+          --filter label=meta-raspberrypi-ci=1 \
+          --filter until=336h

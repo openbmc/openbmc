@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei@gherzan.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: "Check for changes relevant to Yocto builds"
+
+outputs:
+  any_changed:
+    description: "'true' if the PR touches a file relevant to Yocto builds"
+    value: ${{ steps.check.outputs.any_changed }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check for changes relevant to Yocto builds
+      id: check
+      shell: bash
+      # actions/checkout checks out the PR merge commit, so HEAD^1 is the
+      # base branch tip and HEAD^1..HEAD is exactly the PR's change set.
+      run: |
+        git rev-parse -q --verify HEAD^2 >/dev/null ||
+          { echo "HEAD is not a PR merge commit"; exit 1; }
+
+        # Globs as in [[ == ]], where '*' also matches '/'.
+        patterns=(
+          '.github/actions/*'
+          '.github/workflows/docker-images/yocto-builder/*'
+          '.github/workflows/docker-images/*.sh'
+          '.github/workflows/yocto-builds.yml'
+          '.github/workflows/yocto-layer.yml'
+          'classes/*'
+          'conf/*'
+          'dynamic-layers/*'
+          'files/*'
+          'lib/*'
+          'recipes-*'
+          'wic/*'
+        )
+
+        files="$(git diff --no-renames --name-only HEAD^1 HEAD)"
+        any_changed=false
+        while read -r f; do
+          for p in "${patterns[@]}"; do
+            # shellcheck disable=SC2053
+            if [[ $f == $p ]]; then
+              echo "Relevant change: $f"
+              any_changed=true
+              break 2
+            fi
+          done
+        done <<< "$files"
+        echo "any_changed=$any_changed" >> "$GITHUB_OUTPUT"

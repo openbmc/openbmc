@@ -37,7 +37,7 @@ a good component name is the following:
 
 * For changes that affect *layer recipes*, please just use the **base names**
   of the affected recipes, separated by commas (`,`), as the component name.
-  For example: use `omxplayer` instead of `omxplayer_git.bb`. If you are
+  For example: use `userland` instead of `userland_git.bb`. If you are
   adding new recipe(s), just use the new recipe(s) base name(s). An example
   for changes to multiple recipes would be `userland,vc-graphics,wayland`.
 * For changes that affect the *layer documentation*, please just use `docs`

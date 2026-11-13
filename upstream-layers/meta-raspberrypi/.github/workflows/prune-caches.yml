@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei@gherzan.com>
+#
+# SPDX-License-Identifier: MIT
+
+---
+
+name: Prune caches
+
+on:
+  schedule:
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: prune-caches
+
+jobs:
+  sstate:
+    name: Prune unused sstate
+    runs-on: [self-hosted, Linux]
+    env:
+      DL_DIR: /var/lib/ci/yocto/downloads
+      SSTATE_DIR: /var/lib/ci/yocto/sstate
+      SSTATE_MAX_AGE_DAYS: 30
+    steps:
+      - name: Prune sstate not used in ${{ env.SSTATE_MAX_AGE_DAYS }} days
+        # bitbake touches sstate files whenever a build uses them, so mtime is
+        # a reliable last-use time.
+        run: |
+          du -sh "$DL_DIR" "$SSTATE_DIR"
+          find "$SSTATE_DIR" -type f -name 'sstate:*' \
+            -mtime +"$SSTATE_MAX_AGE_DAYS" -delete
+          find "$SSTATE_DIR" -mindepth 1 -type d -empty -delete
+          du -sh "$SSTATE_DIR"
