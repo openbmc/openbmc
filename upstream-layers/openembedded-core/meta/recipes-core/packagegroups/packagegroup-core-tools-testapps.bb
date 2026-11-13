@@ -30,6 +30,7 @@ GOTOOLS:riscv32 ?= ""
 
 GSTEXAMPLES ?= "gst-examples"
 GSTEXAMPLES:riscv64 = ""
+GSTEXAMPLES:riscv32 = ""
 
 X11GLTOOLS = "\
     mesa-demos \

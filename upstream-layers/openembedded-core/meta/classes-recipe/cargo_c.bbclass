@@ -16,7 +16,7 @@ BASEDEPENDS:append = " cargo-c-native"
 
 B = "${WORKDIR}/build"
 
-CARGO_BUILD_FLAGS += "\
+CARGO_C_BUILD_FLAGS = "\
     --destdir ${D} \
     --prefix ${prefix} \
     --libdir ${libdir} \
@@ -28,13 +28,13 @@ cargo_c_do_compile() {
     oe_cargo_fix_env
     export RUSTFLAGS="${RUSTFLAGS}"
     bbnote "Using rust targets from ${RUST_TARGET_PATH}"
-    cargo-cbuild cbuild ${CARGO_BUILD_FLAGS}
+    cargo-cbuild cbuild ${CARGO_BUILD_FLAGS} ${CARGO_C_BUILD_FLAGS}
 }
 
 cargo_c_do_install() {
     oe_cargo_fix_env
     export RUSTFLAGS="${RUSTFLAGS}"
-    cargo-cinstall cinstall ${CARGO_BUILD_FLAGS}
+    cargo-cinstall cinstall ${CARGO_BUILD_FLAGS} ${CARGO_C_BUILD_FLAGS}
 }
 
 EXPORT_FUNCTIONS do_compile do_install

@@ -10,7 +10,7 @@ SRC_URI = "git://git.sr.ht/~kennylevinsen/seatd;protocol=https;branch=master;tag
            file://init"
 SRCREV = "daa8196e10b180b8b0caeafa8e5f860eb1bd6706"
 
-inherit meson pkgconfig systemd update-rc.d useradd
+inherit meson manpages pkgconfig systemd update-rc.d useradd
 
 # https://www.openwall.com/lists/musl/2020/01/20/3
 CFLAGS:append:libc-musl:powerpc64le = " -Wno-error=overflow"
@@ -30,6 +30,7 @@ PACKAGECONFIG ?= " \
 
 PACKAGECONFIG[libseat-builtin] = "-Dlibseat-builtin=enabled,-Dlibseat-builtin=disabled"
 PACKAGECONFIG[systemd] = "-Dlibseat-logind=systemd,,systemd"
+PACKAGECONFIG[manpages] = "-Dman-pages=enabled,-Dman-pages=disabled,scdoc-native"
 
 do_install:append() {
         if [ "${VIRTUAL-RUNTIME_init_manager}" != "systemd" ]; then

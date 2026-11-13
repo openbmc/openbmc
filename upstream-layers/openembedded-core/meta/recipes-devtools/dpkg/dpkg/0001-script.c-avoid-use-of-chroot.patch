@@ -1,4 +1,4 @@
-From 756513b01ba2d4f0ecfc95955dbe598591ad2d9e Mon Sep 17 00:00:00 2001
+From 4e720386c346db10c0fcd8b20078c05d38c85951 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 8 Feb 2026 21:17:43 -0800
 Subject: [PATCH] script.c: avoid use of chroot
@@ -25,7 +25,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 3 insertions(+), 53 deletions(-)
 
 diff --git a/src/main/script.c b/src/main/script.c
-index dd3f3a4bb..9782d0140 100644
+index 951cdfe7b4e9..102740798617 100644
 --- a/src/main/script.c
 +++ b/src/main/script.c
 @@ -99,60 +99,10 @@ static const char *
@@ -47,9 +47,9 @@ index dd3f3a4bb..9782d0140 100644
 -		if (strncmp(admindir, instdir, instdirlen) != 0)
 -			ohshit(_("admindir must be inside instdir for dpkg to work properly"));
 -		if (setenv("DPKG_ADMINDIR", admindir + instdirlen, 1) < 0)
--			ohshite(_("unable to setenv for subprocesses"));
+-			ohshite(_("cannot set environment for subprocesses"));
 -		if (setenv("DPKG_ROOT", "", 1) < 0)
--			ohshite(_("unable to setenv for subprocesses"));
+-			ohshite(_("cannot set environment for subprocesses"));
 -
 -		rc = chroot(instdir);
 -		if (rc && in_force(FORCE_NON_ROOT) && errno == EPERM)
@@ -57,13 +57,13 @@ index dd3f3a4bb..9782d0140 100644
 -			         "directory with --force-not-root, consider "
 -			         "using --force-script-chrootless?"));
 -		else if (rc)
--			ohshite(_("failed to chroot to '%s'"), instdir);
+-			ohshite(_("cannot change root directory to '%s'"), instdir);
 -	}
 -
 -	/* Switch to a known good directory to give the maintainer script
 -	 * a saner environment, also needed after the chroot(). */
 -	if (chdir(changedir))
--		ohshite(_("failed to chdir to '%s'"), changedir);
+-		ohshite(_("cannot change directory to '%s'"), changedir);
 -
 -	if (debug_has_flag(dbg_scripts)) {
 -		struct varbuf args = VARBUF_INIT;
@@ -93,5 +93,5 @@ index dd3f3a4bb..9782d0140 100644
  
  /**
 -- 
-2.49.0
+2.47.3
 

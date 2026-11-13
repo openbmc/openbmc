@@ -230,3 +230,14 @@ RDEPENDS:${PN}-ptest += "xz  \
                          ${@bb.utils.filter('PACKAGECONFIG', 'acl', d)} \
                          ${@bb.utils.contains('PACKAGECONFIG', 'xattr', 'attr', '', d)}"
 FILES:${PN}-ptest += "${bindir}/getlimits"
+
+RDEPENDS:${PN}-ptest:append:libc-glibc = "\
+     locale-base-ja-jp.euc-jp \
+     locale-base-fr-fr \
+     locale-base-fr-fr.iso-8859-1 \
+     locale-base-zh-cn.gb18030 \
+     glibc-gconv-iso8859-1 \
+     glibc-gconv-euc-jp \
+     glibc-gconv-gb18030 \
+"
+

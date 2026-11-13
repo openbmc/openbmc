@@ -20,6 +20,7 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://0001-tests-Makefile.am-compile-test_nlist-with-standard-C.patch \
            file://0001-config-eu.am-do-not-force-Werror.patch \
            file://0001-backends-use-sys-uio.h-instead-of-linux-uio.h-for-s.patch \
+           file://srcfiles.patch \
            "
 SRC_URI:append:libc-musl = " \
            file://0003-musl-utils.patch \

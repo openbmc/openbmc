@@ -37,7 +37,8 @@ def pseudo_native_environment():
     if not native_sysroot or not os.path.exists(native_sysroot):
         raise PseudoRootfsError("%s doesn't exist" % native_sysroot)
 
-    environment = {'OECORE_NATIVE_SYSROOT': native_sysroot}
+    environment = dict(os.environ)
+    environment['OECORE_NATIVE_SYSROOT'] = native_sysroot
     environment['PSEUDO'] = os.path.join(native_sysroot, 'usr', 'bin', 'pseudo')
     return environment
 
@@ -55,7 +56,7 @@ def _tar_options(rootfs_tarball):
             return ['--numeric-owner', *option.split()]
     raise PseudoRootfsError(
         'Unable to determine sdk tarball format\n'
-        'Accepted types: .tar / .tar.gz / .tar.bz2 / .tar.xz / .tar.zst')
+        'Accepted types: %s' % ' / '.join(tar_extract_options))
 
 
 def pseudo_state_dir(rootfs_dir):

@@ -1,4 +1,4 @@
-From 2becfbb5964754f7c3f1ff90f9447d84093ba986 Mon Sep 17 00:00:00 2001
+From faa062c4bbd9f3678997a90c85ec4efa05156c07 Mon Sep 17 00:00:00 2001
 From: Gyorgy Sarvari <skandigraun@gmail.com>
 Date: Sat, 2 Aug 2025 20:57:49 +0200
 Subject: [PATCH] query-rustc: append RUSTFLAGS to rustc executable

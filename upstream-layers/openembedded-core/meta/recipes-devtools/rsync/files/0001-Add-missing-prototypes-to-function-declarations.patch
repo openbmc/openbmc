@@ -1,4 +1,4 @@
-From 64e62c659649593239ed39ed40a3ae689bf2d593 Mon Sep 17 00:00:00 2001
+From 56a785a7d964f797a786b2d5b75d9cee51b530b1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 29 Aug 2022 19:53:28 -0700
 Subject: [PATCH] Add missing prototypes to function declarations
@@ -63,7 +63,7 @@ index 889b57b..19e5e98 100644
  	int options = LOG_PID;
  
 diff --git a/main.c b/main.c
-index 6050d0e..45722c4 100644
+index ed6e554..b5f9448 100644
 --- a/main.c
 +++ b/main.c
 @@ -250,7 +250,7 @@ void read_del_stats(int f)

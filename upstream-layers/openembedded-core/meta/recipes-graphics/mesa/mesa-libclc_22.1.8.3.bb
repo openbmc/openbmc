@@ -1,10 +1,10 @@
 SUMMARY = "Mesa fork of libclc: Implementation of the library requirements of the OpenCL C programming language."
 HOMEPAGE = "https://gitlab.freedesktop.org/karolherbst/mesa-libclc/"
 SECTION = "devel"
-LICENSE = "Apache-2.0-with-LLVM-exception"
+LICENSE = "Apache-2.0 WITH LLVM-exception"
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=7cc795f6cbb2d801d84336b83c8017db"
 
-SRC_URI = "git://gitlab.freedesktop.org/karolherbst/mesa-libclc.git;protocol=https;branch=llvm_22"
+SRC_URI = "git://gitlab.freedesktop.org/karolherbst/mesa-libclc.git;protocol=https;branch=llvm_22;tag=${PV}"
 
 SRCREV = "87f66007242ff10e9e84bf32be84f9057f6abc75"
 

@@ -678,7 +678,7 @@ sdk_ext_preinst() {
 	fi
         # Check setting of LC_ALL set above
 	canonicalised_locale=`echo $LC_ALL | sed 's/UTF-8/utf8/'`
-	if ! locale -a | grep -q $canonicalised_locale ; then
+	if ! locale -a | grep -Fx "$canonicalised_locale" > /dev/null ; then
 		echo "ERROR: the installer requires the $LC_ALL locale to be installed (but not selected), please install it first"
 		exit 1
 	fi

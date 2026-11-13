@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
 HOMEPAGE = "http://packages.debian.org/resolvconf"
 RDEPENDS:${PN} = "bash sed util-linux-flock"
 
-SRC_URI = "git://salsa.debian.org/debian/resolvconf.git;protocol=https;branch=unstable \
+SRC_URI = "git://salsa.debian.org/debian/resolvconf.git;protocol=https;branch=unstable;tag=debian/${PV} \
            file://99_resolvconf \
            file://0001-avoid-using-m-option-for-readlink.patch \
            "

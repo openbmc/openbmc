@@ -1,4 +1,4 @@
-From 5981a174707a384d6970c7ce7d8d68322985a6fa Mon Sep 17 00:00:00 2001
+From 433f750dcc97131030e7569515b53f32e4591c14 Mon Sep 17 00:00:00 2001
 From: Phil Blundell <pb@pbcl.net>
 Date: Mon, 24 Sep 2012 07:24:51 +0100
 Subject: [PATCH] util-linux: Ensure that ${sbindir} is respected

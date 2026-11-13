@@ -14,6 +14,9 @@ SRC_URI = " \
     file://run-ptest \
     file://disable-tests \
     file://no-test-timeout.patch \
+    file://CVE-2026-92388-1.patch \
+    file://CVE-2026-92388-2.patch \
+    file://CVE-2026-92389.patch \
 "
 
 SRC_URI:append:class-nativesdk = " \
@@ -89,16 +92,17 @@ EXTRA_OECONF = " \
     --enable-optimize \
     --with-ca-bundle=${CURL_CA_BUNDLE_BASE_DIR}/ssl/certs/ca-certificates.crt \
     ${@'--without-ssl' if (bb.utils.filter('PACKAGECONFIG', 'gnutls mbedtls openssl schannel', d) == '') else ''} \
-    WATT_ROOT=${STAGING_DIR_TARGET}${prefix} \
 "
 
 fix_absolute_paths () {
-	# cleanup buildpaths from curl-config
+	# cleanup buildpaths and the build host triple from curl-config
 	sed -i \
 	    -e 's,--sysroot=${STAGING_DIR_TARGET},,g' \
 	    -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
 	    -e 's|${DEBUG_PREFIX_MAP}||g' \
 	    -e 's|${@" ".join(d.getVar("DEBUG_PREFIX_MAP").split())}||g' \
+	    -e "s,'--build=${BUILD_SYS}' ,,g" \
+	    -e "s,'build_alias=${BUILD_SYS}' ,,g" \
 	    ${D}${bindir}/curl-config
 }
 

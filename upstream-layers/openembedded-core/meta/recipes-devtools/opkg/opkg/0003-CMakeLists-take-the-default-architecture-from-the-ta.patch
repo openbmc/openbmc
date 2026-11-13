@@ -1,0 +1,45 @@
+From fd8b3359e9e26a6a81f5f7cb04346c7bf44de279 Mon Sep 17 00:00:00 2001
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Tue, 29 Sep 2026 23:55:32 -0700
+Subject: [PATCH] CMakeLists: take the default architecture from the target CPU
+
+HOST_CPU_STR is the default architecture opkg accepts when no "arch"
+lines are configured. It is set from CMAKE_HOST_SYSTEM_PROCESSOR, which
+is the CPU of the build machine, so a cross-compiled opkg gets the wrong
+default and libopkg differs depending on the machine it was built on.
+
+Use CMAKE_SYSTEM_PROCESSOR, which CMake sets for native builds and the
+toolchain file sets when cross-compiling, and stop with an error if a
+cross build doesn't set it.
+
+Fixes Bugzilla: #15784
+
+Upstream-Status: Backport [https://git.yoctoproject.org/opkg/commit/?id=0682b36c898fb81a40a068481062512bcea9b66b]
+
+Suggested-by: Alex Stewart <alex.stewart@emerson.com>
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+ CMakeLists.txt | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e6deba8..7da091d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -45,8 +45,11 @@ option(WITH_GPGME "Enable signature checking with gpgme" ON)
+ set(DATADIR "/share" CACHE STRING "datadir")
+ set(SYSCONFDIR "/etc" CACHE STRING "sysconfdir")
+ set(VARDIR "/var" CACHE STRING "vardir")
+-# This was ported from autoconf (it used to be "host_cpu"), but it should be target_cpu: https://bugzilla.yoctoproject.org/show_bug.cgi?id=15784
+-set(HOST_CPU_STR ${CMAKE_HOST_SYSTEM_PROCESSOR} CACHE STRING "Host CPU architecture")
++# Default architecture: the CPU opkg runs on, not the build machine
++if(CMAKE_CROSSCOMPILING AND NOT CMAKE_SYSTEM_PROCESSOR)
++    message(FATAL_ERROR "Cross-compiling requires CMAKE_SYSTEM_PROCESSOR")
++endif()
++set(HOST_CPU_STR "${CMAKE_SYSTEM_PROCESSOR}" CACHE STRING "Default package architecture")
+ 
+ configure_file(config.h.in config.h)
+ configure_file(libopkg.pc.in libopkg.pc @ONLY)
+-- 
+2.49.0
+

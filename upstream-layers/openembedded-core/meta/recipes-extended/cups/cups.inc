@@ -48,6 +48,8 @@ PACKAGECONFIG[systemd] = "--with-systemd=${systemd_system_unitdir},--without-sys
 PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,xinetd"
 PACKAGECONFIG[webif] = "--enable-webif,--disable-webif"
 
+CACHED_CONFIGUREVARS += "ac_cv_path_XDGOPEN=${bindir}/xdg-open"
+
 EXTRA_OECONF = " \
                --enable-dbus \
                --with-dbusdir=${sysconfdir}/dbus-1 \

@@ -1,4 +1,4 @@
-From 5180d1866b99125d3353f76151e84644a5791e3d Mon Sep 17 00:00:00 2001
+From 414842987006bf8f1b6e447901360c230966a908 Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Tue, 14 Oct 2025 01:37:35 +0000
 Subject: [PATCH] There are conflict of config files between kea and lib32-kea:

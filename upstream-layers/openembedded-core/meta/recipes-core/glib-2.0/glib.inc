@@ -225,8 +225,7 @@ RDEPENDS:${PN}-ptest:append:libc-glibc = "\
 
 PE = "1"
 
-SRC_URI += "\
-           file://run-ptest \
+SRC_URI += "file://run-ptest \
            file://0001-Fix-DATADIRNAME-on-uclibc-Linux.patch \
            file://0001-Remove-the-warning-about-deprecated-paths-in-schemas.patch \
            file://0001-Install-gio-querymodules-as-libexec_PROGRAM.patch \
@@ -236,16 +235,12 @@ SRC_URI += "\
            file://0010-Do-not-hardcode-python-path-into-various-tools.patch \
            file://skip-timeout.patch \
            file://skip-monotonic-time-similar.patch \
-           file://CVE-2026-58016-1.patch \
-           file://CVE-2026-58016-2.patch \
-           file://0001-gio-tests-services-Fix-installed-service-file-using-.patch \
-           file://0001-gtype-Mark-the-G_DEFINE_TYPE-parent_class-variable-a.patch \
            "
 SRC_URI:append:class-native = " file://relocate-modules.patch \
                                 file://0001-meson.build-do-not-enable-pidfd-features-on-native-g.patch \
                               "
 
-SRC_URI[archive.sha256sum] = "ab24d24e698dfa1e408b7bcdb508f4aafc906185a8b8ce72fdf79bbbdc9b383b"
+SRC_URI[archive.sha256sum] = "17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f"
 
 # Find any meson cross files in FILESPATH that are relevant for the current
 # build (using siteinfo) and add them to EXTRA_OEMESON.

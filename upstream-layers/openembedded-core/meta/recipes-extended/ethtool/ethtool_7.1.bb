@@ -19,8 +19,9 @@ inherit autotools ptest bash-completion pkgconfig
 
 RDEPENDS:${PN}-ptest += "make bash"
 
-PACKAGECONFIG ?= "netlink"
+PACKAGECONFIG ?= "netlink pretty-dump"
 PACKAGECONFIG[netlink] = "--enable-netlink,--disable-netlink,libmnl,"
+PACKAGECONFIG[pretty-dump] = "--enable-pretty-dump,--disable-pretty-dump"
 
 FILES:${PN} += "${datadir}/metainfo/org.kernel.software.network.ethtool.metainfo.xml"
 

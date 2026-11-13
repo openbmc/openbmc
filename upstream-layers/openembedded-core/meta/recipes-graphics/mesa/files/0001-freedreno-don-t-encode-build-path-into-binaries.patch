@@ -1,4 +1,4 @@
-From 44f9c60f2ca4ce212c8cc3ba19e5adc357ebdad4 Mon Sep 17 00:00:00 2001
+From fd5571e22fd18b855199f23731f035927067a2a2 Mon Sep 17 00:00:00 2001
 From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 Date: Wed, 10 Dec 2025 02:27:16 +0200
 Subject: [PATCH] freedreno: don't encode build path into binaries

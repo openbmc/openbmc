@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 from unittest.case import TestCase
+from unittest.mock import patch
 
 import oe.patch
 
@@ -280,3 +281,48 @@ class TestGitApplyTree(TestCase):
                 "2021-01-01T12:34:56Z",
             ))
             self.assert_note_and_extract(repo, patchname, "+plain diff change")
+
+    def test_commit_ignored_uses_explicit_identity(self):
+        with tempfile.TemporaryDirectory(prefix="oe-gitapply-note-") as tmpdir:
+            repo = self.make_repo(tmpdir, "source")
+
+            self.git(repo, "config", "--local", "--unset", "user.name")
+            self.git(repo, "config", "--local", "--unset", "user.email")
+
+            with open(os.path.join(repo, "file.txt"), "a") as f:
+                f.write("generated change\n")
+
+            env = {
+                "PATH": os.environ.get("PATH", os.defpath),
+                "HOME": tmpdir,
+                "GIT_CONFIG_GLOBAL": os.devnull,
+                "GIT_CONFIG_NOSYSTEM": "1",
+            }
+
+            with patch.dict(os.environ, env, clear=True):
+                oe.patch.GitApplyTree.commitIgnored(
+                    "Add generated changes",
+                    dir=repo,
+                    files=["file.txt"],
+                    d=PatchTestDataStore(tmpdir),
+                )
+
+                note = oe.patch.runcmd([
+                    "git", "notes", "--ref",
+                    oe.patch.GitApplyTree.notes_ref,
+                    "show", "HEAD",
+                ], repo)
+
+                identity = oe.patch.runcmd([
+                    "git", "log", "-1",
+                    "--format=%an%n%ae%n%cn%n%ce",
+                    oe.patch.GitApplyTree.notes_ref,
+                ], repo).splitlines()
+
+            self.assertEqual(note.strip(), oe.patch.GitApplyTree.ignore_commit)
+            self.assertEqual(identity, [
+                "OE Test",
+                "oe-test@example.com",
+                "OE Test",
+                "oe-test@example.com",
+            ])

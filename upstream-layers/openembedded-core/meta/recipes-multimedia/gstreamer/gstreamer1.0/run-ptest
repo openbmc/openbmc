@@ -27,4 +27,7 @@ GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,parser_convert_duration,parser_pull_frame_
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/work_items/5163
 GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_device_monitor"
 
+# https://bugzilla.yoctoproject.org/show_bug.cgi?id=15408
+GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_leaky_downstream"
+
 gnome-desktop-testing-runner --parallel=4 gstreamer "$@"

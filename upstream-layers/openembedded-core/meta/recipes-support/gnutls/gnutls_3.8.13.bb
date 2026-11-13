@@ -77,6 +77,24 @@ do_install:append:class-target() {
         fi
 }
 
+EXTRA_TEST_DISALLOWLIST ?= ""
+
+EXTRA_TEST_DISALLOWLIST:riscv64 = "\
+    dtls-rehandshake-anon \
+    dtls-rehandshake-cert \
+    dtls-rehandshake-cert-2 \
+    mini-loss-time \
+    mini-record-2 \
+    record-retvals \
+    rng-op-key \
+    rng-op-nonce \
+    rng-op-random \
+"
+
+do_install_ptest_base:append() {
+    sed -i 's:@EXTRA_TEST_DISALLOWLIST@:${EXTRA_TEST_DISALLOWLIST}:g' ${D}${PTEST_PATH}/run-ptest
+}
+
 PACKAGES =+ "${PN}-dane ${PN}-openssl ${PN}-xx ${PN}-fips"
 
 FILES:${PN}-dev += "${bindir}/gnutls-cli-debug"

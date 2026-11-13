@@ -26,14 +26,14 @@ inherit core-image features_check
 
 REQUIRED_DISTRO_FEATURES += "xattr"
 
-SRCREV_bitbake ?= "046a90b0e9b7b914b7a95aec579cdc3fc9c7617a"
-SRCREV_oe-core ?= "fa11c2f1badc10cd31650b4e3484abe1d611ab5e"
-SRCREV_yocto ?= "7e41504cd63b099b214f10d92cfdaf358ab98c5f"
+SRCREV_bitbake ?= "634f8dede6b9d71b5a6691499fd05a8678b46eae"
+SRCREV_oe-core ?= "2ec6d89befc981063b8e8a56cd6478059a68588d"
+SRCREV_yocto ?= "43946d08974e61361f6313ae348c5d87c12be934"
 SRCREV_FORMAT = "bitbake_oe-core_yocto"
 
-SRC_URI = "git://git.openembedded.org/bitbake;name=bitbake;branch=master;destsuffix=bitbake;protocol=https \
-           git://git.openembedded.org/openembedded-core;name=oe-core;branch=master;destsuffix=openembedded-core;protocol=https \
-           git://git.yoctoproject.org/meta-yocto;name=yocto;branch=master;destsuffix=meta-yocto;protocol=https \
+SRC_URI = "git://git.openembedded.org/bitbake;name=bitbake;branch=2.20;destsuffix=bitbake;protocol=https \
+           git://git.openembedded.org/openembedded-core;name=oe-core;branch=blacksail;destsuffix=openembedded-core;protocol=https \
+           git://git.yoctoproject.org/meta-yocto;name=yocto;branch=blacksail;destsuffix=meta-yocto;protocol=https \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \
            file://README_VirtualBox_Guest_Additions.txt \

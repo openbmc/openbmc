@@ -13,7 +13,8 @@ BINCONFIG = "${bindir}/ncurses5-config ${bindir}/ncursesw5-config \
 inherit autotools binconfig-disabled multilib_header pkgconfig
 
 # Upstream has useful patches at times at ftp://invisible-island.net/ncurses/
-SRC_URI = "git://github.com/ThomasDickey/ncurses-snapshots.git;protocol=https;branch=master"
+GIT_TAG = "v${@d.getVar('PV').replace('.', '_').replace('+', '_')}"
+SRC_URI = "git://github.com/ThomasDickey/ncurses-snapshots.git;protocol=https;branch=master;tag=${GIT_TAG}"
 
 EXTRA_AUTORECONF = "-I m4"
 

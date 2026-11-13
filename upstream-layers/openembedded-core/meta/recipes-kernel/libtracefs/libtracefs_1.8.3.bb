@@ -7,7 +7,7 @@ SECTION = "libs"
 DEPENDS = "libtraceevent bison-native flex-native"
 
 SRCREV = "6fad6a14ba0d4c4b437d9e4eed7098d4bb07b4fc"
-SRC_URI = "git://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git;branch=${BPN};protocol=https"
+SRC_URI = "git://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git;branch=${BPN};protocol=https;tag=${BPN}-${PV}"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[doc] = ",-Ddoc=false,asciidoc-native xmlto-native"

@@ -1,0 +1,65 @@
+From: Mark Wielaard <mark@klomp.org>
+To: elfutils-devel@sourceware.org
+Cc: ross@burtonini.com, Mark Wielaard <mark@klomp.org>
+Subject: [PATCH] srcfiles: Always process the "zero" file table entry (CU comp_dir/name)
+Date: Tue, 22 Sep 2026 13:46:06 +0200
+Message-ID: <20260922114606.2865660-1-mark@klomp.org>
+X-Mailer: git-send-email 2.55.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on gnu.wildebeest.org
+
+If the main CU file doesn't contain any references to the file table
+it wouldn't show up in the src files list (except if --cu-only was
+given). This is because file entry "zero" is special. It cannot be
+referred to by DW_AT file attributes (because zero means, no
+file). But technically it should be equal to (implicitly before
+DWARF5) the DW_AT_name of the main CU DIE (using a zero directory
+entry, equal to DW_AT_comp_dir). collect_sourcefiles skipped this
+implicit zero entry unless --cu-only was given.
+
+Fix this by always handling the zero file table entry. And for
+--cu-only to just exit the loop early, so no other entries are handled
+This is also an optimization, before --cu-only would go through all
+indexes, but always added the CU name. Which worked, because
+duplicates were removed, but was somewhat inefficient.
+
+	   * src/srcfiles.cxx (collect_sourcefiles): Go from index
+	   zero, exit after zero index for CU_only, always handle
+	   index zero specially.
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=34666
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+
+Upstream-Status: Backport [7b675cbdb0d1f216938b4b33aea30fd35fb1ae0a]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/srcfiles.cxx | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/srcfiles.cxx b/src/srcfiles.cxx
+index 9bbb6ef10473..e2fc0f128d71 100644
+--- a/src/srcfiles.cxx
++++ b/src/srcfiles.cxx
+@@ -273,10 +273,14 @@ collect_sourcefiles (Dwfl_Module *dwflmod,
+             clog << "skipping cu=" << cuname << " due to empty comp_dir" << endl;
+           continue;
+         }
+-      for (size_t f = 1; f < nfiles; ++f)
++      for (size_t f = 0; f < nfiles; ++f)
+         {
++	  /* For --cu-only we are only interested in the "zero" entry.  */
++	  if (CU_only && f != 0)
++	    break;
++
+           const char *hat;
+-          if (CU_only)
++          if (f == 0)
+           {
+             if (strcmp(cuname, "<unknown>") == 0 || strcmp(cuname, "<artificial>") == 0 )
+               continue;
+-- 
+2.55.0

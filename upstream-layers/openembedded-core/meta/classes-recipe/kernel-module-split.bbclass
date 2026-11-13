@@ -53,8 +53,15 @@ post_strip_kernel_modules_signing(){
     is_modules="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULES)"
     is_module_sig="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULE_SIG)"
     is_module_sig_all="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULE_SIG_ALL)"
+    is_module_compress_all="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULE_COMPRESS_ALL)"
 
-    if [ "$is_modules" = "y" ] && [ "$is_module_sig" = "y" ] && [ "$is_module_sig_all" = "y" ]; then
+    # Compressed modules are not ELF files, so package stripping leaves them
+    # untouched and the signature made during modules_install is still valid.
+    # Re-signing them is not only unnecessary but fails: with
+    # CONFIG_MODULE_COMPRESS_ALL the install targets carry the compression
+    # suffix, and the uncompressed module their rule depends on does not
+    # exist below ${PKGD}.
+    if [ "$is_modules" = "y" ] && [ "$is_module_sig" = "y" ] && [ "$is_module_sig_all" = "y" ] && [ "$is_module_compress_all" != "y" ]; then
         # Sign modules under ${PKGD}, with M= if out-of-tree module.
         # Out-of-tree module Makefiles invoke the kernel Makefile by appending M= (the module directory) to MAKEFLAGS.
         # However, they usually do not provide a modules_sign target. Therefore, the kernel modules_sign target has to

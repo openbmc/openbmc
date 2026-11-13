@@ -53,6 +53,9 @@ inherit upstream-stable-release-point
 EXTRA_OEMAKE = "NO_RUST=1 NO_PYTHON=1 CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}'"
 EXTRA_OEMAKE += "'PERL_PATH=/usr/bin/env perl'"
 EXTRA_OEMAKE += "COMPUTE_HEADER_DEPENDENCIES=no"
+# git's Makefile falls back to uname -m for HOST_CPU and bakes the result
+# into the binary, which makes git differ between x86 and arm build hosts.
+EXTRA_OEMAKE += "HOST_CPU=${TARGET_ARCH}"
 EXTRA_OEMAKE:append:class-native = " NO_CROSS_DIRECTORY_HARDLINKS=1"
 
 do_compile:prepend () {

@@ -13,9 +13,7 @@ SRC_URI[sha256sum] = "39ad9eb9e1b935d6838f4b3aee4d6e72db65df5602f6feda998dbb4fe8
 RDEPENDS:${PN} += "\
     python3-compression \
     python3-doctest \
-    python3-extras \
     python3-json \
-    python3-six \
     "
 
 BBCLASSEXTEND = "nativesdk"

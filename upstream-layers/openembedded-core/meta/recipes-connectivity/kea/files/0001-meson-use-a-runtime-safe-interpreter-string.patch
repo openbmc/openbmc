@@ -1,4 +1,4 @@
-From 312f5b7e8286c306502bed348fe5da765c20f98d Mon Sep 17 00:00:00 2001
+From 8f832387e2e31683dca5df092c464ad655a417d2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 28 Aug 2025 17:02:49 -0700
 Subject: [PATCH] meson: use a runtime-safe interpreter string
@@ -44,10 +44,10 @@ index 5fc5ee9..6485ce2 100644
  if PDFLATEX.found()
      doc_conf.set('HAVE_PDFLATEX', 'yes')
 diff --git a/meson.build b/meson.build
-index f3ef0ea..11a41cf 100644
+index 4e9ce4b..3cd8987 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -648,9 +648,13 @@ link_args = []
+@@ -655,9 +655,13 @@ link_args = []
  # Also, Meson might use it by default, but might not use it on all systems, so lots of variables...
  # EXECUTABLE_RPATH = f'$ORIGIN/../@LIBDIR@'
  # HOOK_RPATH = '$ORIGIN/../..'
@@ -62,7 +62,7 @@ index f3ef0ea..11a41cf 100644
  
  # Add rpaths for NETCONF dependencies.
  if NETCONF_DEP.found()
-@@ -769,7 +773,13 @@ report_conf_data.set('CXX_ARGS', ' '.join(compile_args))
+@@ -776,7 +780,13 @@ report_conf_data.set('CXX_ARGS', ' '.join(compile_args))
  report_conf_data.set('LD_ID', cpp.get_linker_id())
  link_args += get_option('cpp_link_args')
  report_conf_data.set('LD_ARGS', ' '.join(link_args))

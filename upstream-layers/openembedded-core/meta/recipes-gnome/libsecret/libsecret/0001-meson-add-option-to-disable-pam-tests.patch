@@ -1,24 +1,28 @@
-From a9fd7dcddf8bc64646f2945ab564357c23111541 Mon Sep 17 00:00:00 2001
+From 5a7a8d10d08892dda84092afbcf5fbdeceed0287 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Tue, 3 Dec 2024 15:58:17 +0100
 Subject: [PATCH] meson: add option to disable pam tests
 
 Upstream-Status: Denied [https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/151]
 
+refreshed for 0.21.8.2
+
 Signed-off-by: Markus Volk <f_l_k@t-online.de>
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
 ---
- meson_options.txt |  1 +
+ meson_options.txt |  6 ++++++
  pam/meson.build   | 44 +++++++++++++++++++++++---------------------
- 2 files changed, 24 insertions(+), 21 deletions(-)
+ 2 files changed, 29 insertions(+), 21 deletions(-)
 
 diff --git a/meson_options.txt b/meson_options.txt
-index 936eff8..2ae14f2 100644
+index d7b1628..0bed21d 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -61,3 +61,8 @@
-   description: 'Build PAM module',
+@@ -66,3 +66,9 @@ option('test_setup',
+   value: 'auto',
+   description: 'Automatically setup a test environment when running tests',
  )
-
++
 +option('pam-tests',
 +  type: 'boolean',
 +  value: true,

@@ -1,0 +1,74 @@
+From 6a131b32e0fe948e845ae4bf41f8fed003ec30ce Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Tue, 22 Sep 2026 01:55:01 +0900
+Subject: [PATCH] include: fix limits.h override
+
+This is especially necessary since GCC 16.x.
+
+=====
+$ gcc --version
+gcc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)
+Copyright (C) 2026 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+=====
+
+Without this change, /usr/include/limits.h is not included, hence POSIX
+constants are not defined:
+=====
+$ echo '#include <limits.h>' | gcc -E -H -isystem ~/git/systemd/src/include/musl - 2>&1 >/dev/null | grep '^\..*limit'
+. /home/watanabe/git/systemd/src/include/musl/limits.h
+.. /usr/lib/gcc/x86_64-redhat-linux/16/include/limits.h
+... /usr/lib/gcc/x86_64-redhat-linux/16/include/syslimits.h
+=====
+
+With this change, /usr/include/limits.h is included, thus POSIX
+constants are defined:
+=====
+$ echo '#include <limits.h>' | gcc -E -H -isystem ~/git/systemd/src/include/musl - 2>&1 >/dev/null | grep '^\..*limit'
+. /home/watanabe/git/systemd/src/include/musl/limits.h
+.. /usr/lib/gcc/x86_64-redhat-linux/16/include/limits.h
+... /usr/include/limits.h
+...... /usr/include/linux/limits.h
+.. /usr/lib/gcc/x86_64-redhat-linux/16/include/limits.h
+=====
+
+Replaces #43824.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/pull/43831]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/include/musl/limits.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/include/musl/limits.h b/src/include/musl/limits.h
+index 9620a3b0ac..bcc585be2c 100644
+--- a/src/include/musl/limits.h
++++ b/src/include/musl/limits.h
+@@ -1,6 +1,26 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+ #pragma once
+ 
++/* GCC introduces a spurious, tricky inclusion cycle:
++ *    GCC's limits.h
++ *      -> GCC's syslimits.h
++ *         -> GCC's limits.h (again!!!)
++ *            -> glibc/musl's limits.h
++ *               -> define POSIX defines
++ *      -> define ISO C defines
++ * This works only when GCC's limits.h is included first, but a user override breaks the cycle. Hence, we
++ * need to manually achieve the cycle here. If GCC is not used (e.g., Clang), then including the compiler's
++ * limits.h twice should be redundant but harmless. */
++
++/* First, get the POSIX defines from glibc/musl's limits.h. When the two macros below are defined, GCC's
++ * limits.h includes the next limits.h, that is, one from glibc/musl. */
++#define _GCC_LIMITS_H_
++#define _GCC_NEXT_LIMITS_H
++#include_next <limits.h>        /* IWYU pragma: export */
++#undef _GCC_NEXT_LIMITS_H
++#undef _GCC_LIMITS_H_
++
++/* Next, get the ISO C defines from GCC's limits.h. */
+ #include_next <limits.h>        /* IWYU pragma: export */
+ 
+ #include <assert.h>

@@ -25,7 +25,7 @@ import bb
 from devtool import exec_build_env_command, setup_tinfoil, check_workspace_recipe, DevtoolError, parse_recipe
 from devtool.standard import get_real_srctree
 from devtool.deploy import parse_packages_arg
-from devtool.ide_plugins import BuildTool, DebuggerCrossConfig
+from devtool.ide_plugins import BuildTool, DebuggerCrossConfig, LOOPBACK_HOSTS, is_loopback_target
 from oe.kernel_module import kernel_module_os_env
 from pseudo_rootfs_utils import PseudoRootfsError, extract_sdk_rootfs, pseudo_state_dir
 
@@ -46,20 +46,6 @@ class DevtoolIdeMode(Enum):
 
     modified = 'modified'
     shared = 'shared'
-
-
-# Hosts a ssh target is considered to loop back to the local machine, e.g. a
-# QEMU instance reached through slirp/hostfwd port forwarding (root@localhost)
-# which has an ephemeral ssh host key that changes on every boot.
-LOOPBACK_HOSTS = ('localhost', '127.0.0.1', '::1')
-
-
-def target_host(target):
-    return target.split('@')[-1]
-
-
-def is_loopback_target(target):
-    return target_host(target) in LOOPBACK_HOSTS
 
 
 class TargetDevice:
@@ -137,7 +123,6 @@ class RecipeGdbCross(RecipeNative):
         super().__init__('gdb-cross-' + target_arch, target_arch)
         self.target_device = target_device
         self.gdb = None
-        self.gdbserver_port_next = int(args.gdbserver_port_start)
         self.config_db = {}
 
     def __find_gdbserver(self, config, tinfoil):
@@ -225,6 +210,7 @@ class RecipeImage:
         self.qb_slirp_opt = ''
         self.fakerootcmd = None
         self.fakerootenv = None
+        self.staging_dir_native_qemu_helper = None
         self.bootstrap_tasks = [self.name + ':do_build']
         # Debug settings already provided by the base configuration (e.g.
         # local.conf, MACHINE, DISTRO, the recipe itself) plus any bbappend
@@ -235,6 +221,9 @@ class RecipeImage:
         self.base_image_fstypes_debugfs = ''
         self.base_has_combined_dbg = False
         self.base_image_install = set()
+        self.base_image_install_debugfs = set()
+        # Packages IDE plugins want added to IMAGE_INSTALL_DEBUGFS
+        self.extra_image_install_debugfs = set()
         self._bbappend = None
         # Content of the bbappend before strip_bbappend_sections() ran.
         self._orig_bbappend_content = orig_bbappend_content
@@ -269,7 +258,7 @@ class RecipeImage:
                     f.write(stripped)
         return originals
 
-    def initialize(self, config, tinfoil):
+    def initialize(self, config, tinfoil, nfs=None):
         appends_dir = os.path.join(config.workspace_path, 'appends')
         self._bbappend = os.path.join(appends_dir, self.name + '.bbappend')
 
@@ -293,6 +282,8 @@ class RecipeImage:
             'image-combined-dbg', image_d)
         self.base_image_install = set(
             (image_d.getVar('IMAGE_INSTALL') or '').split())
+        self.base_image_install_debugfs = set(
+            (image_d.getVar('IMAGE_INSTALL_DEBUGFS') or '').split())
 
         workdir = image_d.getVar('WORKDIR')
         self.__rootfs = os.path.join(workdir, 'rootfs')
@@ -303,6 +294,13 @@ class RecipeImage:
         self.qb_slirp_opt = image_d.getVar('QB_SLIRP_OPT') or ''
         self.fakerootcmd = image_d.getVar('FAKEROOTCMD')
         self.fakerootenv = image_d.getVar('FAKEROOTENV')
+
+        # Only needed by nfs_hw_helper()
+        if nfs:
+            qemu_helper_native_d = parse_recipe(
+                config, tinfoil, 'qemu-helper-native', appends=True, filter_workspace=False)
+            self.staging_dir_native_qemu_helper = (
+                qemu_helper_native_d.getVar('STAGING_DIR_NATIVE') if qemu_helper_native_d else None)
 
     @property
     def debug_support(self):
@@ -360,6 +358,38 @@ class RecipeImage:
         os.chmod(helper, os.stat(helper).st_mode | stat.S_IEXEC)
         return helper
 
+    def nfs_hw_helper(self, nfs_export_base_dir, nfs):
+        """Create a helper that exports the selected rootfs and the kernel to a target.
+
+        The rootfs is exported over NFS with runqemu-export-rootfs
+        The deploy directory (fitImage/kernel) is served over plain
+        HTTP, e.g. for a U-Boot 'wget' in recovery/netboot mode.
+        """
+        export_dir = os.path.join(nfs_export_base_dir, self.pn)
+        rootfs_dir = self.nfs_rootfs_dir(nfs_export_base_dir, nfs)
+
+        helper = os.path.join(export_dir, 'export-hw-' + nfs)
+        with open(helper, 'w') as helper_file:
+            helper_file.write('#!/bin/sh\n')
+            helper_file.write('set -e\n')
+            if self.staging_dir_native_qemu_helper:
+                # Skips oe-find-native-sysroot's own bitbake-getvar call, see
+                # the comment on staging_dir_native's resolution in initialize().
+                helper_file.write(
+                    'export OECORE_NATIVE_SYSROOT=%s\n' % shlex.quote(self.staging_dir_native_qemu_helper))
+            helper_file.write(
+                'runqemu-export-rootfs start %s\n' % shlex.quote(rootfs_dir))
+            helper_file.write(
+                'trap \'runqemu-export-rootfs stop %s\' EXIT INT TERM\n' %
+                shlex.quote(rootfs_dir))
+            helper_file.write('cd %s\n' % shlex.quote(self.deploy_dir_image))
+            helper_file.write(
+                'echo "Serving %s over HTTP on port ${PORT:-8080}"\n' %
+                self.deploy_dir_image)
+            helper_file.write('python3 -m http.server "${PORT:-8080}"\n')
+        os.chmod(helper, os.stat(helper).st_mode | stat.S_IEXEC)
+        return helper
+
     def update_image_bbappend(self, recipes_modified, nfs=None):
         """Write debug settings for modified-mode recipes into the image bbappend.
 
@@ -406,10 +436,14 @@ class RecipeImage:
         if wants_lldb_server and 'lldb-server' not in self.base_image_install:
             lines.append('IMAGE_INSTALL:append = " lldb-server"')
         for r in recipes_modified:
+            if not r.wants_image_install:
+                continue
             if r.name not in self.base_image_install:
                 lines.append('IMAGE_INSTALL:append = " %s"' % r.name)
             if r.has_ptest and (r.name + '-ptest') not in self.base_image_install:
                 lines.append('IMAGE_INSTALL:append = " %s-ptest"' % r.name)
+        for pkg in sorted(self.extra_image_install_debugfs - self.base_image_install_debugfs):
+            lines.append('IMAGE_INSTALL_DEBUGFS:append = " %s"' % pkg)
 
         original_content = self._orig_bbappend_content or ''
         # strip_bbappend_sections() left this on disk, and it is what bitbake
@@ -486,6 +520,14 @@ class RecipeImage:
                 '  %s %s\n'
                 'Pass any additional runqemu options to this helper.',
                 helper, opts)
+
+        hw_helper = self.nfs_hw_helper(nfs_export_base_dir, nfs)
+        logger.info(
+            'With the build environment sourced, export the rootfs (NFS) and '
+            'the kernel (HTTP) for a real hardware target instead of QEMU:\n'
+            '  %s\n'
+            'Set PORT to override the HTTP port (default: 8080).',
+            hw_helper)
 
     def update_qb_slirp_opt(self):
         """Update QB_SLIRP_OPT in the image bbappend
@@ -754,6 +796,11 @@ class RecipeModified:
 
     MARKER = '# devtool ide-sdk: clangd toolchain support'
 
+    # PROVIDES of recipes that are deployed via do_deploy (e.g. to
+    # DEPLOY_DIR_IMAGE) rather than installed into the rootfs, so adding them
+    # to IMAGE_INSTALL or attaching a userspace gdbserver does not make sense.
+    NON_IMAGE_INSTALL_PROVIDES = {'virtual/kernel', 'virtual/bootloader'}
+
     def __init__(self, name, orig_bbappend_content=None):
         self.name = name
         self.bootstrap_tasks = [name + ':do_install']
@@ -783,6 +830,7 @@ class RecipeModified:
         self.package_debug_split_style = None
         self.path = None
         self.pn = None
+        self.provides = []
         self.recipe_id = None
         self.recipe_sysroot = None
         self.recipe_sysroot_native = None
@@ -808,6 +856,8 @@ class RecipeModified:
         self.build_tool = BuildTool.UNDEFINED
         # Whether this recipe benefits from gdbserver and rootfs-dbg in the image.
         self.wants_gdbserver = True
+        # Whether this recipe should be added to IMAGE_INSTALL automatically
+        self.wants_image_install = True
         # Whether to warn when DEBUG_BUILD is not set.  Kernel modules are built
         # by the kernel's build system and DEBUG_BUILD does not influence them.
         self.wants_debug_build = True
@@ -942,6 +992,14 @@ class RecipeModified:
             self.packages_files[package] = recipe_d.getVar('FILES:' + package) or ''
         self.path = recipe_d.getVar('PATH')
         self.pn = recipe_d.getVar('PN')
+        self.provides = (recipe_d.getVar('PROVIDES') or '').split()
+        if self.NON_IMAGE_INSTALL_PROVIDES.intersection(self.provides):
+            self.wants_image_install = False
+            self.wants_gdbserver = False
+        ide_sdk_auto_image_install = recipe_d.getVar('IDE_SDK_AUTO_IMAGE_INSTALL')
+        if ide_sdk_auto_image_install is not None:
+            self.wants_image_install = bb.utils.to_boolean(
+                ide_sdk_auto_image_install)
         self.recipe_sysroot = os.path.realpath(
             recipe_d.getVar('RECIPE_SYSROOT'))
         self.recipe_sysroot_native = os.path.realpath(
@@ -1151,61 +1209,29 @@ class RecipeModified:
         return mappings
 
     def _add_broken_srctree_prefix_map(self, mappings):
-        """Work around a -f*-prefix-map / DWARF path resolution issue affecting
-        out-of-tree devtool workspaces (e.g. meson recipes built via 'devtool modify'
-        with the clang toolchain).
+        """Work around broken DWARF paths for out-of-tree meson+clang workspaces.
 
-        meson/ninja may invoke the compiler with a *relative* source file path
-        when the build directory B (under WORKDIR) and the source directory S
-        (relocated outside WORKDIR by 'devtool modify') only share a distant
-        common ancestor. -fdebug-prefix-map/-ffile-prefix-map only rewrite
-        paths that literally start with the mapped host prefix, so a relative
-        path argument is never rewritten: only DW_AT_comp_dir (which is
-        absolute) gets rewritten, DW_AT_name stays relative and unrewritten.
-
-        This has only been observed to actually happen with the clang
-        toolchain: clang's meson/ninja invocation embeds a relative DW_AT_name
-        for out-of-tree sources, while gcc, even via meson/ninja, embeds an
-        absolute (and correctly -fdebug-prefix-map-rewritten) DW_AT_name, so
-        no underflow can happen there - confirmed empirically:
-        oe-selftest's test_devtool_ide_sdk_none_qemu (gcc toolchain, covering
-        both cmake-example and meson-example) fails when this workaround is
-        applied unconditionally to meson, while the dedicated clang tests
-        (test_devtool_ide_sdk_{code,none}_meson_clang) require it. cmake
-        (with the Ninja or Makefiles generators used here) always passes
-        absolute source paths to the compiler regardless of toolchain, so it
-        never needs this workaround either. Applying this workaround outside
-        of the meson+clang combination would incorrectly discard the correct
-        (and, for gcc/cmake, already working) comp_dir-based mapping - see the
-        'del mappings[target_path]' below - falling back to the generic
-        '/usr/src/debug' mapping to the image's (stale, whole-image-build-time)
-        rootfs-dbg instead of the live source tree.
+        meson/ninja invoke clang with a *relative* source path when B (under
+        WORKDIR) and S (relocated by 'devtool modify') only share a distant
+        common ancestor. -f*-prefix-map only rewrites paths starting with the
+        mapped host prefix, so only DW_AT_comp_dir (absolute) gets rewritten;
+        DW_AT_name stays relative. gcc always emits an absolute DW_AT_name
+        here, and cmake always passes absolute source paths regardless of
+        toolchain, so neither needs this workaround (verified by
+        oe-selftest's DevtoolIdeSdkGccTests/DevtoolIdeSdkClangTests).
 
         Debuggers resolve the compile unit path by joining DW_AT_comp_dir with
-        the relative DW_AT_name, popping one path component per leading "..".
-        If DW_AT_name contains more ".." components than DW_AT_comp_dir has
-        path components, the extra ".." are no-ops once the root is reached
-        (they can't go above "/"), so the final resolved path becomes "/"
-        followed by the leftover (non-"..") components of DW_AT_name - i.e. a
-        suffix of the real, absolute source directory rather than the
-        "/usr/src/debug/<pn>/<pv>" prefix that DEBUG_PREFIX_MAP and the
-        generated sourceMap/sourceFileMap assume.
+        DW_AT_name, popping one path component per leading "..". Once DW_AT_name
+        has more ".." than DW_AT_comp_dir has components, the extra ".." are
+        no-ops at "/", leaving a suffix of the real source directory instead of
+        the expected "/usr/src/debug/<pn>/<pv>" prefix.
 
-        This computes that resolved suffix for the recipe's own source
-        directory (S) and replaces the (now dead, since every file under S is
-        affected the same way) comp_dir-based mapping with it, so debuggers
-        relying on prefix matching (e.g. CodeLLDB, GDB) can still locate the
-        sources.
-
-        Note: the original comp_dir-based target_path is removed rather than
-        kept alongside the new one. Keeping both would mean two different
-        target paths map to the same host path (S), which is ambiguous when a
-        debugger needs to go the other way round: translating a local file
-        (opened from the host/workspace) back into a debug-info path in order
-        to resolve a source breakpoint. CodeLLDB in particular appears to
-        pick the first-registered ("normal", comp_dir-based) mapping in that
-        case, which never matches any real compile unit here, leaving the
-        breakpoint pending with 0 locations.
+        This computes that resolved suffix for S and replaces the (now dead)
+        comp_dir-based mapping with it, so prefix-matching debuggers (CodeLLDB,
+        GDB) can still find the sources. The old target_path is removed rather
+        than kept alongside: keeping both would let a debugger's reverse
+        lookup (host file -> debug-info path, e.g. to resolve a breakpoint)
+        pick the comp_dir-based one, which never matches any compile unit.
         """
         if self.build_tool is not BuildTool.MESON or self.toolchain != "clang":
             return
@@ -1728,6 +1754,10 @@ def ide_setup(args, config, basepath, workspace):
         config, args.recipenames)
     orig_recipe_bbappend_contents = RecipeModified.strip_bbappend_sections(
         config, args.recipenames)
+    ide_names = args.ide or [list(ide_plugins.keys())[0]]
+    if 'all' in ide_names:
+        ide_names = list(ide_plugins.keys())
+    ides = [ide_plugins[name]() for name in ide_names]
     tinfoil = setup_tinfoil(config_only=False, basepath=basepath)
     try:
         # define mode depending on recipes which need to be processed
@@ -1804,7 +1834,7 @@ def ide_setup(args, config, basepath, workspace):
             recipe_image = RecipeImage(
                 recipes_image_name,
                 orig_bbappend_contents.get(recipes_image_name))
-            recipe_image.initialize(config, tinfoil)
+            recipe_image.initialize(config, tinfoil, args.nfs)
             recipe_image.set_nfs_rootfs(nfs_export_base_dir, args.nfs)
             # With --skip-bitbake nothing is extracted, so the generated IDE
             # configuration would point at a directory that never appears.
@@ -1845,11 +1875,14 @@ def ide_setup(args, config, basepath, workspace):
         if args.mode == DevtoolIdeMode.modified:
             logger.info("Setting up workspaces for modified recipe: %s" %
                         str(recipes_modified_names))
+            DebuggerCrossConfig._port_next = int(args.gdbserver_port_start)
             debuggers = {}
             for recipe_name in recipes_modified_names:
                 recipe_modified = RecipeModified(
                     recipe_name, orig_recipe_bbappend_contents.get(recipe_name))
                 recipe_modified.initialize(config, workspace, tinfoil)
+                for ide in ides:
+                    ide.initialize_modified_recipe(config, tinfoil, recipe_modified)
                 bootstrap_tasks += recipe_modified.bootstrap_tasks
                 recipes_modified.append(recipe_modified)
 
@@ -1908,18 +1941,18 @@ def ide_setup(args, config, basepath, workspace):
                 config.init_path, basepath,
                 bb_cmd + ' '.join(bootstrap_tasks_late), watch=True)
 
-    # Instantiate the active IDE plugin
-    ide = ide_plugins[args.ide]()
     if args.mode == DevtoolIdeMode.shared:
-        ide.setup_shared_sysroots(shared_env)
+        for ide in ides:
+            ide.setup_shared_sysroots(shared_env)
     elif args.mode == DevtoolIdeMode.modified:
         for recipe_modified in recipes_modified:
             if recipe_modified.build_tool is BuildTool.CMAKE:
                 recipe_modified.cmake_preset()
             if recipe_modified.build_tool is BuildTool.MESON:
                 recipe_modified.gen_meson_wrapper()
-            ide.setup_modified_recipe(
-                args, recipe_image, recipe_modified)
+            for ide in ides:
+                ide.setup_modified_recipe(
+                    args, recipe_image, recipe_modified)
 
             if recipe_modified.wants_debug_build and recipe_modified.debug_build != '1':
                 logger.warn(
@@ -2025,14 +2058,20 @@ def register_commands(subparsers, context):
         '  To use this tool-chain the environment-* file found in the deploy..image folder needs to be sourced into a shell.\n'
         '  In case of VSCode and cmake the tool-chain is also exposed as a cmake-kit')
     default_ide = list(ide_plugins.keys())[0]
+    ide_choices = list(ide_plugins.keys()) + ['all']
     parser_ide_sdk.add_argument(
-        '-i', '--ide', choices=ide_plugins.keys(), default=default_ide,
-        help='Setup the configuration for this IDE (default: %s)' % default_ide)
+        '-i', '--ide', action='append', choices=ide_choices,
+        metavar='{%s}' % ','.join(ide_choices),
+        help='IDE to setup the configuration for. May be specified multiple times '
+        'to set up more than one IDE. "all" sets up every supported IDE '
+        '(choices: %s, default: %s)' % (', '.join(ide_choices), default_ide))
     parser_ide_sdk.add_argument(
         '-t', '--target', default='root@192.168.7.2',
         help='Live target machine running an ssh server: user@hostname.')
     parser_ide_sdk.add_argument(
-        '-G', '--gdbserver-port-start', default="1234", help='port where gdbserver is listening.')
+        '-G', '--gdbserver-port-start', default="1234",
+        help='First port used by the debug servers on the target. Each debug '
+             'configuration consumes one port, counting up from here.')
     parser_ide_sdk.add_argument(
         '-c', '--no-host-check', help='Disable ssh host key checking', action='store_true')
     parser_ide_sdk.add_argument(

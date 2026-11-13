@@ -24,7 +24,7 @@ PACKAGES =+ "${PN}-tools"
 FILES:${PN}-tools = "${bindir}/*.pl"
 
 SRC_URI = "\
-    git://github.com/makedumpfile/makedumpfile;branch=${SRCBRANCH};protocol=https \
+    git://github.com/makedumpfile/makedumpfile;branch=${SRCBRANCH};protocol=https;tag=${PV} \
     file://0001-makedumpfile-replace-hardcode-CFLAGS.patch \
 "
 

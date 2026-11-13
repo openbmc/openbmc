@@ -84,6 +84,8 @@ def add_license_expression(
     if s is None:
         return None
 
+    walk_license(s)
+
     o = objset.new_license_expression(s.to_string(), license_data, license_text_map)
     objset.set_element_alias(o)
     return o

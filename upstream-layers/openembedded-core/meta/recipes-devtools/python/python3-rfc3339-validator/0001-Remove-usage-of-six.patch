@@ -1,0 +1,62 @@
+From 9e74298b018d61f93768061800fa670de8e34dfe Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 14 Sep 2026 22:27:29 +0100
+Subject: [PATCH] Remove usage of six
+
+The last release of Python 2 was 2.7.18, released in April 2020. Python
+was officially end-of-life in 2020.  I think it's time to stop catering
+for people using Python 2, so drop the usage of six.
+
+Closes #11.
+
+Upstream-Status: Submitted [https://github.com/naimetti/rfc3339-validator/pull/14]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ rfc3339_validator.py            | 7 +------
+ setup.py                        | 4 +---
+ tests/test_rfc3339_validator.py | 9 +--------
+ 3 files changed, 3 insertions(+), 17 deletions(-)
+
+diff --git a/rfc3339_validator.py b/rfc3339_validator.py
+index 4be5e87..efc9b7d 100644
+--- a/rfc3339_validator.py
++++ b/rfc3339_validator.py
+@@ -6,11 +6,6 @@ __version__ = '0.1.4'
+ 
+ import re
+ import calendar
+-import six
+-
+-RFC3339_REGEX_FLAGS = 0
+-if six.PY3:
+-    RFC3339_REGEX_FLAGS |= re.ASCII
+ 
+ RFC3339_REGEX = re.compile(r"""
+     ^
+@@ -30,7 +25,7 @@ RFC3339_REGEX = re.compile(r"""
+        | [+-](?:[01]\d|2[0123]):[0-5]\d # Offset
+     )
+     $
+-""", re.VERBOSE | RFC3339_REGEX_FLAGS)
++""", re.VERBOSE | re.ASCII)
+ 
+ 
+ def validate_rfc3339(date_string):
+diff --git a/setup.py b/setup.py
+index 73186bd..b9936b0 100644
+--- a/setup.py
++++ b/setup.py
+@@ -8,9 +8,7 @@ from setuptools import setup, find_packages
+ with open('README.md') as readme_file:
+     readme = readme_file.read()
+ 
+-requirements = [
+-    'six',
+-]
++requirements = []
+ 
+ setup_requirements = []
+ 
+-- 
+2.43.0
+

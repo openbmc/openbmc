@@ -39,7 +39,6 @@ DEPENDS += " \
           gtk4 \
           libxslt \
           libtasn1 \
-          libnotify \
           gstreamer1.0 \
           gstreamer1.0-plugins-base \
           glib-2.0-native \

@@ -1,4 +1,4 @@
-From b03c399e392c492782e680f66dd47bd34b325ab9 Mon Sep 17 00:00:00 2001
+From c8168ea990a1048eb01b20433b754244cdf0c475 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Wed, 8 Jul 2026 09:45:06 -0400
 Subject: [PATCH] t9042-dos-partition-limit.sh: unconditionally skip
@@ -26,6 +26,3 @@ index 87a32df..d6e8d75 100644
  grep '^#define USE_BLKID 1' "$CONFIG_HEADER" > /dev/null ||
    skip_ 'this system lacks a new-enough libblkid'
  
--- 
-2.55.0
-

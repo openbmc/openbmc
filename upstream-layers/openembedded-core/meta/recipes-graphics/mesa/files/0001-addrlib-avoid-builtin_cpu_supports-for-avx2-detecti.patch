@@ -1,4 +1,4 @@
-From 229a8815750765d7125f0c7efe9c8d6216678bef Mon Sep 17 00:00:00 2001
+From 52293e90484f07b5186f2f1fa7de63da0f120122 Mon Sep 17 00:00:00 2001
 From: Khem Raj <khem.raj@oss.qualcomm.com>
 Date: Thu, 13 Aug 2026 00:00:00 +0000
 Subject: [PATCH] addrlib: avoid __builtin_cpu_supports for avx2 detection

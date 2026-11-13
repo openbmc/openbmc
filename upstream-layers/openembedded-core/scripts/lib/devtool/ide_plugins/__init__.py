@@ -15,6 +15,20 @@ from devtool import DevtoolError
 logger = logging.getLogger('devtool')
 
 
+# Hosts a ssh target is considered to loop back to the local machine, e.g. a
+# QEMU instance reached through slirp/hostfwd port forwarding (root@localhost)
+# which has an ephemeral ssh host key that changes on every boot.
+LOOPBACK_HOSTS = ('localhost', '127.0.0.1', '::1')
+
+
+def target_host(target):
+    return target.split('@')[-1]
+
+
+def is_loopback_target(target):
+    return target_host(target) in LOOPBACK_HOSTS
+
+
 class BuildTool(Enum):
     UNDEFINED = auto()
     CMAKE = auto()
@@ -352,6 +366,10 @@ class IdeBase:
     def setup_shared_sysroots(self, shared_env):
         logger.warn("Shared sysroot mode is not supported for IDE %s" %
                     self.ide_name)
+
+    def initialize_modified_recipe(self, config, tinfoil, recipe_modified):
+        """Hook called once per modified recipe, inside the shared tinfoil session"""
+        pass
 
     def setup_modified_recipe(self, args, image_recipe, modified_recipe):
         logger.warn("Modified recipe mode is not supported for IDE %s" %

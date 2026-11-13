@@ -1,0 +1,50 @@
+From 333f149e218bc2b5e4f601443fcc8fe572d048b1 Mon Sep 17 00:00:00 2001
+From: Christophe Lyon <christophe.lyon@arm.com>
+Date: Fri, 18 Sep 2026 15:58:02 +0200
+Subject: [PATCH] Fix check for working assembler --gdwarf-4 option
+
+The code fragment used to check for --gdwarf-4 option with the APP
+marker ends with a hard-coded 'ret' instruction, which is not supported
+by all architectures (e.g. arm).  Replace it with $insn.
+
+gcc/ChangeLog:
+
+	* configure.ac: Replace 'ret' with '$insn'.
+	* configure: Regenerate.
+
+Upstream-Status: Backport [gcc 316c6dddbb4858c2c34b58b3bddc6b85923d2799]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ gcc/configure    | 2 +-
+ gcc/configure.ac | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/configure b/gcc/configure
+index 4a90e86ed9f..4c45f8e7376 100755
+--- a/gcc/configure
++++ b/gcc/configure
+@@ -32340,7 +32340,7 @@ foo:
+ 	.file 1 \"foo.c\"
+ 	$insn
+ 	.file 2 \"foo.h\"
+-	ret
++	$insn
+ "
+    dwarf4_success=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler for --gdwarf-4 with the APP marker" >&5
+diff --git a/gcc/configure.ac b/gcc/configure.ac
+index abf5e4f4e7e..ca6d098b501 100644
+--- a/gcc/configure.ac
++++ b/gcc/configure.ac
+@@ -5914,7 +5914,7 @@ foo:
+ 	.file 1 \"foo.c\"
+ 	$insn
+ 	.file 2 \"foo.h\"
+-	ret
++	$insn
+ "
+    dwarf4_success=no
+    gcc_GAS_CHECK_FEATURE([--gdwarf-4 with the APP marker],
+-- 
+2.43.0
+

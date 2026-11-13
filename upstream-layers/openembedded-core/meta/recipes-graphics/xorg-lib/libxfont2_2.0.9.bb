@@ -21,3 +21,6 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
 CVE_PRODUCT = "libxfont libxfont2"
+
+CVE_STATUS[CVE-2026-44950] = "fixed-version: fixed since v2.0.9"
+CVE_STATUS[CVE-2026-59679] = "fixed-version: fixed since v2.0.9"

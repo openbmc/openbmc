@@ -13,21 +13,22 @@ Move the HAVE_CLANG block up into the FULL_OPTIMIZATION case, alongside
 HAVE_GCC.  This option is never enabled (as it's basically "use native")
 so resolves the build failure.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [obsoleted by "Detect and enable optimization
+                 and hardening flags across the builds" upstream in lame-4.1]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
-diff --git i/configure.in w/configure.in
-index 5e43179..d51b017 100644
---- i/configure.in
-+++ w/configure.in
-@@ -960,45 +960,43 @@ if test "x$HAVE_GCC" = "xyes" -o "x$HAVE_CLANG" = "xyes"; then
+diff --git i/configure.ac w/configure.ac
+index 1111111..2222222 100644
+--- i/configure.ac
++++ w/configure.ac
+@@ -1021,45 +1021,43 @@ if test "x$HAVE_GCC" = "xyes" -o "x$HAVE_CLANG" = "xyes"; then
  				;;
  			esac
  		fi
 +
 +		if test "x${HAVE_CLANG}" = "xyes"; then
 +			case "${CLANG_VERSION}" in
-+			3.[89]*|[45].*)
++			3.[[89]]*|[[45]].*|1[[0-9]].*)
 +				OPTIMIZATION="-Ofast"
 +				;;
 +			*)
@@ -48,23 +49,23 @@ index 5e43179..d51b017 100644
 +				OPTIMIZATION="${OPTIMIZATION} -march=i686 \
 +					-mtune=native"
 +				;;
-+			*86)
-+				OPTIMIZATION="${OPTIMIZATION} -march=native \
-+					-mtune=native"
-+				;;
 +			esac
 +
++			# if someone supplies own CFLAGS, we don't add our own
++			if test "x${ac_save_CFLAGS}" != "x"; then
++				OPTIMIZATION=""
++			fi
 +		fi
  		;;
  	*)
  		AC_MSG_ERROR(bad value �${CONFIG_EXPOPT}� for expopt option)
  		;;
  	esac
- 
+
 -
 -	if test "x${HAVE_CLANG}" = "xyes"; then
 -		case "${CLANG_VERSION}" in
--		3.[89]*|[45].*)
+-		3.[[89]]*|[[45]].*|1[[0-9]].*)
 -			OPTIMIZATION="-Ofast"
 -			;;
 -		*)
@@ -85,12 +86,12 @@ index 5e43179..d51b017 100644
 -			OPTIMIZATION="${OPTIMIZATION} -march=i686 \
 -				-mtune=native"
 -			;;
--		*86)
--			OPTIMIZATION="${OPTIMIZATION} -march=native \
--				-mtune=native"
--			;;
 -		esac
 -
+-		# if someone supplies own CFLAGS, we don't add our own
+-		if test "x${ac_save_CFLAGS}" != "x"; then
+-			OPTIMIZATION=""
+-		fi
 -	fi
 -
 -

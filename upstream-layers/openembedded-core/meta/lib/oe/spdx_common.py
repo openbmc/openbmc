@@ -42,6 +42,10 @@ def is_work_shared_spdx(d):
     return "/work-shared/" in d.getVar("S")
 
 
+def is_external_src_spdx(d):
+    return bb.data.inherits_class("externalsrc", d) and bool(d.getVar("EXTERNALSRC"))
+
+
 def load_spdx_license_data(d):
     with open(d.getVar("SPDX_LICENSES"), "r") as f:
         data = json.load(f)
@@ -174,8 +178,9 @@ def get_patched_src(d):
     """
     spdx_workdir = d.getVar("SPDXWORK")
 
-    # Do not unpack the sources again for the recipe using work-shared
-    if not is_work_shared_spdx(d):
+    # Do not unpack the sources again for the recipe using work-shared or an
+    # external source directory
+    if not is_work_shared_spdx(d) and not is_external_src_spdx(d):
         localdata = d.createCopy()
 
         # Change the UNPACKDIR to make do_unpack do_patch run in another dir.
@@ -196,7 +201,7 @@ def get_patched_src(d):
             if not os.path.exists(kernel_dst_path):
                 shutil.move(kernel_src_path, kernel_dst_path)
 
-    # Copy source from work-shared to spdx_workdir
+    # Copy source from work-shared or external source directory to spdx_workdir
     else:
         share_src = d.getVar("S")
 

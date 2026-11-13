@@ -1,0 +1,108 @@
+From f56f36ecd7481d96c99876e8a6f4a609197e7132 Mon Sep 17 00:00:00 2001
+From: OOHehir <oo.hehir@gmail.com>
+Date: Tue, 13 Oct 2026 09:41:51 +0100
+Subject: [PATCH] Fix: tests: honour LTTNG_TOOLS_DISABLE_KERNEL_TESTS in two
+ Python tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+OBSERVED ISSUE
+━━━━━━━━━━━━━━
+On a target without lttng-modules, kernel/test_event_disable.py & the
+kernel cases of tools/save-load/test_save_load.py fail with "Kernel tracer
+not available", although the test run sets LTTNG_TOOLS_DISABLE_KERNEL_TESTS=1.
+Observed with the Yocto Project ptest on riscv64, which ships no lttng-modules.
+
+CAUSE
+━━━━━
+Both scripts only check that they run as root before running kernel cases,
+while the other Python tests use lttngtest._Environment.run_kernel_tests(),
+which also honours LTTNG_TOOLS_DISABLE_KERNEL_TESTS.
+
+SOLUTION
+━━━━━━━━
+Use run_kernel_tests() in both scripts. It checks for root as before, & also
+honours LTTNG_TOOLS_DISABLE_KERNEL_TESTS.
+
+Under review on Gerrit: https://review.lttng.org/c/lttng-tools/+/18903
+
+Upstream-Status: Submitted [https://lists.lttng.org/pipermail/lttng-dev/2026-October/031100.html]
+Signed-off-by: OOHehir <oo.hehir@gmail.com>
+---
+ tests/regression/kernel/test_event_disable.py      | 7 ++-----
+ tests/regression/tools/save-load/test_save_load.py | 9 ++++-----
+ 2 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/tests/regression/kernel/test_event_disable.py b/tests/regression/kernel/test_event_disable.py
+index da9f146..a373544 100755
+--- a/tests/regression/kernel/test_event_disable.py
++++ b/tests/regression/kernel/test_event_disable.py
+@@ -15,7 +15,6 @@ Validates that disabling events works correctly:
+ - Disabling by name disables all matching rules regardless of filters
+ """
+ 
+-import os
+ import pathlib
+ import sys
+ import traceback
+@@ -307,11 +306,9 @@ if __name__ == "__main__":
+         ),
+     ]
+ 
+-    is_root = os.getuid() == 0
+-
+-    if not is_root:
++    if not lttngtest._Environment.run_kernel_tests():
+         tap = lttngtest.TapGenerator(len(kernel_tests))
+-        tap.skip_all_remaining("Kernel tests require root privileges")
++        tap.skip_all_remaining("Kernel tests not enabled")
+         sys.exit(0)
+ 
+     tap = lttngtest.TapGenerator(len(kernel_tests))
+diff --git a/tests/regression/tools/save-load/test_save_load.py b/tests/regression/tools/save-load/test_save_load.py
+index 9dd8042..1983263 100755
+--- a/tests/regression/tools/save-load/test_save_load.py
++++ b/tests/regression/tools/save-load/test_save_load.py
+@@ -13,7 +13,6 @@ through save/load cycles, including:
+ - Kernel syscalls and tracepoints
+ """
+ 
+-import os
+ import pathlib
+ import sys
+ import traceback
+@@ -953,11 +952,11 @@ if __name__ == "__main__":
+         ),
+     ]
+ 
+-    is_root = os.getuid() == 0
++    run_kernel_tests = lttngtest._Environment.run_kernel_tests()
+     allows_destructive = lttngtest._Environment.allows_destructive()
+ 
+     total_tests = len(user_tests) + len(agent_tests)
+-    if is_root:
++    if run_kernel_tests:
+         total_tests += len(kernel_tests)
+         if allows_destructive:
+             total_tests += len(destructive_kernel_tests)
+@@ -971,7 +970,7 @@ if __name__ == "__main__":
+         for test_name, test_func, kwargs in agent_tests:
+             run_test(tap, test_env, test_func, test_name, **kwargs)
+ 
+-    if is_root:
++    if run_kernel_tests:
+         with lttngtest.test_environment(
+             with_sessiond=True, log=tap.diagnostic, enable_kernel_domain=True
+         ) as test_env:
+@@ -986,6 +985,6 @@ if __name__ == "__main__":
+                     "Skipping destructive kernel tests (LTTNG_ENABLE_DESTRUCTIVE_TESTS not set)"
+                 )
+     else:
+-        tap.diagnostic("Skipping kernel tests (not running as root)")
++        tap.diagnostic("Skipping kernel tests (not enabled)")
+ 
+     sys.exit(0 if tap.is_successful else 1)
+-- 
+2.43.0
+

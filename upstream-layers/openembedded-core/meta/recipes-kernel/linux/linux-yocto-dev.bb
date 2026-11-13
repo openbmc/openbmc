@@ -35,16 +35,6 @@ PV = "${LINUX_VERSION}+git"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-# yaml and dtschema are required for 5.16+ device tree validation, libyaml is checked
-# via pkgconfig, so must always be present, but we can wrap the others to make them
-# conditional
-DEPENDS += "libyaml-native"
-
-PACKAGECONFIG ??= ""
-PACKAGECONFIG[dt-validation] = ",,python3-dtschema-native"
-# we need the wrappers if validation isn't in the packageconfig
-DEPENDS += "${@bb.utils.contains('PACKAGECONFIG', 'dt-validation', '', 'python3-dtschema-wrapper-native', d)}"
-
 COMPATIBLE_MACHINE = "^(qemuarmv5|qemuarm|qemuarm64|qemux86|qemuppc|qemumips|qemumips64|qemux86-64|qemuriscv32|qemuriscv64|qemuloongarch64)$"
 
 KERNEL_DEVICETREE:qemuarmv5 = "arm/versatile-pb.dtb"

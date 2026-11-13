@@ -259,7 +259,8 @@ class SignatureGeneratorOEBasicHashMixIn(object):
             if taskhash != unihash:
                 unihashmap[tid] = "    " + self.lockedpnmap[fn] + ":" + task + ":" + taskhash + ":" + unihash
 
-        with open(sigfile, "w") as f:
+        tmpfile = sigfile + ".new"
+        with open(tmpfile, "w") as f:
             l = sorted(types)
             for t in l:
                 f.write('SIGGEN_LOCKEDSIGS_%s = "\\\n' % t)
@@ -277,6 +278,7 @@ class SignatureGeneratorOEBasicHashMixIn(object):
             for tid in sortedtid:
                 f.write(unihashmap[tid] + " \\\n")
             f.write('    "\n')
+        os.replace(tmpfile, sigfile)
 
     def dump_siglist(self, sigfile, path_prefix_strip=None):
         def strip_fn(fn):

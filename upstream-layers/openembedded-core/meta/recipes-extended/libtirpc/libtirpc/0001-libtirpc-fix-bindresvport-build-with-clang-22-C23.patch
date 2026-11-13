@@ -1,4 +1,4 @@
-From 0ae4371ee63e25a48777a83c0601c85c5747cbac Mon Sep 17 00:00:00 2001
+From 801ec3f723fcf6d531cb57c9f3c6ec1c51b5eb54 Mon Sep 17 00:00:00 2001
 From: Khem Raj <khem.raj@oss.qualcomm.com>
 Date: Tue, 31 Mar 2026 23:07:09 -0700
 Subject: [PATCH] libtirpc: fix bindresvport build with clang-22/C23

@@ -615,7 +615,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
 
         for key, value in license_text:
             lic.simplelicensing_customIdToUri.append(
-                oe.spdx30.DictionaryEntry(key=key, value=value)
+                oe.spdx30.DictionaryEntry(key=key, value=value._id)
             )
 
         return lic

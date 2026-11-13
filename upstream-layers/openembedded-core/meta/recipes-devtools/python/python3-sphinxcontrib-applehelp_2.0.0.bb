@@ -9,4 +9,9 @@ PYPI_PACKAGE = "sphinxcontrib_applehelp"
 
 inherit pypi python_flit_core
 
+RDEPENDS:${PN} += "\
+    python3-plistlib \
+    python3-shell \
+"
+
 BBCLASSEXTEND = "native nativesdk"

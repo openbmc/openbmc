@@ -16,6 +16,9 @@ done
 # This allows running tests that require root access (which we have)
 export DPKG_AS_ROOT=1
 
+# This allows running tests that require permissions to use mkdnod (which we have)
+export DPKG_SYS_HAS_MKNOD=1
+
 for test in $(grep "TESTS_PASS +=" Makefile | cut -f3 -d" "); do
     ALL_TESTS=$((ALL_TESTS + 1))
     make ${test}-test >> ../dpkg-test.log 2>&1

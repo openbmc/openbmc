@@ -1,3 +1,1 @@
-Changelog for devtool-upgrade-test2: 0.1+git -> 0.1+git
-
-6cc6077 dbus-wait.c: Fix typo
+dbus-wait.c: Fix typo

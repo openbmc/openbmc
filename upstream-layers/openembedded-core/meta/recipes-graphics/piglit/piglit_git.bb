@@ -10,13 +10,13 @@ SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=ma
            file://0002-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
            file://0003-tests-util-piglit-shader.c-do-not-hardcode-build-pat.patch \
            file://0001-CMakeLists.txt-do-not-obtain-wayland-scanner-path-fr.patch \
-           file://0001-tests-egl-spec-make-egl_ext_surface_compression-cond.patch \
            file://0001-tests-no_error.py-modify-_command-and-not-command.patch \
-           file://0001-pixel-local-tests-use-unsigned-int-instead-of-uint.patch \
+           file://0001-tests-serializer-reproducible_mtime-should-be-an-int.patch \
+           file://0001-shader_runner-Keep-strchr-result-const.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "56f237be32ed66820eb05ea3cb04cb8b957ccd8d"
+SRCREV = "4950babfd2cd4408e4bfd103d935c6e5cff53d20"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr"
 

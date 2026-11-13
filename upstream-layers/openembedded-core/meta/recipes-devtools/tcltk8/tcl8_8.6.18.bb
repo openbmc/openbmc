@@ -3,7 +3,7 @@ HOMEPAGE = "http://tcl.sourceforge.net"
 DESCRIPTION = "Tool Command Language, is an open-source multi-purpose C library which includes a powerful dynamic scripting language. Together they provide ideal cross-platform development environment for any programming project."
 SECTION = "devel/tcltk"
 
-# http://www.tcl.tk/software/tcltk/license.html
+# http://www.tcl-lang.org/software/tcltk/license.html
 LICENSE = "BSD-3-Clause AND TCL"
 LIC_FILES_CHKSUM = "file://license.terms;md5=058f6229798281bbcac4239c788cfa38 \
     file://compat/license.terms;md5=058f6229798281bbcac4239c788cfa38 \
@@ -28,7 +28,7 @@ SRC_URI[sha256sum] = "1880b6337de72431174511419550bb4cf1327b7c8200a5466d1c4eb3ec
 
 SRC_URI:class-native = "${BASE_SRC_URI}"
 
-UPSTREAM_CHECK_URI = "https://www.tcl.tk/software/tcltk/download.html"
+UPSTREAM_CHECK_URI = "https://www.tcl-lang.org/software/tcltk/download.html"
 UPSTREAM_CHECK_REGEX = "tcl(?P<pver>8(\.\d+)+)-src"
 
 S = "${UNPACKDIR}/tcl${PV}"
@@ -79,14 +79,19 @@ do_compile_ptest() {
 	oe_runmake tcltest
 }
 
+# Override-specific skips; do_install_ptest needs the empty SKIP="" in run-ptest
+SKIPPED_TESTS = ""
+# Assumes locales other than provided by musl-locales
+SKIPPED_TESTS:append:libc-musl = " unixInit-3*"
+# RISC-V widens a negative float NaN to the positive canonical NaN, so the
+# sign check fails: https://core.tcl-lang.org/tcl/tktview/bf029ced86
+SKIPPED_TESTS:append:riscv32 = " binary-40.3"
+SKIPPED_TESTS:append:riscv64 = " binary-40.3"
+
 do_install_ptest() {
 	cp ${B}/tcltest ${D}${PTEST_PATH}
 	cp -r ${S}/tests ${D}${PTEST_PATH}
-}
-
-do_install_ptest:append:libc-musl () {
-	# Assumes locales other than provided by musl-locales
-	sed -i '/SKIP="$SKIP.*$/a # unixInit-3* is suppressed due to hardcoded locale assumptions\nSKIP="$SKIP unixInit-3\\\*"' ${D}${PTEST_PATH}/run-ptest
+	sed -i -e 's|^SKIP=""$|SKIP="${SKIPPED_TESTS}"|' ${D}${PTEST_PATH}/run-ptest
 }
 
 # Fix some paths that might be used by Tcl extensions

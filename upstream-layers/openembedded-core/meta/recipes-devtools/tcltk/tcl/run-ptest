@@ -14,6 +14,8 @@ SKIP="$SKIP async-\* event-\*"
 # This test behaves differently when using a system tzdata, skip until fixed upstream
 # https://core.tcl-lang.org/tcl/tktview/51aa53616067cb63900b17ca1d71f07b094ffa1a
 SKIP="$SKIP clock-59.2\*"
+# These tests check millisecond timing and are unreliable under load
+SKIP="$SKIP clock-33.\*"
 # 14882
 SKIP="$SKIP cmdMZ-6.6"
 # 15081

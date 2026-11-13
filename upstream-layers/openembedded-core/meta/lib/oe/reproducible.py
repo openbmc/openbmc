@@ -156,6 +156,9 @@ def get_source_date_epoch(d, sourcedir):
         fixed_source_date_epoch(d)       # Last resort
     )
 
+# epochfile_read() memoizes into __CACHED_SOURCE_DATE_EPOCH via d.setVar(), so
+# its runtime value must not leak into any task's hash.
+@bb.parse.vardepsexclude("__CACHED_SOURCE_DATE_EPOCH")
 def epochfile_read(epochfile, d):
     cached, efile = d.getVar('__CACHED_SOURCE_DATE_EPOCH') or (None, None)
     if cached and efile == epochfile:

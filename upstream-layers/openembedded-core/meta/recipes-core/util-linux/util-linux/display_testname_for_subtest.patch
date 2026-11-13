@@ -1,4 +1,4 @@
-From caadbbf29cfeeaac301d02185e717a5587a9cdf8 Mon Sep 17 00:00:00 2001
+From 588b121774df964e98e3443185defbc155ed009f Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Thu, 3 Dec 2015 04:08:00 +0100
 Subject: [PATCH] Display testname for subtest

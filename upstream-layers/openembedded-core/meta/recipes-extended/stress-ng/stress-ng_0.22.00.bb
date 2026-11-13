@@ -15,7 +15,7 @@ RPROVIDES:${PN} = "stress"
 RREPLACES:${PN} = "stress"
 RCONFLICTS:${PN} = "stress"
 
-inherit bash-completion
+inherit bash-completion pkgconfig
 
 EXTRA_OEMAKE = "VERBOSE=1"
 

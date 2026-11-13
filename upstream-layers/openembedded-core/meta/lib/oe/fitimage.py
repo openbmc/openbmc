@@ -593,8 +593,11 @@ class ItsNodeRootKernel(ItsNode):
             if not os.path.exists(key_path + '.pem'):
                 bb.fatal("ECDSA signing requires '%s.pem'" % key_path)
         else:
-            if not os.path.exists(key_path + '.key') or not os.path.exists(key_path + '.crt'):
-                bb.fatal("%s.key or .crt does not exist" % key_path)
+            if not os.path.exists(key_path + '.key'):
+                bb.fatal("%s.key (private key) does not exist" % key_path)
+            # public key is only necessary when passing -K option to mkimage
+            if not os.path.exists(key_path + '.crt'):
+                bb.debug(1, "%s.crt (public key) does not exist" % key_path)
 
     def run_mkimage_sign(self, fitfile):
         if not self._sign_enable:

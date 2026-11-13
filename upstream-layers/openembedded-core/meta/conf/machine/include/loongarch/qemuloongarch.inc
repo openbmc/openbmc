@@ -3,7 +3,7 @@ PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot"
 require conf/machine/include/qemu.inc
 require conf/machine/include/loongarch/tune-loongarch.inc
 
-MACHINE_FEATURES = "screen keyboard ext2 ext3 serial"
+MACHINE_FEATURES = "screen keyboard ext2 serial"
 
 KERNEL_IMAGETYPE = "vmlinuz"
 KERNEL_IMAGETYPES += "vmlinuz"

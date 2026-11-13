@@ -1,0 +1,105 @@
+From 90de67e50f45da52acd170484631d785317fa7b1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Sep 2026 21:10:05 -0700
+Subject: [PATCH] Make the TIRPC_1.3.7 symbol version conditional
+
+Commit 468d4e66da9f ("Add missing exports for rpc_gss_getcred +
+authdes_getucred") added a TIRPC_1.3.7 version node which lists both
+symbols unconditionally. However:
+
+- authdes_getucred() is defined in svc_auth_des.c, which is only
+  compiled when --enable-authdes is used (default: no)
+- rpc_gss_getcred() is defined in svc_auth_gss.c, which is only
+  compiled when --enable-gssapi is used
+
+so in the default configuration neither symbol is built, and linkers
+which validate version script assignments (lld always, GNU ld with
+--no-undefined-version) refuse to link the library:
+
+  ld.lld: error: version script assignment of 'TIRPC_1.3.7' to symbol 'authdes_getucred' failed: symbol not defined
+  ld.lld: error: version script assignment of 'TIRPC_1.3.7' to symbol 'rpc_gss_getcred' failed: symbol not defined
+
+This is the same problem that the conditional version script support
+was added for in 1.3.7, the new node simply bypassed the mechanism.
+
+Route the two names through the same substitution used for the other
+optional symbol sets, so that the node only lists what was actually
+compiled in. When both features are disabled the node is emitted empty,
+which both GNU ld and lld accept, and which keeps the version
+definition (and therefore the ABI of the existing versions) unchanged.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-nfs/20260923054722.1556838-1-khem.raj@oss.qualcomm.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac        | 8 ++++++++
+ src/Makefile.am     | 2 ++
+ src/libtirpc.map.in | 6 ++++--
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b0a1d81..f524498 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -115,15 +115,21 @@ if test "x$enable_gssapi" = "xyes"; then
+     GSS_SYMBOLS="_svcauth_gss; authgss_create; authgss_create_default; authgss_free_private_data; authgss_get_private_data; authgss_service; gss_log_debug; gss_log_hexdump; gss_log_status; rpc_gss_get_error; rpc_gss_get_mech_info; rpc_gss_get_mechanisms; rpc_gss_get_principal_name; rpc_gss_get_versions; rpc_gss_qop_to_num; rpc_gss_seccreate; rpc_gss_set_callback; rpc_gss_set_defaults; rpc_gss_set_svc_name; rpc_gss_svc_max_data_length;"
+
+     GSS_SYMBOLS_031="svcauth_gss_get_principal; svcauth_gss_set_svc_name;"
++
++    GSS_SYMBOLS_137="rpc_gss_getcred;"
+ else
+     GSS_SYMBOLS=""
+     GSS_SYMBOLS_031=""
++    GSS_SYMBOLS_137=""
+ fi
+
+ if test "x$enable_authdes" = "xyes"; then
+     DES_SYMBOLS="cbc_crypt; ecb_crypt; xdr_authdes_cred; xdr_authdes_verf; xdr_rpc_gss_cred; xdr_rpc_gss_data; xdr_rpc_gss_init_args; xdr_rpc_gss_init_res;"
++
++    DES_SYMBOLS_137="authdes_getucred;"
+ else
+     DES_SYMBOLS=""
++    DES_SYMBOLS_137=""
+ fi
+
+ if test "x$enable_rpcdb" = "xyes"; then
+@@ -134,7 +140,9 @@ fi
+
+ AC_SUBST([GSS_SYMBOLS])
+ AC_SUBST([GSS_SYMBOLS_031])
++AC_SUBST([GSS_SYMBOLS_137])
+ AC_SUBST([DES_SYMBOLS])
++AC_SUBST([DES_SYMBOLS_137])
+ AC_SUBST([RPCDB_SYMBOLS])
+
+ AC_CANONICAL_BUILD
+diff --git a/src/Makefile.am b/src/Makefile.am
+index cfda770..be88999 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -23,7 +23,9 @@ libtirpc.map: $(srcdir)/libtirpc.map.in
+ 	$(AM_V_GEN)$(SED) \
+ 		-e 's|@GSS_SYMBOLS@|$(GSS_SYMBOLS)|g' \
+ 		-e 's|@GSS_SYMBOLS_031@|$(GSS_SYMBOLS_031)|g' \
++		-e 's|@GSS_SYMBOLS_137@|$(GSS_SYMBOLS_137)|g' \
+ 		-e 's|@DES_SYMBOLS@|$(DES_SYMBOLS)|g' \
++		-e 's|@DES_SYMBOLS_137@|$(DES_SYMBOLS_137)|g' \
+ 		-e 's|@RPCDB_SYMBOLS@|$(RPCDB_SYMBOLS)|g' \
+ 		< $(srcdir)/libtirpc.map.in > $@ || rm -f $@
+
+diff --git a/src/libtirpc.map.in b/src/libtirpc.map.in
+index 6c0b9b2..2f4535c 100644
+--- a/src/libtirpc.map.in
++++ b/src/libtirpc.map.in
+@@ -296,8 +296,10 @@ TIRPC_0.3.3 {
+ } TIRPC_0.3.2;
+
+ TIRPC_1.3.7 {
+-    authdes_getucred;
+-    rpc_gss_getcred;
++    # DES crypto symbols (conditionally included)
++@DES_SYMBOLS_137@
++    # GSS-API symbols (conditionally included)
++@GSS_SYMBOLS_137@
+ } TIRPC_0.3.3;
+
+ TIRPC_PRIVATE {

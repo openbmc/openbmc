@@ -47,14 +47,15 @@ do_install_ptest() {
                      ${D}${PTEST_PATH}/tests/test-xalloc-die
 }
 
-do_install_ptest:append:libc-glibc() {
-                sed -i -e  "s;LOCALE_FR='fr_FR';LOCALE_FR='fr_FR.iso88591';g" \
-                       -e  "s;LOCALE_FR_UTF8='none';LOCALE_FR_UTF8='fr_FR.utf8';g" ${D}${PTEST_PATH}/tests/Makefile
-}
-
 RDEPENDS:${PN}-ptest += "make coreutils diffutils bash locale-base-fr-fr"
 
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
+     locale-base-ja-jp.euc-jp \
      locale-base-fr-fr.iso-8859-1 \
+     locale-base-tr-tr \
+     locale-base-en-us \
+     locale-base-zh-cn.gb18030 \
      glibc-gconv-iso8859-1 \
+     glibc-gconv-euc-jp \
+     glibc-gconv-gb18030 \
 "

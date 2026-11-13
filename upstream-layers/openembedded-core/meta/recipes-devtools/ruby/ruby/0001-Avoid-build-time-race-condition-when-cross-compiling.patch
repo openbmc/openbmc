@@ -1,4 +1,4 @@
-From b79c9ccbf17852f3ffd6acb8cc56124829e03edf Mon Sep 17 00:00:00 2001
+From 94b3a85def80680c6efb35e75b6e0dcd4bbf4645 Mon Sep 17 00:00:00 2001
 From: Paul Barker <paul@pbarker.dev>
 Date: Fri, 31 Jul 2026 13:15:37 +0100
 Subject: [PATCH] Avoid build-time race condition when cross-compiling from a
@@ -39,7 +39,7 @@ Signed-off-by: Paul Barker <paul@pbarker.dev>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/defs/gmake.mk b/defs/gmake.mk
-index e6f553fa8c1b..413057ca6896 100644
+index e6f553f..413057c 100644
 --- a/defs/gmake.mk
 +++ b/defs/gmake.mk
 @@ -435,9 +435,7 @@ endif
@@ -62,6 +62,3 @@ index e6f553fa8c1b..413057ca6896 100644
  
  include $(top_srcdir)/yjit/yjit.mk
  include $(top_srcdir)/zjit/zjit.mk
--- 
-2.43.0
-

@@ -5,6 +5,7 @@
 #
 import contextlib
 from oeqa.core.decorator import OETestTag
+from oeqa.core.decorator.data import skipIfMachine
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, runqemu
 from oeqa.utils.nfs import unfs_server
@@ -187,6 +188,7 @@ class LLVMSelfTestSystemEmulated(ClangFamilyBase):
         "tools/yaml2obj/GOFF/GOFF-header-settings\\.yaml$",
     ]
 
+    @skipIfMachine("qemuppc", "qemuppc cannot run this lit test suite within practical resource and runtime limits")
     def test_llvm(self):
         bitbake("llvm -c install")
         self.build_core_image()
@@ -298,6 +300,7 @@ class ClangSelfTestSystemEmulated(ClangFamilyBase):
         "Sema/fp-eval-pragma-with-float-double_t-3\\.c$",
     ]
 
+    @skipIfMachine("qemuppc", "qemuppc cannot run this lit test suite within practical resource and runtime limits")
     def test_clang(self):
         bitbake("clang -c install")
         self.build_core_image()
@@ -327,6 +330,7 @@ class LLDSelfTestSystemEmulated(ClangFamilyBase):
         "ELF/reproduce\\.s$",
     ]
 
+    @skipIfMachine("qemuppc", "qemuppc cannot run this lit test suite within practical resource and runtime limits")
     def test_lld(self):
         bitbake("lld -c install")
         self.build_core_image()

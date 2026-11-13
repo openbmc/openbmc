@@ -17,14 +17,13 @@ BASEURI ?= "${LLVM_HTTP}/llvm-project/releases/download/llvmorg-${PV}${VER_SUFFI
 UPSTREAM_CHECK_URI = "${LLVM_HTTP}/llvm-project/releases/"
 UPSTREAM_CHECK_REGEX = "releases/tag/llvmorg-?(?P<pver>\d+(\.\d+)+)"
 SOURCEDIR ?= "llvm-project-${PV}${VER_SUFFIX}.src"
-SRC_URI[sha256sum] = "ab1f0e3ec52448c33e8782eaf0422504b87c7b016b22514653ee0d8fcee479ff"
+SRC_URI[sha256sum] = "ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6"
 
 SRC_URI = "\
     ${BASEURI} \
     file://0001-compiler-rt-Simplify-cross-compilation.-Don-t-use-na.patch \
     file://0002-llvm-allow-env-override-of-exe-and-libdir-path.patch \
     file://0003-clang-driver-Check-sysroot-for-ldso-path.patch \
-    file://0004-clang-Driver-tools.cpp-Add-lssp_nonshared-on-musl.patch \
     file://0005-clang-Prepend-trailing-to-sysroot.patch \
     file://0006-clang-Define-releative-gcc-installation-dir.patch \
     file://0007-clang-Add-lpthread-and-ldl-along-with-lunwind-for-st.patch \
@@ -55,7 +54,6 @@ SRC_URI = "\
     file://0032-llvm-libgcc-Fix-symlink-path-for-libcc-when-LLVM_ENA.patch \
     file://0033-Consolidate-and-fix-sysroot-based-compiler-rt-search.patch \
     file://0034-guard-clang-tools-extra-test.patch \
-    file://0035-libc-Disable-float16-on-32-bit-x86-without-SSE2.patch \
 "
 # Fallback to no-PIE if not set
 GCCPIE ??= ""

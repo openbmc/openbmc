@@ -16,13 +16,15 @@ SRC_URI[sha256sum] = "c02940f430841ecf158d5d9a50007afc4d5353c8678a2455003ca0b2c4
 
 inherit multilib_header pkgconfig update-alternatives
 
-PACKAGECONFIG ??= "hwdb kmod zlib"
+PACKAGECONFIG ??= "dns hwdb kmod shared zlib"
+PACKAGECONFIG[dns] = "DNS=yes,DNS=no"
 PACKAGECONFIG[hwdb] = "HWDB=yes,HWDB=no,udev"
 PACKAGECONFIG[kmod] = "LIBKMOD=yes,LIBKMOD=no,kmod"
+PACKAGECONFIG[shared] = "SHARED=yes,SHARED=no"
 PACKAGECONFIG[zlib] = "ZLIB=yes,ZLIB=no,zlib"
 
 # Configuration options
-EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS} DNS=yes SHARED=yes"
+EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
 # Construct a HOST that matches what lib/configure expects
 EXTRA_OEMAKE += "HOST="${HOST_ARCH}-${HOST_OS}""
 # Toolchain. We need to pass CFLAGS via CC as this is the only variable

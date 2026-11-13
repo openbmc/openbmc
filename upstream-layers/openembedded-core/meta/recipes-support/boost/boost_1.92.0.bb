@@ -5,4 +5,5 @@ SRC_URI += "file://boost-math-disable-pch-for-gcc.patch \
            file://0001-Don-t-set-up-arch-instruction-set-flags-we-do-that-o.patch \
            file://0001-dont-setup-compiler-flags-m32-m64.patch \
            file://0001-histogram-move-b2-project-requirements-out-of-build.patch \
+           file://CVE-2023-34399.patch \
            "

@@ -77,7 +77,7 @@ do_rm_work () {
                 # Promote do_image_qa stamps to setscene versions (ahead of *do_image* below)
                 mv $i `echo $i | sed -e "s#do_image_qa#do_image_qa_setscene#"`
                 ;;
-            *do_package_write*|*do_rootfs*|*do_image*|*do_bootimg*|*do_write_qemuboot_conf*|*do_build*)
+            *do_package_write*|*do_rootfs*|*do_image*|*do_bootimg*|*do_write_qemuboot_conf*|*do_populate_lic_deploy*|*do_build*)
                 ;;
             *do_addto_recipe_sysroot*)
                 # Preserve recipe-sysroot-native if do_addto_recipe_sysroot has been used

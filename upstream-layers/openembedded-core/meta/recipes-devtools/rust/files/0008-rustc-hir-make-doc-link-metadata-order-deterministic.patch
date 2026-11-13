@@ -1,0 +1,40 @@
+From 6630363e7bc9bc0926300e242aa538b8d92cdb95 Mon Sep 17 00:00:00 2001
+From: jprochazk <pjanv42@gmail.com>
+Date: Tue, 15 Sep 2026 17:05:36 +0530
+Subject: [PATCH] make DocLinkResMap an FxIndexMap
+
+DocLinkResMap was an UnordMap, so its iteration order varied with the build
+host and that order ended up in the encoded rmeta. An FxIndexMap keeps the
+serialisation stable. Only the code change is carried here, not the
+upstream run-make test.
+
+Upstream-Status: Backport [https://github.com/rust-lang/rust/commit/f9d9939467a5185a72f0ee8da778a0b71fc966ae]
+
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+ compiler/rustc_hir/src/def.rs | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/compiler/rustc_hir/src/def.rs b/compiler/rustc_hir/src/def.rs
+index d0300d6..e903c0c 100644
+--- a/compiler/rustc_hir/src/def.rs
++++ b/compiler/rustc_hir/src/def.rs
+@@ -4,7 +4,7 @@ use std::fmt::Debug;
+ 
+ use rustc_ast as ast;
+ use rustc_ast::NodeId;
+-use rustc_data_structures::unord::UnordMap;
++use rustc_data_structures::fx::FxIndexMap;
+ use rustc_error_messages::{DiagArgValue, IntoDiagArg};
+ use rustc_macros::{Decodable, Encodable, StableHash};
+ use rustc_span::Symbol;
+@@ -969,4 +969,6 @@ pub enum LifetimeRes {
+     ElidedAnchor { start: NodeId, end: NodeId },
+ }
+ 
+-pub type DocLinkResMap = UnordMap<(Symbol, Namespace), Option<Res<NodeId>>>;
++// FxIndexMap is necessary because its data ends up in .rmeta files, so its
++// iteration order must be consistent. See #159677 for context.
++pub type DocLinkResMap = FxIndexMap<(Symbol, Namespace), Option<Res<NodeId>>>;
+-- 
+2.43.0

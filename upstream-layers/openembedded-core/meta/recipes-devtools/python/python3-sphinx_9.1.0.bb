@@ -18,6 +18,7 @@ do_install:append () {
 RDEPENDS:${PN} = "\
     python3-alabaster \
     python3-babel \
+    python3-compile \
     python3-docutils \
     python3-imagesize \
     python3-jinja2 \

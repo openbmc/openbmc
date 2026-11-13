@@ -7,6 +7,7 @@ SRC_URI += "\
 git://gitlab.freedesktop.org/gstreamer/gst-plugins-rs;protocol=https;tag=${PV};nobranch=1;name=default \
 "
 SRCREV = "6302bea23b53e6461c104f9543df887a63b2d6ec"
+UPSTREAM_CHECK_GITTAGREGEX = "^(?P<pver>\d+(\.\d+)+)"
 
 LIC_FILES_CHKSUM =  " \
     file://${BPN}-${PV}/LICENSE-MPL-2.0;md5=815ca599c9df247a0c7f619bab123dad \

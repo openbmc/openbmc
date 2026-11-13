@@ -7,7 +7,7 @@ HOMEPAGE = "https://git.adelielinux.org/adelie/gcompat"
 LICENSE = "NCSA"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=802b1aed7330d90086be4de63a3188e3"
 
-SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=current \
+SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=current;tag=${PV} \
            file://0001-Add-fcntl64-wrapper.patch \
            "
 SRC_URI:append:powerpc = "\

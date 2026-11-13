@@ -11,7 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;beginline=2;md5=0251eaec1188b20d9a72c502ecfdd
 DEPENDS = "file-replacement-native"
 DEPENDS:class-native = "bzip2-replacement-native"
 
-SRC_URI = "git://github.com/file/file.git;branch=master;protocol=https \
+GIT_TAG = "FILE${@d.getVar('PV').replace('.', '_')}"
+SRC_URI = "git://github.com/file/file.git;branch=master;protocol=https;tag=${GIT_TAG} \
            "
 
 SRCREV = "eb754ace19fed5481d8142426543100a2d6bae4e"

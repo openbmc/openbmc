@@ -21,6 +21,7 @@ RDEPENDS:${PN} += " \
     python3-setuptools \
     python3-shell \
     python3-threading \
+    python3-zoneinfo \
 "
 
 BBCLASSEXTEND = "native nativesdk"

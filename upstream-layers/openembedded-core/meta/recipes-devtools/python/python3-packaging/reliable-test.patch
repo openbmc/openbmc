@@ -1,0 +1,30 @@
+From 47b0db5b7b9a5fd9f4d1d3236e90f205c8b34625 Mon Sep 17 00:00:00 2001
+From: Christopher Pruijsen <christopher.pruijsen@gmail.com>
+Date: Fri, 11 Sep 2026 02:32:41 +0100
+Subject: [PATCH] test(specifiers): stop filtering compatible-release examples
+ by epoch
+
+assume() dropped most draws when the specifier and candidate epochs
+differed, so Hypothesis intermittently failed HealthCheck.filter_too_much.
+
+Upstream-Status: Submitted [https://github.com/pypa/packaging/pull/1409]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/property/test_specifier_matching.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/property/test_specifier_matching.py b/tests/property/test_specifier_matching.py
+index 4552ce8ce..4aedafe56 100644
+--- a/tests/property/test_specifier_matching.py
++++ b/tests/property/test_specifier_matching.py
+@@ -205,7 +205,9 @@ def test_compatible_release_matches_expected_compatible(
+     ) -> None:
+         """~=V matches candidate iff candidate >= V and candidate matches the
+         prefix wildcard derived from V."""
+-        assume(spec_ver.epoch == candidate.epoch)
++        # Share an epoch without assume(), which rejects most draws and trips
++        # Hypothesis HealthCheck.filter_too_much.
++        candidate = candidate.__replace__(epoch=spec_ver.epoch)
+         spec = Specifier(f"~={spec_ver}")
+         result = candidate in spec
+         # Also check via the expanded form

@@ -50,7 +50,7 @@ index eb7078158..a2e64fbe6 100644
  endif
  
  # man pages
-@@ -165,7 +171,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
+@@ -216,7 +222,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
  # not done in the source directory!
  EXTRA_DIST= \
  	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \

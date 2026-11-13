@@ -21,7 +21,7 @@ RPROVIDES:${PN} = "matchbox-panel"
 RREPLACES:${PN} = "matchbox-panel"
 RCONFLICTS:${PN} = "matchbox-panel"
 
-SRC_URI = "git://git.yoctoproject.org/${BPN};protocol=https;branch=master \
+SRC_URI = "git://git.yoctoproject.org/${BPN};protocol=https;branch=master;tag=${PV} \
            file://0001-applets-systray-Allow-icons-to-be-smaller.patch \
            file://0001-applets-clock-fix-clock-widget-width-resize.patch \
            "

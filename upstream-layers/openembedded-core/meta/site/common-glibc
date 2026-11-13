@@ -67,9 +67,19 @@ gl_cv_func_mbrtowc_sanitycheck=${gl_cv_func_mbrtowc_sanitycheck=yes}
 gl_cv_func_mbrtowc_null_arg=${gl_cv_func_mbrtowc_null_arg=yes}
 gl_cv_func_mbrtowc_retval=${gl_cv_func_mbrtowc_retval=yes}
 gl_cv_func_mbrtowc_nul_retval=${gl_cv_func_mbrtowc_nul_retval=yes}
+gl_cv_func_mbrtoc32_utf8_locale_works=yes
 
 # va_copy and _va_copy
 ac_cv_va_copy=${ac_cv_va_copy=yes}
 ac_cv___va_copy=${ac_cv___va_copy=yes}
 ac_cv_func_va_copy=${ac_cv_func_va_copy=yes}
 ac_cv_func___va_copy=${ac_cv_func___va_copy=yes}
+
+# gnulib locale-en.m4 and friends look at the sysroot or host locales
+# we need something deterministic
+gt_cv_locale_en_utf8=en_US.UTF-8
+gt_cv_locale_fr=fr_FR.iso88591
+gt_cv_locale_fr_utf8=fr_FR.UTF-8
+gt_cv_locale_zh_CN=zh_CN.GB18030
+gt_cv_locale_ja=ja_JP.euc_jp
+gt_cv_locale_tr_utf8=tr_TR.UTF-8

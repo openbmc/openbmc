@@ -1,0 +1,46 @@
+From 1dcf458933a755b68861816c5f2a0b7525183972 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 10 Sep 2026 09:35:49 +0000
+Subject: [PATCH] tests: (lsfd) accept "rw-" mode for mmap'ed packet socket
+
+mkfds-mapped-packet-socket creates the packet ring with
+mmap(..., PROT_WRITE, MAP_SHARED, sd, 0), i.e. write-only, and filters
+the lsfd output with (MODE == "-w-").
+
+On architectures such as riscv64 the kernel reports a PROT_WRITE-only
+mapping as readable too, because RISC-V has no write-only page
+permission encoding (a writable page is implicitly readable). As a
+result /proc/PID/maps shows the mapping as "rw-s" rather than "-w-s":
+
+  3fbec87000-3fbec88000 rw-s 00000000 00:09 4238   socket:[4238]
+
+lsfd derives MODE from these bits and reports "rw-", so the
+(MODE == "-w-") filter matches nothing and the expected PACKET /
+SOCK.PROTONAME lines are missing, failing the test even though lsfd
+behaves correctly.
+
+Relax the filter to also accept "rw-" so the test passes on riscv64
+while remaining correct on architectures that report "-w-".
+
+Closes: https://github.com/util-linux/util-linux/issues/4618
+
+Upstream-Status: Submitted [https://github.com/util-linux/util-linux/pull/4619]
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ tests/ts/lsfd/mkfds-mapped-packet-socket | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/ts/lsfd/mkfds-mapped-packet-socket b/tests/ts/lsfd/mkfds-mapped-packet-socket
+index ab1f72c..03d5db5 100755
+--- a/tests/ts/lsfd/mkfds-mapped-packet-socket
++++ b/tests/ts/lsfd/mkfds-mapped-packet-socket
+@@ -42,7 +42,7 @@ for PROTOCOL in $(printf "%d" 0x10) 10000; do
+ 	coproc MKFDS { "$TS_HELPER_MKFDS" mapped-packet-socket $FD \
+ 					  interface=${INTERFACE} socktype=${SOCKTYPE} protocol=${PROTOCOL}; }
+ 	if read -u ${MKFDS[0]} PID; then
+-	    EXPR='(ASSOC == "shm") and (STTYPE == "SOCK") and (MODE == "-w-")'
++	    EXPR='(ASSOC == "shm") and (STTYPE == "SOCK") and ((MODE == "-w-") or (MODE == "rw-"))'
+ 	    ${TS_CMD_LSFD} --pid "$PID" --noheadings --output SOCK.PROTONAME --filter "${EXPR}"
+ 	    echo 'SOCK.PROTONAME': $?
+ 

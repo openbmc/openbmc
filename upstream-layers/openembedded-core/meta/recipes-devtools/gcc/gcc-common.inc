@@ -125,8 +125,10 @@ remove_sysroot_paths_from_configargs () {
 	# plugins. Additionally the path is embeddeded into the output binary, this
 	# prevents building a reproducible binary.
 	oe_runmake configure-gcc
-	sed -i "s@${STAGING_DIR_TARGET}@$replacement@g" ${B}/gcc/configargs.h
-	sed -i "s@${STAGING_DIR_HOST}@/$replacement@g" ${B}/gcc/configargs.h
+	sed -i -e "s@${STAGING_DIR_TARGET}@$replacement@g" \
+	       -e "s@${STAGING_DIR_HOST}@/$replacement@g" \
+	       -e "s@--build=${BUILD_ARCH}@@g" \
+	           ${B}/gcc/configargs.h
 }
 
 remove_sysroot_paths_from_checksum_options () {

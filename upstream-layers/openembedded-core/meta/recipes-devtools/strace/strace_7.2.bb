@@ -29,7 +29,9 @@ COMPATIBLE_HOST:riscv32 = "null"
 # bluez is not enabled by default due to build dependency creep in smaller builds
 # like core-image-minimal leading to significantly more tasks being executed
 PACKAGECONFIG[bluez] = "ac_cv_header_bluetooth_bluetooth_h=yes,ac_cv_header_bluetooth_bluetooth_h=no,bluez5"
-PACKAGECONFIG[libunwind] = "--with-libunwind,--without-libunwind,libunwind"
+# Stack unwinders - mutually exclusive
+PACKAGECONFIG[libdw]     = "--with-libdw,--without-libdw,elfutils,,,libunwind"
+PACKAGECONFIG[libunwind] = "--with-libunwind,--without-libunwind,libunwind,,,libdw"
 
 EXTRA_OECONF += "--enable-mpers=no --disable-gcc-Werror"
 
@@ -53,6 +55,18 @@ do_install_ptest() {
 	    -e '/^CC_FOR_BUILD/s/\s-std=gnu23//g' \
             -e '/^_hide_from_automake/d' \
 	    -i ${D}/${PTEST_PATH}/${TESTDIR}/Makefile
+}
+
+# Too long without output for ptest-runner on qemuriscv64. Keyed on riscv64, as
+# strace is not machine-specific, so also skipped on riscv64 hardware.
+STRACE_PTEST_SKIP ?= ""
+STRACE_PTEST_SKIP:riscv64 = "qual_fault-syscall"
+
+do_install_ptest:append() {
+	for t in ${STRACE_PTEST_SKIP}; do
+		sed -i -e '1a . "${srcdir=.}/init.sh"\nskip_ "Too slow under QEMU on riscv64"' \
+		    ${D}${PTEST_PATH}/${TESTDIR}/$t.test
+	done
 }
 
 RDEPENDS:${PN}-ptest += "make coreutils grep gawk sed locale-base-en-us"

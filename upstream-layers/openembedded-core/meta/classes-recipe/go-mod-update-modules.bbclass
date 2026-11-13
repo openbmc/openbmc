@@ -45,7 +45,7 @@ python do_update_modules() {
 
 """
 
-        env = dict(os.environ, GOMODCACHE=mod_cache_dir)
+        env = dict(os.environ, **bb.fetch.get_fetcher_environment(d), GOMODCACHE=mod_cache_dir)
         source = d.expand("${UNPACKDIR}/${GO_SRCURI_DESTSUFFIX}")
         go_install = d.getVar("GO_INSTALL").split()
         output = subprocess.check_output(("go", "list", "-json=Dir,Module", "-deps", *go_install),

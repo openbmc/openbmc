@@ -1301,7 +1301,7 @@ python do_qa_patch() {
         except FileNotFoundError:
             # pathlib.Path.glob() might throw this when file/directory
             # disappear while scanning.
-            bb.note("unimplemented-ptest: FileNotFoundError exception while scanning (disappearing file while scanning?). Check was ignored." % d.getVar('PN'))
+            bb.note("Recipe %s QA: unimplemented-ptest: FileNotFoundError exception while scanning (disappearing file while scanning?). Check was ignored." % d.getVar('PN'))
             pass
         return False
 
