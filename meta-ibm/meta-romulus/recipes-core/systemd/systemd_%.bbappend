@@ -9,3 +9,7 @@ PACKAGECONFIG:append:romulus = " xz"
 # Remove seccomp support for Romulus to save space.  This isn't actively
 # leveraged.
 PACKAGECONFIG:remove:romulus = "seccomp"
+
+# devlink manages switch-ASIC port params, unneeded on AST2500 BMC NICs.
+# systemd 261.3 added it as a hard udev dep; drop it to save ~200KB.
+RDEPENDS:udev:remove:romulus = "iproute2-devlink"
