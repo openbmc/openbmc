@@ -6,14 +6,7 @@
 IMAGE_FEATURES:remove:e3c246d4i = "obmc-webui"
 
 # obmc-ikvm is not wired up on this board.
-IMAGE_FEATURES:remove:e3c246d4i += "obmc-ikvm"
+IMAGE_FEATURES:remove:e3c246d4i = "obmc-ikvm"
 
 # telemetry daemon is not required for basic BMC operation.
-IMAGE_FEATURES:remove:e3c246d4i += "obmc-telemetry"
-
-# lrzsz is unnecessary
-# rsync use scp instead
-RDEPENDS:${PN}-devtools:remove = " \
-        lrzsz \
-        rsync \
-"
+IMAGE_FEATURES:remove:e3c246d4i = "obmc-telemetry"
