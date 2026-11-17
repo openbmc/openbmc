@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -52,27 +52,27 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
 
 do_install:append() {
 
-    install -d ${D}${datadir}/${PN}
+    install -d ${D}${datadir}/${BPN}
 
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor.json
 
-    install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
 
     install -m 0755 ${UNPACKDIR}/cpu-boot-done \
-                    ${D}${libexecdir}/${PN}/cpu-boot-done
+                    ${D}${libexecdir}/${BPN}/cpu-boot-done
     install -m 0755 ${UNPACKDIR}/cpu-shdn-ok \
-                    ${D}${libexecdir}/${PN}/cpu-shdn-ok
+                    ${D}${libexecdir}/${BPN}/cpu-shdn-ok
     install -m 0755 ${UNPACKDIR}/hmc-ready \
-                    ${D}${libexecdir}/${PN}/hmc-ready
+                    ${D}${libexecdir}/${BPN}/hmc-ready
     install -m 0755 ${UNPACKDIR}/run-power-good \
-                    ${D}${libexecdir}/${PN}/run-power-good
+                    ${D}${libexecdir}/${BPN}/run-power-good
     install -m 0755 ${UNPACKDIR}/thermal-event-logger \
-                    ${D}${libexecdir}/${PN}/thermal-event-logger
+                    ${D}${libexecdir}/${BPN}/thermal-event-logger
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger \
-                    ${D}${libexecdir}/${PN}/power-rail-event-logger
+                    ${D}${libexecdir}/${BPN}/power-rail-event-logger
     install -m 0755 ${UNPACKDIR}/rmc-main-power \
-                    ${D}${libexecdir}/${PN}/rmc-main-power
+                    ${D}${libexecdir}/${BPN}/rmc-main-power
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/

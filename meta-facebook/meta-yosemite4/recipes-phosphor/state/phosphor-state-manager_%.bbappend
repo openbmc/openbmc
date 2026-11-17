@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 EXTRA_OEMESON:append = " \
                          -Dwarm-reboot=enabled \
@@ -82,24 +82,24 @@ do_install:append() {
         install -m 0644 ${UNPACKDIR}/yosemite4-dbus-timeout.conf "$s.d/"
     done
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/chassis-poweron-failure ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-poweron-failure ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-powerreset-failure ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/wait-until-mctp-connection-done ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/wait-until-mctp-EID-remove ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/rescan-cxl-eid ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/check-i3c-hub ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/log-chassis-powercycle-sel ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/policy-chassis-poweron ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/chassis-poweroff ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron-failure ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-poweroff ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron-failure ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-powercycle ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset-failure ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/wait-until-mctp-connection-done ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/wait-until-mctp-EID-remove ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/rescan-cxl-eid ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/check-i3c-hub ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/log-chassis-powercycle-sel ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/policy-chassis-poweron ${D}${libexecdir}/${BPN}/
 }
 
 FILES:${PN} += " \

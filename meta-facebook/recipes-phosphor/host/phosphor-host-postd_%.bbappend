@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 #Enable multi-host support in the phosphor-host-postd
 EXTRA_OEMESON += "-Dhost-instances='${OBMC_HOST_INSTANCES}'"

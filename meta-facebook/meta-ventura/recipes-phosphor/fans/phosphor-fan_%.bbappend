@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 PACKAGECONFIG:remove = "sensor-monitor"
 SYSTEMD_SERVICE:${PN}-sensor-monitor:remove = "sensor-monitor.service"

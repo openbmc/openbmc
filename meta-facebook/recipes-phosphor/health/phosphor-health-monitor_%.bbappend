@@ -50,6 +50,6 @@ do_install:prepend() {
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/clean-up-filesystem.service ${D}${systemd_system_unitdir}/clean-up-filesystem.service
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/clean-up-filesystem ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/clean-up-filesystem ${D}${libexecdir}/${BPN}/
 }

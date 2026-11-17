@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 
 EXTRA_OEMESON:append = "-Dhost-instances='${OBMC_HOST_INSTANCES}' \
 "

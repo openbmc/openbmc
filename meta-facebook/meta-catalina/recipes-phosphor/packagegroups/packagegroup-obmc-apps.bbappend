@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # We do not currently want to use the whole PLDM daemon on Catalina, but
 # just the `pldmtool` to be able to get some sensors out of devices.

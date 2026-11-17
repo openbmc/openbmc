@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 OVERRIDES:append = "${@bb.utils.contains('VIRTUAL-RUNTIME_obmc-host-state-manager', 'phosphor-state-manager-host', ':phosphor-fan-with-psm', ':phosphor-fan-without-psm', d)}"
 

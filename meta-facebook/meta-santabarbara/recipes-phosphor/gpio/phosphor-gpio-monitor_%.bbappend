@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit obmc-phosphor-utils
 inherit systemd
@@ -76,23 +76,23 @@ do_install:append() {
         install -m 0644 ${UNPACKDIR}/${s} ${D}${systemd_system_unitdir}/${s}
     done
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/assert-module-power-good ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/assert-rmc-main-power-enable ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/deassert-module-power-good ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/deassert-rmc-main-power-enable ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/get-mmc-lastest-version ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/mctp_remove ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/swb-pwr-fault-handler ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/mb-pwr-fault-handler ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/assert-module-power-good ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/assert-reset-button ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/assert-rmc-main-power-enable ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/deassert-module-power-good ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/deassert-rmc-main-power-enable ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/get-mmc-lastest-version ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/mctp_remove ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/swb-pwr-fault-handler ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/mb-pwr-fault-handler ${D}${libexecdir}/${BPN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -56,24 +56,24 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
 
 do_install:append() {
 
-    install -d ${D}${datadir}/${PN}
+    install -d ${D}${datadir}/${BPN}
 
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor.json
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-presence.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-presence.json
 
 
-    install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
 
     install -m 0755 ${UNPACKDIR}/platform-gpio-monitor \
-                    ${D}${libexecdir}/${PN}/platform-gpio-monitor
+                    ${D}${libexecdir}/${BPN}/platform-gpio-monitor
     install -m 0755 ${UNPACKDIR}/set-uart-select-led \
-                    ${D}${libexecdir}/${PN}/set-uart-select-led
+                    ${D}${libexecdir}/${BPN}/set-uart-select-led
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger \
-                    ${D}${libexecdir}/${PN}/power-rail-event-logger
+                    ${D}${libexecdir}/${BPN}/power-rail-event-logger
     install -m 0755 ${UNPACKDIR}/vr-fault-event-logger \
-                    ${D}${libexecdir}/${PN}/vr-fault-event-logger
+                    ${D}${libexecdir}/${BPN}/vr-fault-event-logger
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/assert-cpu-boot-done.service ${D}${systemd_system_unitdir}
@@ -96,10 +96,10 @@ do_install:append() {
 do_install:append:catalina() {
 
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor-evt.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-evt.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor-evt.json
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence-evt.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-presence-evt.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-presence-evt.json
 
     install -m 0755 ${UNPACKDIR}/prepare-serv-json \
-                    ${D}${libexecdir}/${PN}/prepare-serv-json
+                    ${D}${libexecdir}/${BPN}/prepare-serv-json
 }

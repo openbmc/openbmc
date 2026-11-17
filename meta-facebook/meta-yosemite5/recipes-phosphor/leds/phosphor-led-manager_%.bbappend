@@ -1,5 +1,5 @@
 # phosphor led configuration
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " file://led-group-config.json"
 

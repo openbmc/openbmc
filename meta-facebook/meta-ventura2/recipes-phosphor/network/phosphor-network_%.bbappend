@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 PACKAGECONFIG:append = " sync-mac"
 
@@ -20,8 +20,8 @@ do_install:append() {
     install -d ${D}${datadir}/network/
     install -m 0644 ${UNPACKDIR}/config.json ${D}${datadir}/network/
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/wait-baseboard-inventory ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/wait-baseboard-inventory ${D}${libexecdir}/${BPN}/
 
     install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d
     install -m 0644 ${UNPACKDIR}/wait-inventory.conf \

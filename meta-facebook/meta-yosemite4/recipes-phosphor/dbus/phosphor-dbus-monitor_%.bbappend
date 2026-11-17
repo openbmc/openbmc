@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -26,9 +26,9 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/fan-rotor-fail-mechanism ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/fan-rotor-missing-mechanism ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/fan-rotor-fail-mechanism ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/fan-rotor-missing-mechanism ${D}${libexecdir}/${BPN}/
 }
 
 FILES:${PN} += "${systemd_system_unitdir}/*.service"

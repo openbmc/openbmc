@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -29,7 +29,7 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/monitor-pldm-sensor.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/monitor-fan-sensor.service ${D}${systemd_system_unitdir}
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/monitor-pldm-sensor ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/monitor-fan-sensor ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/monitor-pldm-sensor ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/monitor-fan-sensor ${D}${libexecdir}/${BPN}/
 }

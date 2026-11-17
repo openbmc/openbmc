@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:fb-compute-multihost = " file://phosphor-multi-gpio-monitor.json"
 SRC_URI:append:fb-compute-multihost = " file://obmc-ipmb-rescan-fru.service"

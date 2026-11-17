@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -103,24 +103,24 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/medusa-power-module-fault.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/medusa-power-module-pwrgd@.service ${D}${systemd_system_unitdir}/
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/reconfig-net-interface ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/rescan-fru-ocp-setting ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/rescan-fru-nic ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/rescan-wf-bic ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/slot-hsc-fault ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/fan-board-efuse-fault ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/disable-i3c-hub ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/check-interrupt ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/nic-power-fault ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/en-i3c-hub-scan-fru ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/slot-plug-in ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/slot-unplug ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/medusa-hsc-alert ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/medusa-hsc-fault ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/medusa-power-module-fault ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/medusa-power-module-pwrgd ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/probe-slot-device ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/reconfig-net-interface ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/rescan-fru-ocp-setting ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/rescan-fru-nic ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/rescan-wf-bic ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/slot-hsc-fault ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/fan-board-efuse-fault ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/disable-i3c-hub ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/check-interrupt ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/nic-power-fault ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/en-i3c-hub-scan-fru ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/slot-plug-in ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/slot-unplug ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/medusa-hsc-alert ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/medusa-hsc-fault ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/medusa-power-module-fault ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/medusa-power-module-pwrgd ${D}${libexecdir}/${BPN}/
 
     install -d ${D}${bindir}
     install -m 0755 ${UNPACKDIR}/configure-nic-mctp-endpoint ${D}${bindir}/

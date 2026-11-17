@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:fb-compute-singlehost = " file://ttyS2.conf"
 OBMC_BMC_TTY = "ttyS4"

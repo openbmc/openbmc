@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 PACKAGECONFIG:remove = "no-warm-reboot"
 PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
@@ -130,23 +130,23 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/chassis-power-state-init ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff-failure ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/chassis-power-state-init ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-force-poweroff ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff-failure ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${BPN}/
 }
 
 do_install:append:aspeed-g6() {
-    install -m 0755 ${UNPACKDIR}/ast2600/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/ast2600/phosphor-state-manager-init ${D}${libexecdir}/${BPN}/
 }
 do_install:append:aspeed-g7() {
-    install -m 0755 ${UNPACKDIR}/ast2700/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/ast2700/phosphor-state-manager-init ${D}${libexecdir}/${BPN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-discover += "discover-sys-init.conf:phosphor-discover-system-state@0.service.d/discover-sys-init.conf"

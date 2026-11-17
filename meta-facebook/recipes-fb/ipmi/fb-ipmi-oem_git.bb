@@ -37,5 +37,5 @@ FILES:${PN}:append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
 FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV}"
 
 do_install:append(){
-   install -d ${D}/var/lib/${PN}
+   install -d ${D}/var/lib/${BPN}
 }

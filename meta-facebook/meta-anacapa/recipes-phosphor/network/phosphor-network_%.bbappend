@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " \
     file://00-bmc-usb0.network \
@@ -30,8 +30,8 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/91-bmc-mctpusb-network.rules ${D}${sysconfdir}/udev/rules.d/91-bmc-mctpusb-network.rules
     install -m 0644 ${UNPACKDIR}/92-mctpusb-hotplug.rules ${D}${sysconfdir}/udev/rules.d/92-mctpusb-hotplug.rules
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/ncsi-bounce ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/ncsi-bounce ${D}${libexecdir}/${BPN}/
     install -m 0644 ${UNPACKDIR}/ncsi-bounce.service ${D}${systemd_system_unitdir}
 
     install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d

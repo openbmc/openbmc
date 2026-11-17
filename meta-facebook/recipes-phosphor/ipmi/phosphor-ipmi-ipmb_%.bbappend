@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 IPMB_CHANNELS ?= ""
 IPMB_REMOTE_ADDR ?= ""

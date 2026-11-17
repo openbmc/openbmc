@@ -46,7 +46,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
 FILES:${PN} += "${systemd_system_unitdir}/*"
 
 do_install() {
-    LIBEXECDIR_PN="${D}${libexecdir}/${PN}"
+    LIBEXECDIR_PN="${D}${libexecdir}/${BPN}"
     install -d ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/marvell-switch-init ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/marvell-switch-poe-init ${LIBEXECDIR_PN}

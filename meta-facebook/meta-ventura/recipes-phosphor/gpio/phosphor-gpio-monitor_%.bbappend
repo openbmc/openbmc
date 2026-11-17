@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit obmc-phosphor-utils
 inherit systemd
@@ -43,11 +43,11 @@ do_install:append() {
         install -m 0644 ${UNPACKDIR}/${s} ${D}${systemd_system_unitdir}/${s}
     done
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/frontled ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/frontled ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${BPN}/
     install -d ${D}${bindir}
     install -m 0755 ${UNPACKDIR}/tray-identify ${D}${bindir}/
 }

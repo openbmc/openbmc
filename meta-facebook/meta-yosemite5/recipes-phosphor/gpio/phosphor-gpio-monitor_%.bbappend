@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -79,33 +79,33 @@ SYSTEMD_SERVICE:${PN} += " \
     "
 
 do_install:append() {
-    install -d ${D}${datadir}/${PN}
+    install -d ${D}${datadir}/${BPN}
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor.json
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor-evt.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-evt.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor-evt.json
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor-t22.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-t22.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor-t22.json
 
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/reset_btn ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/gpio_bypass ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/fault-led ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/hotplug-ac-cycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/set-uart-select-led ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/button-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/drive-fault-led ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/hsc-fault-logger ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/reset_btn ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/gpio_bypass ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/fault-led ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/hotplug-ac-cycle ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/set-uart-select-led ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/button-event-logger ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/drive-fault-led ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/hsc-fault-logger ${D}${libexecdir}/${BPN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

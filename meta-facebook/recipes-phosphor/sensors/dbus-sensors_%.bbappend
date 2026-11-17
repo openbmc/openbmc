@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 FACEBOOK_REMOVED_DBUS_SENSORS = " \
     exitairtempsensor \
@@ -45,10 +45,10 @@ do_install:append:mf-fb-liquid-cooled() {
         install -m 0644 ${UNPACKDIR}/${svc} ${D}${systemd_system_unitdir}/${svc}
     done
 
-    install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
     for handler in ${LEAK_HANDLERS}; do
         handler=$(basename ${handler#file://})
-        install -m 0755 ${UNPACKDIR}/${handler} ${D}${libexecdir}/${PN}/${handler}
+        install -m 0755 ${UNPACKDIR}/${handler} ${D}${libexecdir}/${BPN}/${handler}
     done
 }
 

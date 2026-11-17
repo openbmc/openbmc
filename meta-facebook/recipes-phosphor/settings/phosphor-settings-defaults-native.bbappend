@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " file://fb_host_settings.override.yml"
 SRC_URI:append:fb-compute = " file://restrictionmode-host-settings.override.yml"

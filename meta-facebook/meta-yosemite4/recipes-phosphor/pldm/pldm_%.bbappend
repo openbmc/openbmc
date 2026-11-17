@@ -32,9 +32,9 @@ do_install:append() {
     install -d ${D}/usr/share/pldm/bios
     install -m 0644 ${UNPACKDIR}/boot_config_setting_attrs.json ${D}/usr/share/pldm/bios/boot_config_setting_attrs.json
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/nic-powercycle ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/nic-powercycle ${D}${libexecdir}/${BPN}
     install -m 0644 ${UNPACKDIR}/nic-powercycle@.service ${D}${systemd_system_unitdir}
-    install -m 0755 ${UNPACKDIR}/pldmd-exit-handler ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/pldmd-exit-handler ${D}${libexecdir}/${BPN}/
     install -m 0644 ${UNPACKDIR}/pldmd-exit-handler.service ${D}${systemd_system_unitdir}
 }

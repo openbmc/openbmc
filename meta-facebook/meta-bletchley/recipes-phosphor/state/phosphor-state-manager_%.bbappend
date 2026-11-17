@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " \
     file://chassis-powercycle \
@@ -17,13 +17,13 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${BPN}/
 }
 
 FILES:${PN}:append = " ${systemd_system_unitdir}"
-FILES:${PN}:append = " ${libexecdir}/${PN}"
+FILES:${PN}:append = " ${libexecdir}/${BPN}"
 
 # Because Bletchley does not have IPMI between Bmc & Host, the Host init
 # state will set to Off after Bmc booted. We require an extra service to

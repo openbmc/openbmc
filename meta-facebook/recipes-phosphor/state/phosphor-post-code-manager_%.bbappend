@@ -1,5 +1,5 @@
 # Add post code event log configurations
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 EXTRA_OEMESON:append:fb-compute-arm = " -Dmax-post-code-size-per-cycle=1024"
 

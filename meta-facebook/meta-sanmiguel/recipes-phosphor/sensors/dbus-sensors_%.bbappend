@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 FACEBOOK_REMOVED_DBUS_SENSORS:remove = " \
     external \
@@ -16,7 +16,7 @@ RDEPENDS:${PN}:append = " bash"
 
 do_install:append() {
 
-    install -d ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}/
     install -m 0755 ${UNPACKDIR}/critical-leak-assert-handler \
-                    ${D}${libexecdir}/${PN}/critical-leak-assert-handler
+                    ${D}${libexecdir}/${BPN}/critical-leak-assert-handler
 }

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit obmc-phosphor-utils
 inherit systemd
@@ -28,9 +28,9 @@ SYSTEMD_SERVICE:${PN} += "${SERVICE_LIST}"
 
 do_install:append() {
     install -d ${D}${localstatedir}/lib/${PN}
-    install -d ${D}${datadir}/${PN}
+    install -d ${D}${datadir}/${BPN}
     install -m 0644 ${UNPACKDIR}/plat-phosphor-multi-gpio-monitor.json \
-                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
+                    ${D}${datadir}/${BPN}/phosphor-multi-gpio-monitor.json
 
     install -d ${D}${systemd_system_unitdir}
     for s in ${SERVICE_LIST}
@@ -38,7 +38,7 @@ do_install:append() {
         install -m 0644 ${UNPACKDIR}/${s} ${D}${systemd_system_unitdir}/${s}
     done
 
-    LIBEXECDIR_PN="${D}${libexecdir}/${PN}"
+    LIBEXECDIR_PN="${D}${libexecdir}/${BPN}"
     install -d ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/gpio-setter ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${LIBEXECDIR_PN}

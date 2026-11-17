@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit obmc-phosphor-systemd systemd
 
@@ -16,8 +16,8 @@ SYSTEMD_SERVICE:${PN} += "${CRITICAL_LEAK_SERVICE}"
 
 do_install:append() {
 
-    install -d ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/critical-leak-handler ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}/
+    install -m 0755 ${UNPACKDIR}/critical-leak-handler ${D}${libexecdir}/${BPN}/
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/${CRITICAL_LEAK_SERVICE} ${D}${systemd_system_unitdir}/${CRITICAL_LEAK_SERVICE}

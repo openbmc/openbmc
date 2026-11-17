@@ -21,7 +21,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
     "
 
 do_install() {
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/hmc-datetime-sync ${D}${libexecdir}/${PN}/
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/hmc-datetime-sync ${D}${libexecdir}/${BPN}/
 }
 
