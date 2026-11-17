@@ -8,7 +8,7 @@ inherit obmc-phosphor-image
 # The /etc/version file is misleading and not useful.  Remove it.
 # Users should instead rely on /etc/os-release.
 # Additionally set the pam login environment variables
-ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; set_pam_login_environment ;"
+ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version set_pam_login_environment"
 
 IMAGE_LINGUAS = ""
 IMAGE_FEATURES += " \

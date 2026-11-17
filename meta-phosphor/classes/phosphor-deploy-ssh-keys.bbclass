@@ -15,7 +15,7 @@
 
 inherit useradd_base
 
-IMAGE_PREPROCESS_COMMAND += "deploy_local_user;"
+IMAGE_PREPROCESS_COMMAND += "deploy_local_user"
 
 deploy_local_user () {
     if [ "${SSH_KEYS}" == "" ]; then
