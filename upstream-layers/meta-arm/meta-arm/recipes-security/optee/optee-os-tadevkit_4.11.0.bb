@@ -19,6 +19,8 @@ do_deploy() {
 	echo "Do not inherit do_deploy from optee-os."
 }
 
+SPDX_DEPLOY_ALLOW_EMPTY:task-deploy = "1"
+
 FILES:${PN} = "${includedir}/optee/"
 
 # Build paths are currently embedded
