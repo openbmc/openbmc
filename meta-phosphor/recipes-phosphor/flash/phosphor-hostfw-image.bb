@@ -18,6 +18,8 @@ do_compile() {
 
 addtask deploy before do_build after do_compile
 
+SPDX_DEPLOY_ALLOW_EMPTY:task-deploy = "1"
+
 HOSTFW_LICENSE ?= "Apache-2.0"
 HOSTFW_LIC_FILES_CHKSUM ?= "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 do_deploy() {
