@@ -59,6 +59,12 @@ do_install:append() {
 
     # ata_id has no rules file on its own
     sed -i '/IMPORT{program}="ata_id /d' ${D}${libdir}/udev/rules.d/60-persistent-storage.rules
+
+    # No BMC boots via EFI/systemd-boot (all use u-boot), so the EFI boot
+    # manager tool and the laptop hardware-ID database it carries are dead
+    # weight. Delete both.
+    rm -f ${D}${bindir}/bootctl
+    rm -rf ${D}${nonarch_libdir}/systemd/boot/hwids
 }
 
 # udev is added to the USERADD_PACKAGES due to some 'render' group
