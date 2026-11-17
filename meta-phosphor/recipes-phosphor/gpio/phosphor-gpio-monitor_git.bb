@@ -32,11 +32,11 @@ FILES:${PN}-monitor += "${bindir}/phosphor-gpio-monitor"
 FILES:${PN}-monitor += "${bindir}/phosphor-multi-gpio-monitor"
 FILES:${PN}-monitor += "${bindir}/phosphor-gpio-util"
 FILES:${PN}-monitor += "${nonarch_base_libdir}/udev/rules.d/99-gpio-keys.rules"
-FILES:${PN}-monitor += "${datadir}/${PN}/phosphor-multi-gpio-monitor.json"
+FILES:${PN}-monitor += "${datadir}/${BPN}/phosphor-multi-gpio-monitor.json"
 FILES:${PN}-monitor += "${systemd_system_unitdir}/phosphor-gpio-monitor@.service"
 FILES:${PN}-presence += "${bindir}/phosphor-gpio-presence"
 FILES:${PN}-presence += "${bindir}/phosphor-multi-gpio-presence"
-FILES:${PN}-presence += "${datadir}/${PN}/phosphor-multi-gpio-presence.json"
+FILES:${PN}-presence += "${datadir}/${BPN}/phosphor-multi-gpio-presence.json"
 FILES:${PN}-presence += "${systemd_system_unitdir}/phosphor-gpio-presence@.service"
 
 ALLOW_EMPTY:${PN} = "1"
@@ -49,5 +49,5 @@ PACKAGE_BEFORE_PN += "${GPIO_PACKAGES}"
 
 do_install:append() {
     install -d ${D}${datadir}/phosphor-gpio-monitor/
-    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${BPN}/
 }

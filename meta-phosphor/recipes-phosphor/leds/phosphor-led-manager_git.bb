@@ -18,7 +18,7 @@ PR = "r1"
 LED_ORG_JSON_PATTERNS ??= "${@ d.getVar('OBMC_ORG_YAML_SUBDIRS').replace('/', '.')}"
 LED_CONFIG_GREP_ARGS = "${@ ''.join([ ' -e ' + x for x in d.getVar('LED_ORG_JSON_PATTERNS').split() ])}"
 do_install:append() {
-    for f in "${D}${datadir}/${PN}/"*.json ;
+    for f in "${D}${datadir}/${BPN}/"*.json ;
     do
         if ! echo "$(basename $f)" | grep -q ${LED_CONFIG_GREP_ARGS};
         then
@@ -49,7 +49,7 @@ FILES:${PN} += "${datadir}/dbus-1/system.d"
 FILES:${PN}-faultmonitor += "${libexecdir}/phosphor-fru-fault-monitor"
 FILES:${PN}-faultmonitor += "${systemd_unitdir}/system/obmc-fru-fault-monitor.service"
 
-require ${PN}.inc
+require ${BPN}.inc
 
 PACKAGE_BEFORE_PN += "${PN}-faultmonitor"
 DBUS_SERVICE:${PN} += "xyz.openbmc_project.LED.GroupManager.service"

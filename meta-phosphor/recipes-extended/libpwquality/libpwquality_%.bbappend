@@ -1,7 +1,7 @@
 EXTRA_OECONF:append = " --enable-python-bindings=no"
 RDEPENDS:${PN}:remove:class-target = " ${PYTHON_PN}-core"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI += " \
         file://pwquality.conf \
         "

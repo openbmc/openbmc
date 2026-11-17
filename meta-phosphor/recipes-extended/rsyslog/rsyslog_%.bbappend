@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 PACKAGECONFIG ??= " \
     rsyslogd rsyslogrt inet regexp uuid \
     ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \

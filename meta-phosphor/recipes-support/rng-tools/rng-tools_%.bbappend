@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 PACKAGECONFIG:remove = "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'hw-rng', \
                              'libjitterentropy', '', d)}\

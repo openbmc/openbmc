@@ -1,5 +1,5 @@
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=9aa91e13d644326bf281924212862184"
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 DEPENDS += "systemd"
 
 # Temporary patch for https://codeberg.org/IPMITool/ipmitool/pulls/1

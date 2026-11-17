@@ -1,5 +1,5 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS:prepend:df-phosphor-no-ipmi-rmcp := "${THISDIR}/${PN}-no-ipmi-rmcp:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend:df-phosphor-no-ipmi-rmcp := "${THISDIR}/${BPN}-no-ipmi-rmcp:"
 
 SRC_URI += " file://pam.d/common-password \
              file://pam.d/common-account \

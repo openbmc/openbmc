@@ -1,6 +1,6 @@
-FILESEXTRAPATHS:prepend:df-obmc-ubi-fs := "${THISDIR}/${PN}/df-ubi:"
-FILESEXTRAPATHS:prepend:df-phosphor-mmc := "${THISDIR}/${PN}/df-mmc:"
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:df-obmc-ubi-fs := "${THISDIR}/${BPN}/df-ubi:"
+FILESEXTRAPATHS:prepend:df-phosphor-mmc := "${THISDIR}/${BPN}/df-mmc:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += " \
     file://50-rp_filter.conf \

@@ -12,7 +12,7 @@ PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-ecc.git;branch=master;protocol=https"
 
-SYSTEMD_SERVICE:${PN} = " ${PN}.service"
+SYSTEMD_SERVICE:${PN} = " ${BPN}.service"
 
 inherit meson pkgconfig
 inherit systemd

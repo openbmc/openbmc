@@ -15,7 +15,7 @@ PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/kcsbridge.git;branch=master;protocol=https"
 
-SYSTEMD_SERVICE:${PN} = "${PN}@${KCS_DEVICE}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}@${KCS_DEVICE}.service"
 
 inherit meson pkgconfig
 inherit systemd
@@ -24,6 +24,6 @@ RRECOMMENDS:${PN} += "phosphor-ipmi-host"
 
 RPROVIDES:${PN} += "virtual-obmc-host-ipmi-hw"
 
-FILES:${PN} += "${systemd_system_unitdir}/${PN}@.service"
+FILES:${PN} += "${systemd_system_unitdir}/${BPN}@.service"
 
 KCS_DEVICE ?= "ipmi-kcs3"

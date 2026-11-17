@@ -3,8 +3,8 @@
 #
 # ALT_RMCPP_IFACE = "eth1"
 # SYSTEMD_SERVICE:${PN} += " \
-#     ${PN}@${ALT_RMCPP_IFACE}.service \
-#     ${PN}@${ALT_RMCPP_IFACE}.socket \
+#     ${BPN}@${ALT_RMCPP_IFACE}.service \
+#     ${BPN}@${ALT_RMCPP_IFACE}.socket \
 #     "
 # Also, be sure to enable a corresponding entry in the channel
 # config file with the same 'name' as the interfaces above
@@ -25,8 +25,8 @@ SRC_URI = "git://github.com/openbmc/phosphor-net-ipmid;branch=master;protocol=ht
 
 # install parameterized service and socket files
 SYSTEMD_SERVICE:${PN} = " \
-        ${PN}@${RMCPP_IFACE}.service \
-        ${PN}@${RMCPP_IFACE}.socket \
+        ${BPN}@${RMCPP_IFACE}.service \
+        ${BPN}@${RMCPP_IFACE}.socket \
         "
 
 inherit meson pkgconfig
@@ -43,8 +43,8 @@ RDEPENDS:${PN} += "srvcfg-manager"
 RRECOMMENDS:${PN} = "pam-ipmi"
 
 FILES:${PN} += " \
-        ${systemd_system_unitdir}/${PN}@.service \
-        ${systemd_system_unitdir}/${PN}@.socket \
+        ${systemd_system_unitdir}/${BPN}@.service \
+        ${systemd_system_unitdir}/${BPN}@.socket \
         "
 
 # If RMCPP_IFACE is not set by bbappend, set it to default
