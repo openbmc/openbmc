@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 
 RRECOMMENDS:${PN} += "ipmitool"
 RDEPENDS:${PN} += "bash"

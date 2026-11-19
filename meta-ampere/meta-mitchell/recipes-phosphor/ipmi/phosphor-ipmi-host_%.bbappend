@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 
 PACKAGECONFIG:append = " dynamic-storages-only"
 DEPENDS:append = " mtmitchell-yaml-config"

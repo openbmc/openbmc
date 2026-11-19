@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 PACKAGECONFIG:remove = "run-apr-on-software-reset"
 PACKAGECONFIG:append = " host-gpio check-fwupdate-before-do-transition"

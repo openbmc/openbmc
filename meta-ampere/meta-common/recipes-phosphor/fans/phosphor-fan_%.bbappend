@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 
 # To delay turning off host when fan sensors are not detected yet
 # To use CurrentHostState to decide host state for phosphor-fan-monitor

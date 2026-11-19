@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 inherit systemd
 
@@ -18,7 +18,7 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
                                  "
 
 FILES:${PN}-monitor += " \
-                        ${datadir}/${PN}/phosphor-multi-gpio-monitor.json \
+                        ${datadir}/${BPN}/phosphor-multi-gpio-monitor.json \
                         ${sbindir}/ampere_scp_failover.sh \
                         ${sbindir}/ampere_psu_reset_hotswap.sh \
                         ${systemd_system_unitdir}/ampere_scp_failover.service \
@@ -26,13 +26,13 @@ FILES:${PN}-monitor += " \
                        "
 
 FILES:${PN}-presence += " \
-                         ${datadir}/${PN}/phosphor-multi-gpio-presence.json \
+                         ${datadir}/${BPN}/phosphor-multi-gpio-presence.json \
                         "
 
 do_install:append() {
     install -d ${D}${sbindir}
-    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json ${D}${datadir}/${PN}/
-    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json ${D}${datadir}/${BPN}/
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${BPN}/
     install -m 0755 ${UNPACKDIR}/ampere_scp_failover.sh ${D}${sbindir}/
     install -m 0755 ${UNPACKDIR}/ampere_psu_reset_hotswap.sh ${D}${sbindir}/
 

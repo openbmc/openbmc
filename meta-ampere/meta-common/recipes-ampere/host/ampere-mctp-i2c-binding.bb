@@ -10,7 +10,7 @@ inherit systemd
 inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} = "bash"
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 
 SRC_URI = " \
            file://ampere-mctp-i2c-binding.service \
