@@ -2,6 +2,23 @@
 
 # Ventura2 Sled Power Cycle
 
+# Stop writes to rwfs before BMC power is removed.
+# Lazy umount alone does not stop writes through the overlays.
+rwfs-quiesce() {
+    timeout 10 systemctl stop syslog.socket rsyslog.service
+    sync
+    for m in /mnt/data /home /var /etc; do
+        umount --lazy "$m" 2>/dev/null
+    done
+    if ! /usr/libexec/phosphor-static-norootfs-init/umount-filesystem; then
+        echo "Failed to detach /run/mnt-persist"
+    else
+        echo "Succeeded to detach /run/mnt-persist"
+    fi
+    sync
+    sleep 2
+}
+
 rmc-hsc-power-cycle() {
     # LTC4287 MFR_REBOOT_CONTROL (FDh) Read/Write
     # [3]:
@@ -22,10 +39,12 @@ rmc-hsc-power-cycle() {
 
     if [[ "$ret1" =~ ^0x[0-9A-Fa-f]+$ ]]; then
         echo "RMC Main Source AC"
+        rwfs-quiesce
         i2cset -y -f 10 0x44 0xfd 0x00
         i2cset -y -f 10 0x44 0xfd 0x0b
     elif [[ "$ret2" =~ ^0x[0-9A-Fa-f]+$ ]]; then
         echo "RMC Second Source AC"
+        rwfs-quiesce
         i2ctransfer -f -y 10 w1@0x24 0xec
     fi
 
