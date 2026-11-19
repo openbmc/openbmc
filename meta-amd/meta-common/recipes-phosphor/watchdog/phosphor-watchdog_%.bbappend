@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS:append := ":${THISDIR}/${BPN}"
 
 # Remove the override to keep service running after DC cycle
 SYSTEMD_OVERRIDE_${PN}:remove = "poweron.conf:phosphor-watchdog@poweron.service.d/poweron.conf"

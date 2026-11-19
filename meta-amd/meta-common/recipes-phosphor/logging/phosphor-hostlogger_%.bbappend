@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}/${MACHINE}:"
 
 # Default service instance to install (single-host mode)
 DEFAULT_INSTANCE:ethanolx = "ttyS0"

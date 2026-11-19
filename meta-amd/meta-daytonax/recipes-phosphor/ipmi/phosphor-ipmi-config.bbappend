@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:daytonax := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:daytonax := "${THISDIR}/${BPN}:"

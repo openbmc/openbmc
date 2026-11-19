@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS:append := ":${THISDIR}/${BPN}"
 SRC_URI:append = " file://daytonax-baseboard.json \
                    file://daytonax-chassis.json \
                  "
@@ -9,4 +9,4 @@ do_install:append() {
      install -m 0444 ${UNPACKDIR}/daytonax-baseboard.json ${D}${datadir}/entity-manager/configurations
      install -m 0444 ${UNPACKDIR}/daytonax-chassis.json ${D}${datadir}/entity-manager/configurations
 }
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
