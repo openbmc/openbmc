@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 DEPS_CFG = "resetreason.conf"
 DEPS_TGT = "phosphor-discover-system-state@.service"

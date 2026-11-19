@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 KCS_DEVICE = "ipmi_kcs3"
 SMM_DEVICE = "ipmi_kcs4"
