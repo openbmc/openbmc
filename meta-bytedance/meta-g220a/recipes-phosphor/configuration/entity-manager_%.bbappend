@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS:append := ":${THISDIR}/${BPN}"
 SRC_URI:append = " file://g220a_baseboard.json \
 		"
 do_install:append() {

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 DEPENDS:append:g220a= " g220a-yaml-config"
 
