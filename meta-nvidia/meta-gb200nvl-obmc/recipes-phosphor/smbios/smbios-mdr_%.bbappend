@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # smbios-ipmi-blob is used to collect SMBIOS information from IPMI blobs
 PACKAGECONFIG:append = " smbios-ipmi-blob"

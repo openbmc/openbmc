@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 OBMC_CONSOLE_HOST_TTY = "ttyS2"
 
 SRC_URI:append = " \
