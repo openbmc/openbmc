@@ -26,9 +26,9 @@ inherit image_types
 IMAGE_TYPEDEP:rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
 # Boot partition volume id
-# Shorten raspberrypi to just rpi to keep it under 11 characters
-# now enforced by mkfs.vfat from dosfstools-4.2
-BOOTDD_VOLUME_ID ?= "${@d.getVar('MACHINE').replace('raspberrypi', 'rpi')}"
+# Shorten raspberrypi to rpi and truncate to the 11-character limit
+# enforced by mkfs.vfat from dosfstools-4.2
+BOOTDD_VOLUME_ID ?= "${@d.getVar('MACHINE').replace('raspberrypi', 'rpi')[:11]}"
 
 # Boot partition size [in KiB] (will be rounded up to IMAGE_ROOTFS_ALIGNMENT)
 BOOT_SPACE ?= "49152"

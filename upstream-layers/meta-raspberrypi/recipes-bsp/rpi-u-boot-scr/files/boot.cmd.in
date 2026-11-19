@@ -1,4 +1,6 @@
 fdt addr ${fdt_addr} && fdt get value bootargs /chosen bootargs
 fatload @@BOOT_MEDIA@@ 0:1 ${kernel_addr_r} @@KERNEL_IMAGETYPE@@
 if test ! -e @@BOOT_MEDIA@@ 0:1 uboot.env; then saveenv; fi;
+# Keep the FDT out of the CMA allocation range on relevant machines.
+if test @@RPI_SET_FDT_HIGH@@ = 1; then setenv fdt_high ${fdt_addr}; fi
 @@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr}

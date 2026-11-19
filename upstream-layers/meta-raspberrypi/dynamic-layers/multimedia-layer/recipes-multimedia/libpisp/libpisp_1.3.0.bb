@@ -12,3 +12,6 @@ SRCREV = "9ba67e6680f03f31f2b1741a53e8fd549be82cbe"
 DEPENDS = "nlohmann-json"
 
 inherit meson pkgconfig
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[logging] = "-Dlogging=enabled,-Dlogging=disabled,boost"

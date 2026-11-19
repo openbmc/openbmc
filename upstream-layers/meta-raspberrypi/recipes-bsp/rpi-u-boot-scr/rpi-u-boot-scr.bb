@@ -10,11 +10,13 @@ INHIBIT_DEFAULT_DEPS = "1"
 SRC_URI = "file://boot.cmd.in"
 
 BOOT_MEDIA ?= "mmc"
+RPI_SET_FDT_HIGH ?= "${@oe.utils.conditional('TARGET_ARCH', 'aarch64', '1', '0', d)}"
 
 do_compile() {
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
         -e 's/@@BOOT_MEDIA@@/${BOOT_MEDIA}/' \
+        -e 's/@@RPI_SET_FDT_HIGH@@/${RPI_SET_FDT_HIGH}/' \
         "${UNPACKDIR}/boot.cmd.in" > "${WORKDIR}/boot.cmd"
     mkimage -A ${@oe.kernel.map_uboot_arch(d)} -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
 }
