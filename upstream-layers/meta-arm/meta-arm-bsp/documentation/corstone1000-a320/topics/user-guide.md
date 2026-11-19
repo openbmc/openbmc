@@ -2,7 +2,7 @@
 
 The Arm Corstone-1000 with Cortex-A320 software stack uses the Yocto Project to build a tiny Linux distribution suitable for the Arm Corstone-1000 with Cortex-A320 platform (kernel and initramfs filesystem less than 6 MB on the flash).
 
-The Corstone-1000 with Cortex-A320 software stack can be run on [Arm Corstone-1000 with Cortex-A320 FVP (Fixed Virtual Platform)](https://developer.arm.com/downloads/-/arm-ecosystem-fvps) and is built on top of Yocto Project's [Wrynose release]($meta_arm_repository_release_branch).
+The Corstone-1000 with Cortex-A320 software stack can be run on [Arm Corstone-1000 with Cortex-A320 FVP (Fixed Virtual Platform)](https://developer.arm.com/downloads/-/arm-ecosystem-fvps) and is built on top of Yocto Project's [Blacksail release]($meta_arm_repository_release_branch).
 
 The Yocto Project relies on the [BitBake](https://docs.yoctoproject.org/bitbake.html#bitbake-documentation) tool as its build tool. Please see the [Yocto Project documentation](https://docs.yoctoproject.org/) for more information.
 
@@ -135,7 +135,7 @@ Table: Trusted Firmware-M secure enclave components
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend`                |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.3.0.bb`                      |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.3.1.bb`                      |
 
 ## Build {.reference}
 
@@ -164,7 +164,7 @@ Building binaries natively on Windows and AArch64 Linux is not supported. Use an
 
    ```
    cd ${WORKSPACE}
-   git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2026.05
+   git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2026.11
    ```
 
 4. Accept the EULA on the [Arm Developer](https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula) site to build a Corstone-1000 with Cortex-A320 image for FVP as follows:

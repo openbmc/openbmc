@@ -10,8 +10,8 @@ product: Corstone-1000 with Cortex-A320
 product_type: Open Source Projects
 product_revision:
   - prefix: Version
-    version: "0101"
-    version_label: "2026.02"
+    version: "0102"
+    version_label: "2026.11"
 output_type: "software"
 conformance_notice: "true"
 content_type: User Guide
@@ -24,8 +24,8 @@ themes:
 intended_audience: Software Developers
 terminology_review: new
 releases:
- - revision: 0100-01
-   date: 2026-05-01
+ - revision: 0102-01
+   date: 2026-11-09
    change_summary: Update
    permissions: nonconfidential
 
@@ -97,7 +97,7 @@ variables:
 - name: secure_debug_manager_armds_integration
   value: 'https://github.com/ARM-software/secure-debug-manager?tab=readme-ov-file#arm-development-studio-integration'
 - name: meta_arm_repository_release_branch
-  value: 'https://docs.yoctoproject.org/next/migration-guides/migration-6.0.html'
+  value: 'https://docs.yoctoproject.org/next/migration-guides/migration-6.1.html'
 - name: arm_ulink_pro_website
   value: 'https://www.arm.com/products/development-tools/debug-probes/ulink-pro'
 - name: arm_ds_website

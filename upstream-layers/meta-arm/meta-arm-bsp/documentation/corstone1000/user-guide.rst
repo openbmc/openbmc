@@ -51,7 +51,7 @@ The Corstone-1000 software stack can be run on:
 Yocto Stable Branch
 -------------------
 
-Corstone-1000 software stack is built on top of Yocto Project's `Wrynose release <meta-arm-repository-release-branch_>`__.
+Corstone-1000 software stack is built on top of Yocto Project's `Blacksail release <meta-arm-repository-release-branch_>`__.
 
 Software Components
 -------------------
@@ -173,7 +173,7 @@ Secure Enclave Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.3.0.bb``         |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.3.1.bb``         |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 ************************************
@@ -233,7 +233,7 @@ Build
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2026.05
+        git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2026.11
 
 #. Build a Corstone-1000 image:
 
@@ -322,7 +322,7 @@ Flash
     Using smaller cards or unsupported file systems (e.g., exFAT, NTFS) may cause the flashing
     process to fail or the device to become unresponsive.
 
-#. Download the FPGA bit file image ``AN550: Arm® Corstone™-1000 for MPS3 Version 2.0``
+#. Download the FPGA bit file image ``AN550: Arm® Corstone™-1000 for MPS3 Version 2.0 r2p0-00rel0``
    on the `Arm Developer website <https://developer.arm.com/tools-and-software/development-boards/fpga-prototyping-boards/download-fpga-images>`__.
    Click on the ``Download AN550 bundle`` button and login to download the file.
 
@@ -544,8 +544,8 @@ Tests
 Reports
 -------
 
-Reports for the tests conducted on the `Corstone-1000 software (CORSTONE1000-2026.05) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2026.05>`__
-release are available for reference `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2026.05/embedded-a/corstone1000/CORSTONE1000-2026.05?ref_type=tags>`__.
+Reports for the tests conducted on the `Corstone-1000 software (CORSTONE1000-2026.11) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2026.11>`__
+release are available for reference `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2026.11/embedded-a/corstone1000/CORSTONE1000-2026.11?ref_type=tags>`__.
 
 
 .. _clean-secure-flash:
@@ -564,7 +564,7 @@ Clean Secure Flash
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git -b CORSTONE1000-2026.05
+        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git -b CORSTONE1000-2026.11
 
 #. Copy the secure flash cleaning Git patch file to your copy of `meta-arm`.
 
@@ -691,7 +691,7 @@ FVP
 ===
 
 The ESP disk image will automatically be used by the Corstone-1000 FVP as the 2nd MMC card image.
-It will be used when the SystemReady-IR tests is performed on the FVP in the later section.
+It will be used when the SystemReady-IR tests are performed on the FVP in the later section.
 
 
 ****************************
@@ -749,7 +749,7 @@ The ``BOOT`` partition is also used to store test results in the ``acs_results``
     Ensure that the ``acs_results`` folder is empty before starting the test.
 
 
-This sections below describe how to build and run ACS tests on Corstone-1000.
+This section below describe how to build and run ACS tests on Corstone-1000.
 
 .. _mps3-instructions-for-acs-image:
 
@@ -1126,7 +1126,7 @@ Positive Full Capsule Update Test
     The capsule update will be started.
 
     .. note::
-        The capsule update takes about 8 minutes to complete on MPS3 and between 15-30 minutes on FVP.
+        The capsule update takes about 8 minutes to complete on MPS3 and between 10-15 minutes on FVP.
 
         The Corstone-1000 will reset after successfully applying the capsule.
 
@@ -1437,13 +1437,13 @@ The following table shows the details of the first four ESRT entries for the pos
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
 | ``capsule_flags`` | ``fw_class``          | ``fw_type`` | ``fw_version`` | ``last_attempt_status`` | ``last_attempt_version`` | ``lowest_supported_fw_ver`` |
 +===================+=======================+=============+================+=========================+==========================+=============================+
-| 0                 | ``${BL2_GUID}``       | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${BL2_GUID}``       | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${TFM_S_GUID}``     | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${TFM_S_GUID}``     | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${FIP_GUID}``       | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${FIP_GUID}``       | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${INITRAMFS_GUID}`` | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${INITRAMFS_GUID}`` | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
 
 Positive Partial Capsule Update Test ESRT
@@ -1454,13 +1454,13 @@ The following table shows the details of the first four ESRT entries for the pos
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
 | ``capsule_flags`` | ``fw_class``          | ``fw_type`` | ``fw_version`` | ``last_attempt_status`` | ``last_attempt_version`` | ``lowest_supported_fw_ver`` |
 +===================+=======================+=============+================+=========================+==========================+=============================+
-| 0                 | ``${BL2_GUID}``       | 0           | 7              | 0                       | 7                        | 0                           |
+| 0                 | ``${BL2_GUID}``       | 1           | 7              | 0                       | 7                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${TFM_S_GUID}``     | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${TFM_S_GUID}``     | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${FIP_GUID}``       | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${FIP_GUID}``       | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${INITRAMFS_GUID}`` | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${INITRAMFS_GUID}`` | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
 
 Rollback Protection Capsule Update Test ESRT
@@ -1471,13 +1471,13 @@ The following table shows the details of the first four ESRT entries for the rol
 +-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
 | ``capsule_flags`` | ``fw_class``           | ``fw_type`` | ``fw_version`` | ``last_attempt_status`` | ``last_attempt_version`` | ``lowest_supported_fw_ver`` |
 +===================+========================+=============+================+=========================+==========================+=============================+
-| 0                 | ``${BL2_GUID}``        | 0           | 7              | 1                       | 5                        | 0                           |
+| 0                 | ``${BL2_GUID}``        | 1           | 7              | 1                       | 5                        | 0                           |
 +-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${TFM_S_GUID}``      | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${TFM_S_GUID}``      | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${FIP_GUID}``        | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${FIP_GUID}``        | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
-| 0                 | ``${INITRAMFS_GUID}``  | 0           | 6              | 0                       | 6                        | 0                           |
+| 0                 | ``${INITRAMFS_GUID}``  | 1           | 6              | 0                       | 6                        | 0                           |
 +-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
 
 See the `UEFI documentation <https://uefi.org/specs/UEFI/2.10/23_Firmware_Update_and_Reporting.html#id29>`__ for more information on the significance of the table fields.
@@ -1486,7 +1486,7 @@ See the `UEFI documentation <https://uefi.org/specs/UEFI/2.10/23_Firmware_Update
 Linux Distributions
 -------------------
 
-This sections describes the steps to install major Linux distributions to the Corstone-1000 Host Processor.
+This section describes the steps to install major Linux distributions to the Corstone-1000 Host Processor.
 
 The Linux distributions to be installed are:
 
@@ -1512,7 +1512,7 @@ Follow the instructions below to create the installation media.
     
         The location of the ISO file on the development machine will be referred to as ``${DISTRO_INSTALLER_ISO_PATH}``.
 
-#. Create the installation media which will contain the necessary files to install the operation system.
+#. Create the installation media which will contain the necessary files to install the operating system.
 
 - **MPS3**:
 
@@ -1553,7 +1553,7 @@ Corstone-1000 on-board non-volatile storage size is insufficient for installing 
         #. Do not yet connect this blank USB drive to the MPS3. It will be used as the primary drive to boot the distribution.
 
     - FVP:
-        #. Create an 10 GB GUID Partition Table (GPT) formatted MultiMediaCard (MMC) image.
+        #. Create a 10 GB GUID Partition Table (GPT) formatted MultiMediaCard (MMC) image.
 
             .. code-block:: console
 
@@ -1674,6 +1674,13 @@ Boot Distribution
     #. Once the installation is complete, unplug the installation media.
     #. Perform a cold boot of the MPS3.
 
+    .. note::
+
+        As a workaround, if U-Boot does not detect the USB drive that contains
+        the installed operating system, copy the contents of that USB drive to
+        another supported USB drive that U-Boot can detect, then boot from the
+        new USB drive.
+
 - FVP
 
     The target should automatically boot into the installed operating system image.
@@ -1788,7 +1795,7 @@ Generate Keys, Signed Image and Unsigned Image
         cd ${WORKSPACE}
 
         git clone https://gitlab.arm.com/arm-reference-solutions/iot-platform-assets \
-        -b CORSTONE1000-2026.05
+        -b CORSTONE1000-2026.11
 
 #. Set the current working directory to build directory's subdirectory containing the software stack build images.
 
@@ -2172,10 +2179,12 @@ For more information about this, see the following resources:
 #. Enable the built-in PSA-ADAC Secure Debug Manager in the copied database.
    In
    ``${CS1000_ADAC_DB}/Boards/Arm_Development_Boards/MPS3_Corstone_1000_ADAC_611/project_types.xml``,
-   add the following element alongside the existing ``dtsl_config`` parameter:
+   add the ``secure_debug_manager`` element immediately below the existing
+   ``dtsl_config`` parameter:
 
     .. code-block:: xml
 
+        <param default="DtslScript" id="dtsl_config" type="string" visible="false"/>
         <secure_debug_manager type="adac_sdc600" manifest="CDB://../../../ATP/manifest.xml" device="CSAPBCOM" reset_type="nSRST"/>
 
    This selects the built-in PSA-ADAC implementation, its authentication-token
@@ -2193,7 +2202,8 @@ For more information about this, see the following resources:
    DPv3 is required so that Arm Development Studio uses the ADIv6 debug-port
    addressing needed to reach ``CSAPBCOM``.
 
-   In the same file, give the copied platform a unique title:
+   In the same file, rename the platform to a unique title in the
+   ``<extension name="ds">`` extension block:
 
     .. code-block:: xml
 
@@ -2301,7 +2311,7 @@ For more information about this, see the following resources:
 *Copyright (c) 2022-2026, Arm Limited. All rights reserved.*
 
 .. _arm-developer-fvp: https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
-.. _meta-arm-repository-release-branch: https://docs.yoctoproject.org/next/migration-guides/migration-6.0.html
+.. _meta-arm-repository-release-branch: https://docs.yoctoproject.org/next/migration-guides/migration-6.1.html
 .. _arm-ds-website: https://www.arm.com/products/development-tools/embedded-and-software/arm-development-studio
 .. _arm-ulink-pro-d-website: https://www.arm.com/products/development-tools/debug-probes/ulink-pro
 .. _arm-dstream-website: https://www.arm.com/products/development-tools/debug-probes/dstream-st

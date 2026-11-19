@@ -7,6 +7,15 @@ intended for safety-critical applications. Should your software or hardware
 prove defective, you assume the entire cost of all necessary servicing, repair
 or correction.
 
+## Release notes - 2026.11 {.reference}
+
+The following knowns issues and limitations are present in this release:
+
+- Crypto isolation is not supported in the Secure world of Corstone-1000 with Cortex-A320. Additionally, clients in
+  the Normal world are not isolated from one another. Therefore, if an end user wants to add a new
+  Secure Partition (SP) (such as a software TPM) that accesses the Crypto service via the SE-Proxy,
+  they are responsible for implementing their own isolation mechanisms to ensure proper security boundaries.
+
 ## Release notes - 2026.05 {.reference}
 
 The following knowns issues and limitations are present in this release:

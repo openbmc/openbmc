@@ -2,6 +2,73 @@
 
 This document contains a summary of the new features, changes and fixes in each release of the Corstone-1000 with Cortex-A320 software stack.
 
+## Version 2026.11 {.reference}
+
+The following changes are present in this release:
+
+- Continued Corstone-1000 with Cortex-A320 enablement with U-Boot 2026.07, TF-A 2.15.0, TF-M 2.3.1, OP-TEE 4.10.0, Trusted Services 1.3.0, and Linux 6.19.
+- Updated TF-M to include Corstone-1000 security fixes and the latest firmware-update partition fixes.
+
+### Corstone-1000 with Cortex-A320 components versions {.reference}
+
+The following component versions are available:
+
+Table: Corstone-1000 with Cortex-A320 component versions
+
++----------------------------------------+-----------------------------------+
+| Component                              | Version                           |
++========================================+===================================+
+| linux-yocto                            | 6.19                              |
++----------------------------------------+-----------------------------------+
+| u-boot                                 | 2026.07                           |
++----------------------------------------+-----------------------------------+
+| optee-client                           | 4.10.0                            |
++----------------------------------------+-----------------------------------+
+| optee-os                               | 4.10.0                            |
++----------------------------------------+-----------------------------------+
+| trusted-firmware-a                     | 2.15.0                            |
++----------------------------------------+-----------------------------------+
+| trusted-firmware-m                     | 2.3.1                             |
++----------------------------------------+-----------------------------------+
+| libts                                  | v1.3.0                            |
++----------------------------------------+-----------------------------------+
+| ts-sp-{se-proxy, smm-gateway}          | v1.3.0                            |
++----------------------------------------+-----------------------------------+
+| ts-psa-{crypto, iat, its. ps}-api-test | 74dc6646ff                        |
++----------------------------------------+-----------------------------------+
+
+### Yocto distribution components versions {.reference}
+
+The following Yocto distribution components versions are available:
+
+Table: Yocto distribution component versions
+
++-------------------+------------+
+| Component         | Version    |
++===================+============+
+| meta-arm          | blacksail  |
++-------------------+------------+
+| bitbake           | 634f8dede6 |
++-------------------+------------+
+| meta-openembedded | a9d69bc066 |
++-------------------+------------+
+| openembedded-core | e182a0c4b9 |
++-------------------+------------+
+| meta-yocto        | d0119aa2eb |
++-------------------+------------+
+| meta-secure-core  | 56316bacdb |
++-------------------+------------+
+| busybox           | 1.38.0     |
++-------------------+------------+
+| musl              | 1.2.6      |
++-------------------+------------+
+| gcc-arm-none-eabi | 15.3.rel1  |
++-------------------+------------+
+| gcc-cross-aarch64 | 16.2.0     |
++-------------------+------------+
+| openssl           | 4.0.3      |
++-------------------+------------+
+
 ## Version 2026.05 {.reference}
 
 The following changes are present in this release:

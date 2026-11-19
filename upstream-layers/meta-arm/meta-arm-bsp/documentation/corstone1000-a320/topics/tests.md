@@ -4,7 +4,7 @@ All the tests in this chapter assume you have already built the software stack a
 
 ## Reports {.reference}
 
-Reports for the tests conducted on the [Corstone-1000 software (CORSTONE1000-2026.05)](https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2026.05) release are available for reference in the [GitLab repo](https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2026.05/embedded-a/corstone1000/CORSTONE1000-2026.05?ref_type=tags).
+Reports for the tests conducted on the [Corstone-1000 software (CORSTONE1000-2026.11)](https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2026.11) release are available for reference in the [GitLab repo](https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2026.11/embedded-a/corstone1000/CORSTONE1000-2026.11?ref_type=tags).
 
 ## SystemReady IR {.reference}
 
@@ -29,8 +29,8 @@ A storage with EFI System Partition (ESP) must exist in the system for the UEFI-
 
 ### Use the EFI system partition {.reference}
 
-The ESP disk image will automatically be used by the Corstone-1000 FVP as the 2nd MMC card image.
-It will be used when the SystemReady-IR tests is performed on the FVP in the later section.
+The ESP disk image will automatically be used by the Corstone-1000 with Cortex-A320 FVP as the 2nd MMC card image.
+It will be used when the SystemReady-IR tests are performed on the FVP in the later section.
 
 ### Run SystemReady IR ACS tests {.reference}
 
@@ -85,7 +85,7 @@ The `BOOT` partition is also used to store test results in the `acs_results` fol
 Ensure that the `acs_results` folder is empty before starting the test.
 :::
 
-To build and run ACS tests on Corstone-1000:
+To build and run ACS tests on Corstone-1000 with Cortex-A320:
 
 1. On your host development machine, clone the [Arm SystemReady ACS repository](https://github.com/ARM-software/arm-systemready/).
 
@@ -100,7 +100,7 @@ To build and run ACS tests on Corstone-1000:
 2. Find the pre-built ACS live image in `${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0/ir-acs-live-image-generic-arm64.wic.xz`.
 
    :::note
-   This prebuilt ACS image includes v5.13 kernel, which does not provide USB driver support for Corstone-1000.
+   This prebuilt ACS image includes v5.13 kernel, which does not provide USB driver support for Corstone-1000 with Cortex-A320.
    :::
 
 3. Decompress the pre-built ACS live image.
@@ -172,14 +172,15 @@ Table: Payload GUIDs
 +-----------+--------------------------------------+
 
 The following section describes the steps to update the firmware using Capsule Update
-as the Corstone-1000 supports UEFI.
+as the Corstone-1000 with Cortex-A320 supports UEFI.
 
 The firmware update process is tested with an invalid capsule and with valid capsules to validate the robustness and
 error-handling capabilities of the firmware update mechanism.
 
-- Positive full capsule update test: The Corstone-1000 is provided with a valid full capsule, which it applies successfully. The system then boots normally and reaches the Linux command prompt.
-- Positive partial capsule update test: The Corstone-1000 is provided with a valid partial capsule that specifies an update for a single component only. The capsule is applied successfully, after which the system boots normally and reaches the Linux command prompt.
-- Rollback protection capsule update test: The Corstone-1000 is provided with an outdated capsule containing lower version numbers for all payloads. The capsule is correctly rejected due to rollback protection, and the previously installed firmware is retained.
+- Positive full capsule update test: The Corstone-1000 with Cortex-A320 is provided with a valid full capsule, which it applies successfully. The system then boots normally and reaches the Linux command prompt.
+- Positive partial capsule update test: The Corstone-1000 with Cortex-A320 is provided with a valid partial capsule that specifies an update for a single component only. The capsule is applied successfully,
+after which the system boots normally and reaches the Linux command prompt.
+- Rollback protection capsule update test: The Corstone-1000 with Cortex-A320 is provided with an outdated capsule containing lower version numbers for all payloads. The capsule is correctly rejected due to rollback protection, and the previously installed firmware is retained.
 
 Three different capsules are therefore needed to perform the tests.
 
@@ -383,7 +384,7 @@ To run the test:
    ...
    ```
 
-6. Run the following commands in order to run the Corstone-1000 Linux kernel.
+6. Run the following commands in order to run the Corstone-1000 with Cortex-A320 Linux kernel.
 
    :::note
    Otherwise, the execution ends up in the ACS live image.
@@ -420,7 +421,7 @@ To run the test:
    Hit any key to stop autoboot:
    ```
 
-9. Run the following commands to boot the Corstone-1000 Linux kernel.
+9. Run the following commands to boot the Corstone-1000 with Cortex-A320 Linux kernel.
 
    :::note
    If these commands are not executed, the system will default to booting into the ACS live image.
@@ -524,7 +525,7 @@ To run the rollback protection capsule update test:
    Hit any key to stop autoboot:
    ```
 
-8. Run the following commands in order to run the Corstone-1000 Linux kernel, otherwise, the execution ends up in the ACS live image.
+8. Run the following commands in order to run the Corstone-1000 with Cortex-A320 Linux kernel, otherwise, the execution ends up in the ACS live image.
 
    ```
    $ unzip $kernel_addr 0x90000000
@@ -545,7 +546,7 @@ To run the rollback protection capsule update test:
     Hit any key to stop autoboot:
     ```
 
-11. Run the following commands to boot the Corstone-1000 Linux kernel. If these commands are not executed, the system will default to booting into the ACS live image.
+11. Run the following commands to boot the Corstone-1000 with Cortex-A320 Linux kernel. If these commands are not executed, the system will default to booting into the ACS live image.
 
     ```
     $ unzip $kernel_addr 0x90000000
@@ -621,28 +622,28 @@ cat /sys/firmware/efi/esrt/entries/entry0/last_attempt_status
 The following list shows the details of the first four ESRT entries for the positive capsule update test:
 
 - BL2 (`${BL2_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - TFM_S (`${TFM_S_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - FIP (`${FIP_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - INITRAMFS (`${INITRAMFS_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
@@ -654,28 +655,28 @@ The following list shows the details of the first four ESRT entries for the posi
 The following list shows the details of the first four ESRT entries for the positive partial capsule update test:
 
 - BL2 (`${BL2_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 7
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 7
 - TFM_S (`${TFM_S_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - FIP (`${FIP_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - INITRAMFS (`${INITRAMFS_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
@@ -687,28 +688,28 @@ The following list shows the details of the first four ESRT entries for the posi
 The following list shows the details of the first four ESRT entries for the rollback protection capsule update test:
 
 - BL2 (`${BL2_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 7
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 1
   - Last attempt version: 5
 - TFM_S (`${TFM_S_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - FIP (`${FIP_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
   - Last attempt status: 0
   - Last attempt version: 6
 - INITRAMFS (`${INITRAMFS_GUID}`):
-  - FW type: 0
+  - FW type: 1
   - FW version: 6
   - Lowest supported version: 0
   - Capsule flags: 0
@@ -719,14 +720,14 @@ See the [UEFI documentation](https://uefi.org/specs/UEFI/2.10/23_Firmware_Update
 
 ## Linux distributions {.reference}
 
-This sections describes the steps to install major Linux distributions to the Corstone-1000 Host Processor.
+This section describes the steps to install major Linux distributions to the Corstone-1000 with Cortex-A320 Host Processor.
 
 The Linux distributions to be installed are:
 
 - [Debian](https://www.debian.org/)
 - [openSUSE](https://www.opensuse.org/)
 
-Follow the instructions below to install the Linux distributions to the Corstone-1000 software stack.
+Follow the instructions below to install the Linux distributions to the Corstone-1000 with Cortex-A320 software stack.
 
 ### Prepare installation media {.reference}
 
@@ -741,7 +742,7 @@ Follow the instructions below to create the installation media.
 
    Note that the location of the ISO file on the development machine will be referred to as `${DISTRO_INSTALLER_ISO_PATH}`.
 
-2. Create the installation media which will contain the necessary files to install the operation system.
+2. Create the installation media which will contain the necessary files to install the operating system.
 
    The distribution installer ISO file does not need to be burnt to a USB drive.
    It will be used as is when starting the FVP install the distribution.
@@ -749,9 +750,9 @@ Follow the instructions below to create the installation media.
 ### Prepare system drive {.reference}
 
 A system (or boot) drive, to store all the operating system files and used to boot the distribution, is required as
-Corstone-1000 on-board non-volatile storage size is insufficient for installing the distributions.
+Corstone-1000 with Cortex-A320 on-board non-volatile storage size is insufficient for installing the distributions.
 
-1. Create an 10 GB GUID Partition Table (GPT) formatted MultiMediaCard (MMC) image.
+1. Create a 10 GB GUID Partition Table (GPT) formatted MultiMediaCard (MMC) image.
 
    ```
    dd if=/dev/zero of=${WORKSPACE}/fvp_distro_system_drive.img \
@@ -914,7 +915,7 @@ To generate keys:
    cd ${WORKSPACE}
 
    git clone https://gitlab.arm.com/arm-reference-solutions/iot-platform-assets \
-   -b CORSTONE1000-2026.05
+   -b CORSTONE1000-2026.11
    ```
 
 3. Set the current working directory to build directory's subdirectory containing the software stack build images.
@@ -927,7 +928,7 @@ To generate keys:
 
    ```
    ${WORKSPACE}/iot-platform-assets/corstone1000/secureboot/create_keys_and_sign.sh \
-   -d fvp \
+   -d a320-fvp \
    -v ${CERTIFICATE_VALIDITY_DURATION_IN_DAYS}
    ```
 
@@ -978,7 +979,7 @@ To run an unsigned image boot test:
 
    ```
    corstone1000# \
-   load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp; \
+   load mmc 1:1 $loadaddr corstone1000_secureboot_a320-fvp_images/Image_a320-fvp; \
    loadm $loadaddr $kernel_addr_r $filesize; \
    bootefi $kernel_addr_r $fdtcontroladdr
 
@@ -997,7 +998,7 @@ Load the signed kernel image.
 
 ```
 corstone1000# \
-load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp.signed; \
+load mmc 1:1 $loadaddr corstone1000_secureboot_a320-fvp_images/Image_a320-fvp.signed; \
 loadm $loadaddr $kernel_addr_r $filesize; \
 bootefi $kernel_addr_r $fdtcontroladdr
 ```
@@ -1036,7 +1037,7 @@ to communicate between the normal world and the secure world to run the [Arm Pla
 
 The tests use the `arm_tstee` driver to access Trusted Services Secure Partitions from user space. The driver is included in the Linux Kernel, starting from v6.10.
 
-1. Start the Corstone-1000 FVP and wait until it boots to Linux.
+1. Start the Corstone-1000 with Cortex-A320 FVP and wait until it boots to Linux.
 
 2. Run the PSA API tests by running the commands below in the order shown:
 
@@ -1058,7 +1059,7 @@ Symmetric multiprocessing (SMP) mode is supported on the Corstone-1000 with Cort
    meta-arm/kas/corstone1000-multicore.yml
    ```
 
-2. Run the Corstone-1000 FVP.
+2. Run the Corstone-1000 with Cortex-A320 FVP.
 
    ```
    kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
@@ -1082,7 +1083,7 @@ To build on Ethos-U85 NPU:
    ```
    cd ${WORKSPACE}
    git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git \
-   -b CORSTONE1000-2026.05
+   -b CORSTONE1000-2026.11
    ```
 
 2. Copy the additional kas configuration file to:
@@ -1107,14 +1108,14 @@ To build on Ethos-U85 NPU:
    cd ${WORKSPACE}
    ```
 
-5. Re-build the Corstone-1000 FVP software stack as follows:
+5. Re-build the Corstone-1000 with Cortex-A320 FVP software stack as follows:
 
    ```
    kas build meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
    meta-arm/kas/ethos-u85-test.yml
    ```
 
-6. Run the Corstone-1000 FVP:
+6. Run the Corstone-1000 with Cortex-A320 FVP:
 
    ```
    kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
@@ -1122,7 +1123,7 @@ To build on Ethos-U85 NPU:
    -c "../meta-arm/scripts/runfvp"
    ```
 
-7. To verify you are running the Corstone-1000 FVP (Cortex-A320), build and run the FVP and inspect the CPU model
+7. To verify you are running the Corstone-1000 with Cortex-A320 FVP, build and run the FVP and inspect the CPU model
    reported in `/proc/cpuinfo` as shown below. Inside the FVP shell, confirm the core type:
 
    ```
