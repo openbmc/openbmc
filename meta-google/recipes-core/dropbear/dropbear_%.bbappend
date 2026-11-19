@@ -1,8 +1,8 @@
-FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${BPN}:"
 SRC_URI:append:gbmc  = " file://dropbear.default"
 SYSTEMD_AUTO_ENABLE:${PN}:prod = "disable"
 
-FILESEXTRAPATHS:remove:gbmc:bandaid := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:remove:gbmc:bandaid := "${THISDIR}/${BPN}:"
 SYSTEMD_AUTO_ENABLE:${PN}:bandaid:prod = "enable"
 
 # Allow SSH to the gbmc-bridge node on DEV builds

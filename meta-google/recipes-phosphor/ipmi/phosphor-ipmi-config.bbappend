@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:gbmc = " \
   file://gbmc_eth_config.json \

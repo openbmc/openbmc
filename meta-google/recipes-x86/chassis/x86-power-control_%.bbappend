@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${BPN}:"

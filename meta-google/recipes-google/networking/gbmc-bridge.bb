@@ -8,7 +8,7 @@ inherit systemd
 GBMC_NCSI_IF_NAME ??= ""
 GBMC_DHCP_RELAY ??= "${@'' if int(d.getVar('FLASH_SIZE')) < 65536 else '1'}"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI += " \
   file://-bmc-gbmcbr.netdev \
   file://-bmc-gbmcbr.network.in \

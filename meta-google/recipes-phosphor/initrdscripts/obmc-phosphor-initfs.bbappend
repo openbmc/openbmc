@@ -1,6 +1,6 @@
 # This is needed to guarantee that our whitelist takes
 # precendence over the OpenBMC one
-FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:gbmc:dev = " file://whitelist.dev"
 
