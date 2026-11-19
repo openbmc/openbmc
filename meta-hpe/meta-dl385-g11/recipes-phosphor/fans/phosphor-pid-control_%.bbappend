@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 SRC_URI:append = " file://config.json"
 
 FILES:${PN} = "${datadir}/swampd/config.json /usr/share/swampd/* /usr/bin/swampd /usr/bin/setsensor"

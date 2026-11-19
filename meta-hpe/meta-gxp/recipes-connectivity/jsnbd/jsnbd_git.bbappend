@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 FILES:${PN} += "${sysconfdir}/nbd-proxy/state"
 SRC_URI += "file://state_hook"

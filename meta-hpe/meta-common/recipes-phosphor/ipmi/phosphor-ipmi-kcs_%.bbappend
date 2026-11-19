@@ -1,5 +1,5 @@
 KCS_DEVICE = "ipmi_kcs1"
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += "file://99-ipmi-kcs.rules"
 

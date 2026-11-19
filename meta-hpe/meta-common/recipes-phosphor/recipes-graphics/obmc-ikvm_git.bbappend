@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 SRC_URI += " file://obmc-ikvm.service "
 SRC_URI += " file://create_usbhid.sh "
 
