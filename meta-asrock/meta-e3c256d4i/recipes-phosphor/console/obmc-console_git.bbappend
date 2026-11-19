@@ -1,3 +1,3 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 OBMC_CONSOLE_HOST_TTY = "ttyS3"

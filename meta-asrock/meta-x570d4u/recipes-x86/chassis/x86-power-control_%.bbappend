@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += " \
     file://power-config-host0.json \
@@ -12,6 +12,6 @@ EXTRA_OEMESON:append = " \
     "
 
 do_install:append() {
-    install -d  ${D}/${datadir}/${PN}
-    install -m 0644 ${UNPACKDIR}/power-config-host0.json ${D}/${datadir}/${PN}
+    install -d  ${D}/${datadir}/${BPN}
+    install -m 0644 ${UNPACKDIR}/power-config-host0.json ${D}/${datadir}/${BPN}
 }
