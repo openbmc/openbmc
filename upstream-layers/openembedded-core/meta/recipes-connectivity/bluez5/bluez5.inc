@@ -76,6 +76,11 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
            file://0001-src-device-Fix-stored-gatt-cache-DB-Hash-value-no.patch    \
            file://0001-profile-Set-L2CAP-IMTU-for-OBEX-profile-listeners.patch \
            file://0001-adapter-restrict-delta-0-RSSI-to-proximity-filters.patch \
+           file://0001-avdtp-Fix-error-handling-for-AVDTP_OPEN-cmd.patch \
+           file://0001-avdtp-Fix-GET_CONFIGURATION-cmd.patch \
+           file://0001-avdtp-Return-correct-error-when-SEP-is-inuse.patch \
+           file://0001-gobex-Fix-ABORT-response-being-discarded.patch \
+           file://0001-obexd-pbap-Fix-u128_to_string-skipping-data-4.patch \
            "
 S = "${UNPACKDIR}/bluez-${PV}"
 

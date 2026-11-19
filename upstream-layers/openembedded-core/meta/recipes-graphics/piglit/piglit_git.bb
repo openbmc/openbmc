@@ -14,6 +14,7 @@ SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=ma
            file://0001-tests-egl-spec-make-egl_ext_surface_compression-cond.patch \
            file://0001-tests-no_error.py-modify-_command-and-not-command.patch \
            file://0001-generated_tests-use-shape-in-place-of-newshape-on-nu.patch \
+           file://0001-tests-serializer-reproducible_mtime-should-be-an-int.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 

@@ -1,0 +1,36 @@
+From 8e5ca68aeee22970e3ccf3bbb30c050938ba09a2 Mon Sep 17 00:00:00 2001
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Date: Mon, 8 Jun 2026 13:29:22 +0200
+Subject: [PATCH] avdtp: Fix GET_CONFIGURATION cmd
+
+This fixes AVDTP/SNK/ACP/SIG/SMG/BV-12-C
+Upstream-Status: Backport [https://github.com/bluez/bluez/commit/60437c06560e46d211aaf99620cc9510dfd8081f]
+Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+---
+ profiles/audio/avdtp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index d475a545e..7cfc9a80d 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1641,7 +1641,6 @@ static gboolean avdtp_getconf_cmd(struct avdtp *session, uint8_t transaction,
+ 					struct seid_req *req, int size)
+ {
+ 	GSList *l;
+-	struct avdtp_local_sep *sep = NULL;
+ 	struct avdtp_stream *stream;
+ 	int rsp_size;
+ 	uint8_t err;
+@@ -1656,7 +1655,7 @@ static gboolean avdtp_getconf_cmd(struct avdtp *session, uint8_t transaction,
+ 	memset(buf, 0, sizeof(buf));
+ 
+ 	stream = find_stream_by_lseid(session, req->acp_seid);
+-	if (!sep) {
++	if (!stream) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+ 	}
+-- 
+2.34.1
+

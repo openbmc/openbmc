@@ -1,0 +1,48 @@
+From 4e0aba5a8ebd969b68cd3442e9f8066a4b15a366 Mon Sep 17 00:00:00 2001
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Date: Mon, 8 Jun 2026 13:29:23 +0200
+Subject: [PATCH] avdtp: Fix error handling for AVDTP_OPEN cmd
+
+We have to return BAD_STATE when local SEP is available instead of
+BAD_ACP_SEID.
+
+This fixes: AVDTP/SNK/ACP/SIG/SMG/BI-26-C
+Upstream-Status: Backport [https://github.com/bluez/bluez/commit/7c1c90f7b6d0f653c581878a039e2d02362f33f5]
+Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+---
+ profiles/audio/avdtp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index b57ba609b..56d27b973 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1777,13 +1777,14 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
+ 		return FALSE;
+ 	}
+ 
+-	stream = find_stream_by_lseid(session, req->acp_seid);
+-	if (!stream) {
++	sep = find_local_sep_by_seid(session, req->acp_seid);
++	if (!sep) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+ 	}
+ 
+-	if (stream->state != AVDTP_STATE_CONFIGURED) {
++	stream = find_stream_by_lsep(session, sep);
++	if (!stream || stream->state != AVDTP_STATE_CONFIGURED) {
+ 		err = AVDTP_BAD_STATE;
+ 		goto failed;
+ 	}
+@@ -1796,7 +1797,6 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
+ 							AVDTP_OPEN, NULL, 0);
+ 	}
+ 
+-	sep = stream->lsep;
+ 	if (sep->ind && sep->ind->open && !session->pending_open) {
+ 		if (!sep->ind->open(session, sep, stream, &err,
+ 					sep->user_data))
+-- 
+2.34.1
+

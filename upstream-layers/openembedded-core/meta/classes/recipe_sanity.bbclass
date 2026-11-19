@@ -34,13 +34,6 @@ def req_vars(cfgdata, d):
         elif val == cfgval:
             __note("%s should be defined to something other than default (%s)" % (var, cfgval), d)
 
-def var_renames_overwrite(cfgdata, d):
-    renames = d.getVar("__recipe_sanity_renames", False)
-    if renames:
-        for (key, newkey, oldvalue, newvalue) in renames:
-            if oldvalue != newvalue and oldvalue != cfgdata.get(newkey):
-                __note("rename of variable '%s' to '%s' overwrote existing value '%s' with '%s'." % (key, newkey, oldvalue, newvalue), d)
-
 def incorrect_nonempty_PACKAGES(cfgdata, d):
     if bb.data.inherits_class("native", d) or \
             bb.data.inherits_class("cross", d):
@@ -113,7 +106,6 @@ python do_recipe_sanity () {
             __note(msg, d)
 
     can_delete_others(p, cfgdata, d)
-    var_renames_overwrite(cfgdata, d)
     req_vars(cfgdata, d)
     bad_runtime_vars(cfgdata, d)
 }
@@ -137,19 +129,6 @@ python recipe_sanity_eh () {
 
     d.setVar("__recipe_sanity_cfgdata", cfgdata)
     #d.setVar("__recipe_sanity_cfgdata", d)
-
-    # Sick, very sick..
-    from bb.data_smart import DataSmart
-    old = DataSmart.renameVar
-    def myrename(self, key, newkey):
-        oldvalue = self.getVar(newkey, 0)
-        old(self, key, newkey)
-        newvalue = self.getVar(newkey, 0)
-        if oldvalue:
-            renames = self.getVar("__recipe_sanity_renames", 0) or set()
-            renames.add((key, newkey, oldvalue, newvalue))
-            self.setVar("__recipe_sanity_renames", renames)
-    DataSmart.renameVar = myrename
 }
 addhandler recipe_sanity_eh
 recipe_sanity_eh[eventmask] = "bb.event.ConfigParsed"

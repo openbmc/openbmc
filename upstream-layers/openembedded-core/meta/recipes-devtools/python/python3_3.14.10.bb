@@ -40,7 +40,7 @@ SRC_URI:append:class-native = " \
            file://0001-Lib-sysconfig.py-use-prefix-value-from-build-configu.patch \
            "
 
-SRC_URI[sha256sum] = "3b48dac8fb59f62eaa67ac83c1eb12bda1b7a08406dd286e252c11a66be27f81"
+SRC_URI[sha256sum] = "de414a57119abef52784d8993e341d53aed635fc2b05c2607d9f98a2c5b72032"
 
 # exclude pre-releases for both python 2.x and 3.x
 UPSTREAM_CHECK_REGEX = "[Pp]ython-(?P<pver>\d+(\.\d+)+).tar"
@@ -274,6 +274,11 @@ SKIPPED_TESTS:append:class-target:libc-musl = " \
     --ignore test.test_ctypes.test_dlerror.TestNullDlsym.test_null_dlsym \
 "
 
+# https://github.com/python/cpython/issues/159424
+SKIPPED_TESTS:append:libc-musl = " \
+    --ignore test.test_readline.TestHistoryManipulation.test_append_limited_history \
+    --ignore test.test_readline.TestHistoryManipulation.test_write_read_append \
+"
 
 do_install_ptest:append () {
     sed -i -e "s|SKIPPED_TESTS=|SKIPPED_TESTS=\"${SKIPPED_TESTS}\"|" ${D}${PTEST_PATH}/run-ptest

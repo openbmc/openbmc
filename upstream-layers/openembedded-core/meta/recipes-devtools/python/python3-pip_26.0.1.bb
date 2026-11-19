@@ -29,6 +29,8 @@ SRC_URI += "file://no_shebang_mangling.patch \
             file://CVE-2026-8643.patch \
             file://CVE-2026-8643-regression_p1.patch \
             file://CVE-2026-8643-regression_p2.patch \
+            file://0001-Remove-emsign-437.patch;patchdir=src/pip/_vendor \
+            file://0002-Restore-unaffected-emSign-roots-439-440.patch;patchdir=src/pip/_vendor \
            "
 
 SRC_URI[sha256sum] = "c4037d8a277c89b320abe636d59f91e6d0922d08a05b60e85e53b296613346d8"

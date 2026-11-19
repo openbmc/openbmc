@@ -32,17 +32,19 @@ python () {
     # Parse loadables config
     loadables = d.getVar('FIT_LOADABLES')
     if loadables:
-        # Check that the loadables configuration variables are not set directly
-        # directly, then assign them a synthetic value for testability purposes
-        for v in ['FIT_LOADABLE_ARCH', 'FIT_LOADABLE_COMPRESSION',
-                  'FIT_LOADABLE_DESCRIPTION', 'FIT_LOADABLE_ENTRYPOINT',
-                  'FIT_LOADABLE_FILENAME', 'FIT_LOADABLE_LOADADDRESS',
-                  'FIT_LOADABLE_OS', 'FIT_LOADABLE_TYPE']:
+        # Forbid direct assignment, set synthetic values for testability and
+        # add the vars to vardeps so their flags are part of the signature.
+        loadable_vars = ['FIT_LOADABLE_ARCH', 'FIT_LOADABLE_COMPRESSION',
+                         'FIT_LOADABLE_DESCRIPTION', 'FIT_LOADABLE_ENTRYPOINT',
+                         'FIT_LOADABLE_FILENAME', 'FIT_LOADABLE_LOADADDRESS',
+                         'FIT_LOADABLE_OS', 'FIT_LOADABLE_TYPE']
+        for v in loadable_vars:
             if d.getVar(v):
                 raise bb.parse.SkipRecipe("You cannot use %s as a variable, you can only set flags." % v)
 
             synt_value = " ? ".join([ d.getVarFlag(v, loadable) or "" for loadable in loadables.split() ])
             d.setVar(v, synt_value)
+        d.appendVarFlag('do_compile', 'vardeps', ' ' + ' '.join(loadable_vars))
 }
 
 do_configure[noexec] = "1"

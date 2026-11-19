@@ -15,6 +15,8 @@ SRC_URI = "${GNU_MIRROR}/groff/groff-${PV}.tar.gz \
            file://builddep.patch \
            "
 
+SRC_URI:append:class-native = "file://build-less.patch"
+
 SRC_URI[sha256sum] = "74e2819795b6aff431aeac983d63a9c8968eeaba2a2eba7df8ba4c7b41e7cfd8"
 
 DEPENDS = "bison-native groff-native"
@@ -65,8 +67,10 @@ do_install:append() {
 	rm -rf ${D}${bindir}/grap2graph
 	rm -rf ${D}${mandir}/man1/grap2graph*
 
-        # strip hosttool path out of generated files
-        sed -i -e 's:${HOSTTOOLS_DIR}/::g' ${D}${docdir}/${BP}/examples/hdtbl/*.roff
+	# strip hosttool path out of generated files
+	if [ -d ${D}${docdir}/${BP}/examples/hdtbl/ ]; then
+		sed -i -e 's:${HOSTTOOLS_DIR}/::g' ${D}${docdir}/${BP}/examples/hdtbl/*.roff
+	fi
 }
 
 do_install:append:class-native() {

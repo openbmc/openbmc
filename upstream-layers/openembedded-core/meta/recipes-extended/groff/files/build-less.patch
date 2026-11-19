@@ -1,0 +1,24 @@
+Build less bits of groff to save time and reduce random build
+failures from missing dependencies in this logic.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+--- a/Makefile.am~	2026-05-15 13:23:08.000000000 +0100
++++ b/Makefile.am	2026-05-15 13:29:17.053867035 +0100
+@@ -556,15 +556,0 @@
+-include $(top_srcdir)/contrib/chem/chem.am
+-include $(top_srcdir)/contrib/eqn2graph/eqn2graph.am
+-include $(top_srcdir)/contrib/gdiffmk/gdiffmk.am
+-include $(top_srcdir)/contrib/glilypond/glilypond.am
+-include $(top_srcdir)/contrib/gperl/gperl.am
+-include $(top_srcdir)/contrib/gpinyin/gpinyin.am
+-include $(top_srcdir)/contrib/grap2graph/grap2graph.am
+-include $(top_srcdir)/contrib/hdtbl/hdtbl.am
+-include $(top_srcdir)/contrib/install-font/install-font.am
+-include $(top_srcdir)/contrib/mm/mm.am
+-include $(top_srcdir)/contrib/mom/mom.am
+-include $(top_srcdir)/contrib/pic2graph/pic2graph.am
+-include $(top_srcdir)/contrib/rfc1345/rfc1345.am
+-include $(top_srcdir)/contrib/sboxes/sboxes.am
+-include $(top_srcdir)/doc/doc.am

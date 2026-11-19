@@ -1,0 +1,32 @@
+From f1bbe63447bcc69beb546bc1e26a4e99c529d70e Mon Sep 17 00:00:00 2001
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Date: Tue, 9 Jun 2026 23:30:13 +0200
+Subject: [PATCH] avdtp: Return correct error when SEP is inuse
+
+This fixes AVDTP/SNK/ACP/SIG/SMG/BI-08-C
+Upstream-Status: Backport [https://github.com/bluez/bluez/commit/39ad431de60b896a03904887a0f1d0285b719edd]
+Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+---
+ profiles/audio/avdtp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 7cfc9a80d..b57ba609b 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1556,6 +1556,12 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+ 		goto failed;
+ 	}
+ 
++	/* check if SEID is in use */
++	if (find_stream_by_lsep(session, sep)) {
++		err = AVDTP_SEP_IN_USE;
++		goto failed;
++	}
++
+ 	switch (sep->info.type) {
+ 	case AVDTP_SEP_TYPE_SOURCE:
+ 		service = btd_device_get_service(session->device,
+-- 
+2.34.1
+
