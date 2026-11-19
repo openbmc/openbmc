@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:x11spi := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:x11spi := "${THISDIR}/${BPN}:"
