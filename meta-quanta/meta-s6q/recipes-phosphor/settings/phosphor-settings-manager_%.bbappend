@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:s6q := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:s6q := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:s6q = " file://chassis-capabilities.override.yml \
                        file://power-policy-set-default.override.yml \

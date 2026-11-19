@@ -1,6 +1,6 @@
 inherit obmc-phosphor-utils
 
-FILESEXTRAPATHS:prepend:quanta-q71l := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:quanta-q71l := "${THISDIR}/${BPN}:"
 
 # More conf files can be added as sensors are added.
 

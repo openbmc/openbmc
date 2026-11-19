@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 SRC_URI:append:gbs = " file://config.json.in \
                        file://fan-table-init.sh \
                        file://phosphor-pid-control.service \

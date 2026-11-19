@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append:gbs = " obmc/watchdog/host0"
 OBMC_HOST_WATCHDOG_INSTANCES_A = "host0"

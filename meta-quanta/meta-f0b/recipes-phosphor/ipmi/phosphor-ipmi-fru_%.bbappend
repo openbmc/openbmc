@@ -1,6 +1,6 @@
 inherit obmc-phosphor-systemd
 
-FILESEXTRAPATHS:prepend:f0b := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:f0b := "${THISDIR}/${BPN}:"
 
 EEPROM_NAMES = "motherboard "
 

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${BPN}:"
 
 
 ITEMS = " \

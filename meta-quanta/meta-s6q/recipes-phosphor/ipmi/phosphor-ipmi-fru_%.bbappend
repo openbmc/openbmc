@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:s6q := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:s6q := "${THISDIR}/${BPN}:"
 
 inherit obmc-phosphor-systemd
 DEPENDS:append:s6q = " s6q-yaml-config"

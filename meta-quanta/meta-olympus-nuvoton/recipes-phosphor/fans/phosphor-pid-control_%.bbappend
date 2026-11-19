@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:olympus-nuvoton = " file://config-olympus-nuvoton.json"
 SRC_URI:append:olympus-nuvoton = " file://fan-full-speed.sh"

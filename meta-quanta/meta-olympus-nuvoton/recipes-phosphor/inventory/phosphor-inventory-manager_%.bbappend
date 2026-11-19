@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${BPN}:"
 PACKAGECONFIG:append:olympus-nuvoton = " associations"
 SRC_URI:append:olympus-nuvoton = " file://associations.json"
 

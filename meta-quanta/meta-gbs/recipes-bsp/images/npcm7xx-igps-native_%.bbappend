@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " file://BootBlockAndHeader_GBS.xml"
 SRC_URI:append = " file://UbootHeader_GBS.xml"

@@ -1,6 +1,6 @@
 inherit obmc-phosphor-systemd
 
-FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${BPN}:"
 
 DEPENDS:append:olympus-nuvoton = " olympus-nuvoton-yaml-config"
 

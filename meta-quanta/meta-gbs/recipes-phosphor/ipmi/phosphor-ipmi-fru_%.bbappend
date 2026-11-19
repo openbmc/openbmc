@@ -1,7 +1,7 @@
 inherit obmc-phosphor-systemd
 DEPENDS:append:gbs = " gbs-yaml-config"
 
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 
 EEPROM_NAMES = "motherboard hsbp fan"
 

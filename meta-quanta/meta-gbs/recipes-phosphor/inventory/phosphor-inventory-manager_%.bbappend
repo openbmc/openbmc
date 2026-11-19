@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 PACKAGECONFIG:append:gbs = " associations"
 SRC_URI:append:gbs = " file://associations.json"
 DEPENDS:append:gbs = " gbs-inventory-cleanup"

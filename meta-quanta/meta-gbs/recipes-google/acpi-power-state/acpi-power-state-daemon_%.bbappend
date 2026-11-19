@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:gbs = " \
     file://gbs-host-s0-set-failsafe.service \

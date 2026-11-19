@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:append:s6q := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS:append:s6q := ":${THISDIR}/${BPN}"

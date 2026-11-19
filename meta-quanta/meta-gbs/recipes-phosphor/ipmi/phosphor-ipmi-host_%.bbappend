@@ -1,6 +1,6 @@
 DEPENDS:append:gbs = " gbs-yaml-config"
 
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 SRC_URI:append:gbs = " file://gbs-ipmid-whitelist.conf"
 
 WHITELIST_CONF:gbs = "${UNPACKDIR}/gbs-ipmid-whitelist.conf"

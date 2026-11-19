@@ -1,6 +1,6 @@
 inherit obmc-phosphor-systemd
 
-FILESEXTRAPATHS:prepend:quanta-q71l := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:quanta-q71l := "${THISDIR}/${BPN}:"
 
 EEPROM_NAMES = "motherboard pdb fp bmc"
 

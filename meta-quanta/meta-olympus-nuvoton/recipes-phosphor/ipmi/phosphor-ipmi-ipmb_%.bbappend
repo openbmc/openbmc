@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:olympus-nuvoton = " file://ipmb-olympus-channels.json"
 FILES:${PN}:append:olympus-nuvoton = " ${datadir}/ipmbbridge/ipmb-channels.json"

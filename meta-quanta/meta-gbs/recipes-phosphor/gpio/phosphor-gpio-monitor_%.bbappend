@@ -1,7 +1,7 @@
 inherit obmc-phosphor-utils
 inherit systemd
 
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:gbs = " \
     file://phosphor-gpio-presence@.service.replace \

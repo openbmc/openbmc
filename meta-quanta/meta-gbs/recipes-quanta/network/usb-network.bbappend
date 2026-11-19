@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${BPN}:"
 SRC_URI:append:gbs = " file://00-bmc-usb0.network"
 SRC_URI:append:gbs = " file://usb-network.conf"
 

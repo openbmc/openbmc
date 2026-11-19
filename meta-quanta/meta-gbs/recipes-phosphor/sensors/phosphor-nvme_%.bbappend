@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append:gbs = " file://nvme_config.json"
 SRC_URI:append:gbs = " file://nvme_json_rewrite.sh"
 SRC_URI:append:gbs = " file://xyz.openbmc_project.nvme.manager.service.replace"
