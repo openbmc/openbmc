@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append:starscream := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append:starscream := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " file://starscream.cfg \
                 "

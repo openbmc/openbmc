@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:starscream := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:starscream := "${THISDIR}/${BPN}:"
