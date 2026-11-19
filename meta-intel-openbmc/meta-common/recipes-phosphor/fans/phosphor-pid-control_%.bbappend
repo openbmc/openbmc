@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:intel := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:intel := "${THISDIR}/${BPN}:"
 
 inherit obmc-phosphor-systemd
 SYSTEMD_SERVICE:${PN}:intel = "phosphor-pid-control.service"
