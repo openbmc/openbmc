@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append:ibm-enterprise = " file://ibm.json file://ips.json file://keys/"

@@ -1,6 +1,6 @@
 inherit obmc-phosphor-systemd
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 DEPENDS:append = " system1-yaml-config"
 

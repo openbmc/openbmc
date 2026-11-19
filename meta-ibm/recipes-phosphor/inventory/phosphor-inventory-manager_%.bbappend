@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 PACKAGECONFIG:append:ibm-ac-server = " associations"
 SRC_URI:append:ibm-ac-server = " file://associations.json"
 DEPENDS:append:ibm-ac-server = " inventory-cleanup"

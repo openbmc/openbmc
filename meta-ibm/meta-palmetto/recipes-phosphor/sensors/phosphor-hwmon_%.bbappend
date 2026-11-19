@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:palmetto := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:palmetto := "${THISDIR}/${BPN}:"
 
 NAMES = " \
         bus@1e78a000/i2c@40/rtc@68 \

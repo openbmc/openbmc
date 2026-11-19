@@ -50,7 +50,7 @@ pkg_prerm:${PN}-obmc-targets:append:ibm-enterprise() {
 }
 
 # Override critical services to monitor with IBM file
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 FILES:${PN}-bmc:append = " ${sysconfdir}/phosphor-service-monitor-default.json"
 SRC_URI:append = " file://phosphor-service-monitor-default.json"
 do_install:append() {

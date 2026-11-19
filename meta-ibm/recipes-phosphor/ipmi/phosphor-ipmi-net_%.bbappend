@@ -17,7 +17,7 @@ SYSTEMD_SERVICE:${PN}:append:sbp1 = " \
     ${PN}@${ALT_RMCPP_IFACE}.socket \
     "
 
-FILESEXTRAPATHS:prepend:p10bmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:p10bmc := "${THISDIR}/${BPN}:"
 SRC_URI:append:p10bmc = " file://first-boot-disable-ipmi-net.service"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " first-boot-disable-ipmi-net.service"
 

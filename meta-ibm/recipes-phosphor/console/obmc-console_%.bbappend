@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:remove:df-openpower = "file://${BPN}.conf"
 SRC_URI:append:df-openpower = " file://server.ttyVUART0.conf"

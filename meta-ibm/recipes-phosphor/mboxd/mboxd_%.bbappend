@@ -2,7 +2,7 @@ MBOXD_FLASH_SIZE:ibm-ac-server = "64M"
 MBOXD_FLASH_SIZE:ibm-enterprise = "64M"
 MBOXD_WINDOW_NUM:ibm-enterprise = "63"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SYSTEMD_SERVICE:${PN}:append:df-openpower-ubi-fs = " check-pnor-format.service"
 

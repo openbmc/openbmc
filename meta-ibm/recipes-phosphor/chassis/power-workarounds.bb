@@ -10,7 +10,7 @@ RDEPENDS:${PN} += "i2c-tools"
 
 S = "${UNPACKDIR}"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}/${MACHINE}:"
 
 TMPL_WA = "power-workarounds@.service"
 INSTFMT_WA = "power-workarounds@{0}.service"

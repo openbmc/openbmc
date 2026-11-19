@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:romulus := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:romulus := "${THISDIR}/${BPN}:"
 
 EXTRA_OEMESON:append:romulus = " -Dnegative-errno-on-fail=true"
 

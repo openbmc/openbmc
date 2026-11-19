@@ -1,6 +1,6 @@
 inherit obmc-phosphor-systemd
 
-FILESEXTRAPATHS:prepend:genesis3 := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:genesis3 := "${THISDIR}/${BPN}:"
 
 DEPENDS:append:genesis3 = " genesis3-yaml-config"
 

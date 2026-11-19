@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append:ibm-ac-server = " file://journald-storage-policy.conf"
 SRC_URI:append:ibm-ac-server = " file://systemd-journald-override.conf"
 SRC_URI:append:ibm-ac-server = " file://journald-size-policy-2MB.conf"

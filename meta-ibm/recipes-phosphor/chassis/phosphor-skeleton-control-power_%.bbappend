@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # Remove, from the ibm-enterprise image, the service file that starts the skeleton power
 # control application. That image will use the power control application

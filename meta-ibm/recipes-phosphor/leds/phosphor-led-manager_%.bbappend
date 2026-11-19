@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SYSTEMD_SERVICE:${PN}:append:ibm-enterprise = " obmc-led-create-virtual-leds@.service"
 

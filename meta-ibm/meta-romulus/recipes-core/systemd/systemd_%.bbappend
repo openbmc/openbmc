@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # Romulus doesn't have the space for the both zstd and xz compression
 # libraries and currently phosphor-debug-collector is using xz.  Switch systemd

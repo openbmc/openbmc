@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append:ibm-ac-server = " file://TPMEnable-default-true.override.yml"
 SRC_URI:append:ibm-ac-server = " file://ClearHostSecurityKeys-default-zero.override.yml"
 SRC_URI:append = " file://ibm_settings.override.yml"

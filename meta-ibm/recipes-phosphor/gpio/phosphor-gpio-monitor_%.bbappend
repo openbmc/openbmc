@@ -1,7 +1,7 @@
 inherit obmc-phosphor-utils
 inherit systemd
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:ibm-ac-server = " \
     file://obmc/gpio/phosphor-power-supply-0.conf \

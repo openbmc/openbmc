@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append:p10bmc = " file://virtual_sensor_config.json"
 SRC_URI:append:sbp1 = " file://virtual_sensor_config.json"
 

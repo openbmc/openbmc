@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # utilize a 600s default timer config for ibm-enterprise
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append:ibm-enterprise = " obmc/watchdog/poweron"

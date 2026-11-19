@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:sbp1 := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:sbp1 := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:sbp1 = " file://fan-setup.service"
 
