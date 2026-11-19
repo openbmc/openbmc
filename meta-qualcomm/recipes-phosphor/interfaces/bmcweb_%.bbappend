@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 
 PACKAGECONFIG:append:qcom-bmc-ast2600 = " \
     redfish-bmc-journal \
