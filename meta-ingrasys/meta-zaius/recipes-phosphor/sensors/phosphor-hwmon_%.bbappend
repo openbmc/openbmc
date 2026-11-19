@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:zaius := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:zaius := "${THISDIR}/${BPN}:"
 
 ZAIUS_CHIPS = "bus@1e78a000/i2c@40/ucd90160@64"
 ZAIUS_CHIPS += " bus@1e78a000/i2c@300/pca9541a@70/i2c-arb/hotswap@54"

@@ -5,7 +5,7 @@ SRC_URI:append:zaius = " \
     file://obmc/gpio/pcie-card-e2b.conf \
     "
 
-FILESEXTRAPATHS:append:zaius := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append:zaius := "${THISDIR}/${BPN}:"
 
 PCIE_CARD_E2B_INSTANCE = "pcie-card-e2b"
 

@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:zaius := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:zaius := "${THISDIR}/${BPN}:"
