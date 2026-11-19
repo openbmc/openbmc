@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # Systems with IBM processors tend to use IBM-formatted VPD, so fru-device
 # shouldn't be enabled.
