@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append:ncplite := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append:ncplite := "${THISDIR}/${BPN}:"
 
 DEPENDS:append:ncplite = " ncplite-yaml-config"
 

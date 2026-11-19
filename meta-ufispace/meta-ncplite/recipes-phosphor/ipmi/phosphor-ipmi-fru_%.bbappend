@@ -2,7 +2,7 @@ inherit obmc-phosphor-systemd
 
 DEPENDS:append:ncplite = " ncplite-yaml-config"
 
-FILESEXTRAPATHS:prepend:ncplite := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:ncplite := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:ncplite = " file://ncplite-obmc-read-eeprom@.service \
                          "

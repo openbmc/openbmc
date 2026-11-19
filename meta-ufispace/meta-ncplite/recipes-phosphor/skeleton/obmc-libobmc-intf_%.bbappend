@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:ncplite := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:ncplite := "${THISDIR}/${BPN}:"
