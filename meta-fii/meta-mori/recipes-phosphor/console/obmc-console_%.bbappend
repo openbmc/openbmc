@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:mori = " \
     file://mori-overrides.conf \
@@ -14,9 +14,9 @@ SYSTEMD_SERVICE:${PN}:append:mori = " \
 "
 
 do_install:append:mori() {
-    install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
     install -m 0755 ${UNPACKDIR}/mori_uart_mux_ctrl.sh \
-        ${D}${libexecdir}/${PN}/mori_uart_mux_ctrl.sh
+        ${D}${libexecdir}/${BPN}/mori_uart_mux_ctrl.sh
     install -m 0644 ${UNPACKDIR}/host_console_uart_config.service \
         ${D}${systemd_unitdir}/system
     install -d ${D}${systemd_unitdir}/system/obmc-console@.service.d

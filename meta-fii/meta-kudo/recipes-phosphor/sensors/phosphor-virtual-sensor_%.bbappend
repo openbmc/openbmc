@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${BPN}:"
 
 inherit systemd
 RDEPENDS:${PN} += "bash"

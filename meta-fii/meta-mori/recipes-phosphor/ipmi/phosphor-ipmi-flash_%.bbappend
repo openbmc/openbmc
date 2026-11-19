@@ -1,7 +1,7 @@
 PACKAGECONFIG:append = " nuvoton-p2a-mbox net-bridge"
 IPMI_FLASH_BMC_ADDRESS = "0xF0848000"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/bmc-update:${THISDIR}/${PN}/bios-update:${THISDIR}/${PN}/cpld-update:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}/bmc-update:${THISDIR}/${BPN}/bios-update:${THISDIR}/${BPN}/cpld-update:"
 
 SRC_URI:append = " file://config-bmc.json \
                    file://config-bios.json \

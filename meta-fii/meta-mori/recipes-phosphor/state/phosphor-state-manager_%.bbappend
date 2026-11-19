@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${BPN}:"
 PACKAGECONFIG:append:mori = " host-gpio"
 
 SRC_URI:append:mori = " \

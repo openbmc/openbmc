@@ -27,10 +27,10 @@ SYSTEMD_SERVICE:${PN} = " \
 
 do_install () {
     install -d ${D}${sbindir}
-    install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
     install -m 0755 ${UNPACKDIR}/kudo-fw.sh ${D}${sbindir}/kudo-fw.sh
-    install -m 0755 ${UNPACKDIR}/kudo-fw-ver.sh ${D}${libexecdir}/${PN}/kudo-fw-ver.sh
-    install -m 0755 ${UNPACKDIR}/kudo-lib.sh ${D}${libexecdir}/${PN}/kudo-lib.sh
+    install -m 0755 ${UNPACKDIR}/kudo-fw-ver.sh ${D}${libexecdir}/${BPN}/kudo-fw-ver.sh
+    install -m 0755 ${UNPACKDIR}/kudo-lib.sh ${D}${libexecdir}/${BPN}/kudo-lib.sh
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/kudo-fw-ver.service ${D}${systemd_system_unitdir}
 }

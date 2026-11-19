@@ -23,8 +23,8 @@ SYSTEMD_SERVICE:${PN} = " \
     "
 
 do_install () {
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/init_once.sh ${D}${libexecdir}/${PN}/init_once.sh
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/init_once.sh ${D}${libexecdir}/${BPN}/init_once.sh
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${UNPACKDIR}/host-powerctrl.service ${D}${systemd_unitdir}/system
 }

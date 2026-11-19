@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:mori = " file://config.json"
 

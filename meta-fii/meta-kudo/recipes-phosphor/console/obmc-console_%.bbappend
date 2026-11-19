@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${BPN}:"
 RDEPENDS:${PN}:append:kudo = " bash"
 
 OBMC_CONSOLE_TTYS = "ttyS1 ttyS3"
@@ -17,8 +17,8 @@ do_install:append() {
     install -d ${D}${systemd_unitdir}/system/obmc-console@.service.d
     install -m 0644 ${UNPACKDIR}/uart-routing.conf ${D}${systemd_unitdir}/system/obmc-console@.service.d/uart-routing.conf
 
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/kudo_uart_mux_ctrl.sh ${D}${libexecdir}/${PN}/kudo_uart_mux_ctrl.sh
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/kudo_uart_mux_ctrl.sh ${D}${libexecdir}/${BPN}/kudo_uart_mux_ctrl.sh
 }
 
 pkg_postinst:${PN}:append () {

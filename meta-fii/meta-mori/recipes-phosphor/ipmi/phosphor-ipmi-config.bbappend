@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${BPN}:"

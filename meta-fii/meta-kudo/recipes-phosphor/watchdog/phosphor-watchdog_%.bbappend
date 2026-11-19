@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${BPN}:"
 
 # Remove the override to keep service running after DC cycle
 SYSTEMD_OVERRIDE:${PN}:remove:kudo = "poweron.conf:phosphor-watchdog@poweron.service.d/poweron.conf"

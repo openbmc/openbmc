@@ -18,11 +18,11 @@ inherit systemd obmc-phosphor-systemd
 
 do_install () {
     install -d ${D}${bindir}
-    install -d ${D}${libexecdir}/${PN}
+    install -d ${D}${libexecdir}/${BPN}
     install -m 0755 ${UNPACKDIR}/mori-fw.sh ${D}${bindir}/mori-fw.sh
     install -m 0755 ${UNPACKDIR}/mori-fw-ver.sh \
-        ${D}${libexecdir}/${PN}/mori-fw-ver.sh
-    install -m 0755 ${UNPACKDIR}/mori-lib.sh ${D}${libexecdir}/${PN}/mori-lib.sh
+        ${D}${libexecdir}/${BPN}/mori-fw-ver.sh
+    install -m 0755 ${UNPACKDIR}/mori-lib.sh ${D}${libexecdir}/${BPN}/mori-lib.sh
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/mori-fw-ver.service ${D}${systemd_system_unitdir}
 }

@@ -68,6 +68,6 @@ FMT = "../${TMPL}:${TGT}.requires/${INSTFMT}"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_MONITOR_INSTANCES')}"
 
 do_install() {
-    install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/ampere_power_util.sh ${D}${libexecdir}/${PN}/ampere_power_util.sh
+    install -d ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/ampere_power_util.sh ${D}${libexecdir}/${BPN}/ampere_power_util.sh
 }
