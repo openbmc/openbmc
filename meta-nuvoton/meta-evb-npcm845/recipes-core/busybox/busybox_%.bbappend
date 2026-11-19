@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend:evb-npcm845 := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:evb-npcm845 := "${THISDIR}/${BPN}:"
 
 SRC_URI:append:evb-npcm845 = " file://lsusb.cfg"
 SRC_URI:append:evb-npcm845 = " file://timeout.cfg"
