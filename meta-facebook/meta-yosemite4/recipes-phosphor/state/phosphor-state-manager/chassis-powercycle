@@ -240,10 +240,15 @@ else
     add_sel "${msg}" "Info"
     exec 300>"$slot_power_control_lock"
     if ! flock -n 300 ; then
-        echo "Chassis $CHASSIS_ID is currently running a power control operation, skipping."
-        msg="Execute chassis$CHASSIS_ID AC cycle fail, power control is operating"
-        add_sel "${msg}" "Error"
-        exit 1
+        msg="Wait power control flock release for chassis$CHASSIS_ID AC cycle"
+        echo "${msg}"
+        add_sel "${msg}" "Info"
+        if ! flock -w 300 300 ; then
+            echo "Chassis $CHASSIS_ID power control operation did not finish in 300s, skipping."
+            msg="Execute chassis$CHASSIS_ID AC cycle fail, power control is operating"
+            add_sel "${msg}" "Error"
+            exit 1
+        fi
     fi
     systemctl stop "log-chassis-powercycle-sel@$CHASSIS_ID.service"
     echo "Starting chassis$1 AC power cycle"
